@@ -1,18 +1,24 @@
 #[derive(Debug)]
-pub struct Daemon<'a> {
-    words: Vec<&'a str>,
-    deeds: Vec<&'a str>,
+pub struct Daemon {
+    words: Vec<String>,
+    deeds: Vec<String>,
+
+    father: Option<Box<Daemon>>,
+    mother: Option<Box<Daemon>>,
 }
 
 fn main() {
 
     let god = Daemon {
         words: vec![
-            "text is the universal interface",
+            String::from("text is the universal interface"),
         ],
         deeds: vec![
-            "creation",
+            String::from("creation"),
         ],
+
+        father: None,
+        mother: None,
     };
 
     println!("{:?}", god);
