@@ -9,7 +9,7 @@ pub struct Daemon {
 
 fn main() {
 
-    let god = Daemon {
+    let almighty = Daemon {
         words: vec![
             String::from("text is the universal interface"),
         ],
@@ -21,5 +21,25 @@ fn main() {
         mother: None,
     };
 
-    println!("{:?}", god);
+    let mary = Daemon {
+        words: vec![],
+        deeds: vec![],
+
+        father: None,
+        mother: None,
+    };
+
+    let jesus = Daemon {
+        words: vec![
+            String::from("render Caesar what is Caesar's"),
+        ],
+        deeds: vec![
+            String::from("walked on water"),
+        ],
+
+        father: Some(Box::new(almighty)),
+        mother: Some(Box::new(mary)),
+    };
+
+    println!("{:?}", jesus);
 }
