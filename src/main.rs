@@ -2,8 +2,8 @@ mod daemon;
 mod bible;
 mod homer;
 
-use crate::homer::ZEUS;
+use crate::bible::JESUS;
 
 fn main() {
-    println!("{:?}", ZEUS);
+    println!("{:?}", JESUS);
 }

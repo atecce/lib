@@ -2,866 +2,866 @@ use crate::daemon::Daemon;
 
 // Luke 3:23-38
 const ALMIGHTY: &Daemon = &Daemon {
-//    names: &[
-//        "God",
-//    ],
-//    words: &[
-//        "text is the universal interface",
-//    ],
-//    deeds: &[
-//        "creation",
-//    ],
+    names: &[
+        "God",
+    ],
+    words: &[
+        "text is the universal interface",
+    ],
+    deeds: &[
+        "creation",
+    ],
 
     father: None,
     mother: None,
 };
 
 const MARY: &Daemon = &Daemon {
-//    names: &str[
-//        "Mary",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Mary",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: None,
     mother: None,
 };
 
 const ADAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Adam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Adam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ALMIGHTY),
     mother: None,
 };
 
 const SETH: &Daemon = &Daemon {
-//    names: &str[
-//        "Seth",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Seth",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ADAM),
     mother: None,
 };
 
 const ENOSH: &Daemon = &Daemon {
-//    names: &str[
-//        "Enosh",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Enosh",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SETH),
     mother: None,
 };
 
 const KENAN: &Daemon = &Daemon {
-//    names: &str[
-//        "Kenan",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Kenan",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ENOSH),
     mother: None,
 };
 
 const MAHALALEL: &Daemon = &Daemon {
-//    names: &str[
-//        "Mahalalel",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Mahalalel",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(KENAN),
     mother: None,
 };
 
 const JARED: &Daemon = &Daemon {
-//    names: &str[
-//        "Jared",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jared",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MAHALALEL),
     mother: None,
 };
 
 const ENOCH: &Daemon = &Daemon {
-//    names: &str[
-//        "Enoch",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Enoch",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JARED),
     mother: None,
 };
 
 const METHUSELAH: &Daemon = &Daemon {
-//    names: &str[
-//        "Methuselah",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Methuselah",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ENOCH),
     mother: None,
 };
 
 const LAMECH: &Daemon = &Daemon {
-//    names: &str[
-//        "Lamech",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Lamech",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(METHUSELAH),
     mother: None,
 };
 
 const NOAH: &Daemon = &Daemon {
-//    names: &str[
-//        "Noah",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Noah",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(LAMECH),
     mother: None,
 };
 
 const SHEM: &Daemon = &Daemon {
-//    names: &str[
-//        "Shem",
-//    ],
-//    words: [String;0];,
-//    deeds: [String;0];,
+    names: &[
+        "Shem",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NOAH),
     mother: None,
 };
 
 const ARPHAXAD: &Daemon = &Daemon {
-//    names: &str[
-//        String::from("Arphaxad"),
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Arphaxad",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SHEM),
     mother: None,
 };
 
 const CAINAN: &Daemon = &Daemon {
-//    names: &str[
-//        "Cainan",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Cainan",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ARPHAXAD),
     mother: None,
 };
 
 const SHELAH: &Daemon = &Daemon {
-//    names: &str[
-//        "Eber",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Eber",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(CAINAN),
     mother: None,
 };
 
 const EBER: &Daemon = &Daemon {
-//    names: &str[
-//        "Eber",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Eber",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SHELAH),
     mother: None,
 };
 
 const PELEG: &Daemon = &Daemon {
-//    names: &str[
-//        "Peleg",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Peleg",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(EBER),
     mother: None,
 };
 
 const REU: &Daemon = &Daemon {
-//    names: &str[
-//        "Reu",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Reu",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(PELEG),
     mother: None,
 };
 
 const SERUG: &Daemon = &Daemon {
-//    names: &str[
-//        "Serug",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Serug",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(REU),
     mother: None,
 };
 
 const NAHOR: &Daemon = &Daemon {
-//    names: &str[
-//        "Nahor",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Nahor",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SERUG),
     mother: None,
 };
 
 const TERRAH: &Daemon = &Daemon {
-//    names: &str[
-//        "Terrah",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Terrah",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NAHOR),
     mother: None,
 };
 
 const ABRAHAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Abraham",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Abraham",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(TERRAH),
     mother: None,
 };
 
 const ISAAC: &Daemon = &Daemon {
-//    names: &str[
-//        "Isaac",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Isaac",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ABRAHAM),
     mother: None,
 };
 
 const JACOB: &Daemon = &Daemon {
-//    names: &str[
-//        "Jacob",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jacob",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ISAAC),
     mother: None,
 };
 
 const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
-//    names: &str[
-//        "Judah",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Judah",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JACOB),
     mother: None,
 };
 
 const PEREZ: &Daemon = &Daemon {
-//    names: &str[
-//        "Perez",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Perez",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JUDAH_SON_OF_JACOB),
     mother: None,
 };
 
 const HEZRON: &Daemon = &Daemon {
-//    names: &str[
-//        "Hezron",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Hezron",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(PEREZ),
     mother: None,
 };
 
 const RAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Ram",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Ram",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(HEZRON),
     mother: None,
 };
 
 const AMMINADAB: &Daemon = &Daemon {
-//    names: &str[
-//        "Amminadab",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Amminadab",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(RAM),
     mother: None,
 };
 
 const NASHON: &Daemon = &Daemon {
-//    names: &str[
-//        "Nashon",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Nashon",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(AMMINADAB),
     mother: None,
 };
 
 const SALMON: &Daemon = &Daemon {
-//    names: &str[
-//        "Salmon",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Salmon",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NASHON),
     mother: None,
 };
 
 const BOAZ: &Daemon = &Daemon {
-//    names: &str[
-//        "Boaz",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Boaz",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SALMON),
     mother: None,
 };
 
 const OBED: &Daemon = &Daemon {
-//    names: &str[
-//        "Obed",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Obed",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(BOAZ),
     mother: None,
 };
 
 const JESSE: &Daemon = &Daemon {
-//    names: &str[
-//        "Jesse",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jesse",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(OBED),
     mother: None,
 };
 
 const DAVID: &Daemon = &Daemon {
-//    names: &str[
-//        "David",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "David",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JESSE),
     mother: None,
 };
 
 const NATHAN: &Daemon = &Daemon {
-//    names: &str[
-//        "Nathan",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Nathan",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(DAVID),
     mother: None,
 };
 
 const MATTATHA: &Daemon = &Daemon {
-//    names: &str[
-//        "Mattatha",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Mattatha",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NATHAN),
     mother: None,
 };
 
 const MENNA: &Daemon = &Daemon {
-//    names: &str[
-//        "Menna",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Menna",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MATTATHA),
     mother: None,
 };
 
 const MELEA: &Daemon = &Daemon {
-//    names: &str[
-//        "Melea",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Melea",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MENNA),
     mother: None,
 };
 
 const ELIAKIM: &Daemon = &Daemon {
-//    names: &str[
-//        "Eliakam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Eliakam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MELEA),
     mother: None,
 };
 
 const JONAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Jonam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jonam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ELIAKIM),
     mother: None,
 };
 
 const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Jonam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jonam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JONAM),
     mother: None,
 };
 
 const JUDAH: &Daemon = &Daemon {
-//    names: &str[
-//        "Judah",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Judah",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JOSEPH_SON_OF_JONAM),
     mother: None,
 };
 
 const SIMEON: &Daemon = &Daemon {
-//    names: &str[
-//        "Simeon",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Simeon",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JUDAH),
     mother: None,
 };
 
 const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
-//    names: &str[
-//        "Levi",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Levi",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SIMEON),
     mother: None,
 };
 
 const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
-//    names: &str[
-//        "Matthat",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Matthat",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(LEVI_SON_OF_SIMEON),
     mother: None,
 };
 
 const JORIM: &Daemon = &Daemon {
-//    names: &str[
-//        "Jorim",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jorim",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MATTHAT_SON_OF_LEVI),
     mother: None,
 };
 
 const ELIEZER: &Daemon = &Daemon {
-//    names: &str[
-//        "Eliezer",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Eliezer",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JORIM),
     mother: None,
 };
 
 const JOSHUA: &Daemon = &Daemon {
-//    names: &str[
-//        "Joshua",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Joshua",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ELIEZER),
     mother: None,
 };
 
 const ER: &Daemon = &Daemon {
-//    names: &str[
-//        "Er",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Er",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JOSHUA),
     mother: None,
 };
 
 const ELMADAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Elmadam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Elmadam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ER),
     mother: None,
 };
 
 const COSAM: &Daemon = &Daemon {
-//    names: &str[
-//        "Cosam",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Cosam",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ELMADAM),
     mother: None,
 };
 
 const ADDI: &Daemon = &Daemon {
-//    names: &str[
-//        "Addi",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Addi",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(COSAM),
     mother: None,
 };
 
 const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
-//    names: &str[
-//        "Melki",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Melki",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ADDI),
     mother: None,
 };
 
 const NERI: &Daemon = &Daemon {
-//    names: &str[
-//        "Neri",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Neri",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MELKI_SON_OF_ADDI),
     mother: None,
 };
 
 const SHEALTIEL: &Daemon = &Daemon {
-//    names: &str[
-//        "Shealtiel",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Shealtiel",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NERI),
     mother: None,
 };
 
 const ZERUBBABEL: &Daemon = &Daemon {
-//    names: &str[
-//        "Zerubbabel",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Zerubbabel",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SHEALTIEL),
     mother: None,
 };
 
 const RHESA: &Daemon = &Daemon {
-//    names: &str[
-//        "Rhesa",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Rhesa",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ZERUBBABEL),
     mother: None,
 };
 
 const JOANAN: &Daemon = &Daemon {
-//    names: &str[
-//        "Joanan",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Joanan",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(RHESA),
     mother: None,
 };
 
 const JODA: &Daemon = &Daemon {
-//    names: &str[
-//        "Joda",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Joda",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JOANAN),
     mother: None,
 };
 
 const JOSEK: &Daemon = &Daemon {
-//    names: &str[
-//        "Josek",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Josek",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JODA),
     mother: None,
 };
 
 const SEMEIN: &Daemon = &Daemon {
-//    names: &str[
-//        "Semein",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Semein",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JOSEK),
     mother: None,
 };
 
 const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
-//    names: &str[
-//        "Mattathias",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Mattathias",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(SEMEIN),
     mother: None,
 };
 
 const MAATH: &Daemon = &Daemon {
-//    names: &str[
-//        "Maath",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Maath",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MATTATHIAS_SON_OF_SEMEIN),
     mother: None,
 };
 
 const NAGGAI: &Daemon = &Daemon {
-//    names: &str[
-//        "Naggai",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Naggai",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MAATH),
     mother: None,
 };
 
 const ESLI: &Daemon = &Daemon {
-//    names: &str[
-//        "Esli",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Esli",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NAGGAI),
     mother: None,
 };
 
 const NAHUM: &Daemon = &Daemon {
-//    names: &str[
-//        "Nahum",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Nahum",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(ESLI),
     mother: None,
 };
 
 const AMOS: &Daemon = &Daemon {
-//    names: &str[
-//        "Amos",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Amos",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(NAHUM),
     mother: None,
 };
 
 const MATTATHIAS: &Daemon = &Daemon {
-//    names: &str[
-//        "Mattathias",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Mattathias",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(AMOS),
     mother: None,
 };
 
 const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
-//    names: &str[
-//        "Joseph",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Joseph",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MATTATHIAS),
     mother: None,
 };
 
 const JANNAI: &Daemon = &Daemon {
-//    names: &str[
-//        "Jannai",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Jannai",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JOSEPH_SON_OF_MATTATHIAS),
     mother: None,
 };
 
 const MELKI: &Daemon = &Daemon {
-//    names: &str[
-//        "Melki",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Melki",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(JANNAI),
     mother: None,
 };
 
 const LEVI: &Daemon = &Daemon {
-//    names: &str[
-//        "Levi",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Levi",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MELKI),
     mother: None,
 };
 
 const MATTHAT: &Daemon = &Daemon {
-//    names: &str[
-//        "Matthat",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Matthat",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(LEVI),
     mother: None,
 };
 
 const HELI: &Daemon = &Daemon {
-//    names: &str[
-//        "Heli",
-//    ],
-//    words: &str[],
-//    deeds: &str[],
+    names: &[
+        "Heli",
+    ],
+    words: &[],
+    deeds: &[],
 
     father: Some(MATTHAT),
     mother: None,
 };
 
 const JOSEPH: &Daemon = &Daemon {
-//    names: &str[
-//        "Joseph",
-//    ],
-//    words: &str[],
-//    deeds: &str["divorcing Mary without disgrace"],
+    names: &[
+        "Joseph",
+    ],
+    words: &[],
+    deeds: &["divorcing Mary without disgrace"],
 
     father: Some(HELI),
     mother: None,
 };
 
 pub const JESUS: &Daemon = &Daemon {
-//    names: &str[
-//        "Jesus",
-//    ],
-//    words: &str[
-//        "render Caesar what is Caesar's",
-//    ],
-//    deeds: &str[
-//        "walked on water",
-//    ],
+    names: &[
+        "Jesus",
+    ],
+    words: &[
+        "render Caesar what is Caesar's",
+    ],
+    deeds: &[
+        "walked on water",
+    ],
 
     father: Some(JOSEPH),
     mother: Some(MARY),

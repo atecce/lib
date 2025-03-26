@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub struct Daemon<'a> {
-//    names: &[&str],
-//    words: &[&str],
-//    deeds: &[&str],
+    pub names: &'a [&'a str],
+    pub words: &'a [&'a str],
+    pub deeds: &'a [&'a str],
 
     pub father: Option<&'a Daemon<'a>>,
     pub mother: Option<&'a Daemon<'a>>,
