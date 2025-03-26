@@ -1,15 +1,6 @@
+use crate::daemon::Daemon;
+
 // Luke 3:23-38
-
-#[derive(Debug)]
-pub struct Daemon<'a> {
-//    names: &[&str],
-//    words: &[&str],
-//    deeds: &[&str],
-
-    father: Option<&'a Daemon<'a>>,
-    mother: Option<&'a Daemon<'a>>,
-}
-
 const ALMIGHTY: &Daemon = &Daemon {
 //    names: &[
 //        "God",

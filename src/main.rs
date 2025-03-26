@@ -1,8 +1,9 @@
-pub mod tmp;
+mod daemon;
+mod bible;
+mod homer;
 
-use crate::tmp::JESUS;
+use crate::homer::APOLLO;
 
-// Luke 3:23-38
 fn main() {
-    println!("{:?}", JESUS);
+    println!("{:?}", APOLLO);
 }
