@@ -1,5 +1,27 @@
 use crate::daemon::Daemon;
 
+pub const ROMULUS: &Daemon = &Daemon {
+    names: &[
+        "Romulus",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+};
+
+pub const REMUS: &Daemon = &Daemon {
+    names: &[
+        "Remus",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+};
+
 pub const CAESAR: &Daemon = &Daemon {
     names: &[
         "Caesar",

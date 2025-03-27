@@ -38,6 +38,39 @@ const ADAM: &Daemon = &Daemon {
     mother: None,
 };
 
+const EVE: &Daemon = &Daemon {
+    names: &[
+        "Eve",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(ALMIGHTY),
+    mother: None,
+};
+
+const CAIN: &Daemon = &Daemon {
+    names: &[
+        "Cain",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(ADAM),
+    mother: Some(EVE),
+};
+
+const ABEL: &Daemon = &Daemon {
+    names: &[
+        "Abel",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(ADAM),
+    mother: Some(EVE),
+};
+
 const SETH: &Daemon = &Daemon {
     names: &[
         "Seth",
