@@ -9,6 +9,7 @@ pub const ROMULUS: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const REMUS: &Daemon = &Daemon {
@@ -20,6 +21,7 @@ pub const REMUS: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None
 };
 
 pub const CAESAR: &Daemon = &Daemon {
@@ -31,6 +33,7 @@ pub const CAESAR: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const CICERO: &Daemon = &Daemon {
@@ -42,4 +45,5 @@ pub const CICERO: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };

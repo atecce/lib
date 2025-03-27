@@ -9,6 +9,7 @@ pub const CRONUS: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const ZEUS: &Daemon = &Daemon {
@@ -20,6 +21,7 @@ pub const ZEUS: &Daemon = &Daemon {
 
     father: Some(CRONUS),
     mother: None,
+    teacher: None,
 };
 
 pub const HERA: &Daemon = &Daemon {
@@ -31,6 +33,7 @@ pub const HERA: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const HERMES: &Daemon = &Daemon {
@@ -40,6 +43,7 @@ pub const HERMES: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const APOLLO: &Daemon = &Daemon {
@@ -51,6 +55,7 @@ pub const APOLLO: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const ARTEMIS: &Daemon = &Daemon {
@@ -62,6 +67,7 @@ pub const ARTEMIS: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
 };
 
 pub const ACHILLES: &Daemon = &Daemon {
@@ -73,4 +79,41 @@ pub const ACHILLES: &Daemon = &Daemon {
 
     father: None,
     mother: None,
+    teacher: None,
+};
+
+pub const SOCRATES: &Daemon = &Daemon {
+    names: &[
+        "Socrates",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+};
+
+pub const PLATO: &Daemon = &Daemon {
+    names: &[
+        "Plato",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: Some(SOCRATES),
+};
+
+pub const ARISTOTLE: &Daemon = &Daemon {
+    names: &[
+        "Aristotle",
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: Some(PLATO),
 };
