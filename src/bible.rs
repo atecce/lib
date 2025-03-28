@@ -1,3 +1,11 @@
+// John 1:1
+use crate::word::Word;
+use crate::book::Book;
+
+// bible
+use crate::name::Name::Leviticus;
+use crate::name::Name::Matthew;
+
 // Luke 3:23-38
 use crate::name::Name::God;
 use crate::name::Name::Mary;
@@ -81,7 +89,13 @@ const ALMIGHTY: &Daemon = &Daemon {
         God,
     ],
     words: &[
-        "text is the universal interface",
+        Word {
+            book: Book {
+                name: Leviticus,
+            },
+            chapter: 20,
+            verse: 26,
+        },
     ],
     deeds: &[
         "creation",
@@ -1046,7 +1060,13 @@ pub const JESUS: &Daemon = &Daemon {
         Jesus,
     ],
     words: &[
-        "render Caesar what is Caesar's",
+        Word {
+            book: Book {
+                name: Matthew,
+            },
+            chapter: 22,
+            verse: 21,
+        },
     ],
     deeds: &[
         "walked on water",

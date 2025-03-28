@@ -18,6 +18,10 @@ pub enum Name {
     Cyrus,
 
     // israel
+    // // books
+    Leviticus,
+    Matthew,
+    // // characters
     Yahweh,
     Mary,
     Adam,
