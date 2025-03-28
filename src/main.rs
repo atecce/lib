@@ -1,5 +1,5 @@
 mod name;
-mod word;
+mod src;
 mod book;
 mod daemon;
 mod bible;

@@ -19,8 +19,10 @@ pub enum Name {
 
     // israel
     // // books
+    Genesis,
     Leviticus,
     Matthew,
+    Ezra,
     // // characters
     Yahweh,
     Mary,

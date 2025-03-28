@@ -1,11 +1,11 @@
 use crate::name::Name;
-use crate::word::Word;
+use crate::src::Source;
 
 #[derive(Debug)]
 pub struct Daemon<'a> {
     pub names: &'a [Name],
-    pub words: &'a [Word],
-    pub deeds: &'a [&'a str],
+    pub words: &'a [Source],
+    pub deeds: &'a [Source],
 
     pub father: Option<&'a Daemon<'a>>,
     pub mother: Option<&'a Daemon<'a>>,

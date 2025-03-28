@@ -1,8 +1,8 @@
-// John 1:1
-use crate::word::Word;
+use crate::src::Source;
 use crate::book::Book;
 
-// bible
+// books
+use crate::name::Name::Genesis;
 use crate::name::Name::Leviticus;
 use crate::name::Name::Matthew;
 
@@ -89,7 +89,7 @@ const ALMIGHTY: &Daemon = &Daemon {
         God,
     ],
     words: &[
-        Word {
+        Source {
             book: Book {
                 name: Leviticus,
             },
@@ -98,7 +98,13 @@ const ALMIGHTY: &Daemon = &Daemon {
         },
     ],
     deeds: &[
-        "creation",
+        Source {
+            book: Book {
+                name: Genesis,
+            },
+            chapter: 1,
+            verse: 1,
+        },
     ],
 
     father: None,
@@ -1048,7 +1054,15 @@ const JOSEPH: &Daemon = &Daemon {
         Joseph,
     ],
     words: &[],
-    deeds: &["divorcing Mary without disgrace"],
+    deeds: &[
+        Source {
+            book: Book {
+                name: Matthew,
+            },
+            chapter: 1,
+            verse: 19,
+        },
+    ],
 
     father: Some(HELI),
     mother: None,
@@ -1060,7 +1074,7 @@ pub const JESUS: &Daemon = &Daemon {
         Jesus,
     ],
     words: &[
-        Word {
+        Source {
             book: Book {
                 name: Matthew,
             },
@@ -1069,7 +1083,13 @@ pub const JESUS: &Daemon = &Daemon {
         },
     ],
     deeds: &[
-        "walked on water",
+        Source {
+            book: Book {
+                name: Matthew,
+            },
+            chapter: 14,
+            verse: 25
+        },
     ],
 
     father: Some(JOSEPH),
