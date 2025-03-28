@@ -1,4 +1,5 @@
 use crate::src::Source;
+use crate::deed::Deed;
 use crate::book::Book;
 
 // books
@@ -98,12 +99,17 @@ const ALMIGHTY: &Daemon = &Daemon {
         },
     ],
     deeds: &[
-        Source {
-            book: Book {
-                name: Genesis,
-            },
-            chapter: 1,
-            verses: [1, 1],
+        Deed {
+            desc: "created the heavens and the earth",
+            srcs: &[
+                Source {
+                    book: Book {
+                        name: Genesis,
+                    },
+                    chapter: 1,
+                    verses: [1, 1],
+                },
+            ],
         },
     ],
 
@@ -1055,12 +1061,17 @@ const JOSEPH: &Daemon = &Daemon {
     ],
     words: &[],
     deeds: &[
-        Source {
-            book: Book {
-                name: Matthew,
-            },
-            chapter: 1,
-            verses: [19, 19],
+        Deed {
+            desc: "decided to divorce Mary secretely to avoid her disgrace",
+            srcs: &[
+                Source {
+                    book: Book {
+                        name: Matthew,
+                    },
+                    chapter: 1,
+                    verses: [19, 19],
+                },
+            ],
         },
     ],
 
@@ -1083,12 +1094,17 @@ pub const JESUS: &Daemon = &Daemon {
         },
     ],
     deeds: &[
-        Source {
-            book: Book {
-                name: Matthew,
-            },
-            chapter: 14,
-            verses: [25, 25],
+        Deed {
+            desc: "walked on water",
+            srcs: &[
+                Source {
+                    book: Book {
+                        name: Matthew,
+                    },
+                    chapter: 14,
+                    verses: [25, 25],
+                },
+            ],
         },
     ],
 

@@ -1,4 +1,5 @@
 use crate::src::Source;
+use crate::deed::Deed;
 use crate::book::Book;
 use crate::name::Name::Cyrus;
 use crate::name::Name::Ezra;
@@ -10,12 +11,17 @@ pub const CYRUS: &Daemon = &Daemon {
     ],
     words: &[],
     deeds: &[
-        Source {
-            book: Book {
-                name: Ezra,
-            },
-            chapter: 1,
-            verses: [1, 1],
+        Deed {
+            desc: "allowed the Israelites to return to the Promised Land",
+            srcs: &[
+                Source {
+                    book: Book {
+                        name: Ezra,
+                    },
+                    chapter: 1,
+                    verses: [1, 1],
+                },
+            ],
         },
     ],
 

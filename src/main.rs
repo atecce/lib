@@ -1,4 +1,5 @@
 mod name;
+mod deed;
 mod src;
 mod book;
 mod daemon;
