@@ -37,6 +37,11 @@ use crate::name::Name::Abraham;
 use crate::name::Name::Isaac;
 use crate::name::Name::Jacob;
 use crate::name::Name::Israel;
+use crate::name::Name::Reuben;
+use crate::name::Name::Amram;
+use crate::name::Name::Jochebed;
+use crate::name::Name::Moses;
+use crate::name::Name::Aaron;
 use crate::name::Name::Judah;
 use crate::name::Name::Perez;
 use crate::name::Name::Hezron;
@@ -440,6 +445,66 @@ const JACOB: &Daemon = &Daemon {
 
     father: Some(ISAAC),
     mother: None,
+    teacher: None,
+};
+
+const REUBEN: &Daemon = &Daemon {
+    names: &[
+        Reuben,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(JACOB),
+    mother: None,
+    teacher: None,
+};
+
+const AMRAM: &Daemon = &Daemon {
+    names: &[
+        Amram,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+};
+
+const JOCHEBED: &Daemon = &Daemon {
+    names: &[
+        Jochebed,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+};
+
+const MOSES: &Daemon = &Daemon {
+    names: &[
+        Moses,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(AMRAM),
+    mother: Some(JOCHEBED),
+    teacher: None,
+};
+
+const AARON: &Daemon = &Daemon {
+    names: &[
+        Aaron,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: Some(AMRAM),
+    mother: Some(JOCHEBED),
     teacher: None,
 };
 
