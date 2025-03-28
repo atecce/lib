@@ -15,7 +15,7 @@ pub const CYRUS: &Daemon = &Daemon {
                 name: Ezra,
             },
             chapter: 1,
-            verse: 1,
+            verses: [1, 1],
         },
     ],
 

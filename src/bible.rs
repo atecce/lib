@@ -94,7 +94,7 @@ const ALMIGHTY: &Daemon = &Daemon {
                 name: Leviticus,
             },
             chapter: 20,
-            verse: 26,
+            verses: [26, 26],
         },
     ],
     deeds: &[
@@ -103,7 +103,7 @@ const ALMIGHTY: &Daemon = &Daemon {
                 name: Genesis,
             },
             chapter: 1,
-            verse: 1,
+            verses: [1, 1],
         },
     ],
 
@@ -1060,7 +1060,7 @@ const JOSEPH: &Daemon = &Daemon {
                 name: Matthew,
             },
             chapter: 1,
-            verse: 19,
+            verses: [19, 19],
         },
     ],
 
@@ -1079,7 +1079,7 @@ pub const JESUS: &Daemon = &Daemon {
                 name: Matthew,
             },
             chapter: 22,
-            verse: 21,
+            verses: [21, 21],
         },
     ],
     deeds: &[
@@ -1088,7 +1088,7 @@ pub const JESUS: &Daemon = &Daemon {
                 name: Matthew,
             },
             chapter: 14,
-            verse: 25
+            verses: [25, 25],
         },
     ],
 
