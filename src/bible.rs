@@ -1,9 +1,84 @@
+// Luke 3:23-38
+use crate::name::Name::God;
+use crate::name::Name::Mary;
+use crate::name::Name::Adam;
+use crate::name::Name::Eve;
+use crate::name::Name::Cain;
+use crate::name::Name::Abel;
+use crate::name::Name::Seth;
+use crate::name::Name::Enosh;
+use crate::name::Name::Kenan;
+use crate::name::Name::Mahalalel;
+use crate::name::Name::Jared;
+use crate::name::Name::Enoch;
+use crate::name::Name::Methuselah;
+use crate::name::Name::Lamech;
+use crate::name::Name::Noah;
+use crate::name::Name::Shem;
+use crate::name::Name::Arphaxad;
+use crate::name::Name::Cainan;
+use crate::name::Name::Shelah;
+use crate::name::Name::Eber;
+use crate::name::Name::Peleg;
+use crate::name::Name::Reu;
+use crate::name::Name::Serug;
+use crate::name::Name::Nahor;
+use crate::name::Name::Terrah;
+use crate::name::Name::Abraham;
+use crate::name::Name::Isaac;
+use crate::name::Name::Jacob;
+use crate::name::Name::Israel;
+use crate::name::Name::Judah;
+use crate::name::Name::Perez;
+use crate::name::Name::Hezron;
+use crate::name::Name::Ram;
+use crate::name::Name::Amminadab;
+use crate::name::Name::Nashon;
+use crate::name::Name::Salmon;
+use crate::name::Name::Boaz;
+use crate::name::Name::Obed;
+use crate::name::Name::Jesse;
+use crate::name::Name::David;
+use crate::name::Name::Nathan;
+use crate::name::Name::Mattatha;
+use crate::name::Name::Menna;
+use crate::name::Name::Melea;
+use crate::name::Name::Eliakim;
+use crate::name::Name::Jonam;
+use crate::name::Name::Joseph;
+use crate::name::Name::Simeon;
+use crate::name::Name::Levi;
+use crate::name::Name::Matthat;
+use crate::name::Name::Jorim;
+use crate::name::Name::Eliezer;
+use crate::name::Name::Joshua;
+use crate::name::Name::Er;
+use crate::name::Name::Elmadam;
+use crate::name::Name::Cosam;
+use crate::name::Name::Addi;
+use crate::name::Name::Melki;
+use crate::name::Name::Neri;
+use crate::name::Name::Shealtiel;
+use crate::name::Name::Zerubbabel;
+use crate::name::Name::Rhesa;
+use crate::name::Name::Joanan;
+use crate::name::Name::Joda;
+use crate::name::Name::Josek;
+use crate::name::Name::Semein;
+use crate::name::Name::Mattathias;
+use crate::name::Name::Maath;
+use crate::name::Name::Naggai;
+use crate::name::Name::Esli;
+use crate::name::Name::Nahum;
+use crate::name::Name::Amos;
+use crate::name::Name::Jannai;
+use crate::name::Name::Heli;
+use crate::name::Name::Jesus;
 use crate::daemon::Daemon;
 
-// Luke 3:23-38
 const ALMIGHTY: &Daemon = &Daemon {
     names: &[
-        "God",
+        God,
     ],
     words: &[
         "text is the universal interface",
@@ -19,7 +94,7 @@ const ALMIGHTY: &Daemon = &Daemon {
 
 const MARY: &Daemon = &Daemon {
     names: &[
-        "Mary",
+        Mary,
     ],
     words: &[],
     deeds: &[],
@@ -31,7 +106,7 @@ const MARY: &Daemon = &Daemon {
 
 const ADAM: &Daemon = &Daemon {
     names: &[
-        "Adam",
+        Adam,
     ],
     words: &[],
     deeds: &[],
@@ -43,7 +118,7 @@ const ADAM: &Daemon = &Daemon {
 
 const EVE: &Daemon = &Daemon {
     names: &[
-        "Eve",
+        Eve,
     ],
     words: &[],
     deeds: &[],
@@ -55,7 +130,7 @@ const EVE: &Daemon = &Daemon {
 
 const CAIN: &Daemon = &Daemon {
     names: &[
-        "Cain",
+        Cain,
     ],
     words: &[],
     deeds: &[],
@@ -67,7 +142,7 @@ const CAIN: &Daemon = &Daemon {
 
 const ABEL: &Daemon = &Daemon {
     names: &[
-        "Abel",
+        Abel,
     ],
     words: &[],
     deeds: &[],
@@ -79,7 +154,7 @@ const ABEL: &Daemon = &Daemon {
 
 const SETH: &Daemon = &Daemon {
     names: &[
-        "Seth",
+        Seth,
     ],
     words: &[],
     deeds: &[],
@@ -91,7 +166,7 @@ const SETH: &Daemon = &Daemon {
 
 const ENOSH: &Daemon = &Daemon {
     names: &[
-        "Enosh",
+        Enosh,
     ],
     words: &[],
     deeds: &[],
@@ -103,7 +178,7 @@ const ENOSH: &Daemon = &Daemon {
 
 const KENAN: &Daemon = &Daemon {
     names: &[
-        "Kenan",
+        Kenan,
     ],
     words: &[],
     deeds: &[],
@@ -115,7 +190,7 @@ const KENAN: &Daemon = &Daemon {
 
 const MAHALALEL: &Daemon = &Daemon {
     names: &[
-        "Mahalalel",
+        Mahalalel,
     ],
     words: &[],
     deeds: &[],
@@ -127,7 +202,7 @@ const MAHALALEL: &Daemon = &Daemon {
 
 const JARED: &Daemon = &Daemon {
     names: &[
-        "Jared",
+        Jared,
     ],
     words: &[],
     deeds: &[],
@@ -139,7 +214,7 @@ const JARED: &Daemon = &Daemon {
 
 const ENOCH: &Daemon = &Daemon {
     names: &[
-        "Enoch",
+        Enoch,
     ],
     words: &[],
     deeds: &[],
@@ -151,7 +226,7 @@ const ENOCH: &Daemon = &Daemon {
 
 const METHUSELAH: &Daemon = &Daemon {
     names: &[
-        "Methuselah",
+        Methuselah,
     ],
     words: &[],
     deeds: &[],
@@ -163,7 +238,7 @@ const METHUSELAH: &Daemon = &Daemon {
 
 const LAMECH: &Daemon = &Daemon {
     names: &[
-        "Lamech",
+        Lamech,
     ],
     words: &[],
     deeds: &[],
@@ -175,7 +250,7 @@ const LAMECH: &Daemon = &Daemon {
 
 const NOAH: &Daemon = &Daemon {
     names: &[
-        "Noah",
+        Noah,
     ],
     words: &[],
     deeds: &[],
@@ -187,7 +262,7 @@ const NOAH: &Daemon = &Daemon {
 
 const SHEM: &Daemon = &Daemon {
     names: &[
-        "Shem",
+        Shem,
     ],
     words: &[],
     deeds: &[],
@@ -199,7 +274,7 @@ const SHEM: &Daemon = &Daemon {
 
 const ARPHAXAD: &Daemon = &Daemon {
     names: &[
-        "Arphaxad",
+        Arphaxad,
     ],
     words: &[],
     deeds: &[],
@@ -211,7 +286,7 @@ const ARPHAXAD: &Daemon = &Daemon {
 
 const CAINAN: &Daemon = &Daemon {
     names: &[
-        "Cainan",
+        Cainan,
     ],
     words: &[],
     deeds: &[],
@@ -223,7 +298,7 @@ const CAINAN: &Daemon = &Daemon {
 
 const SHELAH: &Daemon = &Daemon {
     names: &[
-        "Eber",
+        Shelah,
     ],
     words: &[],
     deeds: &[],
@@ -235,7 +310,7 @@ const SHELAH: &Daemon = &Daemon {
 
 const EBER: &Daemon = &Daemon {
     names: &[
-        "Eber",
+        Eber,
     ],
     words: &[],
     deeds: &[],
@@ -247,7 +322,7 @@ const EBER: &Daemon = &Daemon {
 
 const PELEG: &Daemon = &Daemon {
     names: &[
-        "Peleg",
+        Peleg,
     ],
     words: &[],
     deeds: &[],
@@ -259,7 +334,7 @@ const PELEG: &Daemon = &Daemon {
 
 const REU: &Daemon = &Daemon {
     names: &[
-        "Reu",
+        Reu,
     ],
     words: &[],
     deeds: &[],
@@ -271,7 +346,7 @@ const REU: &Daemon = &Daemon {
 
 const SERUG: &Daemon = &Daemon {
     names: &[
-        "Serug",
+        Serug,
     ],
     words: &[],
     deeds: &[],
@@ -283,7 +358,7 @@ const SERUG: &Daemon = &Daemon {
 
 const NAHOR: &Daemon = &Daemon {
     names: &[
-        "Nahor",
+        Nahor,
     ],
     words: &[],
     deeds: &[],
@@ -295,7 +370,7 @@ const NAHOR: &Daemon = &Daemon {
 
 const TERRAH: &Daemon = &Daemon {
     names: &[
-        "Terrah",
+        Terrah,
     ],
     words: &[],
     deeds: &[],
@@ -307,7 +382,7 @@ const TERRAH: &Daemon = &Daemon {
 
 const ABRAHAM: &Daemon = &Daemon {
     names: &[
-        "Abraham",
+        Abraham,
     ],
     words: &[],
     deeds: &[],
@@ -319,7 +394,7 @@ const ABRAHAM: &Daemon = &Daemon {
 
 const ISAAC: &Daemon = &Daemon {
     names: &[
-        "Isaac",
+        Isaac,
     ],
     words: &[],
     deeds: &[],
@@ -331,7 +406,8 @@ const ISAAC: &Daemon = &Daemon {
 
 const JACOB: &Daemon = &Daemon {
     names: &[
-        "Jacob",
+        Jacob,
+        Israel,
     ],
     words: &[],
     deeds: &[],
@@ -343,7 +419,7 @@ const JACOB: &Daemon = &Daemon {
 
 const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
     names: &[
-        "Judah",
+        Judah,
     ],
     words: &[],
     deeds: &[],
@@ -355,7 +431,7 @@ const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
 
 const PEREZ: &Daemon = &Daemon {
     names: &[
-        "Perez",
+        Perez,
     ],
     words: &[],
     deeds: &[],
@@ -367,7 +443,7 @@ const PEREZ: &Daemon = &Daemon {
 
 const HEZRON: &Daemon = &Daemon {
     names: &[
-        "Hezron",
+        Hezron,
     ],
     words: &[],
     deeds: &[],
@@ -379,7 +455,7 @@ const HEZRON: &Daemon = &Daemon {
 
 const RAM: &Daemon = &Daemon {
     names: &[
-        "Ram",
+        Ram,
     ],
     words: &[],
     deeds: &[],
@@ -391,7 +467,7 @@ const RAM: &Daemon = &Daemon {
 
 const AMMINADAB: &Daemon = &Daemon {
     names: &[
-        "Amminadab",
+        Amminadab,
     ],
     words: &[],
     deeds: &[],
@@ -403,7 +479,7 @@ const AMMINADAB: &Daemon = &Daemon {
 
 const NASHON: &Daemon = &Daemon {
     names: &[
-        "Nashon",
+        Nashon,
     ],
     words: &[],
     deeds: &[],
@@ -415,7 +491,7 @@ const NASHON: &Daemon = &Daemon {
 
 const SALMON: &Daemon = &Daemon {
     names: &[
-        "Salmon",
+        Salmon,
     ],
     words: &[],
     deeds: &[],
@@ -427,7 +503,7 @@ const SALMON: &Daemon = &Daemon {
 
 const BOAZ: &Daemon = &Daemon {
     names: &[
-        "Boaz",
+        Boaz,
     ],
     words: &[],
     deeds: &[],
@@ -439,7 +515,7 @@ const BOAZ: &Daemon = &Daemon {
 
 const OBED: &Daemon = &Daemon {
     names: &[
-        "Obed",
+        Obed,
     ],
     words: &[],
     deeds: &[],
@@ -451,7 +527,7 @@ const OBED: &Daemon = &Daemon {
 
 const JESSE: &Daemon = &Daemon {
     names: &[
-        "Jesse",
+        Jesse,
     ],
     words: &[],
     deeds: &[],
@@ -463,7 +539,7 @@ const JESSE: &Daemon = &Daemon {
 
 const DAVID: &Daemon = &Daemon {
     names: &[
-        "David",
+        David,
     ],
     words: &[],
     deeds: &[],
@@ -475,7 +551,7 @@ const DAVID: &Daemon = &Daemon {
 
 const NATHAN: &Daemon = &Daemon {
     names: &[
-        "Nathan",
+        Nathan,
     ],
     words: &[],
     deeds: &[],
@@ -487,7 +563,7 @@ const NATHAN: &Daemon = &Daemon {
 
 const MATTATHA: &Daemon = &Daemon {
     names: &[
-        "Mattatha",
+        Mattatha,
     ],
     words: &[],
     deeds: &[],
@@ -499,7 +575,7 @@ const MATTATHA: &Daemon = &Daemon {
 
 const MENNA: &Daemon = &Daemon {
     names: &[
-        "Menna",
+        Menna,
     ],
     words: &[],
     deeds: &[],
@@ -511,7 +587,7 @@ const MENNA: &Daemon = &Daemon {
 
 const MELEA: &Daemon = &Daemon {
     names: &[
-        "Melea",
+        Melea,
     ],
     words: &[],
     deeds: &[],
@@ -523,7 +599,7 @@ const MELEA: &Daemon = &Daemon {
 
 const ELIAKIM: &Daemon = &Daemon {
     names: &[
-        "Eliakam",
+        Eliakim,
     ],
     words: &[],
     deeds: &[],
@@ -535,7 +611,7 @@ const ELIAKIM: &Daemon = &Daemon {
 
 const JONAM: &Daemon = &Daemon {
     names: &[
-        "Jonam",
+        Jonam,
     ],
     words: &[],
     deeds: &[],
@@ -547,7 +623,7 @@ const JONAM: &Daemon = &Daemon {
 
 const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
     names: &[
-        "Jonam",
+        Joseph,
     ],
     words: &[],
     deeds: &[],
@@ -559,7 +635,7 @@ const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
 
 const JUDAH: &Daemon = &Daemon {
     names: &[
-        "Judah",
+        Judah,
     ],
     words: &[],
     deeds: &[],
@@ -571,7 +647,7 @@ const JUDAH: &Daemon = &Daemon {
 
 const SIMEON: &Daemon = &Daemon {
     names: &[
-        "Simeon",
+        Simeon,
     ],
     words: &[],
     deeds: &[],
@@ -583,7 +659,7 @@ const SIMEON: &Daemon = &Daemon {
 
 const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
     names: &[
-        "Levi",
+        Levi,
     ],
     words: &[],
     deeds: &[],
@@ -595,7 +671,7 @@ const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
 
 const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
     names: &[
-        "Matthat",
+        Matthat,
     ],
     words: &[],
     deeds: &[],
@@ -607,7 +683,7 @@ const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
 
 const JORIM: &Daemon = &Daemon {
     names: &[
-        "Jorim",
+        Jorim,
     ],
     words: &[],
     deeds: &[],
@@ -619,7 +695,7 @@ const JORIM: &Daemon = &Daemon {
 
 const ELIEZER: &Daemon = &Daemon {
     names: &[
-        "Eliezer",
+        Eliezer,
     ],
     words: &[],
     deeds: &[],
@@ -631,7 +707,7 @@ const ELIEZER: &Daemon = &Daemon {
 
 const JOSHUA: &Daemon = &Daemon {
     names: &[
-        "Joshua",
+        Joshua,
     ],
     words: &[],
     deeds: &[],
@@ -643,7 +719,7 @@ const JOSHUA: &Daemon = &Daemon {
 
 const ER: &Daemon = &Daemon {
     names: &[
-        "Er",
+        Er,
     ],
     words: &[],
     deeds: &[],
@@ -655,7 +731,7 @@ const ER: &Daemon = &Daemon {
 
 const ELMADAM: &Daemon = &Daemon {
     names: &[
-        "Elmadam",
+        Elmadam,
     ],
     words: &[],
     deeds: &[],
@@ -667,7 +743,7 @@ const ELMADAM: &Daemon = &Daemon {
 
 const COSAM: &Daemon = &Daemon {
     names: &[
-        "Cosam",
+        Cosam,
     ],
     words: &[],
     deeds: &[],
@@ -679,7 +755,7 @@ const COSAM: &Daemon = &Daemon {
 
 const ADDI: &Daemon = &Daemon {
     names: &[
-        "Addi",
+        Addi,
     ],
     words: &[],
     deeds: &[],
@@ -691,7 +767,7 @@ const ADDI: &Daemon = &Daemon {
 
 const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
     names: &[
-        "Melki",
+        Melki,
     ],
     words: &[],
     deeds: &[],
@@ -703,7 +779,7 @@ const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
 
 const NERI: &Daemon = &Daemon {
     names: &[
-        "Neri",
+        Neri,
     ],
     words: &[],
     deeds: &[],
@@ -715,7 +791,7 @@ const NERI: &Daemon = &Daemon {
 
 const SHEALTIEL: &Daemon = &Daemon {
     names: &[
-        "Shealtiel",
+        Shealtiel,
     ],
     words: &[],
     deeds: &[],
@@ -727,7 +803,7 @@ const SHEALTIEL: &Daemon = &Daemon {
 
 const ZERUBBABEL: &Daemon = &Daemon {
     names: &[
-        "Zerubbabel",
+        Zerubbabel,
     ],
     words: &[],
     deeds: &[],
@@ -739,7 +815,7 @@ const ZERUBBABEL: &Daemon = &Daemon {
 
 const RHESA: &Daemon = &Daemon {
     names: &[
-        "Rhesa",
+        Rhesa,
     ],
     words: &[],
     deeds: &[],
@@ -751,7 +827,7 @@ const RHESA: &Daemon = &Daemon {
 
 const JOANAN: &Daemon = &Daemon {
     names: &[
-        "Joanan",
+        Joanan,
     ],
     words: &[],
     deeds: &[],
@@ -763,7 +839,7 @@ const JOANAN: &Daemon = &Daemon {
 
 const JODA: &Daemon = &Daemon {
     names: &[
-        "Joda",
+        Joda,
     ],
     words: &[],
     deeds: &[],
@@ -775,7 +851,7 @@ const JODA: &Daemon = &Daemon {
 
 const JOSEK: &Daemon = &Daemon {
     names: &[
-        "Josek",
+        Josek,
     ],
     words: &[],
     deeds: &[],
@@ -787,7 +863,7 @@ const JOSEK: &Daemon = &Daemon {
 
 const SEMEIN: &Daemon = &Daemon {
     names: &[
-        "Semein",
+        Semein,
     ],
     words: &[],
     deeds: &[],
@@ -799,7 +875,7 @@ const SEMEIN: &Daemon = &Daemon {
 
 const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
     names: &[
-        "Mattathias",
+        Mattathias,
     ],
     words: &[],
     deeds: &[],
@@ -811,7 +887,7 @@ const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
 
 const MAATH: &Daemon = &Daemon {
     names: &[
-        "Maath",
+        Maath,
     ],
     words: &[],
     deeds: &[],
@@ -823,7 +899,7 @@ const MAATH: &Daemon = &Daemon {
 
 const NAGGAI: &Daemon = &Daemon {
     names: &[
-        "Naggai",
+        Naggai,
     ],
     words: &[],
     deeds: &[],
@@ -835,7 +911,7 @@ const NAGGAI: &Daemon = &Daemon {
 
 const ESLI: &Daemon = &Daemon {
     names: &[
-        "Esli",
+        Esli,
     ],
     words: &[],
     deeds: &[],
@@ -847,7 +923,7 @@ const ESLI: &Daemon = &Daemon {
 
 const NAHUM: &Daemon = &Daemon {
     names: &[
-        "Nahum",
+        Nahum,
     ],
     words: &[],
     deeds: &[],
@@ -859,7 +935,7 @@ const NAHUM: &Daemon = &Daemon {
 
 const AMOS: &Daemon = &Daemon {
     names: &[
-        "Amos",
+        Amos,
     ],
     words: &[],
     deeds: &[],
@@ -871,7 +947,7 @@ const AMOS: &Daemon = &Daemon {
 
 const MATTATHIAS: &Daemon = &Daemon {
     names: &[
-        "Mattathias",
+        Mattathias,
     ],
     words: &[],
     deeds: &[],
@@ -883,7 +959,7 @@ const MATTATHIAS: &Daemon = &Daemon {
 
 const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
     names: &[
-        "Joseph",
+        Joseph,
     ],
     words: &[],
     deeds: &[],
@@ -895,7 +971,7 @@ const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
 
 const JANNAI: &Daemon = &Daemon {
     names: &[
-        "Jannai",
+        Jannai,
     ],
     words: &[],
     deeds: &[],
@@ -907,7 +983,7 @@ const JANNAI: &Daemon = &Daemon {
 
 const MELKI: &Daemon = &Daemon {
     names: &[
-        "Melki",
+        Melki,
     ],
     words: &[],
     deeds: &[],
@@ -919,7 +995,7 @@ const MELKI: &Daemon = &Daemon {
 
 const LEVI: &Daemon = &Daemon {
     names: &[
-        "Levi",
+        Levi,
     ],
     words: &[],
     deeds: &[],
@@ -931,7 +1007,7 @@ const LEVI: &Daemon = &Daemon {
 
 const MATTHAT: &Daemon = &Daemon {
     names: &[
-        "Matthat",
+        Matthat,
     ],
     words: &[],
     deeds: &[],
@@ -943,7 +1019,7 @@ const MATTHAT: &Daemon = &Daemon {
 
 const HELI: &Daemon = &Daemon {
     names: &[
-        "Heli",
+        Heli,
     ],
     words: &[],
     deeds: &[],
@@ -955,7 +1031,7 @@ const HELI: &Daemon = &Daemon {
 
 const JOSEPH: &Daemon = &Daemon {
     names: &[
-        "Joseph",
+        Joseph,
     ],
     words: &[],
     deeds: &["divorcing Mary without disgrace"],
@@ -967,7 +1043,7 @@ const JOSEPH: &Daemon = &Daemon {
 
 pub const JESUS: &Daemon = &Daemon {
     names: &[
-        "Jesus",
+        Jesus,
     ],
     words: &[
         "render Caesar what is Caesar's",

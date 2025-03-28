@@ -1,6 +1,8 @@
+use crate::name::Name;
+
 #[derive(Debug)]
 pub struct Daemon<'a> {
-    pub names: &'a [&'a str],
+    pub names: &'a [Name],
     pub words: &'a [&'a str],
     pub deeds: &'a [&'a str],
 

@@ -1,9 +1,10 @@
+use crate::name::Name::Alexander;
 use crate::daemon::Daemon;
 use crate::greece::ARISTOTLE;
 
 pub const ALEXANDER: &Daemon = &Daemon {
     names: &[
-        "Alexander",
+        Alexander,
     ],
     words: &[],
     deeds: &[],

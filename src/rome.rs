@@ -1,8 +1,12 @@
+use crate::name::Name::Romulus;
+use crate::name::Name::Remus;
+use crate::name::Name::Caesar;
+use crate::name::Name::Cicero;
 use crate::daemon::Daemon;
 
 pub const ROMULUS: &Daemon = &Daemon {
     names: &[
-        "Romulus",
+        Romulus,
     ],
     words: &[],
     deeds: &[],
@@ -14,7 +18,7 @@ pub const ROMULUS: &Daemon = &Daemon {
 
 pub const REMUS: &Daemon = &Daemon {
     names: &[
-        "Remus",
+        Remus,
     ],
     words: &[],
     deeds: &[],
@@ -26,7 +30,7 @@ pub const REMUS: &Daemon = &Daemon {
 
 pub const CAESAR: &Daemon = &Daemon {
     names: &[
-        "Caesar",
+        Caesar,
     ],
     words: &[],
     deeds: &[],
@@ -38,7 +42,7 @@ pub const CAESAR: &Daemon = &Daemon {
 
 pub const CICERO: &Daemon = &Daemon {
     names: &[
-        "Cicero",
+        Cicero,
     ],
     words: &[],
     deeds: &[],
