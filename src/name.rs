@@ -9,6 +9,7 @@ pub enum Name {
     Kronos,
     Zeus,
     Hera,
+    Leto,
     Hermes,
     Apollo,
     Artemis,

@@ -3,6 +3,7 @@ use crate::name::Name::Cronos;
 use crate::name::Name::Kronos;
 use crate::name::Name::Zeus;
 use crate::name::Name::Hera;
+use crate::name::Name::Leto;
 use crate::name::Name::Hermes;
 use crate::name::Name::Apollo;
 use crate::name::Name::Artemis;
@@ -50,6 +51,18 @@ pub const HERA: &Daemon = &Daemon {
     teacher: None,
 };
 
+const LETO: &Daemon = &Daemon {
+    names: &[
+        Leto,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+};
+
 pub const HERMES: &Daemon = &Daemon {
     names: &[
         Hermes,
@@ -69,8 +82,8 @@ pub const APOLLO: &Daemon = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: None,
-    mother: None,
+    father: Some(ZEUS),
+    mother: Some(LETO),
     teacher: None,
 };
 
@@ -81,8 +94,8 @@ pub const ARTEMIS: &Daemon = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: None,
-    mother: None,
+    father: Some(ZEUS),
+    mother: Some(LETO),
     teacher: None,
 };
 
