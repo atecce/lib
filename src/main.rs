@@ -22,13 +22,15 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
-fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, verse: &mut u8) where R: std::io::Read {
+fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, verse: &mut u8, text: &mut String) 
+    where R: std::io::Read {
 
     match &s[0..1].parse::<u8>() {
         Ok(n) => {
 
+            *text = s.clone();
+
             *verse = *n;
-            b.clear();
 
             match &s[0..2].parse::<u8>() {
                 Ok(n) => {
@@ -47,15 +49,12 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, verse
 
             println!("failed conversion {}", e);
 
-            r.read_until(b':', b);
             *s = String::from_utf8_lossy(&b).to_string();
-            println!("debug: {}", s);
-
-            let mut tmp = String::new();
-            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
-            extract_verse(r, s, b, verse);
+            *text = text.to_owned() + s;
         }
     }
+
+    b.clear();
 }
 
 fn main() {
@@ -74,13 +73,14 @@ fn main() {
     let mut b: Vec<u8> = Vec::new();
     let mut started = false;
     let mut tmp = String::new();
+    let mut text = String::new();
 
     while r.read_until(b':', &mut b).is_ok() {
 
         let mut s = String::from_utf8_lossy(&b).to_string();
 
         if chapter > 0 {
-            extract_verse(&mut r, &mut s, &mut b, &mut verse);
+            extract_verse(&mut r, &mut s, &mut b, &mut verse, &mut text);
         }
 
         // TODO(atec): some recursive bullshit
@@ -113,7 +113,7 @@ fn main() {
 
         println!("chapter: {}", chapter);
         println!("verse: {}", verse);
-        println!("s: {}", s);
+        println!("text: {}", text);
 
         io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
     }
