@@ -22,6 +22,42 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
+fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, verse: &mut u8) where R: std::io::Read {
+
+    match &s[0..1].parse::<u8>() {
+        Ok(n) => {
+
+            *verse = *n;
+            b.clear();
+
+            match &s[0..2].parse::<u8>() {
+                Ok(n) => {
+
+                    *verse = *n;
+
+                    match &s[0..3].parse::<u8>() {
+                        Ok(n) => *verse = *n,
+                        Err(_) => _ = 0,
+                    }
+                },
+                Err(_) => _ = 0,
+            }
+        },
+        Err(e) => {
+
+            println!("failed conversion {}", e);
+
+            r.read_until(b':', b);
+            *s = String::from_utf8_lossy(&b).to_string();
+            println!("debug: {}", s);
+
+            let mut tmp = String::new();
+            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
+            extract_verse(r, s, b, verse);
+        }
+    }
+}
+
 fn main() {
     println!("{:?}", JESUS);
     println!("{:?}", APOLLO);
@@ -32,64 +68,44 @@ fn main() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
-    let mut b: Vec<u8> = Vec::new();
     let mut chapter: u8 = 0;
     let mut verse: u8 = 0;
 
+    let mut b: Vec<u8> = Vec::new();
+    let mut started = false;
+    let mut tmp = String::new();
+
     while r.read_until(b':', &mut b).is_ok() {
 
-        let s = String::from_utf8_lossy(&b);
+        let mut s = String::from_utf8_lossy(&b).to_string();
 
         if chapter > 0 {
-
-            let head = &s[0..1];
-
-            // TODO(atec): some recursive bullshit
-            match head.parse::<u8>() {
-                Ok(n) => {
-
-                    verse = n;
-
-                    let head = &s[0..2];
-                    match head.parse::<u8>() {
-                        Ok(n) => {
-
-                            verse = n;
-
-                            let head = &s[0..3];
-                            match head.parse::<u8>() {
-                                Ok(n) => verse = n,
-                                Err(_) => _ = 0,
-                            }
-                        },
-                        Err(_) => _ = 0,
-                    }
-                },
-                Err(_) => _ = 0,
-            }
+            extract_verse(&mut r, &mut s, &mut b, &mut verse);
         }
 
-        let tail = &s[s.len()-2..s.len()-1];
-
         // TODO(atec): some recursive bullshit
-        match tail.parse::<u8>() {
+        match &s[s.len()-2..s.len()-1].parse::<u8>() {
             Ok(n) => {
 
-                chapter = n;
+                chapter = *n;
 
-                let tail = &s[s.len()-3..s.len()-1];
-                match tail.parse::<u8>() {
+                match &s[s.len()-3..s.len()-1].parse::<u8>() {
                     Ok(n) => {
 
-                        chapter = n;
+                        chapter = *n;
 
-                        let tail = &s[s.len()-4..s.len()-1];
-                        match tail.parse::<u8>() {
-                            Ok(n) => chapter = n,
+                        match &s[s.len()-4..s.len()-1].parse::<u8>() {
+                            Ok(n) => chapter = *n,
                             Err(_) => _ = 0,
                         }
                     },
                     Err(_) => _ = 0,
+                }
+
+                // TODO(atec): hack to avoid index error on s[0..1]
+                if !started {
+                    started = true;
+                    b.clear();
                 }
             },
             Err(_) => _ = 0,
@@ -97,11 +113,8 @@ fn main() {
 
         println!("chapter: {}", chapter);
         println!("verse: {}", verse);
-        println!("s: {}\n", s);
+        println!("s: {}", s);
 
-        b.clear();
-
-        let mut tmp = String::new();
         io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
     }
 }
