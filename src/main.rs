@@ -25,6 +25,9 @@ fn print_type_of<T>(_: &T) {
 fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, verse: &mut u8, text: &mut String) 
     where R: std::io::Read {
 
+    if s.len() == 0 {
+        return
+    }
     match &s[0..1].parse::<u8>() {
         Ok(n) => {
 
@@ -83,38 +86,41 @@ fn main() {
             extract_verse(&mut r, &mut s, &mut b, &mut verse, &mut text);
         }
 
-        // TODO(atec): some recursive bullshit
-        match &s[s.len()-2..s.len()-1].parse::<u8>() {
-            Ok(n) => {
+        if s.len() == 0 {
+            return
+        }
+        if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
+            // TODO(atec): some recursive bullshit
+            match &s[s.len()-2..s.len()-1].parse::<u8>() {
+                Ok(n) => {
 
-                chapter = *n;
+                    chapter = *n;
 
-                match &s[s.len()-3..s.len()-1].parse::<u8>() {
-                    Ok(n) => {
+                    match &s[s.len()-3..s.len()-1].parse::<u8>() {
+                        Ok(n) => {
 
-                        chapter = *n;
+                            chapter = *n;
 
-                        match &s[s.len()-4..s.len()-1].parse::<u8>() {
-                            Ok(n) => chapter = *n,
-                            Err(_) => _ = 0,
-                        }
-                    },
-                    Err(_) => _ = 0,
-                }
+                            match &s[s.len()-4..s.len()-1].parse::<u8>() {
+                                Ok(n) => chapter = *n,
+                                Err(_) => _ = 0,
+                            }
+                        },
+                        Err(_) => _ = 0,
+                    }
 
-                // TODO(atec): hack to avoid index error on s[0..1]
-                if !started {
-                    started = true;
-                    b.clear();
-                }
-            },
-            Err(_) => _ = 0,
+                    // TODO(atec): hack to avoid index error on s[0..1]
+                    if !started {
+                        started = true;
+                        b.clear();
+                    }
+                },
+                Err(_) => _ = 0,
+            }
         }
 
         println!("chapter: {}", chapter);
         println!("verse: {}", verse);
         println!("text: {}", text);
-
-        io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
     }
 }
