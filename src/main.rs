@@ -129,8 +129,11 @@ fn main() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
+    let mut book = &Genesis;
+    let mut i: usize = 0;
     let mut chapter: usize = 0;
     let mut verse: usize = 0;
+    let mut last: usize = 0;
 
     let mut b: Vec<u8> = Vec::new();
     let mut started = false;
@@ -213,6 +216,8 @@ fn main() {
             match &s[s.len()-2..s.len()-1].parse::<usize>() {
                 Ok(n) => {
 
+                    last = chapter;
+
                     chapter = *n;
                     word[&Genesis].push(Vec::new());
 
@@ -239,9 +244,17 @@ fn main() {
             }
         }
 
+        if last > chapter {
+            i += 1;
+            (book, _) = word.get_index(i).unwrap();
+            println!("{:?}", word[&Genesis]);
+            println!("{:?}", word[&Exodus]);
+            let mut tmp = String::new();
+            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
+        }
+
         println!("chapter: {}", chapter);
         println!("verse: {}", verse);
         println!("text: {}", text);
     }
-    println!("{:?}", word);
 }
