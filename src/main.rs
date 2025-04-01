@@ -79,13 +79,16 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
-fn extract_verse(s: &mut String, b: &mut Vec<u8>, verse: &mut usize, text: &mut String) {
+fn extract_verse(word: &mut IndexMap<Name, Vec<Vec<String>>>, s: &mut String,
+    b: &mut Vec<u8>, chapter: &mut usize, verse: &mut usize, text: &mut String) {
 
     if s.len() == 0 {
         return
     }
     match &s[0..1].parse::<usize>() {
         Ok(n) => {
+
+            word[&Genesis][*chapter-1].push(text.clone());
 
             *text = s.clone();
 
@@ -197,7 +200,7 @@ fn main() {
         let mut s = String::from_utf8_lossy(&b).to_string();
 
         if chapter > 0 {
-            extract_verse(&mut s, &mut b, &mut verse, &mut text);
+            extract_verse(&mut word, &mut s, &mut b, &mut chapter, &mut verse, &mut text);
         }
 
         if s.len() == 0 {
@@ -205,6 +208,7 @@ fn main() {
             return
         }
         if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
+
             // TODO(atec): some recursive bullshit
             match &s[s.len()-2..s.len()-1].parse::<usize>() {
                 Ok(n) => {
@@ -238,13 +242,6 @@ fn main() {
         println!("chapter: {}", chapter);
         println!("verse: {}", verse);
         println!("text: {}", text);
-        if chapter > 0 {
-            word[&Genesis][chapter-1].push(text.clone());
-        }
-
-        println!("{:?}", word);
-
-        let mut tmp = String::new();
-        io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
     }
+    println!("{:?}", word);
 }
