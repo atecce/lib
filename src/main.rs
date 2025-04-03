@@ -13,11 +13,6 @@ use std::io;
 use std::fs::File;
 use std::io::{BufRead,BufReader};
 use indexmap::IndexMap;
-use crate::bible::JESUS;
-use crate::greece::APOLLO;
-use crate::macedon::ALEXANDER;
-use crate::rome::CICERO;
-use crate::persia::CYRUS;
 use crate::name::Name;
 use crate::name::Name::Genesis;
 use crate::name::Name::Exodus;
@@ -27,9 +22,12 @@ use crate::name::Name::Deuteronomy;
 use crate::name::Name::Joshua;
 use crate::name::Name::Judges;
 use crate::name::Name::Ruth;
-use crate::name::Name::Samuel;
-use crate::name::Name::Kings;
-use crate::name::Name::Chronicles;
+use crate::name::Name::SamuelI;
+use crate::name::Name::SamuelII;
+use crate::name::Name::KingsI;
+use crate::name::Name::KingsII;
+use crate::name::Name::ChroniclesI;
+use crate::name::Name::ChroniclesII;
 use crate::name::Name::Ezra;
 use crate::name::Name::Nehemiah;
 use crate::name::Name::Esther;
@@ -60,27 +58,39 @@ use crate::name::Name::Luke;
 use crate::name::Name::John;
 use crate::name::Name::Acts;
 use crate::name::Name::Romans;
-use crate::name::Name::Corinthians;
+use crate::name::Name::CorinthiansI;
+use crate::name::Name::CorinthiansII;
 use crate::name::Name::Galatians;
 use crate::name::Name::Ephesians;
 use crate::name::Name::Philippians;
 use crate::name::Name::Colossians;
-use crate::name::Name::Thessalonians;
-use crate::name::Name::Timothy;
+use crate::name::Name::ThessaloniansI;
+use crate::name::Name::ThessaloniansII;
+use crate::name::Name::TimothyI;
+use crate::name::Name::TimothyII;
 use crate::name::Name::Titus;
 use crate::name::Name::Philemon;
 use crate::name::Name::Hebrews;
 use crate::name::Name::James;
-use crate::name::Name::Peter;
+use crate::name::Name::PeterI;
+use crate::name::Name::PeterII;
+use crate::name::Name::JohnI;
+use crate::name::Name::JohnII;
+use crate::name::Name::JohnIII;
 use crate::name::Name::Jude;
 use crate::name::Name::Revelation;
+use crate::bible::JESUS;
+use crate::greece::APOLLO;
+use crate::macedon::ALEXANDER;
+use crate::rome::CICERO;
+use crate::persia::CYRUS;
 
 fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
 fn extract_verse(word: &mut IndexMap<Name, Vec<Vec<String>>>, s: &mut String,
-    b: &mut Vec<u8>, chapter: &mut usize, verse: &mut usize, text: &mut String) {
+    b: &mut Vec<u8>, book: Name, chapter: &mut usize, verse: &mut usize, text: &mut String) {
 
     if s.len() == 0 {
         return
@@ -88,7 +98,7 @@ fn extract_verse(word: &mut IndexMap<Name, Vec<Vec<String>>>, s: &mut String,
     match &s[0..1].parse::<usize>() {
         Ok(n) => {
 
-            word[&Genesis][*chapter-1].push(text.clone());
+            word[book][*chapter-1].push(text.clone());
 
             *text = s.clone();
 
@@ -129,7 +139,7 @@ fn main() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
-    let mut book = &Genesis;
+    let book = Genesis;
     let mut i: usize = 0;
     let mut chapter: usize = 0;
     let mut verse: usize = 0;
@@ -148,9 +158,12 @@ fn main() {
         (Joshua, Vec::new()),
         (Judges, Vec::new()),
         (Ruth, Vec::new()),
-        (Samuel, Vec::new()),
-        (Kings, Vec::new()),
-        (Chronicles, Vec::new()),
+        (SamuelI, Vec::new()),
+        (SamuelII, Vec::new()),
+        (KingsI, Vec::new()),
+        (KingsII, Vec::new()),
+        (ChroniclesI, Vec::new()),
+        (ChroniclesII, Vec::new()),
         (Ezra, Vec::new()),
         (Nehemiah, Vec::new()),
         (Esther, Vec::new()),
@@ -182,18 +195,25 @@ fn main() {
         (John, Vec::new()),
         (Acts, Vec::new()),
         (Romans, Vec::new()),
-        (Corinthians, Vec::new()),
+        (CorinthiansI, Vec::new()),
+        (CorinthiansII, Vec::new()),
         (Galatians, Vec::new()),
         (Ephesians, Vec::new()),
         (Philippians, Vec::new()),
         (Colossians, Vec::new()),
-        (Thessalonians, Vec::new()),
-        (Timothy, Vec::new()),
+        (ThessaloniansI, Vec::new()),
+        (ThessaloniansII, Vec::new()),
+        (TimothyI, Vec::new()),
+        (TimothyII, Vec::new()),
         (Titus, Vec::new()),
         (Philemon, Vec::new()),
         (Hebrews, Vec::new()),
         (James, Vec::new()),
-        (Peter, Vec::new()),
+        (PeterI, Vec::new()),
+        (PeterII, Vec::new()),
+        (JohnI, Vec::new()),
+        (JohnII, Vec::new()),
+        (JohnIII, Vec::new()),
         (Jude, Vec::new()),
         (Revelation, Vec::new()),
     ]);
@@ -203,7 +223,7 @@ fn main() {
         let mut s = String::from_utf8_lossy(&b).to_string();
 
         if chapter > 0 {
-            extract_verse(&mut word, &mut s, &mut b, &mut chapter, &mut verse, &mut text);
+            extract_verse(&mut word, &mut s, &mut b, book, &mut chapter, &mut verse, &mut text);
         }
 
         if s.len() == 0 {
@@ -219,7 +239,7 @@ fn main() {
                     last = chapter;
 
                     chapter = *n;
-                    word[&Genesis].push(Vec::new());
+                    word[book].push(Vec::new());
 
                     match &s[s.len()-3..s.len()-1].parse::<usize>() {
                         Ok(n) => {
@@ -246,11 +266,12 @@ fn main() {
 
         if last > chapter {
             i += 1;
-            (book, _) = word.get_index(i).unwrap();
-            println!("{:?}", word[&Genesis]);
-            println!("{:?}", word[&Exodus]);
-            let mut tmp = String::new();
-            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
+            let (tmp, _) = word.get_index(i).unwrap();
+            book = *tmp;
+            println!("{:?}", word[Genesis]);
+            println!("{:?}", word[Exodus]);
+//            let mut tmp = String::new();
+//            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
         }
 
         println!("chapter: {}", chapter);
