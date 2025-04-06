@@ -89,6 +89,68 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
+fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
+    b: &mut Vec<u8>, book: &Name, chapter: &mut usize, last: &mut usize, started: &mut bool) {
+
+    if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
+
+        // TODO(atec): some recursive bullshit
+        match &s[s.len()-2..s.len()-1].parse::<usize>() {
+            Ok(n1) => {
+
+                *last = *chapter;
+
+                match &s[s.len()-3..s.len()-1].parse::<usize>() {
+                    Ok(n2) => {
+
+                        match &s[s.len()-4..s.len()-1].parse::<usize>() {
+                            Ok(n3) => {
+
+                                *chapter = *n3;
+
+                                if let Some(chapter_and_verse) = word.get_mut(book) {
+                                    if chapter != last {
+                                        chapter_and_verse.push(Vec::new());
+                                    }
+                                }
+                            },
+                            Err(e) => {
+                                println!("failed conversion parsing three digit chapter: {}", e);
+                                println!("falling back to two digits");
+                                *chapter = *n2;
+
+                                if let Some(chapter_and_verse) = word.get_mut(book) {
+                                    if chapter != last {
+                                        chapter_and_verse.push(Vec::new());
+                                    }
+                                }
+                            },
+                        }
+                    },
+                    Err(e) => {
+                        println!("failed conversion parsing two digit chapter: {}", e);
+                        println!("falling back to one digit");
+                        *chapter = *n1;
+
+                        if let Some(chapter_and_verse) = word.get_mut(book) {
+                            if chapter != last {
+                                chapter_and_verse.push(Vec::new());
+                            }
+                        }
+                    },
+                }
+
+                // TODO(atec): hack to avoid index error on s[0..1]
+                if !*started {
+                    *started = true;
+                    b.clear();
+                }
+            },
+            Err(_) => _ = 0,
+        }
+    }
+}
+
 fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
     b: &mut Vec<u8>, book: &Name, chapter: &mut usize, verse: &mut usize, text: &mut String) {
 
@@ -130,6 +192,10 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             *text = text.to_owned() + s;
 
             if let Some(chapter_and_verse) = word.get_mut(book) {
+                println!("book: {:?}", book);
+                println!("chapter: {}", chapter);
+                println!("verse: {}", verse);
+                println!("text: {}", text);
                 chapter_and_verse[*chapter-1][*verse-1] = text.clone();
             }
         }
@@ -311,63 +377,7 @@ fn main() {
             return
         }
 
-        if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
-
-            // TODO(atec): some recursive bullshit
-            match &s[s.len()-2..s.len()-1].parse::<usize>() {
-                Ok(n1) => {
-
-                    last = chapter;
-
-                    match &s[s.len()-3..s.len()-1].parse::<usize>() {
-                        Ok(n2) => {
-
-                            match &s[s.len()-4..s.len()-1].parse::<usize>() {
-                                Ok(n3) => {
-
-                                    chapter = *n3;
-
-                                    if let Some(chapter_and_verse) = word.get_mut(book) {
-                                        if chapter != last {
-                                            chapter_and_verse.push(Vec::new());
-                                        }
-                                    }
-                                },
-                                Err(e) => {
-                                    println!("failed conversion parsing three digit chapter: {}", e);
-                                    println!("falling back to two digits");
-                                    chapter = *n2;
-
-                                    if let Some(chapter_and_verse) = word.get_mut(book) {
-                                        if chapter != last {
-                                            chapter_and_verse.push(Vec::new());
-                                        }
-                                    }
-                                },
-                            }
-                        },
-                        Err(e) => {
-                            println!("failed conversion parsing two digit chapter: {}", e);
-                            println!("falling back to one digit");
-                            chapter = *n1;
-
-                            if let Some(chapter_and_verse) = word.get_mut(book) {
-                                if chapter != last {
-                                    chapter_and_verse.push(Vec::new());
-                                }
-                            }
-                        },
-                    }
-
-                    // TODO(atec): hack to avoid index error on s[0..1]
-                    if !started {
-                        started = true;
-                        b.clear();
-                    }
-                },
-                Err(_) => _ = 0,
-            }
-        }
+        extract_chapter(&mut word, &mut s, &mut b, book, &mut chapter, &mut last, &mut started);
 
         if last > chapter {
             i += 1;
