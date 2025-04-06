@@ -103,15 +103,8 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             *text = s.clone();
 
             if let Some(chapter_and_verse) = word.get_mut(book) {
-
-                println!("pushing new text");
                 chapter_and_verse[*chapter-1].push(text.clone());
             }
-
-            println!("word: {:?}", word);
-
-            let mut tmp = String::new();
-            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
 
             *verse = *n;
 
@@ -133,13 +126,12 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             println!("failed conversion extracting verse: {}", e);
             println!("appending text (probably a colon inside the verse)");
 
-            println!("word: {:?}", word);
-
-            let mut tmp = String::new();
-            io::stdin().read_line(&mut tmp).ok().expect("failed to read line");
-
             *s = String::from_utf8_lossy(&b).to_string();
             *text = text.to_owned() + s;
+
+            if let Some(chapter_and_verse) = word.get_mut(book) {
+                chapter_and_verse[*chapter-1][*verse-1] = text.clone();
+            }
         }
     }
 
@@ -336,9 +328,7 @@ fn main() {
                                     chapter = *n3;
 
                                     if let Some(chapter_and_verse) = word.get_mut(book) {
-
                                         if chapter != last {
-                                            println!("pushing new chapter and verse");
                                             chapter_and_verse.push(Vec::new());
                                         }
                                     }
@@ -349,9 +339,7 @@ fn main() {
                                     chapter = *n2;
 
                                     if let Some(chapter_and_verse) = word.get_mut(book) {
-
                                         if chapter != last {
-                                            println!("pushing new chapter and verse");
                                             chapter_and_verse.push(Vec::new());
                                         }
                                     }
@@ -364,9 +352,7 @@ fn main() {
                             chapter = *n1;
 
                             if let Some(chapter_and_verse) = word.get_mut(book) {
-
                                 if chapter != last {
-                                    println!("pushing new chapter and verse");
                                     chapter_and_verse.push(Vec::new());
                                 }
                             }
