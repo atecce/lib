@@ -89,6 +89,16 @@ fn print_type_of<T>(_: &T) {
         println!("{}", std::any::type_name::<T>());
 }
 
+fn push_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>,
+    book: &Name, chapter: &mut usize, last: &mut usize) {
+
+    if let Some(chapter_and_verse) = word.get_mut(book) {
+        if chapter != last {
+            chapter_and_verse.push(Vec::new());
+        }
+    }
+}
+
 fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
     b: &mut Vec<u8>, book: &Name, chapter: &mut usize, last: &mut usize, started: &mut bool) {
 
@@ -108,22 +118,14 @@ fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
 
                                 *chapter = *n3;
 
-                                if let Some(chapter_and_verse) = word.get_mut(book) {
-                                    if chapter != last {
-                                        chapter_and_verse.push(Vec::new());
-                                    }
-                                }
+                                push_chapter(word, book, chapter, last);
                             },
                             Err(e) => {
                                 println!("failed conversion parsing three digit chapter: {}", e);
                                 println!("falling back to two digits");
                                 *chapter = *n2;
 
-                                if let Some(chapter_and_verse) = word.get_mut(book) {
-                                    if chapter != last {
-                                        chapter_and_verse.push(Vec::new());
-                                    }
-                                }
+                                push_chapter(word, book, chapter, last);
                             },
                         }
                     },
@@ -132,11 +134,7 @@ fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
                         println!("falling back to one digit");
                         *chapter = *n1;
 
-                        if let Some(chapter_and_verse) = word.get_mut(book) {
-                            if chapter != last {
-                                chapter_and_verse.push(Vec::new());
-                            }
-                        }
+                        push_chapter(word, book, chapter, last);
                     },
                 }
 
@@ -265,11 +263,7 @@ fn main() {
         if last > chapter {
             i += 1;
             book = books[i];
-            if let Some(chapter_and_verse) = word.get_mut(book) {
-                if chapter != last {
-                    chapter_and_verse.push(Vec::new());
-                }
-            }
+            push_chapter(&mut word, book, &mut chapter, &mut last);
         }
     }
 }
