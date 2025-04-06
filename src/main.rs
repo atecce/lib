@@ -372,6 +372,11 @@ fn main() {
         if last > chapter {
             i += 1;
             book = books[i];
+            if let Some(chapter_and_verse) = word.get_mut(book) {
+                if chapter != last {
+                    chapter_and_verse.push(Vec::new());
+                }
+            }
         }
     }
 }
