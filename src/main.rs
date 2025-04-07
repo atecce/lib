@@ -212,20 +212,21 @@ fn main() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
-    let books = [ &Genesis, &Exodus, &Leviticus, &Numbers, &Deuteronomy,
-                  &Joshua, &Judges, &Ruth, &SamuelI, &SamuelII, &KingsI, &KingsII, &ChroniclesI, &ChroniclesII,
-                  &Ezra, &Nehemiah, &Esther, &Job,
-                  &Psalms, &Proverbs,
-                  &Ecclesiastes, &SongOfSolomon,
-                  &Isaiah, &Jeremiah, &Ezekiel, &Daniel, &Hosea, &Joel, &Amos, &Obadiah,
-                  &Jonah,
-                  &Micah, &Nahum, &Habakkuk, &Zephaniah, &Haggai, &Zechariah, &Malachi,
+    let books = [
+        &Genesis, &Exodus, &Leviticus, &Numbers, &Deuteronomy,
+        &Joshua, &Judges, &Ruth, &SamuelI, &SamuelII, &KingsI, &KingsII, &ChroniclesI, &ChroniclesII,
+        &Ezra, &Nehemiah, &Esther, &Job,
+        &Psalms, &Proverbs,
+        &Ecclesiastes, &SongOfSolomon,
+        &Isaiah, &Jeremiah, &Ezekiel, &Daniel, &Hosea, &Joel, &Amos, &Obadiah,
+        &Jonah,
+        &Micah, &Nahum, &Habakkuk, &Zephaniah, &Haggai, &Zechariah, &Malachi,
 
-                  &Matthew, &Mark, &Luke, &John,
-                  &Acts, &Romans, &CorinthiansI, &CorinthiansII, &Galatians, &Ephesians, &Philippians,
-                  &Colossians, &ThessaloniansI, &ThessaloniansII, &TimothyI, &TimothyII, &Titus,
-                  &Philemon, &Hebrews, &James, &PeterI, &PeterII, &JohnI, &JohnII, &JohnIII, &Jude,
-                  &Revelation,
+        &Matthew, &Mark, &Luke, &John,
+        &Acts, &Romans, &CorinthiansI, &CorinthiansII, &Galatians, &Ephesians, &Philippians,
+        &Colossians, &ThessaloniansI, &ThessaloniansII, &TimothyI, &TimothyII, &Titus,
+        &Philemon, &Hebrews, &James, &PeterI, &PeterII, &JohnI, &JohnII, &JohnIII, &Jude,
+        &Revelation,
     ];
 
     let mut i: usize = 0;
