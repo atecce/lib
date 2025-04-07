@@ -202,13 +202,16 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
     b.clear();
 }
 
-fn main() {
+fn print_optimates() {
     println!("{:?}", JESUS);
     println!("{:?}", APOLLO);
     println!("{:?}", ALEXANDER);
     println!("{:?}", CICERO);
     println!("{:?}", CYRUS);
     println!();
+}
+
+fn read_bible() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
@@ -267,4 +270,7 @@ fn main() {
             push_chapter(&mut word, book, &mut chapter, &mut last);
         }
     }
+}
+
+fn main() {
 }
