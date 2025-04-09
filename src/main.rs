@@ -10,8 +10,8 @@ mod rome;
 mod persia;
 
 use std::collections::HashMap;
+use std::error::Error;
 use std::fs::File;
-use std::io;
 use std::io::{BufRead,BufReader};
 use crate::name::Name;
 use crate::name::Name::Genesis;
@@ -272,5 +272,20 @@ fn read_bible() {
     }
 }
 
+type Record = (String, u16, u16, u16, u16);
+
+fn read_csv() -> Result<(), Box<dyn Error>> {
+
+    let mut r = csv::Reader::from_reader(File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"));
+
+    for res in r.deserialize() {
+        let record: Record = res?;
+        println!("{:?}", record);
+    }
+
+    Ok(())
+}
+
 fn main() {
+    read_csv();
 }
