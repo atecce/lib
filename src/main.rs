@@ -14,71 +14,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead,BufReader};
 use crate::name::Name;
-use crate::name::Name::Genesis;
-use crate::name::Name::Exodus;
-use crate::name::Name::Leviticus;
-use crate::name::Name::Numbers;
-use crate::name::Name::Deuteronomy;
-use crate::name::Name::Joshua;
-use crate::name::Name::Judges;
-use crate::name::Name::Ruth;
-use crate::name::Name::SamuelI;
-use crate::name::Name::SamuelII;
-use crate::name::Name::KingsI;
-use crate::name::Name::KingsII;
-use crate::name::Name::ChroniclesI;
-use crate::name::Name::ChroniclesII;
-use crate::name::Name::Ezra;
-use crate::name::Name::Nehemiah;
-use crate::name::Name::Esther;
-use crate::name::Name::Job;
-use crate::name::Name::Psalms;
-use crate::name::Name::Proverbs;
-use crate::name::Name::Ecclesiastes; 
-use crate::name::Name::SongOfSolomon;
-use crate::name::Name::Isaiah;
-use crate::name::Name::Jeremiah;
-use crate::name::Name::Ezekiel;
-use crate::name::Name::Daniel;
-use crate::name::Name::Hosea;
-use crate::name::Name::Joel; 
-use crate::name::Name::Amos;
-use crate::name::Name::Obadiah;
-use crate::name::Name::Jonah;
-use crate::name::Name::Micah;
-use crate::name::Name::Nahum;
-use crate::name::Name::Habakkuk;
-use crate::name::Name::Zephaniah;
-use crate::name::Name::Haggai;
-use crate::name::Name::Zechariah;
-use crate::name::Name::Malachi;
-use crate::name::Name::Matthew;
-use crate::name::Name::Mark;
-use crate::name::Name::Luke;
-use crate::name::Name::John;
-use crate::name::Name::Acts;
-use crate::name::Name::Romans;
-use crate::name::Name::CorinthiansI;
-use crate::name::Name::CorinthiansII;
-use crate::name::Name::Galatians;
-use crate::name::Name::Ephesians;
-use crate::name::Name::Philippians;
-use crate::name::Name::Colossians;
-use crate::name::Name::ThessaloniansI;
-use crate::name::Name::ThessaloniansII;
-use crate::name::Name::TimothyI;
-use crate::name::Name::TimothyII;
-use crate::name::Name::Titus;
-use crate::name::Name::Philemon;
-use crate::name::Name::Hebrews;
-use crate::name::Name::James;
-use crate::name::Name::PeterI;
-use crate::name::Name::PeterII;
-use crate::name::Name::JohnI;
-use crate::name::Name::JohnII;
-use crate::name::Name::JohnIII;
-use crate::name::Name::Jude;
-use crate::name::Name::Revelation;
+use crate::bible::BOOKS;
 use crate::bible::JESUS;
 use crate::greece::APOLLO;
 use crate::macedon::ALEXANDER;
@@ -215,25 +151,8 @@ fn read_bible() {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
-    let books = [
-        &Genesis, &Exodus, &Leviticus, &Numbers, &Deuteronomy,
-        &Joshua, &Judges, &Ruth, &SamuelI, &SamuelII, &KingsI, &KingsII, &ChroniclesI, &ChroniclesII,
-        &Ezra, &Nehemiah, &Esther, &Job,
-        &Psalms, &Proverbs,
-        &Ecclesiastes, &SongOfSolomon,
-        &Isaiah, &Jeremiah, &Ezekiel, &Daniel, &Hosea, &Joel, &Amos, &Obadiah,
-        &Jonah,
-        &Micah, &Nahum, &Habakkuk, &Zephaniah, &Haggai, &Zechariah, &Malachi,
-
-        &Matthew, &Mark, &Luke, &John,
-        &Acts, &Romans, &CorinthiansI, &CorinthiansII, &Galatians, &Ephesians, &Philippians,
-        &Colossians, &ThessaloniansI, &ThessaloniansII, &TimothyI, &TimothyII, &Titus,
-        &Philemon, &Hebrews, &James, &PeterI, &PeterII, &JohnI, &JohnII, &JohnIII, &Jude,
-        &Revelation,
-    ];
-
     let mut i: usize = 0;
-    let mut book = books[i];
+    let mut book = BOOKS[i];
 
     let mut chapter: usize = 0;
     let mut verse: usize = 0;
@@ -245,7 +164,7 @@ fn read_bible() {
 
     let mut word = HashMap::<&Name, Vec<Vec<String>>>::new();
     for i in 1..65 {
-        word.insert(books[i], Vec::new());
+        word.insert(BOOKS[i], Vec::new());
     }
 
     while r.read_until(b':', &mut b).is_ok() {
@@ -266,7 +185,7 @@ fn read_bible() {
 
         if last > chapter {
             i += 1;
-            book = books[i];
+            book = BOOKS[i];
             push_chapter(&mut word, book, &mut chapter, &mut last);
         }
     }
@@ -287,5 +206,4 @@ fn read_csv() -> Result<(), Box<dyn Error>> {
 }
 
 fn main() {
-    read_csv();
 }
