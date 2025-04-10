@@ -191,19 +191,21 @@ fn read_bible() {
     }
 }
 
-type Record = (String, u16, u16, u16, u16);
+type Record = (String, f32, f32, f32, f32);
 
-fn read_csv() -> Result<(), Box<dyn Error>> {
+fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
 
     let mut r = csv::Reader::from_reader(File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"));
+    let mut records = Vec::new();
 
     for res in r.deserialize() {
         let record: Record = res?;
-        println!("{:?}", record);
+        records.push(record);
     }
 
-    Ok(())
+    Ok(records)
 }
 
 fn main() {
+    println!("{:?}", read_csv());
 }
