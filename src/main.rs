@@ -12,7 +12,9 @@ mod persia;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
+use std::io;
 use std::io::{BufRead,BufReader};
+use std::io::prelude::*;
 use crate::name::Name;
 use crate::bible::BOOKS;
 use crate::bible::JESUS;
@@ -43,24 +45,18 @@ fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
         // TODO(atec): some recursive bullshit
         match &s[s.len()-2..s.len()-1].parse::<usize>() {
             Ok(n1) => {
-
                 *last = *chapter;
-
                 match &s[s.len()-3..s.len()-1].parse::<usize>() {
                     Ok(n2) => {
-
                         match &s[s.len()-4..s.len()-1].parse::<usize>() {
                             Ok(n3) => {
-
                                 *chapter = *n3;
-
                                 push_chapter(word, book, chapter, last);
                             },
                             Err(e) => {
                                 println!("failed conversion parsing three digit chapter: {}", e);
                                 println!("falling back to two digits");
                                 *chapter = *n2;
-
                                 push_chapter(word, book, chapter, last);
                             },
                         }
@@ -69,7 +65,6 @@ fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
                         println!("failed conversion parsing two digit chapter: {}", e);
                         println!("falling back to one digit");
                         *chapter = *n1;
-
                         push_chapter(word, book, chapter, last);
                     },
                 }
@@ -106,9 +101,7 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
 
             match &s[0..2].parse::<usize>() {
                 Ok(n) => {
-
                     *verse = *n;
-
                     match &s[0..3].parse::<usize>() {
                         Ok(n) => *verse = *n,
                         Err(_) => _ = 0,
@@ -130,6 +123,15 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
                 println!("chapter: {}", chapter);
                 println!("verse: {}", verse);
                 println!("text: {}", text);
+
+                let mut stdin = io::stdin();
+                let mut stdout = io::stdout();
+
+                write!(stdout, "setting text. press any key").unwrap();
+                stdout.flush().unwrap();
+
+                let _ = stdin.read(&mut [0u8]).unwrap();
+
                 chapter_and_verse[*chapter-1][*verse-1] = text.clone();
             }
         }
@@ -207,5 +209,5 @@ fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
 }
 
 fn main() {
-    println!("{:?}", read_csv());
+    read_bible();
 }
