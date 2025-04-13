@@ -127,10 +127,25 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
                 let mut stdin = io::stdin();
                 let mut stdout = io::stdout();
 
-                write!(stdout, "setting text. press any key").unwrap();
+                write!(stdout, "setting text. press any key: ").unwrap();
                 stdout.flush().unwrap();
 
-                let _ = stdin.read(&mut [0u8]).unwrap();
+                let mut lines = stdin.lock().lines();
+                let line = lines.next().unwrap().unwrap();
+                let tmp1 = line.split_whitespace().collect::<Vec<_>>();
+                println!("{:?}", tmp1);
+
+                let target_book = tmp1[0];
+                println!("target book: {}", target_book);
+
+                let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
+                println!("{:?}", tmp2);
+
+                let target_chapter = tmp2[0].parse::<usize>();
+                println!("target chapter: {:?}", target_chapter);
+
+                let target_verse = tmp2[1].parse::<usize>();
+                println!("target verse: {:?}", target_verse);
 
                 chapter_and_verse[*chapter-1][*verse-1] = text.clone();
             }
