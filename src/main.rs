@@ -13,8 +13,9 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io;
-use std::io::{BufRead,BufReader};
+use std::io::{BufRead,BufReader,BufWriter};
 use std::io::prelude::*;
+use std::num::ParseIntError;
 use crate::name::Name;
 use crate::bible::BOOKS;
 use crate::bible::JESUS;
@@ -37,66 +38,35 @@ fn push_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>,
     }
 }
 
-fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
-    b: &mut Vec<u8>, book: &Name, chapter: &mut usize, last: &mut usize, started: &mut bool) {
-
-    println!("extracting chapter");
-
+fn extract_chapter(s: &mut String) -> Result<usize, ParseIntError> {
     if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
-
-        println!("is char boundary");
-        println!("s: {}", s);
-        println!("s_slice: {}", &s[s.len()-2..s.len()-1]);
-
         // TODO(atec): some recursive bullshit
         match &s[s.len()-2..s.len()-1].parse::<usize>() {
             Ok(n1) => {
-                println!("setting last");
-                println!("last: {}", last);
-                println!("chapter: {}", chapter);
-                *last = *chapter;
                 match &s[s.len()-3..s.len()-1].parse::<usize>() {
                     Ok(n2) => {
                         match &s[s.len()-4..s.len()-1].parse::<usize>() {
                             Ok(n3) => {
-                                println!("setting chapter");
-                                println!("chapter: {}", chapter);
-                                println!("n3: {}", n3);
-                                *chapter = *n3;
-                                push_chapter(word, book, chapter, last);
+                                return Ok(*n3);
                             },
                             Err(e) => {
                                 println!("failed conversion parsing three digit chapter: {}", e);
                                 println!("falling back to two digits");
-
-                                println!("setting chapter");
-                                println!("chapter: {}", chapter);
-                                println!("n2: {}", n2);
-                                *chapter = *n2;
-                                push_chapter(word, book, chapter, last);
+                                return Ok(*n2);
                             },
                         }
                     },
                     Err(e) => {
                         println!("failed conversion parsing two digit chapter: {}", e);
                         println!("falling back to one digit");
-
-                        println!("setting chapter");
-                        println!("chapter: {}", chapter);
-                        println!("n1: {}", n1);
-                        *chapter = *n1;
-                        push_chapter(word, book, chapter, last);
+                        return Ok(*n1);
                     },
                 }
-
-                // TODO(atec): hack to avoid index error on s[0..1]
-                if !*started {
-                    *started = true;
-                    b.clear();
-                }
             },
-            Err(_) => _ = 0,
+            Err(e) => return Err(e.clone()),
         }
+    } else {
+        return "is not character boundary".parse::<usize>();
     }
 }
 
@@ -156,7 +126,7 @@ fn print_optimates() {
     println!();
 }
 
-fn read_bible() {
+fn read_bible() -> std::io::Result<()> {
 
     let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
 
@@ -182,19 +152,18 @@ fn read_bible() {
 
     while r.read_until(b':', &mut b).is_ok() {
 
-        println!("book: {:?}", book);
-        println!("chapter: {}", chapter);
-        println!("verse: {}", verse);
-        println!("text: {}", text);
-
         let mut line = String::new();
 
         if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
 
+            if chapter != 0 && verse != 0 {
+                println!("{}", word[book][chapter-1][verse-1]);
+            }
+
             let stdin = io::stdin();
             let mut stdout = io::stdout();
 
-            write!(stdout, "setting text. press any key: ").unwrap();
+            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
             stdout.flush().unwrap();
 
             let mut lines = stdin.lock().lines();
@@ -224,20 +193,36 @@ fn read_bible() {
 
         // TODO(atec): hack at the end
         if s.len() == 0 {
-            println!("{:?}", word);
-            return
+            let mut w = BufWriter::new(File::create("word.json")?);
+            serde_json::to_writer(&mut w, &word)?;
+            w.flush();
+            return Ok(());
         }
 
-        extract_chapter(&mut word, &mut s, &mut b, book, &mut chapter, &mut last, &mut started);
+        match extract_chapter(&mut s) {
+            Ok(n) => {
+                last = chapter;
+                chapter = n;
 
-        if last > chapter {
-            println!("last: {}", last);
-            println!("chapter: {}", chapter);
-            i += 1;
-            book = BOOKS[i];
-            push_chapter(&mut word, book, &mut chapter, &mut last);
+                if last > chapter {
+                    i += 1;
+                    book = BOOKS[i];
+                }
+
+                push_chapter(&mut word, book, &mut chapter, &mut last);
+
+                // TODO(atec): hack to avoid index error on s[0..1]
+                if !started {
+                    started = true;
+                    b.clear();
+                }
+            },
+            Err(e) => {
+                println!("failed to push chapter: {}", e);
+            },
         }
     }
+    Ok(())
 }
 
 type Record = (String, f32, f32, f32, f32);
