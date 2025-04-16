@@ -40,22 +40,38 @@ fn push_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>,
 fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
     b: &mut Vec<u8>, book: &Name, chapter: &mut usize, last: &mut usize, started: &mut bool) {
 
+    println!("extracting chapter");
+
     if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
+
+        println!("is char boundary");
+        println!("s: {}", s);
+        println!("s_slice: {}", &s[s.len()-2..s.len()-1]);
 
         // TODO(atec): some recursive bullshit
         match &s[s.len()-2..s.len()-1].parse::<usize>() {
             Ok(n1) => {
+                println!("setting last");
+                println!("last: {}", last);
+                println!("chapter: {}", chapter);
                 *last = *chapter;
                 match &s[s.len()-3..s.len()-1].parse::<usize>() {
                     Ok(n2) => {
                         match &s[s.len()-4..s.len()-1].parse::<usize>() {
                             Ok(n3) => {
+                                println!("setting chapter");
+                                println!("chapter: {}", chapter);
+                                println!("n3: {}", n3);
                                 *chapter = *n3;
                                 push_chapter(word, book, chapter, last);
                             },
                             Err(e) => {
                                 println!("failed conversion parsing three digit chapter: {}", e);
                                 println!("falling back to two digits");
+
+                                println!("setting chapter");
+                                println!("chapter: {}", chapter);
+                                println!("n2: {}", n2);
                                 *chapter = *n2;
                                 push_chapter(word, book, chapter, last);
                             },
@@ -64,6 +80,10 @@ fn extract_chapter(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
                     Err(e) => {
                         println!("failed conversion parsing two digit chapter: {}", e);
                         println!("falling back to one digit");
+
+                        println!("setting chapter");
+                        println!("chapter: {}", chapter);
+                        println!("n1: {}", n1);
                         *chapter = *n1;
                         push_chapter(word, book, chapter, last);
                     },
@@ -119,7 +139,6 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             *text = text.to_owned() + s;
 
             if let Some(chapter_and_verse) = word.get_mut(book) {
-
                 chapter_and_verse[*chapter-1][*verse-1] = text.clone();
             }
         }
@@ -212,6 +231,8 @@ fn read_bible() {
         extract_chapter(&mut word, &mut s, &mut b, book, &mut chapter, &mut last, &mut started);
 
         if last > chapter {
+            println!("last: {}", last);
+            println!("chapter: {}", chapter);
             i += 1;
             book = BOOKS[i];
             push_chapter(&mut word, book, &mut chapter, &mut last);
