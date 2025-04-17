@@ -84,7 +84,7 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             *text = s.clone();
 
             if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[*chapter-1].push(text.clone());
+                chapter_and_verse[*chapter-1].push(text.replace("\r\n", " "));
             }
 
             *verse = *n;
@@ -109,7 +109,7 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             *text = text.to_owned() + s;
 
             if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[*chapter-1][*verse-1] = text.clone();
+                chapter_and_verse[*chapter-1][*verse-1] = text.replace("\r\n", " ");
             }
         }
     }
