@@ -140,6 +140,7 @@ fn read_bible() -> std::io::Result<()> {
     let mut target_book = BOOKS[i].to_string();
     let mut target_chapter: usize = 0;
     let mut target_verse: usize = 0;
+    let mut next: bool = false;
 
     let mut b: Vec<u8> = Vec::new();
     let mut started = false;
@@ -154,7 +155,11 @@ fn read_bible() -> std::io::Result<()> {
 
         let mut line = String::new();
 
-        if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
+        if (book.to_string() == target_book && chapter == target_chapter && verse == target_verse) || next {
+
+            println!("book: {}", book);
+            println!("chapter: {}", chapter);
+            println!("verse: {}", verse);
 
             if chapter != 0 && verse != 0 {
                 println!("{}", word[book][chapter-1][verse-1]);
@@ -172,17 +177,23 @@ fn read_bible() -> std::io::Result<()> {
             let tmp1 = line.split_whitespace().collect::<Vec<_>>();
             println!("{:?}", tmp1);
 
-            target_book = tmp1[0].to_string();
-            println!("target book: {}", target_book);
+            if tmp1[0] == "next" {
+                next = true;
+            } else {
+                next = false;
 
-            let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-            println!("{:?}", tmp2);
+                target_book = tmp1[0].to_string();
+                println!("target book: {}", target_book);
 
-            target_chapter = tmp2[0].parse::<usize>().unwrap();
-            println!("target chapter: {:?}", target_chapter);
+                let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
+                println!("{:?}", tmp2);
 
-            target_verse = tmp2[1].parse::<usize>().unwrap();
-            println!("target verse: {:?}", target_verse);
+                target_chapter = tmp2[0].parse::<usize>().unwrap();
+                println!("target chapter: {:?}", target_chapter);
+
+                target_verse = tmp2[1].parse::<usize>().unwrap();
+                println!("target verse: {:?}", target_verse);
+            }
         }
 
         let mut s = String::from_utf8_lossy(&b).to_string();
