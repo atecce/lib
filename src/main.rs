@@ -206,7 +206,7 @@ fn read_bible() -> std::io::Result<()> {
         if s.len() == 0 {
             let mut w = BufWriter::new(File::create("word.json")?);
             serde_json::to_writer(&mut w, &word)?;
-            w.flush();
+            println!("{:?}", w.flush());
             return Ok(());
         }
 
@@ -252,5 +252,5 @@ fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
 }
 
 fn main() {
-    read_bible();
+    println!("{:?}", read_bible());
 }
