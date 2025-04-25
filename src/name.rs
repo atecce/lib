@@ -17,6 +17,7 @@ pub enum Name {
     Apollo,
     Artemis,
     Achilles,
+    Philip,
 
     // persia
     Cyrus,

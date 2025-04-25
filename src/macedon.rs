@@ -1,6 +1,19 @@
+use crate::name::Name::Philip;
 use crate::name::Name::Alexander;
 use crate::daemon::Daemon;
 use crate::greece::ARISTOTLE;
+
+const PHILIP: &Daemon = &Daemon {
+    names: &[
+        Philip,
+    ],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+};
 
 pub const ALEXANDER: &Daemon = &Daemon {
     names: &[
@@ -9,7 +22,7 @@ pub const ALEXANDER: &Daemon = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: None,
+    father: Some(PHILIP),
     mother: None,
     teacher: Some(ARISTOTLE),
 };
