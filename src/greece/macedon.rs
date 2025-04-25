@@ -1,7 +1,7 @@
 use crate::name::Name::Philip;
 use crate::name::Name::Alexander;
 use crate::daemon::Daemon;
-use crate::greece::ARISTOTLE;
+use crate::greece::main::ARISTOTLE;
 
 const PHILIP: &Daemon = &Daemon {
     names: &[

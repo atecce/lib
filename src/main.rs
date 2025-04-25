@@ -5,7 +5,6 @@ mod book;
 mod daemon;
 mod bible;
 mod greece;
-mod macedon;
 mod rome;
 mod persia;
 
@@ -19,8 +18,8 @@ use std::num::ParseIntError;
 use crate::name::Name;
 use crate::bible::BOOKS;
 use crate::bible::JESUS;
-use crate::greece::APOLLO;
-use crate::macedon::ALEXANDER;
+use crate::greece::main::APOLLO;
+use crate::greece::macedon::ALEXANDER;
 use crate::rome::CICERO;
 use crate::persia::CYRUS;
 
