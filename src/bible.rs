@@ -150,21 +150,21 @@ use crate::name::Name::Heli;
 use crate::name::Name::Jesus;
 use crate::daemon::Daemon;
 
-pub const BOOKS: [&Name; 65] = [
-    &Genesis, &Exodus, &Leviticus, &Numbers, &Deuteronomy,
-    &Joshua, &Judges, &Ruth, &SamuelI, &SamuelII, &KingsI, &KingsII, &ChroniclesI, &ChroniclesII,
-    &Ezra, &Nehemiah, &Esther, &Job,
-    &Psalms, &Proverbs,
-    &Ecclesiastes, &SongOfSolomon,
-    &Isaiah, &Jeremiah, &Ezekiel, &Daniel, &Hosea, &Joel, &Amos, &Obadiah,
-    &Jonah,
-    &Micah, &Nahum, &Habakkuk, &Zephaniah, &Haggai, &Zechariah, &Malachi,
+pub const BOOKS: [Name; 65] = [
+    Genesis, Exodus, Leviticus, Numbers, Deuteronomy,
+    Joshua, Judges, Ruth, SamuelI, SamuelII, KingsI, KingsII, ChroniclesI, ChroniclesII,
+    Ezra, Nehemiah, Esther, Job,
+    Psalms, Proverbs,
+    Ecclesiastes, SongOfSolomon,
+    Isaiah, Jeremiah, Ezekiel, Daniel, Hosea, Joel, Amos, Obadiah,
+    Jonah,
+    Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi,
 
-    &Matthew, &Mark, &Luke, &John,
-    &Acts, &Romans, &CorinthiansI, &CorinthiansII, &Galatians, &Ephesians, &Philippians,
-    &Colossians, &ThessaloniansI, &ThessaloniansII, &TimothyI, &TimothyII, &Titus,
-    &Philemon, &Hebrews, &James, &PeterI, &PeterII, &JohnI, &JohnII, &JohnIII, &Jude,
-    &Revelation,
+    Matthew, Mark, Luke, John,
+    Acts, Romans, CorinthiansI, CorinthiansII, Galatians, Ephesians, Philippians,
+    Colossians, ThessaloniansI, ThessaloniansII, TimothyI, TimothyII, Titus,
+    Philemon, Hebrews, James, PeterI, PeterII, JohnI, JohnII, JohnIII, Jude,
+    Revelation,
 ];
 
 const ALMIGHTY: &Daemon = &Daemon {

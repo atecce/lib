@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io;
-use std::io::{BufRead,BufReader,BufWriter};
+use std::io::{BufRead,BufReader};
 use std::io::prelude::*;
 use std::num::ParseIntError;
 use crate::name::Name;
@@ -22,6 +22,85 @@ use crate::greece::main::APOLLO;
 use crate::greece::macedon::ALEXANDER;
 use crate::rome::CICERO;
 use crate::persia::CYRUS;
+
+struct BibleReader<R> {
+    r: BufReader<R>,
+    b: Vec<u8>,
+    book: Name,
+    i: usize,
+    chapter: usize,
+    last: usize,
+    verse: usize,
+    started: bool,
+    word: HashMap::<Name, Vec<Vec<String>>>,
+}
+
+impl<R: std::io::Read> Iterator for BibleReader<R> {
+    type Item = (Name, usize, usize, String);
+
+    fn next(&mut self) -> Option<Self::Item> {
+
+        // TODO(atec): hack to avoid index error on s[0..1] at beginning
+        if !self.started {
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            let _ = self.r.read_until(b':', &mut self.b);
+            self.started = true;
+            self.b.clear();
+        }
+
+        // TODO(atec); perhaps use returned byte number
+        while self.r.read_until(b':', &mut self.b).is_ok() {
+
+            let mut s = String::from_utf8_lossy(&self.b).to_string();
+
+            match extract_chapter(&mut s) {
+                Ok(n) => {
+
+                    println!("extracting chapter");
+                    self.last = self.chapter;
+                    self.chapter = n;
+
+                    if self.last > self.chapter {
+                        self.i += 1;
+                        self.book = BOOKS[self.i];
+                    }
+
+                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                        chapter_and_verse.push(Vec::new());
+                    }
+                    println!("done extracting chapter");
+
+                    println!("s: {}", s);
+                    println!("book: {}", self.book);
+                    println!("chapter: {}", self.chapter);
+                    println!("verse: {}", self.verse);
+
+                    println!("extracting verse...");
+                    self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                        chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
+                    }
+                    println!("done extracting verse");
+
+                    println!("{:?}", self.word);
+                    return Some((self.book, self.chapter, self.verse, s.replace("\r\n", " ")));
+                },
+                Err(e) => {
+                    println!("failed to extract chapter: {}", e);
+                    continue;
+                },
+            }
+        }
+        None
+    }
+}
 
 fn extract_chapter(s: &mut String) -> Result<usize, ParseIntError> {
     if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
@@ -124,120 +203,69 @@ fn print_optimates() {
 
 fn read_bible() -> std::io::Result<()> {
 
-    let mut r = BufReader::new(File::open("./pg10.txt").expect("can't open file"));
-
-    let mut i: usize = 0;
-    let mut book = BOOKS[i];
-
-    let mut chapter: usize = 0;
-    let mut verse: usize = 0;
-    let mut last: usize = 0;
-
-    let mut target_book = BOOKS[i].to_string();
-    let mut target_chapter: usize = 0;
-    let mut target_verse: usize = 0;
-    let mut next = false;
-
-    let mut b: Vec<u8> = Vec::new();
-    let mut started = false;
-
-    let mut word = HashMap::<&Name, Vec<Vec<String>>>::new();
+    let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
     for i in 0..65 {
         word.insert(BOOKS[i], Vec::new());
     }
 
-    // TODO(atec); perhaps used returned byte number
-    while r.read_until(b':', &mut b).is_ok() {
+    let br = BibleReader{
+        r: BufReader::new(File::open("./pg10.txt").expect("can't open file")),
+        b: Vec::new(),
+        book: BOOKS[0],
+        i: 0,
+        chapter: 0,
+        verse: 0,
+        last: 0,
+        started: false,
+        word: word,
+    };
 
-        let mut line = String::new();
+    let mut target_book = BOOKS[0].to_string();
+    let mut target_chapter: usize = 1;
+    let mut target_verse: usize = 1;
 
-        if (book.to_string() == target_book && chapter == target_chapter && verse == target_verse) || next {
+    let mut line = String::new();
 
-            println!("book: {}", book);
-            println!("chapter: {}", chapter);
-            println!("verse: {}", verse);
-            println!("word: {:?}", word);
+    for (book, chapter, verse, text) in br {
 
-            if chapter != 0 && verse != 0 {
-                println!("{}", word[book][chapter-1][verse-1]);
-            }
+        let mut stdin = io::stdin();
+        let mut stdout = io::stdout();
 
-            let stdin = io::stdin();
-            let mut stdout = io::stdout();
+        write!(stdout, "continue...").unwrap();
+        stdout.flush().unwrap();
 
-            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
-            stdout.flush().unwrap();
+        let _ = stdin.read(&mut [0u8]).unwrap();
 
-            let mut lines = stdin.lock().lines();
-            line = lines.next().unwrap().unwrap();
-
-            let tmp1 = line.split_whitespace().collect::<Vec<_>>();
-            println!("{:?}", tmp1);
-
-            if tmp1[0] == "next" {
-                next = true;
-            } else {
-                next = false;
-
-                target_book = tmp1[0].to_string();
-                println!("target book: {}", target_book);
-
-                let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-                println!("{:?}", tmp2);
-
-                target_chapter = tmp2[0].parse::<usize>().unwrap();
-                println!("target chapter: {:?}", target_chapter);
-
-                target_verse = tmp2[1].parse::<usize>().unwrap();
-                println!("target verse: {:?}", target_verse);
-            }
-        }
-
-        let mut s = String::from_utf8_lossy(&b).to_string();
-
-        if chapter > 0 {
-            println!("extracting verse...");
-            verse = extract_verse(&mut r, &mut s, &mut b);
-            if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[chapter-1].push(s.replace("\r\n", " "));
-            }
-            println!("done extracting verse");
-        }
-
-        // TODO(atec): hack at the end
-        if s.len() == 0 {
-            let mut w = BufWriter::new(File::create("word.json")?);
-            serde_json::to_writer(&mut w, &word)?;
-            println!("{:?}", w.flush());
-            return Ok(());
-        }
-
-        match extract_chapter(&mut s) {
-            Ok(n) => {
-                last = chapter;
-                chapter = n;
-
-                if last > chapter {
-                    i += 1;
-                    book = BOOKS[i];
-                }
-
-                if let Some(chapter_and_verse) = word.get_mut(book) {
-                    if chapter != last {
-                        chapter_and_verse.push(Vec::new());
-                    }
-                }
-
-                // TODO(atec): hack to avoid index error on s[0..1]
-                if !started {
-                    started = true;
-                    b.clear();
-                }
-            },
-            Err(e) => {
-                println!("failed to push chapter: {}", e);
-            },
-        }
+//        if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
+//
+//            println!("book: {}", book);
+//            println!("chapter: {}", chapter);
+//            println!("verse: {}", verse);
+//
+//            let stdin = io::stdin();
+//            let mut stdout = io::stdout();
+//
+//            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
+//            stdout.flush().unwrap();
+//
+//            let mut lines = stdin.lock().lines();
+//            line = lines.next().unwrap().unwrap();
+//
+//            let tmp1 = line.split_whitespace().collect::<Vec<_>>();
+//            println!("{:?}", tmp1);
+//
+//            target_book = tmp1[0].to_string();
+//            println!("target book: {}", target_book);
+//
+//            let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
+//            println!("{:?}", tmp2);
+//
+//            target_chapter = tmp2[0].parse::<usize>().unwrap();
+//            println!("target chapter: {:?}", target_chapter);
+//
+//            target_verse = tmp2[1].parse::<usize>().unwrap();
+//            println!("target verse: {:?}", target_verse);
+//        }
     }
     Ok(())
 }

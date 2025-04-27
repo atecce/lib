@@ -1,7 +1,7 @@
 use std::fmt;
 use serde::Serialize;
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize)]
 pub enum Name {
     // 
     God,
