@@ -69,7 +69,7 @@ fn extract_chapter(s: &mut String) -> Result<usize, ParseIntError> {
     }
 }
 
-fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, text: &mut String) -> usize
+fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>) -> usize
     where R: std::io::Read {
 
     let mut verse = 0;
@@ -84,7 +84,6 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, text:
 
             println!("matched verse");
 
-            *text = s.clone();
             verse = *n;
 
             match &s[0..2].parse::<usize>() {
@@ -115,7 +114,6 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, text:
         let _ = r.read_until(b':', b);
 
         *s = String::from_utf8_lossy(&b).to_string();
-        *text = s.to_string();
 
         println!("s: {}", s);
 
@@ -148,7 +146,6 @@ fn read_bible() -> std::io::Result<()> {
     let mut chapter: usize = 0;
     let mut verse: usize = 0;
     let mut last: usize = 0;
-    let mut text = String::new();
 
     let mut target_book = BOOKS[i].to_string();
     let mut target_chapter: usize = 0;
@@ -214,9 +211,9 @@ fn read_bible() -> std::io::Result<()> {
 
         if chapter > 0 {
             println!("extracting verse...");
-            verse = extract_verse(&mut r, &mut s, &mut b, &mut text);
+            verse = extract_verse(&mut r, &mut s, &mut b);
             if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[chapter-1].push(text.replace("\r\n", " "));
+                chapter_and_verse[chapter-1].push(s.replace("\r\n", " "));
             }
             println!("done extracting verse");
         }
