@@ -69,30 +69,29 @@ fn extract_chapter(s: &mut String) -> Result<usize, ParseIntError> {
     }
 }
 
-fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
-    b: &mut Vec<u8>, book: &Name, chapter: &mut usize, verse: &mut usize, text: &mut String) {
+fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>, text: &mut String) -> usize
+    where R: std::io::Read {
+
+    let mut verse = 0;
 
     // TODO(atec): hack at the end
     if s.len() == 0 {
-        return
+        return verse;
     }
 
     match &s[0..1].parse::<usize>() {
         Ok(n) => {
 
+            println!("matched verse");
+
             *text = s.clone();
-
-            if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[*chapter-1].push(text.replace("\r\n", " "));
-            }
-
-            *verse = *n;
+            verse = *n;
 
             match &s[0..2].parse::<usize>() {
                 Ok(n) => {
-                    *verse = *n;
+                    verse = *n;
                     match &s[0..3].parse::<usize>() {
-                        Ok(n) => *verse = *n,
+                        Ok(n) => verse = *n,
                         Err(_) => _ = 0,
                     }
                 },
@@ -100,20 +99,34 @@ fn extract_verse(word: &mut HashMap<&Name, Vec<Vec<String>>>, s: &mut String,
             }
         },
         Err(e) => {
-
             println!("failed conversion extracting verse: {}", e);
-            println!("appending text (probably a colon inside the verse)");
-
-            *s = String::from_utf8_lossy(&b).to_string();
-            *text = text.to_owned() + s;
-
-            if let Some(chapter_and_verse) = word.get_mut(book) {
-                chapter_and_verse[*chapter-1][*verse-1] = text.replace("\r\n", " ");
-            }
+            println!("should not happen because we read to the end of the verse as soon as we match");
         }
     }
 
+    let mut next_verse = s.is_char_boundary(s.len()-1) &&
+        s.is_char_boundary(s.len()-2) &&
+        s[s.len()-2..s.len()-1].parse::<usize>().is_ok();
+
+    println!("reading until end of verse");
+    while !next_verse {
+
+        // TODO(atec); perhaps used returned byte number
+        let _ = r.read_until(b':', b);
+
+        *s = String::from_utf8_lossy(&b).to_string();
+        *text = s.to_string();
+
+        println!("s: {}", s);
+
+        next_verse = s.is_char_boundary(s.len()-1) &&
+            s.is_char_boundary(s.len()-2) &&
+            s[s.len()-2..s.len()-1].parse::<usize>().is_ok()
+    }
+
     b.clear();
+
+    return verse;
 }
 
 fn print_optimates() {
@@ -135,21 +148,22 @@ fn read_bible() -> std::io::Result<()> {
     let mut chapter: usize = 0;
     let mut verse: usize = 0;
     let mut last: usize = 0;
+    let mut text = String::new();
 
     let mut target_book = BOOKS[i].to_string();
     let mut target_chapter: usize = 0;
     let mut target_verse: usize = 0;
-    let mut next: bool = false;
+    let mut next = false;
 
     let mut b: Vec<u8> = Vec::new();
     let mut started = false;
-    let mut text = String::new();
 
     let mut word = HashMap::<&Name, Vec<Vec<String>>>::new();
-    for i in 1..65 {
+    for i in 0..65 {
         word.insert(BOOKS[i], Vec::new());
     }
 
+    // TODO(atec); perhaps used returned byte number
     while r.read_until(b':', &mut b).is_ok() {
 
         let mut line = String::new();
@@ -159,6 +173,7 @@ fn read_bible() -> std::io::Result<()> {
             println!("book: {}", book);
             println!("chapter: {}", chapter);
             println!("verse: {}", verse);
+            println!("word: {:?}", word);
 
             if chapter != 0 && verse != 0 {
                 println!("{}", word[book][chapter-1][verse-1]);
@@ -198,7 +213,12 @@ fn read_bible() -> std::io::Result<()> {
         let mut s = String::from_utf8_lossy(&b).to_string();
 
         if chapter > 0 {
-            extract_verse(&mut word, &mut s, &mut b, book, &mut chapter, &mut verse, &mut text);
+            println!("extracting verse...");
+            verse = extract_verse(&mut r, &mut s, &mut b, &mut text);
+            if let Some(chapter_and_verse) = word.get_mut(book) {
+                chapter_and_verse[chapter-1].push(text.replace("\r\n", " "));
+            }
+            println!("done extracting verse");
         }
 
         // TODO(atec): hack at the end
