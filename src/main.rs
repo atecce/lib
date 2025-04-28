@@ -42,44 +42,37 @@ fn read_bible() -> std::io::Result<()> {
 
     for (book, chapter, verse, text) in r {
 
-        let mut stdin = io::stdin();
-        let mut stdout = io::stdout();
+        if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
 
-        write!(stdout, "continue...").unwrap();
-        stdout.flush().unwrap();
+            println!("book: {}", book);
+            println!("chapter: {}", chapter);
+            println!("verse: {}", verse);
+            println!("text: {}", text);
 
-        let _ = stdin.read(&mut [0u8]).unwrap();
+            let stdin = io::stdin();
+            let mut stdout = io::stdout();
 
-//        if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
-//
-//            println!("book: {}", book);
-//            println!("chapter: {}", chapter);
-//            println!("verse: {}", verse);
-//
-//            let stdin = io::stdin();
-//            let mut stdout = io::stdout();
-//
-//            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
-//            stdout.flush().unwrap();
-//
-//            let mut lines = stdin.lock().lines();
-//            line = lines.next().unwrap().unwrap();
-//
-//            let tmp1 = line.split_whitespace().collect::<Vec<_>>();
-//            println!("{:?}", tmp1);
-//
-//            target_book = tmp1[0].to_string();
-//            println!("target book: {}", target_book);
-//
-//            let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-//            println!("{:?}", tmp2);
-//
-//            target_chapter = tmp2[0].parse::<usize>().unwrap();
-//            println!("target chapter: {:?}", target_chapter);
-//
-//            target_verse = tmp2[1].parse::<usize>().unwrap();
-//            println!("target verse: {:?}", target_verse);
-//        }
+            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
+            stdout.flush().unwrap();
+
+            let mut lines = stdin.lock().lines();
+            line = lines.next().unwrap().unwrap();
+
+            let tmp1 = line.split_whitespace().collect::<Vec<_>>();
+            println!("{:?}", tmp1);
+
+            target_book = tmp1[0].to_string();
+            println!("target book: {}", target_book);
+
+            let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
+            println!("{:?}", tmp2);
+
+            target_chapter = tmp2[0].parse::<usize>().unwrap();
+            println!("target chapter: {:?}", target_chapter);
+
+            target_verse = tmp2[1].parse::<usize>().unwrap();
+            println!("target verse: {:?}", target_verse);
+        }
     }
     Ok(())
 }

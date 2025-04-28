@@ -98,7 +98,6 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                     }
                     println!("done extracting verse");
 
-                    println!("{:?}", self.word);
                     return Some((self.book, self.chapter, self.verse, s.replace("\r\n", " ")));
                 },
                 Err(e) => {
