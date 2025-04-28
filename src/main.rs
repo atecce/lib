@@ -10,6 +10,7 @@ mod persia;
 
 use std::error::Error;
 use std::fs::File;
+use std::collections::HashMap;
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -32,48 +33,60 @@ fn print_optimates() {
 
 fn read_bible() -> std::io::Result<()> {
 
-    let r = bible::io::new_reader(BufReader::new(File::open("./pg10.txt").expect("can't open file")));
+    let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
+    for i in 0..65 {
+        word.insert(BOOKS[i], Vec::new());
+    }
 
     let mut target_book = BOOKS[0].to_string();
     let mut target_chapter: usize = 1;
     let mut target_verse: usize = 1;
 
-    let mut line = String::new();
+    {
+        let r = bible::io::new_reader(BufReader::new(File::open("./pg10.txt").expect("can't open file")), &mut word);
 
-    for (book, chapter, verse, text) in r {
+        let mut line = String::new();
 
-        if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
+        for (book, chapter, verse, text) in r {
 
-            println!("book: {}", book);
-            println!("chapter: {}", chapter);
-            println!("verse: {}", verse);
-            println!("text: {}", text);
+            if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
 
-            let stdin = io::stdin();
-            let mut stdout = io::stdout();
+                println!("book: {}", book);
+                println!("chapter: {}", chapter);
+                println!("verse: {}", verse);
+                println!("text: {}", text);
 
-            write!(stdout, "reading bible; set chapter and verse: ").unwrap();
-            stdout.flush().unwrap();
+                let stdin = io::stdin();
+                let mut stdout = io::stdout();
 
-            let mut lines = stdin.lock().lines();
-            line = lines.next().unwrap().unwrap();
+                write!(stdout, "reading bible; set chapter and verse or break: ").unwrap();
+                stdout.flush().unwrap();
 
-            let tmp1 = line.split_whitespace().collect::<Vec<_>>();
-            println!("{:?}", tmp1);
+                let mut lines = stdin.lock().lines();
+                line = lines.next().unwrap().unwrap();
 
-            target_book = tmp1[0].to_string();
-            println!("target book: {}", target_book);
+                if line == "break" {
+                    break;
+                }
 
-            let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-            println!("{:?}", tmp2);
+                let tmp1 = line.split_whitespace().collect::<Vec<_>>();
+                println!("{:?}", tmp1);
 
-            target_chapter = tmp2[0].parse::<usize>().unwrap();
-            println!("target chapter: {:?}", target_chapter);
+                target_book = tmp1[0].to_string();
+                println!("target book: {}", target_book);
 
-            target_verse = tmp2[1].parse::<usize>().unwrap();
-            println!("target verse: {:?}", target_verse);
+                let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
+                println!("{:?}", tmp2);
+
+                target_chapter = tmp2[0].parse::<usize>().unwrap();
+                println!("target chapter: {:?}", target_chapter);
+
+                target_verse = tmp2[1].parse::<usize>().unwrap();
+                println!("target verse: {:?}", target_verse);
+            }
         }
     }
+    println!("{:?}", word);
     Ok(())
 }
 

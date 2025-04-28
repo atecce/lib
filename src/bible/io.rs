@@ -4,7 +4,7 @@ use std::num::ParseIntError;
 use crate::name::Name;
 use crate::bible::main::BOOKS;
 
-pub struct Reader<R> {
+pub struct Reader<'a, R> {
     r: BufReader<R>,
     b: Vec<u8>,
     book: Name,
@@ -13,15 +13,11 @@ pub struct Reader<R> {
     last: usize,
     verse: usize,
     started: bool,
-    word: HashMap::<Name, Vec<Vec<String>>>,
+    word: &'a mut HashMap::<Name, Vec<Vec<String>>>,
 }
 
-pub fn new_reader<R: std::io::Read>(r: BufReader<R>) -> Reader<R> {
-
-    let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
-    for i in 0..65 {
-        word.insert(BOOKS[i], Vec::new());
-    }
+pub fn new_reader<R: std::io::Read>(r: BufReader<R>,
+    word: &mut HashMap::<Name, Vec<Vec<String>>>) -> Reader<R> {
 
     Reader{
         r: r,
@@ -36,7 +32,7 @@ pub fn new_reader<R: std::io::Read>(r: BufReader<R>) -> Reader<R> {
     }
 }
 
-impl<R: std::io::Read> Iterator for Reader<R> {
+impl<R: std::io::Read> Iterator for Reader<'_, R> {
     type Item = (Name, usize, usize, String);
 
     fn next(&mut self) -> Option<Self::Item> {
