@@ -50,6 +50,11 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                 if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2)
                     && s[s.len()-2..s.len()-1].parse::<usize>().is_ok() {
 
+                    self.started = true;
+                    self.b.clear();
+                    let _ = self.r.read_until(b':', &mut self.b);
+                    s = String::from_utf8_lossy(&self.b).to_string();
+
                     self.chapter = 1;
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse.push(Vec::new());
@@ -59,8 +64,6 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
                     }
-
-                    self.started = true;
 
                     return Some((self.book, self.chapter, self.verse, s));
                 }
