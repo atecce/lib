@@ -43,17 +43,30 @@ impl<R: std::io::Read> Iterator for Reader<R> {
 
         // TODO(atec): hack to avoid index error on s[0..1] at beginning
         if !self.started {
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            let _ = self.r.read_until(b':', &mut self.b);
-            self.started = true;
-            self.b.clear();
+            while self.r.read_until(b':', &mut self.b).is_ok() {
+
+                let mut s = String::from_utf8_lossy(&self.b).to_string();
+
+                if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2)
+                    && s[s.len()-2..s.len()-1].parse::<usize>().is_ok() {
+
+                    self.chapter = 1;
+                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                        chapter_and_verse.push(Vec::new());
+                    }
+
+                    self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                        chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
+                    }
+
+                    self.started = true;
+
+                    return Some((self.book, self.chapter, self.verse, s));
+                }
+
+                self.b.clear();
+            }
         }
 
         // TODO(atec); perhaps use returned byte number
@@ -77,11 +90,6 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                         chapter_and_verse.push(Vec::new());
                     }
                     println!("done extracting chapter");
-
-                    println!("s: {}", s);
-                    println!("book: {}", self.book);
-                    println!("chapter: {}", self.chapter);
-                    println!("verse: {}", self.verse);
 
                     println!("extracting verse...");
                     self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
