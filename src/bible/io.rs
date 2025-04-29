@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::io;
 use std::io::{BufRead,BufReader,Read,Write};
 use std::num::ParseIntError;
 use crate::name::Name;
@@ -63,10 +62,10 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
                     self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
+                        chapter_and_verse[self.chapter-1].push(s.clone());
                     }
 
-                    return Some((self.book, self.chapter, self.verse, s.replace("\r\n", " ")));
+                    return Some((self.book, self.chapter, self.verse, s));
                 }
 
                 self.b.clear();
@@ -80,8 +79,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
             match extract_chapter(&s) {
                 Ok(n) => {
-
-                    println!("extracting chapter");
                     if self.new_book {
                         self.i += 1;
                         self.book = BOOKS[self.i];
@@ -101,17 +98,13 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         self.new_chapter = true;
                         self.last_chapter = n;
                     }
-                    println!("done extracting chapter");
 
-                    println!("extracting verse...");
                     self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
-
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
+                        chapter_and_verse[self.chapter-1].push(s.clone());
                     }
-                    println!("done extracting verse");
 
-                    return Some((self.book, self.chapter, self.verse, s.replace("\r\n", " ")));
+                    return Some((self.book, self.chapter, self.verse, s));
                 },
                 Err(e) => {
                     println!("failed to extract chapter: {}", e);
@@ -209,6 +202,8 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>) -> us
     }
 
     b.clear();
+
+    *s = s.replace("\r\n", " ");
 
     return verse;
 }
