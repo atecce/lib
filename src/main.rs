@@ -70,14 +70,10 @@ fn read_bible() -> std::io::Result<()> {
                 }
 
                 let tmp1 = line.split_whitespace().collect::<Vec<_>>();
-                println!("{:?}", tmp1);
-
                 target_book = tmp1[0].to_string();
                 println!("target book: {}", target_book);
 
                 let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-                println!("{:?}", tmp2);
-
                 target_chapter = tmp2[0].parse::<usize>().unwrap();
                 println!("target chapter: {:?}", target_chapter);
 

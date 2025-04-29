@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::io::{BufRead,BufReader};
+use std::io;
+use std::io::{BufRead,BufReader,Read,Write};
 use std::num::ParseIntError;
 use crate::name::Name;
 use crate::bible::main::BOOKS;
@@ -8,9 +9,11 @@ pub struct Reader<'a, R> {
     r: BufReader<R>,
     b: Vec<u8>,
     book: Name,
+    new_book: bool,
     i: usize,
     chapter: usize,
-    last: usize,
+    last_chapter: usize,
+    new_chapter: bool,
     verse: usize,
     started: bool,
     word: &'a mut HashMap::<Name, Vec<Vec<String>>>,
@@ -23,10 +26,12 @@ pub fn new_reader<R: std::io::Read>(r: BufReader<R>,
         r: r,
         b: Vec::new(),
         book: BOOKS[0],
+        new_book: false,
         i: 0,
-        chapter: 0,
-        verse: 0,
-        last: 0,
+        chapter: 1,
+        last_chapter: 1,
+        new_chapter: false,
+        verse: 1,
         started: false,
         word: word,
     }
@@ -61,7 +66,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
                     }
 
-                    return Some((self.book, self.chapter, self.verse, s));
+                    return Some((self.book, self.chapter, self.verse, s.replace("\r\n", " ")));
                 }
 
                 self.b.clear();
@@ -73,25 +78,34 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
             let mut s = String::from_utf8_lossy(&self.b).to_string();
 
-            match extract_chapter(&mut s) {
+            match extract_chapter(&s) {
                 Ok(n) => {
 
                     println!("extracting chapter");
-                    self.last = self.chapter;
-                    self.chapter = n;
-
-                    if self.last > self.chapter {
+                    if self.new_book {
                         self.i += 1;
                         self.book = BOOKS[self.i];
+                        self.new_book = false;
                     }
-
-                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse.push(Vec::new());
+                    if self.new_chapter {
+                        self.chapter = n;
+                        self.new_chapter = false;
+                        if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                            chapter_and_verse.push(Vec::new());
+                        }
+                    }
+                    if self.last_chapter != n {
+                        if self.last_chapter > n {
+                            self.new_book = true;
+                        }
+                        self.new_chapter = true;
+                        self.last_chapter = n;
                     }
                     println!("done extracting chapter");
 
                     println!("extracting verse...");
                     self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(s.replace("\r\n", " "));
                     }
@@ -109,7 +123,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
     }
 }
 
-fn extract_chapter(s: &mut String) -> Result<usize, ParseIntError> {
+fn extract_chapter(s: &String) -> Result<usize, ParseIntError> {
     if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
         // TODO(atec): some recursive bullshit
         match &s[s.len()-2..s.len()-1].parse::<usize>() {
