@@ -8,12 +8,11 @@ pub struct Reader<'a, R> {
     r: BufReader<R>,
     b: Vec<u8>,
     book: Name,
-    new_book: bool,
     i: usize,
+    new_book: bool,
     chapter: usize,
     last_chapter: usize,
     new_chapter: bool,
-    verse: usize,
     started: bool,
     word: &'a mut HashMap::<Name, Vec<Vec<String>>>,
 }
@@ -25,12 +24,11 @@ pub fn new_reader<R: std::io::Read>(r: BufReader<R>,
         r: r,
         b: Vec::new(),
         book: BOOKS[0],
-        new_book: false,
         i: 0,
+        new_book: false,
         chapter: 1,
         last_chapter: 1,
         new_chapter: false,
-        verse: 1,
         started: false,
         word: word,
     }
@@ -60,12 +58,12 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         chapter_and_verse.push(Vec::new());
                     }
 
-                    self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    let verse = extract_verse(&mut self.r, &mut s, &mut self.b);
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(s.clone());
                     }
 
-                    return Some((self.book, self.chapter, self.verse, s));
+                    return Some((self.book, self.chapter, verse, s));
                 }
 
                 self.b.clear();
@@ -99,12 +97,12 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         self.last_chapter = n;
                     }
 
-                    self.verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    let verse = extract_verse(&mut self.r, &mut s, &mut self.b);
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(s.clone());
                     }
 
-                    return Some((self.book, self.chapter, self.verse, s));
+                    return Some((self.book, self.chapter, verse, s));
                 },
                 Err(e) => {
                     println!("failed to extract chapter: {}", e);
