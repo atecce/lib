@@ -11,7 +11,6 @@ mod persia;
 use std::error::Error;
 use std::fs::File;
 use std::collections::HashMap;
-use std::io;
 use std::io::prelude::*;
 use std::io::{BufReader,BufWriter};
 use crate::name::Name;
@@ -38,58 +37,9 @@ fn read_bible() -> std::io::Result<()> {
         word.insert(BOOKS[i], Vec::new());
     }
 
-    let mut target_book = BOOKS[0].to_string();
-    let mut target_chapter: usize = 1;
-    let mut target_verse: usize = 1;
-
     {
         let r = bible::io::new_reader(BufReader::new(File::open("./pg10.txt").expect("can't open file")), &mut word);
-
-        let mut line = String::new();
-        let mut next = false;
-
-        for (book, chapter, verse, text) in r {
-
-            if (book.to_string() == target_book && chapter == target_chapter && verse == target_verse) ||
-                next {
-
-                next = false;
-
-                println!("book: {}", book);
-                println!("chapter: {}", chapter);
-                println!("verse: {}", verse);
-                println!("text: {}", text);
-
-                let stdin = io::stdin();
-                let mut stdout = io::stdout();
-
-                write!(stdout, "reading bible; set chapter and verse or break: ").unwrap();
-                stdout.flush().unwrap();
-
-                let mut lines = stdin.lock().lines();
-                line = lines.next().unwrap().unwrap();
-
-                if line == "" {
-                    next = true;
-                    continue;
-                }
-
-                if line == "break" {
-                    break;
-                }
-
-                let tmp1 = line.split_whitespace().collect::<Vec<_>>();
-                target_book = tmp1[0].to_string();
-                println!("target book: {}", target_book);
-
-                let tmp2 = tmp1[1].split(":").collect::<Vec<_>>();
-                target_chapter = tmp2[0].parse::<usize>().unwrap();
-                println!("target chapter: {:?}", target_chapter);
-
-                target_verse = tmp2[1].parse::<usize>().unwrap();
-                println!("target verse: {:?}", target_verse);
-            }
-        }
+        for _ in r {}
     }
 
     let mut w = BufWriter::new(File::create("word.json")?);

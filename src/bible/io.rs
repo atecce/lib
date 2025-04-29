@@ -53,7 +53,11 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
         }
         if self.revelation {
             self.amen = true;
-            return Some((Revelation, 22, 21, "21 The grace of our Lord Jesus Christ be with you all. Amen.".to_string()));
+            let text = "21 The grace of our Lord Jesus Christ be with you all. Amen.";
+            if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
+                chapter_and_verse[self.chapter-1].push(text.to_string());
+            }
+            return Some((Revelation, 22, 21, text.to_string()));
         }
 
         // TODO(atec): hack to avoid index error on s[0..1] at beginning
