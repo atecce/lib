@@ -159,27 +159,20 @@ impl<R> Reader<'_, R> {
             return (verse, "".to_string());
         }
 
-        match &s[0..1].parse::<usize>() {
-            Ok(n) => {
-
-                println!("matched verse");
-
-                verse = *n;
-
-                match &s[0..2].parse::<usize>() {
-                    Ok(n) => {
-                        verse = *n;
-                        match &s[0..3].parse::<usize>() {
-                            Ok(n) => verse = *n,
-                            Err(_) => _ = 0,
-                        }
-                    },
-                    Err(_) => _ = 0,
+        for i in 0..3 {
+            match &s[0..(1+i)].parse::<usize>() {
+                Ok(n) => {
+                    verse = *n;
+                },
+                Err(e) => {
+                    if i == 0 {
+                        // TODO(atec): perhaps panic
+                        println!("failed conversion extracting verse: {}", e);
+                        println!("should not happen because we read to the end of the verse as soon as we match");
+                    } else {
+                        // TODO(atec): warn about fallbacks
+                    }
                 }
-            },
-            Err(e) => {
-                println!("failed conversion extracting verse: {}", e);
-                println!("should not happen because we read to the end of the verse as soon as we match");
             }
         }
 
@@ -190,12 +183,9 @@ impl<R> Reader<'_, R> {
         println!("reading until end of verse");
         while !next_verse {
 
-            // TODO(atec); perhaps used returned byte number
+            // TODO(atec); perhaps use returned byte number
             let _ = self.r.read_until(b':', &mut self.b);
-
             s = String::from_utf8_lossy(&self.b).to_string();
-
-            println!("s: {}", s);
 
             next_verse = s.is_char_boundary(s.len()-1) &&
                 s.is_char_boundary(s.len()-2) &&
