@@ -1231,6 +1231,20 @@ pub const JESUS: &Daemon = &Daemon {
             book: Book {
                 name: Matthew,
             },
+            chapter: 5,
+            verses: [13, 16],
+        },
+        Source {
+            book: Book {
+                name: Matthew,
+            },
+            chapter: 7,
+            verses: [6, 7],
+        },
+        Source {
+            book: Book {
+                name: Matthew,
+            },
             chapter: 22,
             verses: [21, 21],
         },

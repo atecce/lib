@@ -48,6 +48,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
     fn next(&mut self) -> Option<Self::Item> {
 
+        // special case for final verse
         if self.amen {
             return None;
         }
@@ -131,6 +132,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         self.new_chapter = true;
                     }
 
+                    // special case for penultimate verse
                     if self.book == Revelation && self.chapter == 22 && verse == 20 {
                         self.revelation = true;
                     }
@@ -138,7 +140,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     return Some((self.book, self.chapter, verse, text));
                 },
                 Err(e) => {
-                    println!("failed to extract chapter: {}", e);
+                    // TODO(atec): possibly accumulate warnings
                     continue;
                 },
             }

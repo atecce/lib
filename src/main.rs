@@ -11,8 +11,7 @@ mod persia;
 use std::error::Error;
 use std::fs::File;
 use std::collections::HashMap;
-use std::io::prelude::*;
-use std::io::{BufReader,BufWriter};
+use std::io::BufReader;
 use crate::name::Name;
 use crate::bible::main::BOOKS;
 use crate::bible::main::JESUS;
@@ -30,7 +29,7 @@ fn print_optimates() {
     println!();
 }
 
-fn read_bible() -> std::io::Result<()> {
+fn read_bible() -> HashMap::<Name, Vec<Vec<String>>> {
 
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
     for i in 0..65 {
@@ -41,12 +40,8 @@ fn read_bible() -> std::io::Result<()> {
         let r = bible::io::new_reader(BufReader::new(File::open("./pg10.txt").expect("can't open file")), &mut word);
         for _ in r {}
     }
-
-    let mut w = BufWriter::new(File::create("word.json")?);
-    serde_json::to_writer(&mut w, &word)?;
-    println!("{:?}", w.flush());
-
-    Ok(())
+    
+    return word;
 }
 
 type Record = (String, f32, f32, f32, f32);
@@ -65,5 +60,13 @@ fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
 }
 
 fn main() {
-    println!("{:?}", read_bible());
+    let word = read_bible();
+
+    for src in JESUS.words {
+        println!("book: {}", src.book.name);
+        println!("chapter: {}", src.chapter);
+        println!("verses: {:?}", src.verses);
+        let words = &word[&src.book.name][src.chapter-1][src.verses[0]-1..=src.verses[1]-1];
+        println!("{:?}", words);
+    }
 }
