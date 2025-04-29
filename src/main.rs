@@ -46,10 +46,14 @@ fn read_bible() -> std::io::Result<()> {
         let r = bible::io::new_reader(BufReader::new(File::open("./pg10.txt").expect("can't open file")), &mut word);
 
         let mut line = String::new();
+        let mut next = false;
 
         for (book, chapter, verse, text) in r {
 
-            if book.to_string() == target_book && chapter == target_chapter && verse == target_verse {
+            if (book.to_string() == target_book && chapter == target_chapter && verse == target_verse) ||
+                next {
+
+                next = false;
 
                 println!("book: {}", book);
                 println!("chapter: {}", chapter);
@@ -64,6 +68,11 @@ fn read_bible() -> std::io::Result<()> {
 
                 let mut lines = stdin.lock().lines();
                 line = lines.next().unwrap().unwrap();
+
+                if line == "" {
+                    next = true;
+                    continue;
+                }
 
                 if line == "break" {
                     break;

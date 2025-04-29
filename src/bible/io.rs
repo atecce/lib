@@ -2,6 +2,11 @@ use std::collections::HashMap;
 use std::io::{BufRead,BufReader};
 use std::num::ParseIntError;
 use crate::name::Name;
+use crate::name::Name::Philemon;
+use crate::name::Name::JohnII;
+use crate::name::Name::JohnIII;
+use crate::name::Name::Jude;
+use crate::name::Name::Revelation;
 use crate::bible::main::BOOKS;
 
 pub struct Reader<'a, R> {
@@ -14,6 +19,8 @@ pub struct Reader<'a, R> {
     last_chapter: usize,
     new_chapter: bool,
     started: bool,
+    revelation: bool,
+    amen: bool,
     word: &'a mut HashMap::<Name, Vec<Vec<String>>>,
 }
 
@@ -30,6 +37,8 @@ pub fn new_reader<R: std::io::Read>(r: BufReader<R>,
         last_chapter: 1,
         new_chapter: false,
         started: false,
+        revelation: false,
+        amen: false,
         word: word,
     }
 }
@@ -38,6 +47,14 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
     type Item = (Name, usize, usize, String);
 
     fn next(&mut self) -> Option<Self::Item> {
+
+        if self.amen {
+            return None;
+        }
+        if self.revelation {
+            self.amen = true;
+            return Some((Revelation, 22, 21, "21 The grace of our Lord Jesus Christ be with you all. Amen.".to_string()));
+        }
 
         // TODO(atec): hack to avoid index error on s[0..1] at beginning
         if !self.started {
@@ -98,6 +115,20 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     let (verse, text) = self.extract_verse();
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(text.clone());
+                    }
+
+                    // special case for Philemon, JohnII, JohnIII, and Jude
+                    // these books only have one chapter so we will just
+                    // hard code the final verse
+                    if (self.book == Philemon && verse == 25) || (self.book == JohnII && verse == 13) ||
+                        (self.book == JohnIII && verse == 14) || (self.book == Jude && verse == 25) {
+
+                        self.new_book = true;
+                        self.new_chapter = true;
+                    }
+
+                    if self.book == Revelation && self.chapter == 22 && verse == 20 {
+                        self.revelation = true;
                     }
 
                     return Some((self.book, self.chapter, verse, text));
