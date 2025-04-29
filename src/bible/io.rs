@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{BufRead,BufReader,Read,Write};
+use std::io::{BufRead,BufReader};
 use std::num::ParseIntError;
 use crate::name::Name;
 use crate::bible::main::BOOKS;
@@ -58,12 +58,12 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         chapter_and_verse.push(Vec::new());
                     }
 
-                    let verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    let (verse, text) = extract_verse(&mut self.r, &mut self.b);
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter-1].push(s.clone());
                     }
 
-                    return Some((self.book, self.chapter, verse, s));
+                    return Some((self.book, self.chapter, verse, text));
                 }
 
                 self.b.clear();
@@ -73,9 +73,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
         // TODO(atec); perhaps use returned byte number
         while self.r.read_until(b':', &mut self.b).is_ok() {
 
-            let mut s = String::from_utf8_lossy(&self.b).to_string();
-
-            match extract_chapter(&s) {
+            match extract_chapter(&self.b) {
                 Ok(n) => {
                     if self.new_book {
                         self.i += 1;
@@ -97,12 +95,12 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                         self.last_chapter = n;
                     }
 
-                    let verse = extract_verse(&mut self.r, &mut s, &mut self.b);
+                    let (verse, text) = extract_verse(&mut self.r, &mut self.b);
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter-1].push(s.clone());
+                        chapter_and_verse[self.chapter-1].push(text.clone());
                     }
 
-                    return Some((self.book, self.chapter, verse, s));
+                    return Some((self.book, self.chapter, verse, text));
                 },
                 Err(e) => {
                     println!("failed to extract chapter: {}", e);
@@ -114,7 +112,10 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
     }
 }
 
-fn extract_chapter(s: &String) -> Result<usize, ParseIntError> {
+fn extract_chapter(b: &Vec<u8>) -> Result<usize, ParseIntError> {
+
+    let s = String::from_utf8_lossy(&b).to_string();
+
     if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
         // TODO(atec): some recursive bullshit
         match &s[s.len()-2..s.len()-1].parse::<usize>() {
@@ -146,14 +147,15 @@ fn extract_chapter(s: &String) -> Result<usize, ParseIntError> {
     }
 }
 
-fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>) -> usize
+fn extract_verse<R>(r: &mut BufReader<R>, b: &mut Vec<u8>) -> (usize, String)
     where R: std::io::Read {
 
+    let mut s = String::from_utf8_lossy(&b).to_string();
     let mut verse = 0;
 
     // TODO(atec): hack at the end
     if s.len() == 0 {
-        return verse;
+        return (verse, "".to_string());
     }
 
     match &s[0..1].parse::<usize>() {
@@ -190,7 +192,7 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>) -> us
         // TODO(atec); perhaps used returned byte number
         let _ = r.read_until(b':', b);
 
-        *s = String::from_utf8_lossy(&b).to_string();
+        s = String::from_utf8_lossy(&b).to_string();
 
         println!("s: {}", s);
 
@@ -201,7 +203,5 @@ fn extract_verse<R>(r: &mut BufReader<R>, s: &mut String, b: &mut Vec<u8>) -> us
 
     b.clear();
 
-    *s = s.replace("\r\n", " ");
-
-    return verse;
+    return (verse, s.replace("\r\n", " "));
 }
