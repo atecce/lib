@@ -13,7 +13,7 @@ use std::fs::File;
 use std::collections::HashMap;
 use std::io;
 use std::io::prelude::*;
-use std::io::BufReader;
+use std::io::{BufReader,BufWriter};
 use crate::name::Name;
 use crate::bible::main::BOOKS;
 use crate::bible::main::JESUS;
@@ -82,7 +82,11 @@ fn read_bible() -> std::io::Result<()> {
             }
         }
     }
-    println!("{:?}", word);
+
+    let mut w = BufWriter::new(File::create("word.json")?);
+    serde_json::to_writer(&mut w, &word)?;
+    println!("{:?}", w.flush());
+
     Ok(())
 }
 
