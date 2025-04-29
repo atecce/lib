@@ -116,36 +116,28 @@ impl<R> Reader<'_, R> {
     fn extract_chapter(&self) -> Result<usize, ParseIntError> {
 
         let s = String::from_utf8_lossy(&self.b).to_string();
+        let mut chapter = 0;
 
         if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
-            // TODO(atec): some recursive bullshit
-            match &s[s.len()-2..s.len()-1].parse::<usize>() {
-                Ok(n1) => {
-                    match &s[s.len()-3..s.len()-1].parse::<usize>() {
-                        Ok(n2) => {
-                            match &s[s.len()-4..s.len()-1].parse::<usize>() {
-                                Ok(n3) => {
-                                    return Ok(*n3);
-                                },
-                                Err(e) => {
-                                    println!("failed conversion parsing three digit chapter: {}", e);
-                                    println!("falling back to two digits");
-                                    return Ok(*n2);
-                                },
-                            }
-                        },
-                        Err(e) => {
-                            println!("failed conversion parsing two digit chapter: {}", e);
-                            println!("falling back to one digit");
-                            return Ok(*n1);
-                        },
-                    }
-                },
-                Err(e) => return Err(e.clone()),
+            for i in 0..3 {
+                match &s[s.len()-(2+i)..s.len()-1].parse::<usize>() {
+                    Ok(n) => {
+                        chapter = *n;
+                    },
+                    Err(e) => {
+                        if i == 0{
+                            return Err(e.clone());
+                        }
+                        // TODO(atec): warn about nested fallbacks
+                    },
+                }
             }
         } else {
+            // TODO(atec): perhaps create own err type
             return "is not character boundary".parse::<usize>();
         }
+
+        return Ok(chapter);
     }
 
     fn extract_verse(&mut self) -> (usize, String)
@@ -180,7 +172,6 @@ impl<R> Reader<'_, R> {
             s.is_char_boundary(s.len()-2) &&
             s[s.len()-2..s.len()-1].parse::<usize>().is_ok();
 
-        println!("reading until end of verse");
         while !next_verse {
 
             // TODO(atec); perhaps use returned byte number
