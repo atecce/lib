@@ -75,7 +75,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     let _ = self.r.read_until(b':', &mut self.b);
                     s = String::from_utf8_lossy(&self.b).to_string();
 
-                    self.chapter = 1;
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse.push(Vec::new());
                     }

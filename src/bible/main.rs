@@ -1253,7 +1253,7 @@ pub const JESUS: &Daemon = &Daemon {
                 name: Revelation,
             },
             chapter: 22,
-            verses: [16, 21],
+            verses: [16, 16],
         },
     ],
     deeds: &[
