@@ -66,7 +66,18 @@ fn main() {
         println!("book: {}", src.book.name);
         println!("chapter: {}", src.chapter);
         println!("verses: {:?}", src.verses);
-        let words = &word[&src.book.name][src.chapter-1][src.verses[0]-1..=src.verses[1]-1];
-        println!("{:?}", words);
+        let text = &word[&src.book.name][src.chapter-1][src.verses[0]-1..=src.verses[1]-1];
+        println!("{:?}", text);
+    }
+
+    for deed in JESUS.deeds {
+        println!("desc: {}", deed.desc);
+        for src in deed.srcs {
+            println!("book: {}", src.book.name);
+            println!("chapter: {}", src.chapter);
+            println!("verses: {:?}", src.verses);
+            let text = &word[&src.book.name][src.chapter][src.verses[0]-1..=src.verses[1]-1];
+            println!("{:?}", text);
+        }
     }
 }

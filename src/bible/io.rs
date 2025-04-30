@@ -139,7 +139,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
                     return Some((self.book, self.chapter, verse, text));
                 },
-                Err(e) => {
+                Err(_) => {
                     // TODO(atec): possibly accumulate warnings
                     continue;
                 },
