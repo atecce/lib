@@ -13,6 +13,8 @@ const PHILIP: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 pub const ALEXANDER: &Daemon = &Daemon {
@@ -25,4 +27,6 @@ pub const ALEXANDER: &Daemon = &Daemon {
     father: Some(PHILIP),
     mother: None,
     teacher: Some(ARISTOTLE),
+
+    predecessor: None,
 };

@@ -198,6 +198,8 @@ const ALMIGHTY: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MARY: &Daemon = &Daemon {
@@ -210,6 +212,8 @@ const MARY: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ADAM: &Daemon = &Daemon {
@@ -222,6 +226,8 @@ const ADAM: &Daemon = &Daemon {
     father: Some(ALMIGHTY),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const EVE: &Daemon = &Daemon {
@@ -234,6 +240,8 @@ const EVE: &Daemon = &Daemon {
     father: Some(ALMIGHTY),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const CAIN: &Daemon = &Daemon {
@@ -246,6 +254,8 @@ const CAIN: &Daemon = &Daemon {
     father: Some(ADAM),
     mother: Some(EVE),
     teacher: None,
+
+    predecessor: None,
 };
 
 const ABEL: &Daemon = &Daemon {
@@ -258,6 +268,8 @@ const ABEL: &Daemon = &Daemon {
     father: Some(ADAM),
     mother: Some(EVE),
     teacher: None,
+
+    predecessor: None,
 };
 
 const SETH: &Daemon = &Daemon {
@@ -270,6 +282,8 @@ const SETH: &Daemon = &Daemon {
     father: Some(ADAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ENOSH: &Daemon = &Daemon {
@@ -282,6 +296,8 @@ const ENOSH: &Daemon = &Daemon {
     father: Some(SETH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const KENAN: &Daemon = &Daemon {
@@ -294,6 +310,8 @@ const KENAN: &Daemon = &Daemon {
     father: Some(ENOSH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MAHALALEL: &Daemon = &Daemon {
@@ -306,6 +324,8 @@ const MAHALALEL: &Daemon = &Daemon {
     father: Some(KENAN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JARED: &Daemon = &Daemon {
@@ -318,6 +338,8 @@ const JARED: &Daemon = &Daemon {
     father: Some(MAHALALEL),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ENOCH: &Daemon = &Daemon {
@@ -330,6 +352,8 @@ const ENOCH: &Daemon = &Daemon {
     father: Some(JARED),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const METHUSELAH: &Daemon = &Daemon {
@@ -342,6 +366,8 @@ const METHUSELAH: &Daemon = &Daemon {
     father: Some(ENOCH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const LAMECH: &Daemon = &Daemon {
@@ -354,6 +380,8 @@ const LAMECH: &Daemon = &Daemon {
     father: Some(METHUSELAH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NOAH: &Daemon = &Daemon {
@@ -366,6 +394,8 @@ const NOAH: &Daemon = &Daemon {
     father: Some(LAMECH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SHEM: &Daemon = &Daemon {
@@ -378,6 +408,8 @@ const SHEM: &Daemon = &Daemon {
     father: Some(NOAH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ARPHAXAD: &Daemon = &Daemon {
@@ -390,6 +422,8 @@ const ARPHAXAD: &Daemon = &Daemon {
     father: Some(SHEM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const CAINAN: &Daemon = &Daemon {
@@ -402,6 +436,8 @@ const CAINAN: &Daemon = &Daemon {
     father: Some(ARPHAXAD),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SHELAH: &Daemon = &Daemon {
@@ -414,6 +450,8 @@ const SHELAH: &Daemon = &Daemon {
     father: Some(CAINAN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const EBER: &Daemon = &Daemon {
@@ -426,6 +464,8 @@ const EBER: &Daemon = &Daemon {
     father: Some(SHELAH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const PELEG: &Daemon = &Daemon {
@@ -438,6 +478,8 @@ const PELEG: &Daemon = &Daemon {
     father: Some(EBER),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const REU: &Daemon = &Daemon {
@@ -450,6 +492,8 @@ const REU: &Daemon = &Daemon {
     father: Some(PELEG),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SERUG: &Daemon = &Daemon {
@@ -462,6 +506,8 @@ const SERUG: &Daemon = &Daemon {
     father: Some(REU),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NAHOR: &Daemon = &Daemon {
@@ -474,6 +520,8 @@ const NAHOR: &Daemon = &Daemon {
     father: Some(SERUG),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const TERRAH: &Daemon = &Daemon {
@@ -486,6 +534,8 @@ const TERRAH: &Daemon = &Daemon {
     father: Some(NAHOR),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ABRAHAM: &Daemon = &Daemon {
@@ -498,6 +548,8 @@ const ABRAHAM: &Daemon = &Daemon {
     father: Some(TERRAH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ISAAC: &Daemon = &Daemon {
@@ -510,6 +562,8 @@ const ISAAC: &Daemon = &Daemon {
     father: Some(ABRAHAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JACOB: &Daemon = &Daemon {
@@ -523,6 +577,8 @@ const JACOB: &Daemon = &Daemon {
     father: Some(ISAAC),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const REUBEN: &Daemon = &Daemon {
@@ -535,6 +591,8 @@ const REUBEN: &Daemon = &Daemon {
     father: Some(JACOB),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const AMRAM: &Daemon = &Daemon {
@@ -547,6 +605,8 @@ const AMRAM: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOCHEBED: &Daemon = &Daemon {
@@ -559,6 +619,8 @@ const JOCHEBED: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MOSES: &Daemon = &Daemon {
@@ -571,6 +633,8 @@ const MOSES: &Daemon = &Daemon {
     father: Some(AMRAM),
     mother: Some(JOCHEBED),
     teacher: None,
+
+    predecessor: None,
 };
 
 const AARON: &Daemon = &Daemon {
@@ -583,6 +647,8 @@ const AARON: &Daemon = &Daemon {
     father: Some(AMRAM),
     mother: Some(JOCHEBED),
     teacher: None,
+
+    predecessor: None,
 };
 
 const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
@@ -595,6 +661,8 @@ const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
     father: Some(JACOB),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const PEREZ: &Daemon = &Daemon {
@@ -607,6 +675,8 @@ const PEREZ: &Daemon = &Daemon {
     father: Some(JUDAH_SON_OF_JACOB),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const HEZRON: &Daemon = &Daemon {
@@ -619,6 +689,8 @@ const HEZRON: &Daemon = &Daemon {
     father: Some(PEREZ),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const RAM: &Daemon = &Daemon {
@@ -631,6 +703,8 @@ const RAM: &Daemon = &Daemon {
     father: Some(HEZRON),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const AMMINADAB: &Daemon = &Daemon {
@@ -643,6 +717,8 @@ const AMMINADAB: &Daemon = &Daemon {
     father: Some(RAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NASHON: &Daemon = &Daemon {
@@ -655,6 +731,8 @@ const NASHON: &Daemon = &Daemon {
     father: Some(AMMINADAB),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SALMON: &Daemon = &Daemon {
@@ -667,6 +745,8 @@ const SALMON: &Daemon = &Daemon {
     father: Some(NASHON),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const BOAZ: &Daemon = &Daemon {
@@ -679,6 +759,8 @@ const BOAZ: &Daemon = &Daemon {
     father: Some(SALMON),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const OBED: &Daemon = &Daemon {
@@ -691,6 +773,8 @@ const OBED: &Daemon = &Daemon {
     father: Some(BOAZ),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JESSE: &Daemon = &Daemon {
@@ -703,6 +787,8 @@ const JESSE: &Daemon = &Daemon {
     father: Some(OBED),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const DAVID: &Daemon = &Daemon {
@@ -715,6 +801,8 @@ const DAVID: &Daemon = &Daemon {
     father: Some(JESSE),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NATHAN: &Daemon = &Daemon {
@@ -727,6 +815,8 @@ const NATHAN: &Daemon = &Daemon {
     father: Some(DAVID),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MATTATHA: &Daemon = &Daemon {
@@ -739,6 +829,8 @@ const MATTATHA: &Daemon = &Daemon {
     father: Some(NATHAN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MENNA: &Daemon = &Daemon {
@@ -751,6 +843,8 @@ const MENNA: &Daemon = &Daemon {
     father: Some(MATTATHA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MELEA: &Daemon = &Daemon {
@@ -763,6 +857,8 @@ const MELEA: &Daemon = &Daemon {
     father: Some(MENNA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ELIAKIM: &Daemon = &Daemon {
@@ -775,6 +871,8 @@ const ELIAKIM: &Daemon = &Daemon {
     father: Some(MELEA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JONAM: &Daemon = &Daemon {
@@ -787,6 +885,8 @@ const JONAM: &Daemon = &Daemon {
     father: Some(ELIAKIM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
@@ -799,6 +899,8 @@ const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
     father: Some(JONAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JUDAH: &Daemon = &Daemon {
@@ -811,6 +913,8 @@ const JUDAH: &Daemon = &Daemon {
     father: Some(JOSEPH_SON_OF_JONAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SIMEON: &Daemon = &Daemon {
@@ -823,6 +927,8 @@ const SIMEON: &Daemon = &Daemon {
     father: Some(JUDAH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
@@ -835,6 +941,8 @@ const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
     father: Some(SIMEON),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
@@ -847,6 +955,8 @@ const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
     father: Some(LEVI_SON_OF_SIMEON),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JORIM: &Daemon = &Daemon {
@@ -859,6 +969,8 @@ const JORIM: &Daemon = &Daemon {
     father: Some(MATTHAT_SON_OF_LEVI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ELIEZER: &Daemon = &Daemon {
@@ -871,6 +983,8 @@ const ELIEZER: &Daemon = &Daemon {
     father: Some(JORIM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOSHUA: &Daemon = &Daemon {
@@ -883,6 +997,8 @@ const JOSHUA: &Daemon = &Daemon {
     father: Some(ELIEZER),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ER: &Daemon = &Daemon {
@@ -895,6 +1011,8 @@ const ER: &Daemon = &Daemon {
     father: Some(JOSHUA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ELMADAM: &Daemon = &Daemon {
@@ -907,6 +1025,8 @@ const ELMADAM: &Daemon = &Daemon {
     father: Some(ER),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const COSAM: &Daemon = &Daemon {
@@ -919,6 +1039,8 @@ const COSAM: &Daemon = &Daemon {
     father: Some(ELMADAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ADDI: &Daemon = &Daemon {
@@ -931,6 +1053,8 @@ const ADDI: &Daemon = &Daemon {
     father: Some(COSAM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
@@ -943,6 +1067,8 @@ const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
     father: Some(ADDI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NERI: &Daemon = &Daemon {
@@ -955,6 +1081,8 @@ const NERI: &Daemon = &Daemon {
     father: Some(MELKI_SON_OF_ADDI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SHEALTIEL: &Daemon = &Daemon {
@@ -967,6 +1095,8 @@ const SHEALTIEL: &Daemon = &Daemon {
     father: Some(NERI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ZERUBBABEL: &Daemon = &Daemon {
@@ -979,6 +1109,8 @@ const ZERUBBABEL: &Daemon = &Daemon {
     father: Some(SHEALTIEL),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const RHESA: &Daemon = &Daemon {
@@ -991,6 +1123,8 @@ const RHESA: &Daemon = &Daemon {
     father: Some(ZERUBBABEL),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOANAN: &Daemon = &Daemon {
@@ -1003,6 +1137,8 @@ const JOANAN: &Daemon = &Daemon {
     father: Some(RHESA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JODA: &Daemon = &Daemon {
@@ -1015,6 +1151,8 @@ const JODA: &Daemon = &Daemon {
     father: Some(JOANAN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOSEK: &Daemon = &Daemon {
@@ -1027,6 +1165,8 @@ const JOSEK: &Daemon = &Daemon {
     father: Some(JODA),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const SEMEIN: &Daemon = &Daemon {
@@ -1039,6 +1179,8 @@ const SEMEIN: &Daemon = &Daemon {
     father: Some(JOSEK),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
@@ -1051,6 +1193,8 @@ const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
     father: Some(SEMEIN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MAATH: &Daemon = &Daemon {
@@ -1063,6 +1207,8 @@ const MAATH: &Daemon = &Daemon {
     father: Some(MATTATHIAS_SON_OF_SEMEIN),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NAGGAI: &Daemon = &Daemon {
@@ -1075,6 +1221,8 @@ const NAGGAI: &Daemon = &Daemon {
     father: Some(MAATH),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const ESLI: &Daemon = &Daemon {
@@ -1087,6 +1235,8 @@ const ESLI: &Daemon = &Daemon {
     father: Some(NAGGAI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const NAHUM: &Daemon = &Daemon {
@@ -1099,6 +1249,8 @@ const NAHUM: &Daemon = &Daemon {
     father: Some(ESLI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const AMOS: &Daemon = &Daemon {
@@ -1111,6 +1263,8 @@ const AMOS: &Daemon = &Daemon {
     father: Some(NAHUM),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MATTATHIAS: &Daemon = &Daemon {
@@ -1123,6 +1277,8 @@ const MATTATHIAS: &Daemon = &Daemon {
     father: Some(AMOS),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
@@ -1135,6 +1291,8 @@ const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
     father: Some(MATTATHIAS),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JANNAI: &Daemon = &Daemon {
@@ -1147,6 +1305,8 @@ const JANNAI: &Daemon = &Daemon {
     father: Some(JOSEPH_SON_OF_MATTATHIAS),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MELKI: &Daemon = &Daemon {
@@ -1159,6 +1319,8 @@ const MELKI: &Daemon = &Daemon {
     father: Some(JANNAI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const LEVI: &Daemon = &Daemon {
@@ -1171,6 +1333,8 @@ const LEVI: &Daemon = &Daemon {
     father: Some(MELKI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const MATTHAT: &Daemon = &Daemon {
@@ -1183,6 +1347,8 @@ const MATTHAT: &Daemon = &Daemon {
     father: Some(LEVI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const HELI: &Daemon = &Daemon {
@@ -1195,6 +1361,8 @@ const HELI: &Daemon = &Daemon {
     father: Some(MATTHAT),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 const JOSEPH: &Daemon = &Daemon {
@@ -1220,6 +1388,8 @@ const JOSEPH: &Daemon = &Daemon {
     father: Some(HELI),
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 pub const JESUS: &Daemon = &Daemon {
@@ -1274,4 +1444,6 @@ pub const JESUS: &Daemon = &Daemon {
     father: Some(JOSEPH),
     mother: Some(MARY),
     teacher: None,
+
+    predecessor: None,
 };

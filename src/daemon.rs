@@ -11,4 +11,6 @@ pub struct Daemon<'a> {
     pub father: Option<&'a Daemon<'a>>,
     pub mother: Option<&'a Daemon<'a>>,
     pub teacher: Option<&'a Daemon<'a>>,
+
+    pub predecessor: Option<&'a Daemon<'a>>,
 }

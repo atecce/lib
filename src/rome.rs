@@ -14,6 +14,8 @@ pub const ROMULUS: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 pub const REMUS: &Daemon = &Daemon {
@@ -25,7 +27,9 @@ pub const REMUS: &Daemon = &Daemon {
 
     father: None,
     mother: None,
-    teacher: None
+    teacher: None,
+
+    predecessor: None,
 };
 
 pub const CICERO: &Daemon = &Daemon {
@@ -38,6 +42,8 @@ pub const CICERO: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
 
 pub const CAESAR: &Daemon = &Daemon {
@@ -50,6 +56,20 @@ pub const CAESAR: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
+};
+
+pub const AUGUSTUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(CAESAR),
 };
 
 // // Julio-Claudian dynasty

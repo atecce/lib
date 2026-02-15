@@ -28,4 +28,6 @@ pub const CYRUS: &Daemon = &Daemon {
     father: None,
     mother: None,
     teacher: None,
+
+    predecessor: None,
 };
