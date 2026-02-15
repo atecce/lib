@@ -136,3 +136,11 @@ pub const CAESAR: &Daemon = &Daemon {
 // Julius Nepotianus, "Nepotianus"; 3 June - 30 June 350
 // Flavius Claudius Julianus, "Julian (the Apostate)"; 3 November 361 - 26 June 363
 // Jovianus, "Jovian"; 27 June 363 - 17 February 364
+// Valentinianus, "Valentinan I (the Great)"; 25/26 February 364 - 17 November 375
+// "Valens"; 28 March 364 - 9 August 378
+// "Procopius"; 28 September 365 - 27 May 366
+// Gratianus, "Gratian"; 17 November 375 - 25 August 383
+// "Magnus Maximus"; 25 August 383 - 28 August 388
+// "Victor"; 383/387 - 388
+// Valentinianus, "Valentinian II"; 28 August 388 - 15 May 392
+// "Eugenius"; 22 August 392 - 6 September 394
