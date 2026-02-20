@@ -80,4 +80,15 @@ fn main() {
             println!("{:?}", text);
         }
     }
+
+    for (book, chapter_and_verse) in word {
+        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+            for (j, verse) in chapter.iter().enumerate() {
+                if verse.contains("Joshua") {
+                    println!("{} {}:{}", book, i+1, j+1);
+                    println!("{}", verse);
+                }
+            }
+        }
+    }
 }
