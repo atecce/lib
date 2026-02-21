@@ -20,6 +20,11 @@ use crate::greece::macedon::ALEXANDER;
 use crate::rome::CICERO;
 use crate::persia::CYRUS;
 
+use orp::params::RuntimeParameters;
+use gliner::util::result::Result;
+use gliner::model::{GLiNER, input::text::TextInput, params::Parameters};
+use gliner::model::pipeline::span::SpanMode;
+
 fn print_optimates() {
     println!("{:?}", JESUS);
     println!("{:?}", APOLLO);
@@ -44,22 +49,22 @@ fn read_bible() -> HashMap::<Name, Vec<Vec<String>>> {
     return word;
 }
 
-type Record = (String, f32, f32, f32, f32);
+// type Record = (String, f32, f32, f32, f32);
+// 
+// fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
+// 
+//     let mut r = csv::Reader::from_reader(File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"));
+//     let mut records = Vec::new();
+// 
+//     for res in r.deserialize() {
+//         let record: Record = res?;
+//         records.push(record);
+//     }
+// 
+//     Ok(records)
+// }
 
-fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
-
-    let mut r = csv::Reader::from_reader(File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"));
-    let mut records = Vec::new();
-
-    for res in r.deserialize() {
-        let record: Record = res?;
-        records.push(record);
-    }
-
-    Ok(records)
-}
-
-fn main() {
+fn main() -> Result<()> {
     let word = read_bible();
 
     for src in JESUS.words {
@@ -81,14 +86,33 @@ fn main() {
         }
     }
 
+    let model = GLiNER::<SpanMode>::new(
+        Parameters::default(),
+        RuntimeParameters::default(),
+        "tokenizer.json",
+        "pytorch_model.bin",
+    )?;
+
+    let mut verses = Vec::new();
     for (book, chapter_and_verse) in word {
         for (i, chapter) in chapter_and_verse.iter().enumerate() {
             for (j, verse) in chapter.iter().enumerate() {
-                if verse.contains("Joshua") {
-                    println!("{} {}:{}", book, i+1, j+1);
-                    println!("{}", verse);
-                }
+                verses.push(verse.clone());
             }
         }
     }
+
+    let tmp: Vec<&str> = verses
+        .iter()
+        .map(|s| s.as_str())
+        .collect();
+
+    let input = TextInput::from_str(
+        &tmp,
+        &[],
+    )?;
+
+    println!("{}", model.inference(input)?);
+
+    Ok(())
 }
