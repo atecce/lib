@@ -781,22 +781,191 @@ pub const NUMERIAN: &Daemon = &Daemon {
     // TODO(atec): multiple emperors
     predecessor: Some(CARUS),
 };
+
 // // // Dominate
 // // Tetrarchy
 // Gaius Aurelius Valerius Diocletianus, "Diocletian (Jovius)"; 20 November 284 - 1 May 305
+pub const DIOCLETIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(NUMERIAN),
+};
+
 // Marcus Aurelius Valerius Maximianus, "Maximian"; 1 April 286 - 1 May 305
+pub const MAXIMIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(NUMERIAN),
+};
+
 // Gaius Galerius Valerius Maximianus, "Galerius"; 1 May 305 - May 311
+pub const GALERIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(MAXIMIAN),
+};
+
 // Marcus Flavius Valerius Constantius, "Constantius I (Chlorus)"; 1 May 305 - 25 July 306
+pub const CONSTANTIUS_I: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(MAXIMIAN),
+};
+
 // Flavius Valerius Severus, "Severus II"; August 306 - March/April 307
+pub const SEVERUS_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANTIUS_I),
+};
+
 // Lucius Domitius Alexander, "Alexander"; 308 - 310
+pub const ALEXANDER: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Marcus Aurelius Valerius Maxentius, "Maxentius"; 28 October 306 - 28 October 312
+pub const MAXENTIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Valerius Licinianus Licinius, "Licinius"; 11 November 308 - 19 September 324
+pub const LICINIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Galerius Valerius Maximinus, "Maximinus II (Daza)"; 310 - July 313
+pub const MAXIMUS_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Aurelius Valerius Valens, "Valerius Valens"; October 316 - January 317
+pub const VALERIUS_VALENS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Mar. Martinianus, "Martinian"; July - 19 September 324 ;
+pub const MARTINIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // // Constantinian dynasty
 // Flavius Valerius Constantinus, "Constantine I (the Great)"; 25 July 306 - 22 May 337
+pub const CONSTANTINE_I: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(SEVERUS_II),
+};
+
 // Falvius Claudius Constantinus, "Constantine II"; 9 September 337 - April 340
+pub const CONSTANTINE_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANTINE_I),
+};
 // Flavius Julius Constans, "Constans I"; 9 September 337 - January 350
 // Flavius Julius Constantius, "Constantius II"; 9 September 337 - 3 November 361
 // Magnus Magnentius, "Magnentius"; 18 January 350 - 10 August 353
