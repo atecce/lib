@@ -972,17 +972,199 @@ pub const CONSTANS_I: &Daemon = &Daemon {
     // TODO(atec): multiple emperors
     predecessor: Some(CONSTANTINE_I),
 };
+
 // Flavius Julius Constantius, "Constantius II"; 9 September 337 - 3 November 361
+pub const CONSTANTIUS_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANTINE_I),
+};
+
 // Magnus Magnentius, "Magnentius"; 18 January 350 - 10 August 353
+pub const MAGNENTIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANS_I),
+};
+
 // "Vetranio"; 1 March - 25 December 350
+pub const VETRANIO: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANS_I),
+};
+
 // Julius Nepotianus, "Nepotianus"; 3 June - 30 June 350
+pub const NEPOTIANUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANS_I),
+};
+
 // Flavius Claudius Julianus, "Julian (the Apostate)"; 3 November 361 - 26 June 363
+pub const JULIAN_THE_APOSTATE: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANTIUS_II),
+};
+
 // Jovianus, "Jovian"; 27 June 363 - 17 February 364
-// Valentinianus, "Valentinan I (the Great)"; 25/26 February 364 - 17 November 375
+pub const JOVIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(JULIAN_THE_APOSTATE),
+};
+
+// Valentinianus, "Valentinian I (the Great)"; 25/26 February 364 - 17 November 375
+pub const VALENTINIAN_I_THE_GREAT: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(JOVIAN),
+};
+
 // "Valens"; 28 March 364 - 9 August 378
+pub const VALENS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(JOVIAN),
+};
+
 // "Procopius"; 28 September 365 - 27 May 366
+pub const PROCOPIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(JOVIAN),
+};
+
 // Gratianus, "Gratian"; 17 November 375 - 25 August 383
+pub const GRATIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(VALENTINIAN_I_THE_GREAT),
+};
+
 // "Magnus Maximus"; 25 August 383 - 28 August 388
+pub const MAGNUS_MAXIMUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(GRATIAN),
+};
+
 // "Victor"; 383/387 - 388
+pub const VICTOR: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(GRATIAN),
+};
+
 // Valentinianus, "Valentinian II"; 28 August 388 - 15 May 392
+pub const VALENTINIAN_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(VICTOR),
+};
+
 // "Eugenius"; 22 August 392 - 6 September 394
+pub const EUGENIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(VALENTINIAN_II),
+};
