@@ -1,13 +1,11 @@
-use crate::name::Name::Romulus;
-use crate::name::Name::Remus;
+use crate::daemon::Daemon;
 use crate::name::Name::Caesar;
 use crate::name::Name::Cicero;
-use crate::daemon::Daemon;
+use crate::name::Name::Remus;
+use crate::name::Name::Romulus;
 
 pub const ROMULUS: &Daemon = &Daemon {
-    names: &[
-        Romulus,
-    ],
+    names: &[Romulus],
     words: &[],
     deeds: &[],
 
@@ -19,9 +17,7 @@ pub const ROMULUS: &Daemon = &Daemon {
 };
 
 pub const REMUS: &Daemon = &Daemon {
-    names: &[
-        Remus,
-    ],
+    names: &[Remus],
     words: &[],
     deeds: &[],
 
@@ -33,9 +29,7 @@ pub const REMUS: &Daemon = &Daemon {
 };
 
 pub const CICERO: &Daemon = &Daemon {
-    names: &[
-        Cicero,
-    ],
+    names: &[Cicero],
     words: &[],
     deeds: &[],
 
@@ -47,9 +41,7 @@ pub const CICERO: &Daemon = &Daemon {
 };
 
 pub const CAESAR: &Daemon = &Daemon {
-    names: &[
-        Caesar,
-    ],
+    names: &[Caesar],
     words: &[],
     deeds: &[],
 
@@ -966,7 +958,20 @@ pub const CONSTANTINE_II: &Daemon = &Daemon {
     // TODO(atec): multiple emperors
     predecessor: Some(CONSTANTINE_I),
 };
+
 // Flavius Julius Constans, "Constans I"; 9 September 337 - January 350
+pub const CONSTANS_I: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(CONSTANTINE_I),
+};
 // Flavius Julius Constantius, "Constantius II"; 9 September 337 - 3 November 361
 // Magnus Magnentius, "Magnentius"; 18 January 350 - 10 August 353
 // "Vetranio"; 1 March - 25 December 350

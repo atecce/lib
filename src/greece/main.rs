@@ -1,24 +1,20 @@
-use crate::name::Name::Cronus;
-use crate::name::Name::Cronos;
-use crate::name::Name::Kronos;
-use crate::name::Name::Zeus;
-use crate::name::Name::Hera;
-use crate::name::Name::Leto;
-use crate::name::Name::Hermes;
-use crate::name::Name::Apollo;
-use crate::name::Name::Artemis;
-use crate::name::Name::Achilles;
-use crate::name::Name::Socrates;
-use crate::name::Name::Plato;
-use crate::name::Name::Aristotle;
 use crate::daemon::Daemon;
+use crate::name::Name::Achilles;
+use crate::name::Name::Apollo;
+use crate::name::Name::Aristotle;
+use crate::name::Name::Artemis;
+use crate::name::Name::Cronos;
+use crate::name::Name::Cronus;
+use crate::name::Name::Hera;
+use crate::name::Name::Hermes;
+use crate::name::Name::Kronos;
+use crate::name::Name::Leto;
+use crate::name::Name::Plato;
+use crate::name::Name::Socrates;
+use crate::name::Name::Zeus;
 
 pub const CRONUS: &Daemon = &Daemon {
-    names: &[
-        Cronus,
-        Cronos,
-        Kronos,
-    ],
+    names: &[Cronus, Cronos, Kronos],
     words: &[],
     deeds: &[],
 
@@ -30,9 +26,7 @@ pub const CRONUS: &Daemon = &Daemon {
 };
 
 pub const ZEUS: &Daemon = &Daemon {
-    names: &[
-        Zeus,
-    ],
+    names: &[Zeus],
     words: &[],
     deeds: &[],
 
@@ -44,9 +38,7 @@ pub const ZEUS: &Daemon = &Daemon {
 };
 
 pub const HERA: &Daemon = &Daemon {
-    names: &[
-        Hera,
-    ],
+    names: &[Hera],
     words: &[],
     deeds: &[],
 
@@ -58,9 +50,7 @@ pub const HERA: &Daemon = &Daemon {
 };
 
 const LETO: &Daemon = &Daemon {
-    names: &[
-        Leto,
-    ],
+    names: &[Leto],
     words: &[],
     deeds: &[],
 
@@ -72,9 +62,7 @@ const LETO: &Daemon = &Daemon {
 };
 
 pub const HERMES: &Daemon = &Daemon {
-    names: &[
-        Hermes,
-    ],
+    names: &[Hermes],
     words: &[],
     deeds: &[],
 
@@ -86,9 +74,7 @@ pub const HERMES: &Daemon = &Daemon {
 };
 
 pub const APOLLO: &Daemon = &Daemon {
-    names: &[
-        Apollo,
-    ],
+    names: &[Apollo],
     words: &[],
     deeds: &[],
 
@@ -100,9 +86,7 @@ pub const APOLLO: &Daemon = &Daemon {
 };
 
 pub const ARTEMIS: &Daemon = &Daemon {
-    names: &[
-        Artemis,
-    ],
+    names: &[Artemis],
     words: &[],
     deeds: &[],
 
@@ -114,9 +98,7 @@ pub const ARTEMIS: &Daemon = &Daemon {
 };
 
 pub const ACHILLES: &Daemon = &Daemon {
-    names: &[
-        Achilles,
-    ],
+    names: &[Achilles],
     words: &[],
     deeds: &[],
 
@@ -128,9 +110,7 @@ pub const ACHILLES: &Daemon = &Daemon {
 };
 
 pub const SOCRATES: &Daemon = &Daemon {
-    names: &[
-        Socrates,
-    ],
+    names: &[Socrates],
     words: &[],
     deeds: &[],
 
@@ -142,9 +122,7 @@ pub const SOCRATES: &Daemon = &Daemon {
 };
 
 pub const PLATO: &Daemon = &Daemon {
-    names: &[
-        Plato,
-    ],
+    names: &[Plato],
     words: &[],
     deeds: &[],
 
@@ -156,9 +134,7 @@ pub const PLATO: &Daemon = &Daemon {
 };
 
 pub const ARISTOTLE: &Daemon = &Daemon {
-    names: &[
-        Aristotle,
-    ],
+    names: &[Aristotle],
     words: &[],
     deeds: &[],
 

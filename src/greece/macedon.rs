@@ -1,12 +1,10 @@
-use crate::name::Name::Philip;
-use crate::name::Name::Alexander;
 use crate::daemon::Daemon;
 use crate::greece::main::ARISTOTLE;
+use crate::name::Name::Alexander;
+use crate::name::Name::Philip;
 
 const PHILIP: &Daemon = &Daemon {
-    names: &[
-        Philip,
-    ],
+    names: &[Philip],
     words: &[],
     deeds: &[],
 
@@ -18,9 +16,7 @@ const PHILIP: &Daemon = &Daemon {
 };
 
 pub const ALEXANDER: &Daemon = &Daemon {
-    names: &[
-        Alexander,
-    ],
+    names: &[Alexander],
     words: &[],
     deeds: &[],
 

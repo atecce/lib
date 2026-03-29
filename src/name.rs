@@ -1,9 +1,9 @@
-use std::fmt;
 use serde::Serialize;
+use std::fmt;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize)]
 pub enum Name {
-    // 
+    //
     God,
 
     // greece

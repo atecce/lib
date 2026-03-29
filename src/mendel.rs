@@ -16,7 +16,7 @@ pub enum SeedAlbumenColor {
     PaleYellow,
     BrightYellow,
     Orange,
-    IntensiveGreen
+    IntensiveGreen,
 }
 
 // 3. The difference in the colour of the seed coat. This is either

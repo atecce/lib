@@ -1,13 +1,13 @@
-use std::collections::HashMap;
-use std::io::{BufRead,BufReader};
-use std::num::ParseIntError;
+use crate::bible::main::BOOKS;
 use crate::name::Name;
-use crate::name::Name::Philemon;
 use crate::name::Name::JohnII;
 use crate::name::Name::JohnIII;
 use crate::name::Name::Jude;
+use crate::name::Name::Philemon;
 use crate::name::Name::Revelation;
-use crate::bible::main::BOOKS;
+use std::collections::HashMap;
+use std::io::{BufRead, BufReader};
+use std::num::ParseIntError;
 
 pub struct Reader<'a, R> {
     r: BufReader<R>,
@@ -21,13 +21,14 @@ pub struct Reader<'a, R> {
     started: bool,
     revelation: bool,
     amen: bool,
-    word: &'a mut HashMap::<Name, Vec<Vec<String>>>,
+    word: &'a mut HashMap<Name, Vec<Vec<String>>>,
 }
 
-pub fn new_reader<R: std::io::Read>(r: BufReader<R>,
-    word: &mut HashMap::<Name, Vec<Vec<String>>>) -> Reader<R> {
-
-    Reader{
+pub fn new_reader<R: std::io::Read>(
+    r: BufReader<R>,
+    word: &mut HashMap<Name, Vec<Vec<String>>>,
+) -> Reader<R> {
+    Reader {
         r: r,
         b: Vec::new(),
         book: BOOKS[0],
@@ -47,7 +48,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
     type Item = (Name, usize, usize, String);
 
     fn next(&mut self) -> Option<Self::Item> {
-
         // special case for final verse
         if self.amen {
             return None;
@@ -56,7 +56,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
             self.amen = true;
             let text = "21 The grace of our Lord Jesus Christ be with you all. Amen.";
             if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                chapter_and_verse[self.chapter-1].push(text.to_string());
+                chapter_and_verse[self.chapter - 1].push(text.to_string());
             }
             return Some((Revelation, 22, 21, text.to_string()));
         }
@@ -64,12 +64,12 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
         // TODO(atec): hack to avoid index error on s[0..1] at beginning
         if !self.started {
             while self.r.read_until(b':', &mut self.b).is_ok() {
-
                 let mut s = String::from_utf8_lossy(&self.b).to_string();
 
-                if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2)
-                    && s[s.len()-2..s.len()-1].parse::<usize>().is_ok() {
-
+                if s.is_char_boundary(s.len() - 1)
+                    && s.is_char_boundary(s.len() - 2)
+                    && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok()
+                {
                     self.started = true;
                     self.b.clear();
                     let _ = self.r.read_until(b':', &mut self.b);
@@ -81,7 +81,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
                     let (verse, text) = self.extract_verse();
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter-1].push(s.clone());
+                        chapter_and_verse[self.chapter - 1].push(s.clone());
                     }
 
                     return Some((self.book, self.chapter, verse, text));
@@ -93,7 +93,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
         // TODO(atec); perhaps use returned byte number
         while self.r.read_until(b':', &mut self.b).is_ok() {
-
             match self.extract_chapter() {
                 Ok(n) => {
                     if self.new_book {
@@ -118,15 +117,17 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
                     let (verse, text) = self.extract_verse();
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter-1].push(text.clone());
+                        chapter_and_verse[self.chapter - 1].push(text.clone());
                     }
 
                     // special case for Philemon, JohnII, JohnIII, and Jude
                     // these books only have one chapter so we will just
                     // hard code the final verse
-                    if (self.book == Philemon && verse == 25) || (self.book == JohnII && verse == 13) ||
-                        (self.book == JohnIII && verse == 14) || (self.book == Jude && verse == 25) {
-
+                    if (self.book == Philemon && verse == 25)
+                        || (self.book == JohnII && verse == 13)
+                        || (self.book == JohnIII && verse == 14)
+                        || (self.book == Jude && verse == 25)
+                    {
                         self.new_book = true;
                         self.new_chapter = true;
                     }
@@ -137,11 +138,11 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     }
 
                     return Some((self.book, self.chapter, verse, text));
-                },
+                }
                 Err(_) => {
                     // TODO(atec): possibly accumulate warnings
                     continue;
-                },
+                }
             }
         }
         None
@@ -150,22 +151,21 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
 
 impl<R> Reader<'_, R> {
     fn extract_chapter(&self) -> Result<usize, ParseIntError> {
-
         let s = String::from_utf8_lossy(&self.b).to_string();
         let mut chapter = 0;
 
-        if s.is_char_boundary(s.len()-1) && s.is_char_boundary(s.len()-2) {
+        if s.is_char_boundary(s.len() - 1) && s.is_char_boundary(s.len() - 2) {
             for i in 0..3 {
-                match &s[s.len()-(2+i)..s.len()-1].parse::<usize>() {
+                match &s[s.len() - (2 + i)..s.len() - 1].parse::<usize>() {
                     Ok(n) => {
                         chapter = *n;
-                    },
+                    }
                     Err(e) => {
-                        if i == 0{
+                        if i == 0 {
                             return Err(e.clone());
                         }
                         // TODO(atec): warn about nested fallbacks
-                    },
+                    }
                 }
             }
         } else {
@@ -177,8 +177,9 @@ impl<R> Reader<'_, R> {
     }
 
     fn extract_verse(&mut self) -> (usize, String)
-        where R: std::io::Read {
-
+    where
+        R: std::io::Read,
+    {
         let mut s = String::from_utf8_lossy(&self.b).to_string();
         let mut verse = 0;
 
@@ -188,10 +189,10 @@ impl<R> Reader<'_, R> {
         }
 
         for i in 0..3 {
-            match &s[0..(1+i)].parse::<usize>() {
+            match &s[0..(1 + i)].parse::<usize>() {
                 Ok(n) => {
                     verse = *n;
-                },
+                }
                 Err(e) => {
                     if i == 0 {
                         // TODO(atec): perhaps panic
@@ -204,19 +205,18 @@ impl<R> Reader<'_, R> {
             }
         }
 
-        let mut next_verse = s.is_char_boundary(s.len()-1) &&
-            s.is_char_boundary(s.len()-2) &&
-            s[s.len()-2..s.len()-1].parse::<usize>().is_ok();
+        let mut next_verse = s.is_char_boundary(s.len() - 1)
+            && s.is_char_boundary(s.len() - 2)
+            && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok();
 
         while !next_verse {
-
             // TODO(atec); perhaps use returned byte number
             let _ = self.r.read_until(b':', &mut self.b);
             s = String::from_utf8_lossy(&self.b).to_string();
 
-            next_verse = s.is_char_boundary(s.len()-1) &&
-                s.is_char_boundary(s.len()-2) &&
-                s[s.len()-2..s.len()-1].parse::<usize>().is_ok()
+            next_verse = s.is_char_boundary(s.len() - 1)
+                && s.is_char_boundary(s.len() - 2)
+                && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok()
         }
 
         self.b.clear();

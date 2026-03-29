@@ -1,6 +1,6 @@
+use crate::deed::Deed;
 use crate::name::Name;
 use crate::src::Source;
-use crate::deed::Deed;
 
 #[derive(Debug)]
 pub struct Daemon<'a> {
