@@ -1,7 +1,7 @@
+use crate::Name;
 use crate::book::Book;
 use crate::deed::Deed;
 use crate::src::Source;
-use crate::Name;
 
 // books
 use crate::name::Name::Acts;

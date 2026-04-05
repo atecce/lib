@@ -197,7 +197,9 @@ impl<R> Reader<'_, R> {
                     if i == 0 {
                         // TODO(atec): perhaps panic
                         println!("failed conversion extracting verse: {}", e);
-                        println!("should not happen because we read to the end of the verse as soon as we match");
+                        println!(
+                            "should not happen because we read to the end of the verse as soon as we match"
+                        );
                     } else {
                         // TODO(atec): warn about fallbacks
                     }
