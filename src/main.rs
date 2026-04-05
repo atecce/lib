@@ -21,6 +21,8 @@ use crate::src::Source;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use gliner::model::pipeline::token::TokenMode;
 use gliner::model::{GLiNER, input::text::TextInput, params::Parameters};
@@ -113,8 +115,20 @@ fn main() -> Result<()> {
 
     let mut index = HashMap::<String, Vec<Source>>::new();
 
+    let running = Arc::new(AtomicBool::new(true));
+    let r = running.clone();
+
+    ctrlc::set_handler(move || {
+        r.store(false, Ordering::SeqCst);
+    })
+    .expect("setting ctrlc handler");
+
     for (book, chapter_and_verse) in &word {
         for (i, chapter) in chapter_and_verse.iter().enumerate() {
+            if !running.load(Ordering::SeqCst) {
+                break;
+            }
+
             println!("initiating input for {} {}...", book, i + 1);
             let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
 
@@ -146,7 +160,7 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("{:?}", index);
+    println!("{:#?}", index);
 
     Ok(())
 }
