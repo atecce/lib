@@ -70,34 +70,6 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("initiating model...");
-    let model = GLiNER::<TokenMode>::new(
-        Parameters::default(),
-        RuntimeParameters::default(),
-        "./tokenizer.json",
-        "./model.onnx",
-    )?;
-
-    println!("initiating input...");
-    let input = TextInput::new(
-        verses.get(..100).unwrap().to_vec(),
-        vec![String::from("person")],
-    )?;
-
-    println!("inferring...");
-    let output = model.inference(input)?;
-    for spans in output.spans {
-        for span in spans {
-            println!(
-                "{:3} | {:16} | {:10} | {:.1}%",
-                span.sequence(),
-                span.text(),
-                span.class(),
-                span.probability() * 100.0
-            );
-        }
-    }
-
     for src in JESUS.words {
         println!("book: {}", src.book.name);
         println!("chapter: {}", src.chapter);
@@ -118,12 +90,42 @@ fn main() -> Result<()> {
         }
     }
 
-    for (book, chapter_and_verse) in word {
+    for (book, chapter_and_verse) in &word {
         for (i, chapter) in chapter_and_verse.iter().enumerate() {
             for (j, verse) in chapter.iter().enumerate() {
                 if verse.contains("Joshua") {
                     println!("{} {}:{}", book, i + 1, j + 1);
                     println!("{}", verse);
+                }
+            }
+        }
+    }
+
+    println!("initiating model...");
+    let model = GLiNER::<TokenMode>::new(
+        Parameters::default(),
+        RuntimeParameters::default(),
+        "./tokenizer.json",
+        "./model.onnx",
+    )?;
+
+    for (book, chapter_and_verse) in &word {
+        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+
+            println!("initiating input for {} {}...", book, i+1);
+            let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
+
+            println!("inferring...");
+            let output = model.inference(input)?;
+            for spans in output.spans {
+                for span in spans {
+                    println!(
+                        "{:3} | {:16} | {:10} | {:.1}%",
+                        span.sequence() + 1,
+                        span.text(),
+                        span.class(),
+                        span.probability() * 100.0,
+                    );
                 }
             }
         }
