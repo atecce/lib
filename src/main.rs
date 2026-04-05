@@ -10,11 +10,13 @@ mod src;
 
 use crate::bible::main::BOOKS;
 use crate::bible::main::JESUS;
+use crate::book::Book;
 use crate::greece::macedon::ALEXANDER;
 use crate::greece::main::APOLLO;
 use crate::name::Name;
 use crate::persia::CYRUS;
 use crate::rome::CICERO;
+use crate::src::Source;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -109,10 +111,11 @@ fn main() -> Result<()> {
         "./model.onnx",
     )?;
 
+    let mut index = HashMap::<String, Vec<Source>>::new();
+
     for (book, chapter_and_verse) in &word {
         for (i, chapter) in chapter_and_verse.iter().enumerate() {
-
-            println!("initiating input for {} {}...", book, i+1);
+            println!("initiating input for {} {}...", book, i + 1);
             let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
 
             println!("inferring...");
@@ -126,10 +129,24 @@ fn main() -> Result<()> {
                         span.class(),
                         span.probability() * 100.0,
                     );
+
+                    let src = Source {
+                        book: Book { name: *book },
+                        chapter: i + 1,
+                        verses: [span.sequence() + 1, span.sequence() + 1],
+                    };
+
+                    if let Some(srcs) = index.get_mut(span.text()) {
+                        srcs.push(src);
+                    } else {
+                        index.insert(span.text().to_string(), vec![src]);
+                    }
                 }
             }
         }
     }
+
+    println!("{:?}", index);
 
     Ok(())
 }
