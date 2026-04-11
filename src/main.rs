@@ -54,7 +54,7 @@ fn print_optimates() {
 //     Ok(records)
 // }
 
-fn main() -> Result<()> {
+fn in_the_beginning_was_the() -> HashMap<Name, Vec<Vec<String>>> {
     println!("initiating word...");
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
     for i in 0..65 {
@@ -74,36 +74,11 @@ fn main() -> Result<()> {
         }
     }
 
-    for src in JESUS.words {
-        println!("book: {}", src.book.name);
-        println!("chapter: {}", src.chapter);
-        println!("verses: {:?}", src.verses);
-        let text = &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
-        println!("{:?}", text);
-    }
+    word
+}
 
-    for deed in JESUS.deeds {
-        println!("desc: {}", deed.desc);
-        for src in deed.srcs {
-            println!("book: {}", src.book.name);
-            println!("chapter: {}", src.chapter);
-            println!("verses: {:?}", src.verses);
-            let text =
-                &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
-            println!("{:?}", text);
-        }
-    }
-
-    for (book, chapter_and_verse) in &word {
-        for (i, chapter) in chapter_and_verse.iter().enumerate() {
-            for (j, verse) in chapter.iter().enumerate() {
-                if verse.contains("Joshua") {
-                    println!("{} {}:{}", book, i + 1, j + 1);
-                    println!("{}", verse);
-                }
-            }
-        }
-    }
+fn main() -> Result<()> {
+    let word = in_the_beginning_was_the();
 
     println!("initiating model...");
     let model = GLiNER::<TokenMode>::new(
@@ -163,4 +138,40 @@ fn main() -> Result<()> {
     println!("{:#?}", index);
 
     Ok(())
+}
+
+#[test]
+fn yeshua() {
+    let word = in_the_beginning_was_the();
+
+    for src in JESUS.words {
+        println!("book: {}", src.book.name);
+        println!("chapter: {}", src.chapter);
+        println!("verses: {:?}", src.verses);
+        let text = &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
+        println!("{:?}", text);
+    }
+
+    for deed in JESUS.deeds {
+        println!("desc: {}", deed.desc);
+        for src in deed.srcs {
+            println!("book: {}", src.book.name);
+            println!("chapter: {}", src.chapter);
+            println!("verses: {:?}", src.verses);
+            let text =
+                &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
+            println!("{:?}", text);
+        }
+    }
+
+    for (book, chapter_and_verse) in &word {
+        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+            for (j, verse) in chapter.iter().enumerate() {
+                if verse.contains("Joshua") {
+                    println!("{} {}:{}", book, i + 1, j + 1);
+                    println!("{}", verse);
+                }
+            }
+        }
+    }
 }
