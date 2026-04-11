@@ -29,6 +29,10 @@ use gliner::model::{GLiNER, input::text::TextInput, params::Parameters};
 use gliner::util::result::Result;
 use orp::params::RuntimeParameters;
 
+use futures::{StreamExt, stream};
+
+use reqwest::Client;
+
 use scraper::Html;
 use scraper::Selector;
 
@@ -80,76 +84,100 @@ fn in_the_beginning_was_the() -> HashMap<Name, Vec<Vec<String>>> {
     word
 }
 
-fn main() -> Result<()> {
-    for c in 'a'..='z' {
-        let body = reqwest::blocking::get(format!("https://gutenberg.org/browse/authors/{}", c))?.text()?;
-        let doc = Html::parse_document(&body);
-        let selector = Selector::parse("h2").unwrap();
-        for element in doc.select(&selector) {
-            println!("{:#?}", element.inner_html());
-        }
-    }
+#[tokio::main]
+async fn main() {
+    let client = Client::new();
 
-    let word = in_the_beginning_was_the();
+    let urls = ('a'..='z').map(|c| format!("https://gutenberg.org/browse/authors/{}", c));
 
-    println!("initiating model...");
-    let model = GLiNER::<TokenMode>::new(
-        Parameters::default(),
-        RuntimeParameters::default(),
-        "./tokenizer.json",
-        "./model.onnx",
-    )?;
-
-    let mut index = HashMap::<String, Vec<Source>>::new();
-
-    let running = Arc::new(AtomicBool::new(true));
-    let r = running.clone();
-
-    ctrlc::set_handler(move || {
-        r.store(false, Ordering::SeqCst);
-    })
-    .expect("setting ctrlc handler");
-
-    for (book, chapter_and_verse) in &word {
-        for (i, chapter) in chapter_and_verse.iter().enumerate() {
-            if !running.load(Ordering::SeqCst) {
-                break;
+    let bodies = stream::iter(urls)
+        .map(|url| {
+            let client = &client;
+            async move {
+                let res = client.get(url).send().await?;
+                res.bytes().await
             }
+        })
+        .buffer_unordered(10);
 
-            println!("initiating input for {} {}...", book, i + 1);
-            let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
-
-            println!("inferring...");
-            let output = model.inference(input)?;
-            for spans in output.spans {
-                for span in spans {
-                    println!(
-                        "{:3} | {:16} | {:10} | {:.1}%",
-                        span.sequence() + 1,
-                        span.text(),
-                        span.class(),
-                        span.probability() * 100.0,
-                    );
-
-                    let src = Source {
-                        book: Book { name: *book },
-                        chapter: i + 1,
-                        verses: [span.sequence() + 1, span.sequence() + 1],
-                    };
-
-                    if let Some(srcs) = index.get_mut(span.text()) {
-                        srcs.push(src);
-                    } else {
-                        index.insert(span.text().to_string(), vec![src]);
+    bodies
+        .for_each(|b| async {
+            match b {
+                Ok(b) => {
+                    for url in
+                        ('a'..='z').map(|c| format!("https://gutenberg.org/browse/authors/{}", c))
+                    {
+                        let s = String::from_utf8(b.to_vec()).expect("invalid utf8");
+                        let doc = Html::parse_document(&s);
+                        let selector = Selector::parse("h2").unwrap();
+                        for element in doc.select(&selector) {
+                            println!("{:#?}", element.inner_html());
+                        }
                     }
                 }
+                Err(e) => eprintln!("e: {}", e),
             }
-        }
-    }
+        })
+        .await;
 
-    println!("{:#?}", index);
-
-    Ok(())
+//    let word = in_the_beginning_was_the();
+//
+//    println!("initiating model...");
+//    let model = GLiNER::<TokenMode>::new(
+//        Parameters::default(),
+//        RuntimeParameters::default(),
+//        "./tokenizer.json",
+//        "./model.onnx",
+//    )?;
+//
+//    let mut index = HashMap::<String, Vec<Source>>::new();
+//
+//    let running = Arc::new(AtomicBool::new(true));
+//    let r = running.clone();
+//
+//    ctrlc::set_handler(move || {
+//        r.store(false, Ordering::SeqCst);
+//    })
+//    .expect("setting ctrlc handler");
+//
+//    for (book, chapter_and_verse) in &word {
+//        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+//            if !running.load(Ordering::SeqCst) {
+//                break;
+//            }
+//
+//            println!("initiating input for {} {}...", book, i + 1);
+//            let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
+//
+//            println!("inferring...");
+//            let output = model.inference(input)?;
+//            for spans in output.spans {
+//                for span in spans {
+//                    println!(
+//                        "{:3} | {:16} | {:10} | {:.1}%",
+//                        span.sequence() + 1,
+//                        span.text(),
+//                        span.class(),
+//                        span.probability() * 100.0,
+//                    );
+//
+//                    let src = Source {
+//                        book: Book { name: *book },
+//                        chapter: i + 1,
+//                        verses: [span.sequence() + 1, span.sequence() + 1],
+//                    };
+//
+//                    if let Some(srcs) = index.get_mut(span.text()) {
+//                        srcs.push(src);
+//                    } else {
+//                        index.insert(span.text().to_string(), vec![src]);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    println!("{:#?}", index);
 }
 
 #[test]
