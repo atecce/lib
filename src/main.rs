@@ -29,6 +29,9 @@ use gliner::model::{GLiNER, input::text::TextInput, params::Parameters};
 use gliner::util::result::Result;
 use orp::params::RuntimeParameters;
 
+use scraper::Html;
+use scraper::Selector;
+
 fn print_optimates() {
     println!("{:?}", JESUS);
     println!("{:?}", APOLLO);
@@ -78,6 +81,15 @@ fn in_the_beginning_was_the() -> HashMap<Name, Vec<Vec<String>>> {
 }
 
 fn main() -> Result<()> {
+    for c in 'a'..='z' {
+        let body = reqwest::blocking::get(format!("https://gutenberg.org/browse/authors/{}", c))?.text()?;
+        let doc = Html::parse_document(&body);
+        let selector = Selector::parse("h2").unwrap();
+        for element in doc.select(&selector) {
+            println!("{:#?}", element.inner_html());
+        }
+    }
+
     let word = in_the_beginning_was_the();
 
     println!("initiating model...");
