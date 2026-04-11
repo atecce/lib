@@ -33,6 +33,7 @@ use futures::{StreamExt, stream};
 
 use reqwest::Client;
 
+use scraper::ElementRef;
 use scraper::Html;
 use scraper::Selector;
 
@@ -112,6 +113,16 @@ async fn main() {
                         let selector = Selector::parse("h2").unwrap();
                         for element in doc.select(&selector) {
                             println!("{:#?}", element.inner_html());
+                            if let Some(next_sibling) = element.next_sibling().expect("failed to get next sibling").next_sibling() {
+                                if let Some(next_element_ref) = ElementRef::wrap(next_sibling) {
+                                    println!("{:?}", next_element_ref.inner_html());
+                                } else {
+                                    println!("failed to wrap node with element");
+                                    println!("{:#?}", next_sibling.value());
+                                }
+                            } else {
+                                println!("failed to find next sibling");
+                            }
                         }
                     }
                 }
@@ -120,64 +131,64 @@ async fn main() {
         })
         .await;
 
-//    let word = in_the_beginning_was_the();
-//
-//    println!("initiating model...");
-//    let model = GLiNER::<TokenMode>::new(
-//        Parameters::default(),
-//        RuntimeParameters::default(),
-//        "./tokenizer.json",
-//        "./model.onnx",
-//    )?;
-//
-//    let mut index = HashMap::<String, Vec<Source>>::new();
-//
-//    let running = Arc::new(AtomicBool::new(true));
-//    let r = running.clone();
-//
-//    ctrlc::set_handler(move || {
-//        r.store(false, Ordering::SeqCst);
-//    })
-//    .expect("setting ctrlc handler");
-//
-//    for (book, chapter_and_verse) in &word {
-//        for (i, chapter) in chapter_and_verse.iter().enumerate() {
-//            if !running.load(Ordering::SeqCst) {
-//                break;
-//            }
-//
-//            println!("initiating input for {} {}...", book, i + 1);
-//            let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
-//
-//            println!("inferring...");
-//            let output = model.inference(input)?;
-//            for spans in output.spans {
-//                for span in spans {
-//                    println!(
-//                        "{:3} | {:16} | {:10} | {:.1}%",
-//                        span.sequence() + 1,
-//                        span.text(),
-//                        span.class(),
-//                        span.probability() * 100.0,
-//                    );
-//
-//                    let src = Source {
-//                        book: Book { name: *book },
-//                        chapter: i + 1,
-//                        verses: [span.sequence() + 1, span.sequence() + 1],
-//                    };
-//
-//                    if let Some(srcs) = index.get_mut(span.text()) {
-//                        srcs.push(src);
-//                    } else {
-//                        index.insert(span.text().to_string(), vec![src]);
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    println!("{:#?}", index);
+    //    let word = in_the_beginning_was_the();
+    //
+    //    println!("initiating model...");
+    //    let model = GLiNER::<TokenMode>::new(
+    //        Parameters::default(),
+    //        RuntimeParameters::default(),
+    //        "./tokenizer.json",
+    //        "./model.onnx",
+    //    )?;
+    //
+    //    let mut index = HashMap::<String, Vec<Source>>::new();
+    //
+    //    let running = Arc::new(AtomicBool::new(true));
+    //    let r = running.clone();
+    //
+    //    ctrlc::set_handler(move || {
+    //        r.store(false, Ordering::SeqCst);
+    //    })
+    //    .expect("setting ctrlc handler");
+    //
+    //    for (book, chapter_and_verse) in &word {
+    //        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+    //            if !running.load(Ordering::SeqCst) {
+    //                break;
+    //            }
+    //
+    //            println!("initiating input for {} {}...", book, i + 1);
+    //            let input = TextInput::new(chapter.to_vec(), vec![String::from("person")])?;
+    //
+    //            println!("inferring...");
+    //            let output = model.inference(input)?;
+    //            for spans in output.spans {
+    //                for span in spans {
+    //                    println!(
+    //                        "{:3} | {:16} | {:10} | {:.1}%",
+    //                        span.sequence() + 1,
+    //                        span.text(),
+    //                        span.class(),
+    //                        span.probability() * 100.0,
+    //                    );
+    //
+    //                    let src = Source {
+    //                        book: Book { name: *book },
+    //                        chapter: i + 1,
+    //                        verses: [span.sequence() + 1, span.sequence() + 1],
+    //                    };
+    //
+    //                    if let Some(srcs) = index.get_mut(span.text()) {
+    //                        srcs.push(src);
+    //                    } else {
+    //                        index.insert(span.text().to_string(), vec![src]);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //
+    //    println!("{:#?}", index);
 }
 
 #[test]
