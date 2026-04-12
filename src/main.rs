@@ -89,9 +89,7 @@ fn in_the_beginning_was_the() -> HashMap<Name, Vec<Vec<String>>> {
 async fn main() {
     let client = Client::new();
 
-    let urls = ('a'..='z').map(|c| format!("https://gutenberg.org/browse/authors/{}", c));
-
-    let bodies = stream::iter(urls)
+    let bodies = stream::iter(('a'..='z').map(|c| format!("https://gutenberg.org/browse/authors/{}", c)))
         .map(|url| {
             let client = &client;
             async move {
@@ -105,28 +103,24 @@ async fn main() {
         .for_each(|b| async {
             match b {
                 Ok(b) => {
-                    for url in
-                        ('a'..='z').map(|c| format!("https://gutenberg.org/browse/authors/{}", c))
-                    {
-                        let s = String::from_utf8(b.to_vec()).expect("invalid utf8");
-                        let doc = Html::parse_document(&s);
-                        let selector = Selector::parse("h2").unwrap();
-                        for element in doc.select(&selector) {
-                            println!("{:#?}", element.inner_html());
-                            if let Some(next_sibling) = element
-                                .next_sibling()
-                                .expect("failed to get next sibling")
-                                .next_sibling()
-                            {
-                                if let Some(next_element_ref) = ElementRef::wrap(next_sibling) {
-                                    println!("{:?}", next_element_ref.inner_html());
-                                } else {
-                                    println!("failed to wrap node with element");
-                                    println!("{:#?}", next_sibling.value());
-                                }
+                    let s = String::from_utf8(b.to_vec()).expect("invalid utf8");
+                    let doc = Html::parse_document(&s);
+                    let selector = Selector::parse("h2").unwrap();
+                    for element in doc.select(&selector) {
+                        println!("{:#?}", element.inner_html());
+                        if let Some(next_sibling) = element
+                            .next_sibling()
+                            .expect("failed to get next sibling")
+                            .next_sibling()
+                        {
+                            if let Some(next_element_ref) = ElementRef::wrap(next_sibling) {
+                                println!("{:?}", next_element_ref.inner_html());
                             } else {
-                                println!("failed to find next sibling");
+                                println!("failed to wrap node with element");
+                                println!("{:#?}", next_sibling.value());
                             }
+                        } else {
+                            println!("failed to find next sibling");
                         }
                     }
                 }
