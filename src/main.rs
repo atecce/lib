@@ -134,7 +134,7 @@ async fn main() {
                                             println!("\t\t{}", href);
                                             println!("\t\t{}{}", DOMAIN, href);
 
-                                            let url = format!("{}{}", DOMAIN, href);
+                                            let url = format!("{}{}.txt.utf-8", DOMAIN, href);
                                             println!("\t\t{}", url);
                                             urls.push(url);
                                         } else {
