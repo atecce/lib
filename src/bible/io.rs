@@ -6,10 +6,27 @@ use crate::name::Name::Jude;
 use crate::name::Name::Philemon;
 use crate::name::Name::Revelation;
 use std::collections::HashMap;
+use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 
-pub struct Reader<'a, R> {
+pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
+    let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
+    for i in 0..65 {
+        word.insert(BOOKS[i], Vec::new());
+    }
+
+    let r = new_reader(
+        BufReader::new(File::open("./pg10.txt").expect("can't open file")),
+        &mut word,
+    );
+
+    for (_, _, _, _) in r {}
+
+    word
+}
+
+struct Reader<'a, R> {
     r: BufReader<R>,
     b: Vec<u8>,
     book: Name,
@@ -24,7 +41,7 @@ pub struct Reader<'a, R> {
     word: &'a mut HashMap<Name, Vec<Vec<String>>>,
 }
 
-pub fn new_reader<R: std::io::Read>(
+fn new_reader<R: std::io::Read>(
     r: BufReader<R>,
     word: &mut HashMap<Name, Vec<Vec<String>>>,
 ) -> Reader<R> {

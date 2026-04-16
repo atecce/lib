@@ -8,7 +8,6 @@ mod persia;
 mod rome;
 mod src;
 
-use crate::bible::main::BOOKS;
 use crate::bible::main::JESUS;
 use crate::book::Book;
 use crate::greece::macedon::ALEXANDER;
@@ -19,8 +18,6 @@ use crate::rome::CICERO;
 use crate::src::Source;
 
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -61,29 +58,6 @@ fn print_optimates() {
 //
 //     Ok(records)
 // }
-
-fn in_the_beginning_was_the() -> HashMap<Name, Vec<Vec<String>>> {
-    println!("initiating word...");
-    let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
-    for i in 0..65 {
-        word.insert(BOOKS[i], Vec::new());
-    }
-
-    println!("populating verses...");
-    let mut verses = Vec::new();
-    {
-        let r = bible::io::new_reader(
-            BufReader::new(File::open("./pg10.txt").expect("can't open file")),
-            &mut word,
-        );
-
-        for (_, _, _, verse) in r {
-            verses.push(verse);
-        }
-    }
-
-    word
-}
 
 const DOMAIN: &str = "https://gutenberg.org";
 
@@ -178,7 +152,7 @@ async fn main() {
 
 #[test]
 fn yeshua() {
-    let word = in_the_beginning_was_the();
+    let word = bible::io::read_all();
 
     for src in JESUS.words {
         println!("book: {}", src.book.name);
@@ -214,7 +188,7 @@ fn yeshua() {
 
 #[test]
 fn things_that_can_be_named() -> Result<()> {
-    let word = in_the_beginning_was_the();
+    let word = bible::io::read_all();
 
     println!("initiating model...");
     let model = GLiNER::<TokenMode>::new(
