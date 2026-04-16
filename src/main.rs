@@ -151,49 +151,6 @@ async fn main() {
 }
 
 #[test]
-fn yeshua() {
-    let word = bible::io::read_all();
-
-    for src in JESUS.words {
-        println!("book: {}", src.book.name);
-        println!("chapter: {}", src.chapter);
-        println!("verses: {:?}", src.verses);
-        let text = &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
-        println!("{:?}", text);
-    }
-
-    for deed in JESUS.deeds {
-        println!("desc: {}", deed.desc);
-        for src in deed.srcs {
-            println!("book: {}", src.book.name);
-            println!("chapter: {}", src.chapter);
-            println!("verses: {:?}", src.verses);
-            let text =
-                &word[&src.book.name][src.chapter - 1][src.verses[0] - 1..=src.verses[1] - 1];
-            println!("{:?}", text);
-        }
-    }
-
-    for (book, chapter_and_verse) in &word {
-        for (i, chapter) in chapter_and_verse.iter().enumerate() {
-            for (j, verse) in chapter.iter().enumerate() {
-                if verse.contains("Joshua") {
-                    println!("{} {}:{}", book, i + 1, j + 1);
-                    println!("{}", verse);
-                }
-            }
-        }
-    }
-
-    let mut cur = JESUS.father;
-    while let Some(node) = cur {
-        // TODO(atec): probably some index check
-        println!("{:#?}", node.names[0]);
-        cur = node.father;
-    }
-}
-
-#[test]
 fn things_that_can_be_named() -> Result<()> {
     let word = bible::io::read_all();
 
