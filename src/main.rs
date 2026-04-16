@@ -184,6 +184,13 @@ fn yeshua() {
             }
         }
     }
+
+    let mut cur = JESUS.father;
+    while let Some(node) = cur {
+        // TODO(atec): probably some index check
+        println!("{:#?}", node.names[0]);
+        cur = node.father;
+    }
 }
 
 #[test]
