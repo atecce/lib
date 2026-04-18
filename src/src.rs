@@ -1,6 +1,7 @@
 use crate::book::Book;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Source {
     pub book: Book,
     pub chapter: usize,

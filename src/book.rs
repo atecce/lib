@@ -1,6 +1,7 @@
 use crate::name::Name;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Book {
     pub name: Name,
     // TODO(atec)

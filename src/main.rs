@@ -209,7 +209,7 @@ fn things_that_can_be_named() -> Result<()> {
         }
     }
 
-    println!("{:#?}", index);
+    println!("{:#?}", serde_json::to_string(&index).unwrap());
 
     Ok(())
 }
