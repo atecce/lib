@@ -59,10 +59,14 @@ fn print_optimates() {
 //     Ok(records)
 // }
 
+fn main() {
+    print_optimates();
+}
+
 const DOMAIN: &str = "https://gutenberg.org";
 
-#[tokio::main]
-async fn main() {
+#[test]
+async fn scrape() {
     let client = Client::new();
 
     let bodies = stream::iter(('a'..='z').map(|c| format!("{}/browse/authors/{}", DOMAIN, c)))
