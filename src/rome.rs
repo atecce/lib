@@ -1168,3 +1168,144 @@ pub const EUGENIUS: &Daemon = &Daemon {
     // TODO(atec): multiple emperors
     predecessor: Some(VALENTINIAN_II),
 };
+
+// Theodosian dynasty
+// "Theodosius I (the Great)"; 19 January 379 - 17 January 395
+pub const THEODOSIUS_I: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(VALENS),
+};
+
+// "Arcadius"; 17 January 395 - 1 May 408
+pub const ARCADIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(THEODOSIUS_I),
+};
+
+// "Honorius"; 17 January 395 - 15 August 423
+pub const HONORIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(THEODOSIUS_I),
+};
+
+// Flavius Claudius Constantinus, "Constantine III"; 407 - 411
+pub const CONSTANTINE_III: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(ARCADIUS),
+};
+
+// "Theodosius II (the Calligrapher)"; 1 May 408 - 28 July 450
+pub const THEODOSIUS_II: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(ARCADIUS),
+};
+
+// "Priscus Attalus"; late 409 - summer 410
+pub const PRISCUS_ATTALUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(ARCADIUS),
+};
+
+// "Constantius III"; 8 February - 2 September 421
+pub const CONSTANTIUS_III: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(HONORIUS),
+};
+
+// "Joannes"; 20 November 423 - May 425
+pub const JOANNES: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(HONORIUS),
+};
+
+// Placidus Valentinianus, "Valentinian III"; 20 November 423 - May 425
+pub const VALENTINIAN_III: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(HONORIUS),
+};
+
+// Marcianus, "Marcian"; 25 August 450 - 27 January 457
+pub const MARCIAN: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    // TODO(atec): multiple emperors
+    predecessor: Some(THEODOSIUS_II),
+};
