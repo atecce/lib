@@ -1,17 +1,19 @@
-use crate::daemon::Daemon;
-use crate::name::Name::Achilles;
-use crate::name::Name::Apollo;
-use crate::name::Name::Aristotle;
-use crate::name::Name::Artemis;
-use crate::name::Name::Cronos;
-use crate::name::Name::Cronus;
-use crate::name::Name::Hera;
-use crate::name::Name::Hermes;
-use crate::name::Name::Kronos;
-use crate::name::Name::Leto;
-use crate::name::Name::Plato;
-use crate::name::Name::Socrates;
-use crate::name::Name::Zeus;
+pub mod macedon;
+
+use daemon::Daemon;
+use name::Name::Achilles;
+use name::Name::Apollo;
+use name::Name::Aristotle;
+use name::Name::Artemis;
+use name::Name::Cronos;
+use name::Name::Cronus;
+use name::Name::Hera;
+use name::Name::Hermes;
+use name::Name::Kronos;
+use name::Name::Leto;
+use name::Name::Plato;
+use name::Name::Socrates;
+use name::Name::Zeus;
 
 pub const CRONUS: &Daemon = &Daemon {
     names: &[Cronus, Cronos, Kronos],

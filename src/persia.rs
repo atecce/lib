@@ -1,9 +1,9 @@
-use crate::book::Book;
-use crate::daemon::Daemon;
-use crate::deed::Deed;
-use crate::name::Name::Cyrus;
-use crate::name::Name::Ezra;
-use crate::src::Source;
+use book::Book;
+use daemon::Daemon;
+use deed::Deed;
+use name::Name::Cyrus;
+use name::Name::Ezra;
+use source::Source;
 
 pub const CYRUS: &Daemon = &Daemon {
     names: &[Cyrus],

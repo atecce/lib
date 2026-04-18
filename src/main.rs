@@ -1,21 +1,15 @@
-mod bible;
-mod book;
-mod daemon;
-mod deed;
-mod greece;
-mod name;
 mod persia;
 mod rome;
-mod src;
 
-use crate::bible::main::JESUS;
-use crate::book::Book;
-use crate::greece::macedon::ALEXANDER;
-use crate::greece::main::APOLLO;
-use crate::name::Name;
 use crate::persia::CYRUS;
 use crate::rome::CICERO;
-use crate::src::Source;
+
+use bible::JESUS;
+use book::Book;
+use greece::macedon::ALEXANDER;
+use greece::APOLLO;
+use name::Name;
+use source::Source;
 
 use std::collections::HashMap;
 use std::sync::Arc;

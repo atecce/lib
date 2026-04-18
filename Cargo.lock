@@ -78,6 +78,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
+name = "bible"
+version = "0.1.0"
+dependencies = [
+ "book",
+ "daemon",
+ "deed",
+ "name",
+ "source",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -99,6 +110,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdeb9d870516001442e364c5220d3574d2da8dc765554b4a617230d33fa58ef5"
 dependencies = [
  "objc2",
+]
+
+[[package]]
+name = "book"
+version = "0.1.0"
+dependencies = [
+ "name",
+ "serde",
 ]
 
 [[package]]
@@ -352,6 +371,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "daemon"
+version = "0.1.0"
+dependencies = [
+ "deed",
+ "name",
+ "source",
+]
+
+[[package]]
 name = "darling"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -393,6 +421,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06d2e3287df1c007e74221c49ca10a95d557349e54b3a75dc2fb14712c751f04"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "deed"
+version = "0.1.0"
+dependencies = [
+ "source",
 ]
 
 [[package]]
@@ -776,6 +811,14 @@ dependencies = [
  "ort-sys",
  "regex",
  "tokenizers",
+]
+
+[[package]]
+name = "greece"
+version = "0.1.0"
+dependencies = [
+ "daemon",
+ "name",
 ]
 
 [[package]]
@@ -1176,15 +1219,22 @@ dependencies = [
 name = "lib"
 version = "0.1.0"
 dependencies = [
+ "bible",
+ "book",
  "csv",
  "ctrlc",
+ "daemon",
+ "deed",
  "futures",
  "gline-rs",
+ "greece",
+ "name",
  "orp",
  "reqwest",
  "scraper",
  "serde",
  "serde_json",
+ "source",
  "tokio",
 ]
 
@@ -1335,6 +1385,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "name"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -2232,6 +2289,14 @@ dependencies = [
  "byteorder",
  "libc",
  "winapi",
+]
+
+[[package]]
+name = "source"
+version = "0.1.0"
+dependencies = [
+ "book",
+ "serde",
 ]
 
 [[package]]

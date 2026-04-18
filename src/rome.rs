@@ -1,8 +1,8 @@
-use crate::daemon::Daemon;
-use crate::name::Name::Caesar;
-use crate::name::Name::Cicero;
-use crate::name::Name::Remus;
-use crate::name::Name::Romulus;
+use daemon::Daemon;
+use name::Name::Caesar;
+use name::Name::Cicero;
+use name::Name::Remus;
+use name::Name::Romulus;
 
 pub const ROMULUS: &Daemon = &Daemon {
     names: &[Romulus],
