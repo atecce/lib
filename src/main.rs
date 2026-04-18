@@ -65,7 +65,7 @@ fn main() {
 
 const DOMAIN: &str = "https://gutenberg.org";
 
-#[test]
+#[tokio::test]
 async fn scrape() {
     let client = Client::new();
 
