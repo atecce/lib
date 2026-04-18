@@ -1,4 +1,4 @@
-use crate::book::Book;
+use book::Book;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]

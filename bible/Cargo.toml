@@ -1,0 +1,11 @@
+[package]
+name = "bible"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+book = { path = "../book" }
+daemon = { path = "../daemon" }
+deed = { path = "../deed" }
+name = { path = "../name" }
+source = { path = "../source" }

@@ -1,4 +1,4 @@
-use crate::src::Source;
+use source::Source;
 
 #[derive(Debug)]
 pub struct Deed<'a> {

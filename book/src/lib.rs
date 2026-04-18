@@ -1,4 +1,4 @@
-use crate::name::Name;
+use name::Name;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]

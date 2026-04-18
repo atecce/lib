@@ -1,0 +1,7 @@
+[package]
+name = "deed"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+source = { path = "../source" }

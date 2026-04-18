@@ -1,10 +1,11 @@
-use crate::bible::main::BOOKS;
-use crate::name::Name;
-use crate::name::Name::JohnII;
-use crate::name::Name::JohnIII;
-use crate::name::Name::Jude;
-use crate::name::Name::Philemon;
-use crate::name::Name::Revelation;
+use crate::BOOKS;
+
+use name::Name;
+use name::Name::JohnII;
+use name::Name::JohnIII;
+use name::Name::Jude;
+use name::Name::Philemon;
+use name::Name::Revelation;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -18,7 +19,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
 
     let r = new_reader(
         BufReader::new(
-            File::open("./gutenberg.org/cache/epub/10/pg10.txt").expect("can't open file"),
+            File::open("../gutenberg.org/cache/epub/10/pg10.txt").expect("can't open file"),
         ),
         &mut word,
     );
