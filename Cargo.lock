@@ -826,7 +826,11 @@ dependencies = [
 name = "gutenberg"
 version = "0.1.0"
 dependencies = [
+ "futures",
  "name",
+ "reqwest",
+ "scraper",
+ "tokio",
 ]
 
 [[package]]
@@ -1233,17 +1237,13 @@ dependencies = [
  "ctrlc",
  "daemon",
  "deed",
- "futures",
  "gline-rs",
  "greece",
  "name",
  "orp",
- "reqwest",
- "scraper",
  "serde",
  "serde_json",
  "source",
- "tokio",
 ]
 
 [[package]]
@@ -1927,9 +1927,7 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "encoding_rs",
- "futures-channel",
  "futures-core",
- "futures-util",
  "h2",
  "http",
  "http-body",
