@@ -18,9 +18,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     }
 
     let r = new_reader(
-        BufReader::new(
-            File::open("../gutenberg.org/cache/epub/10/pg10.txt").expect("can't open file"),
-        ),
+        BufReader::new(&include_bytes!("../../gutenberg.org/cache/epub/10/pg10.txt")[..]),
         &mut word,
     );
 
