@@ -89,15 +89,18 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
 
     let r = new_reader(
         BufReader::new(&include_bytes!("../../gutenberg.org/cache/epub/10/pg10.txt")[..]),
-        &mut word,
     );
 
-    for (_, _, _, _) in r {}
+    for (book, chapter, verse, text) in r {
+        if let Some(chapter_and_verse) = word.get_mut(&book) {
+            chapter_and_verse[chapter - 1].push(text);
+        }
+    }
 
     word
 }
 
-struct Reader<'a, R> {
+struct Reader<R> {
     r: BufReader<R>,
     b: Vec<u8>,
     book: Name,
@@ -109,13 +112,11 @@ struct Reader<'a, R> {
     started: bool,
     revelation: bool,
     amen: bool,
-    word: &'a mut HashMap<Name, Vec<Vec<String>>>,
 }
 
 fn new_reader<R: std::io::Read>(
     r: BufReader<R>,
-    word: &mut HashMap<Name, Vec<Vec<String>>>,
-) -> Reader<'_, R> {
+) -> Reader<R> {
     Reader {
         r: r,
         b: Vec::new(),
@@ -128,11 +129,10 @@ fn new_reader<R: std::io::Read>(
         started: false,
         revelation: false,
         amen: false,
-        word: word,
     }
 }
 
-impl<R: std::io::Read> Iterator for Reader<'_, R> {
+impl<R: std::io::Read> Iterator for Reader<R> {
     type Item = (Name, usize, usize, String);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -143,9 +143,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
         if self.revelation {
             self.amen = true;
             let text = "21 The grace of our Lord Jesus Christ be with you all. Amen.";
-            if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                chapter_and_verse[self.chapter - 1].push(text.to_string());
-            }
             return Some((Revelation, 22, 21, text.to_string()));
         }
 
@@ -164,10 +161,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     s = String::from_utf8_lossy(&self.b).to_string();
 
                     let (verse, text) = self.extract_verse();
-                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter - 1].push(s.clone());
-                    }
-
                     return Some((self.book, self.chapter, verse, text));
                 }
 
@@ -197,9 +190,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     }
 
                     let (verse, text) = self.extract_verse();
-                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse[self.chapter - 1].push(text.clone());
-                    }
 
                     // special case for Philemon, JohnII, JohnIII, and Jude
                     // these books only have one chapter so we will just
@@ -231,7 +221,7 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
     }
 }
 
-impl<R> Reader<'_, R> {
+impl<R> Reader<R> {
     fn extract_chapter(&self) -> Result<usize, ParseIntError> {
         let s = String::from_utf8_lossy(&self.b).to_string();
         let mut chapter = 0;
