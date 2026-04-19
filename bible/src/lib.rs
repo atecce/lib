@@ -1,8 +1,8 @@
 pub mod io;
 
-use name::Name;
 use book::Book;
 use deed::Deed;
+use name::Name;
 use source::Source;
 
 // books
@@ -1333,10 +1333,5 @@ fn yeshua() {
         }
     }
 
-    let mut cur = JESUS.father;
-    while let Some(node) = cur {
-        // TODO(atec): probably some index check
-        println!("{:#?}", node.names[0]);
-        cur = node.father;
-    }
+    JESUS.genealogy();
 }
