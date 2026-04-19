@@ -47,7 +47,7 @@ struct Reader<'a, R> {
 fn new_reader<R: std::io::Read>(
     r: BufReader<R>,
     word: &mut HashMap<Name, Vec<Vec<String>>>,
-) -> Reader<R> {
+) -> Reader<'_, R> {
     Reader {
         r: r,
         b: Vec::new(),
