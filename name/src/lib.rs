@@ -49,6 +49,7 @@ pub enum Name {
     SongOfSolomon,
     Isaiah,
     Jeremiah,
+    Lamentations,
     Ezekiel,
     Daniel,
     Hosea,

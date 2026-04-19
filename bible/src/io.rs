@@ -4,17 +4,87 @@ use name::Name;
 use name::Name::JohnII;
 use name::Name::JohnIII;
 use name::Name::Jude;
+use name::Name::Obadiah;
 use name::Name::Philemon;
 use name::Name::Revelation;
 use std::collections::HashMap;
-use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 
 pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
-    for i in 0..65 {
-        word.insert(BOOKS[i], Vec::new());
+    for book in BOOKS {
+        match book {
+            name::Name::Genesis => word.insert(book, vec![Vec::new(); 50]),
+            name::Name::Exodus => word.insert(book, vec![Vec::new(); 40]),
+            name::Name::Leviticus => word.insert(book, vec![Vec::new(); 27]),
+            name::Name::Numbers => word.insert(book, vec![Vec::new(); 36]),
+            name::Name::Deuteronomy => word.insert(book, vec![Vec::new(); 34]),
+            name::Name::Joshua => word.insert(book, vec![Vec::new(); 24]),
+            name::Name::Judges => word.insert(book, vec![Vec::new(); 21]),
+            name::Name::Ruth => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::SamuelI => word.insert(book, vec![Vec::new(); 31]),
+            name::Name::SamuelII => word.insert(book, vec![Vec::new(); 24]),
+            name::Name::KingsI => word.insert(book, vec![Vec::new(); 22]),
+            name::Name::KingsII => word.insert(book, vec![Vec::new(); 25]),
+            name::Name::ChroniclesI => word.insert(book, vec![Vec::new(); 29]),
+            name::Name::ChroniclesII => word.insert(book, vec![Vec::new(); 36]),
+            name::Name::Ezra => word.insert(book, vec![Vec::new(); 10]),
+            name::Name::Nehemiah => word.insert(book, vec![Vec::new(); 13]),
+            name::Name::Esther => word.insert(book, vec![Vec::new(); 10]),
+            name::Name::Job => word.insert(book, vec![Vec::new(); 42]),
+            name::Name::Psalms => word.insert(book, vec![Vec::new(); 150]),
+            name::Name::Proverbs => word.insert(book, vec![Vec::new(); 31]),
+            name::Name::Ecclesiastes => word.insert(book, vec![Vec::new(); 12]),
+            name::Name::SongOfSolomon => word.insert(book, vec![Vec::new(); 8]),
+            name::Name::Isaiah => word.insert(book, vec![Vec::new(); 66]),
+            name::Name::Jeremiah => word.insert(book, vec![Vec::new(); 52]),
+            // TODO(atec): Lamentations
+            name::Name::Lamentations => word.insert(book, vec![Vec::new(); 48]),
+            name::Name::Ezekiel => word.insert(book, vec![Vec::new(); 48]),
+            name::Name::Daniel => word.insert(book, vec![Vec::new(); 12]),
+            name::Name::Hosea => word.insert(book, vec![Vec::new(); 14]),
+            name::Name::Joel => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::Amos => word.insert(book, vec![Vec::new(); 9]),
+            name::Name::Obadiah => word.insert(book, vec![Vec::new(); 1]),
+            name::Name::Jonah => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::Micah => word.insert(book, vec![Vec::new(); 7]),
+            name::Name::Nahum => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::Habakkuk => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::Zephaniah => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::Haggai => word.insert(book, vec![Vec::new(); 2]),
+            name::Name::Zechariah => word.insert(book, vec![Vec::new(); 14]),
+            name::Name::Malachi => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::Matthew => word.insert(book, vec![Vec::new(); 28]),
+            name::Name::Mark => word.insert(book, vec![Vec::new(); 16]),
+            name::Name::Luke => word.insert(book, vec![Vec::new(); 24]),
+            name::Name::John => word.insert(book, vec![Vec::new(); 21]),
+            name::Name::Acts => word.insert(book, vec![Vec::new(); 28]),
+            name::Name::Romans => word.insert(book, vec![Vec::new(); 16]),
+            name::Name::CorinthiansI => word.insert(book, vec![Vec::new(); 16]),
+            name::Name::CorinthiansII => word.insert(book, vec![Vec::new(); 13]),
+            name::Name::Galatians => word.insert(book, vec![Vec::new(); 6]),
+            name::Name::Ephesians => word.insert(book, vec![Vec::new(); 6]),
+            name::Name::Philippians => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::Colossians => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::ThessaloniansI => word.insert(book, vec![Vec::new(); 5]),
+            name::Name::ThessaloniansII => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::TimothyI => word.insert(book, vec![Vec::new(); 6]),
+            name::Name::TimothyII => word.insert(book, vec![Vec::new(); 4]),
+            name::Name::Titus => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::Philemon => word.insert(book, vec![Vec::new(); 1]),
+            name::Name::Hebrews => word.insert(book, vec![Vec::new(); 13]),
+            name::Name::James => word.insert(book, vec![Vec::new(); 5]),
+            name::Name::PeterI => word.insert(book, vec![Vec::new(); 5]),
+            name::Name::PeterII => word.insert(book, vec![Vec::new(); 3]),
+            name::Name::JohnI => word.insert(book, vec![Vec::new(); 5]),
+            name::Name::JohnII => word.insert(book, vec![Vec::new(); 1]),
+            name::Name::JohnIII => word.insert(book, vec![Vec::new(); 1]),
+            name::Name::Jude => word.insert(book, vec![Vec::new(); 1]),
+            name::Name::Revelation => word.insert(book, vec![Vec::new(); 22]),
+            // TODO(atec): this should throw some kind of error
+            _ => word.insert(book, Vec::new()),
+        };
     }
 
     let r = new_reader(
@@ -93,10 +163,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     let _ = self.r.read_until(b':', &mut self.b);
                     s = String::from_utf8_lossy(&self.b).to_string();
 
-                    if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                        chapter_and_verse.push(Vec::new());
-                    }
-
                     let (verse, text) = self.extract_verse();
                     if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
                         chapter_and_verse[self.chapter - 1].push(s.clone());
@@ -121,9 +187,6 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     if self.new_chapter {
                         self.chapter = n;
                         self.new_chapter = false;
-                        if let Some(chapter_and_verse) = self.word.get_mut(&self.book) {
-                            chapter_and_verse.push(Vec::new());
-                        }
                     }
                     if self.last_chapter != n {
                         if self.last_chapter > n {
@@ -141,7 +204,8 @@ impl<R: std::io::Read> Iterator for Reader<'_, R> {
                     // special case for Philemon, JohnII, JohnIII, and Jude
                     // these books only have one chapter so we will just
                     // hard code the final verse
-                    if (self.book == Philemon && verse == 25)
+                    if (self.book == Obadiah && verse == 21)
+                        || (self.book == Philemon && verse == 25)
                         || (self.book == JohnII && verse == 13)
                         || (self.book == JohnIII && verse == 14)
                         || (self.book == Jude && verse == 25)

@@ -42,6 +42,7 @@ use name::Name::Jude;
 use name::Name::Judges;
 use name::Name::KingsI;
 use name::Name::KingsII;
+use name::Name::Lamentations; // TODO(atec): sort out canon here
 use name::Name::Leviticus;
 use name::Name::Luke;
 use name::Name::Malachi;
@@ -152,7 +153,7 @@ use name::Name::Simeon;
 use name::Name::Terrah;
 use name::Name::Zerubbabel;
 
-pub const BOOKS: [Name; 65] = [
+pub const BOOKS: [Name; 66] = [
     Genesis,
     Exodus,
     Leviticus,
@@ -177,6 +178,7 @@ pub const BOOKS: [Name; 65] = [
     SongOfSolomon,
     Isaiah,
     Jeremiah,
+    Lamentations,
     Ezekiel,
     Daniel,
     Hosea,
