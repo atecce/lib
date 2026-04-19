@@ -7,5 +7,6 @@ edition = "2024"
 book = { path = "../book" }
 daemon = { path = "../daemon" }
 deed = { path = "../deed" }
+gutenberg = { path = "../gutenberg" }
 name = { path = "../name" }
 source = { path = "../source" }

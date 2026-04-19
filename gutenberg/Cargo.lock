@@ -3,42 +3,6 @@
 version = 4
 
 [[package]]
-name = "bible"
-version = "0.1.0"
-dependencies = [
- "book",
- "daemon",
- "deed",
- "gutenberg",
- "name",
- "source",
-]
-
-[[package]]
-name = "book"
-version = "0.1.0"
-dependencies = [
- "name",
- "serde",
-]
-
-[[package]]
-name = "daemon"
-version = "0.1.0"
-dependencies = [
- "deed",
- "name",
- "source",
-]
-
-[[package]]
-name = "deed"
-version = "0.1.0"
-dependencies = [
- "source",
-]
-
-[[package]]
 name = "gutenberg"
 version = "0.1.0"
 dependencies = [
@@ -98,14 +62,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "source"
-version = "0.1.0"
-dependencies = [
- "book",
- "serde",
 ]
 
 [[package]]
