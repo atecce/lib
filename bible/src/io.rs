@@ -1,15 +1,8 @@
 use gutenberg::new_reader;
 use name::BIBLE;
 use name::Name;
-use name::Name::JohnII;
-use name::Name::JohnIII;
-use name::Name::Jude;
-use name::Name::Obadiah;
-use name::Name::Philemon;
-use name::Name::Revelation;
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
+use std::io::BufReader;
 
 pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();

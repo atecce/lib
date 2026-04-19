@@ -2,76 +2,7 @@ pub mod io;
 
 use book::Book;
 use deed::Deed;
-use name::Name;
 use source::Source;
-
-// books
-use name::Name::Acts;
-use name::Name::Amos;
-use name::Name::ChroniclesI;
-use name::Name::ChroniclesII;
-use name::Name::Colossians;
-use name::Name::CorinthiansI;
-use name::Name::CorinthiansII;
-use name::Name::Daniel;
-use name::Name::Deuteronomy;
-use name::Name::Ecclesiastes;
-use name::Name::Ephesians;
-use name::Name::Esther;
-use name::Name::Exodus;
-use name::Name::Ezekiel;
-use name::Name::Ezra;
-use name::Name::Galatians;
-use name::Name::Genesis;
-use name::Name::Habakkuk;
-use name::Name::Haggai;
-use name::Name::Hebrews;
-use name::Name::Hosea;
-use name::Name::Isaiah;
-use name::Name::James;
-use name::Name::Jeremiah;
-use name::Name::Job;
-use name::Name::Joel;
-use name::Name::John;
-use name::Name::JohnI;
-use name::Name::JohnII;
-use name::Name::JohnIII;
-use name::Name::Jonah;
-use name::Name::Joshua;
-use name::Name::Jude;
-use name::Name::Judges;
-use name::Name::KingsI;
-use name::Name::KingsII;
-use name::Name::Lamentations; // TODO(atec): sort out canon here
-use name::Name::Leviticus;
-use name::Name::Luke;
-use name::Name::Malachi;
-use name::Name::Mark;
-use name::Name::Matthew;
-use name::Name::Micah;
-use name::Name::Nahum;
-use name::Name::Nehemiah;
-use name::Name::Numbers;
-use name::Name::Obadiah;
-use name::Name::PeterI;
-use name::Name::PeterII;
-use name::Name::Philemon;
-use name::Name::Philippians;
-use name::Name::Proverbs;
-use name::Name::Psalms;
-use name::Name::Revelation;
-use name::Name::Romans;
-use name::Name::Ruth;
-use name::Name::SamuelI;
-use name::Name::SamuelII;
-use name::Name::SongOfSolomon;
-use name::Name::ThessaloniansI;
-use name::Name::ThessaloniansII;
-use name::Name::TimothyI;
-use name::Name::TimothyII;
-use name::Name::Titus;
-use name::Name::Zechariah;
-use name::Name::Zephaniah;
 
 // Luke 3:23-38
 use daemon::Daemon;
@@ -156,14 +87,14 @@ use name::Name::Zerubbabel;
 const ALMIGHTY: &Daemon = &Daemon {
     names: &[God],
     words: &[Source {
-        book: Book { name: Leviticus },
+        book: Book { name: name::Name::Leviticus },
         chapter: 20,
         verses: [26, 26],
     }],
     deeds: &[Deed {
         desc: "created the heavens and the earth",
         srcs: &[Source {
-            book: Book { name: Genesis },
+            book: Book { name: name::Name::Genesis },
             chapter: 1,
             verses: [1, 1],
         }],
@@ -849,7 +780,7 @@ const ELIEZER: &Daemon = &Daemon {
 };
 
 const JOSHUA: &Daemon = &Daemon {
-    names: &[Joshua],
+    names: &[name::Name::Joshua],
     words: &[],
     deeds: &[],
 
@@ -1065,7 +996,7 @@ const ESLI: &Daemon = &Daemon {
 };
 
 const NAHUM: &Daemon = &Daemon {
-    names: &[Nahum],
+    names: &[name::Name::Nahum],
     words: &[],
     deeds: &[],
 
@@ -1077,7 +1008,7 @@ const NAHUM: &Daemon = &Daemon {
 };
 
 const AMOS: &Daemon = &Daemon {
-    names: &[Amos],
+    names: &[name::Name::Amos],
     words: &[],
     deeds: &[],
 
@@ -1178,7 +1109,7 @@ const JOSEPH: &Daemon = &Daemon {
     deeds: &[Deed {
         desc: "decided to divorce Mary secretely to avoid her disgrace",
         srcs: &[Source {
-            book: Book { name: Matthew },
+            book: Book { name: name::Name::Matthew },
             chapter: 1,
             verses: [19, 19],
         }],
@@ -1195,22 +1126,22 @@ pub const JESUS: &Daemon = &Daemon {
     names: &[Jesus],
     words: &[
         Source {
-            book: Book { name: Matthew },
+            book: Book { name: name::Name::Matthew },
             chapter: 5,
             verses: [13, 16],
         },
         Source {
-            book: Book { name: Matthew },
+            book: Book { name: name::Name::Matthew },
             chapter: 7,
             verses: [6, 7],
         },
         Source {
-            book: Book { name: Matthew },
+            book: Book { name: name::Name::Matthew },
             chapter: 22,
             verses: [21, 21],
         },
         Source {
-            book: Book { name: Revelation },
+            book: Book { name: name::Name::Revelation },
             chapter: 22,
             verses: [16, 16],
         },
@@ -1218,7 +1149,7 @@ pub const JESUS: &Daemon = &Daemon {
     deeds: &[Deed {
         desc: "walked on water",
         srcs: &[Source {
-            book: Book { name: Matthew },
+            book: Book { name: name::Name::Matthew },
             chapter: 14,
             verses: [25, 25],
         }],

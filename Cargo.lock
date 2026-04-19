@@ -84,6 +84,7 @@ dependencies = [
  "book",
  "daemon",
  "deed",
+ "gutenberg",
  "name",
  "source",
 ]
@@ -818,6 +819,13 @@ name = "greece"
 version = "0.1.0"
 dependencies = [
  "daemon",
+ "name",
+]
+
+[[package]]
+name = "gutenberg"
+version = "0.1.0"
+dependencies = [
  "name",
 ]
 

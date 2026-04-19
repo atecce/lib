@@ -6,7 +6,6 @@ use name::Name::Jude;
 use name::Name::Obadiah;
 use name::Name::Philemon;
 use name::Name::Revelation;
-use std::collections::HashMap;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 
