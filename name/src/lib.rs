@@ -1,3 +1,5 @@
+uniffi::setup_scaffolding!();
+
 use serde::Serialize;
 use std::fmt;
 
