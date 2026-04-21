@@ -33,12 +33,7 @@ pub struct Daemon<'a> {
 
 impl Ancestry for Daemon<'_> {
     fn father(&self) -> Option<Arc<ArcDaemon>> {
-        if let Some(father) = self.father {
-            let ret = *father;
-            ret.new()
-        } else {
-            None
-        }
+        self.father.and_then(|f| f.new())
     }
 }
 
