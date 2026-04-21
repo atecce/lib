@@ -1,5 +1,4 @@
 uniffi::setup_scaffolding!();
-use std::sync::Arc;
 
 use deed::Deed;
 use deed::SwiftDeed;
@@ -7,7 +6,7 @@ use name::Name;
 use source::Source;
 
 pub trait Ancestry {
-    fn father(&self) -> Option<Arc<ArcDaemon>>;
+    fn father(&self) -> Option<Box<SwiftDaemon>>;
     fn genealogy(&self) {
         let mut cur = self.father();
         while let Some(node) = cur {
@@ -32,14 +31,14 @@ pub struct Daemon<'a> {
 }
 
 impl Ancestry for Daemon<'_> {
-    fn father(&self) -> Option<Arc<ArcDaemon>> {
+    fn father(&self) -> Option<Box<SwiftDaemon>> {
         self.father.and_then(|f| f.new())
     }
 }
 
 impl Daemon<'_> {
-    pub fn new(&self) -> Option<Arc<ArcDaemon>> {
-        Some(Arc::new(ArcDaemon {
+    pub fn new(&self) -> Option<Box<SwiftDaemon>> {
+        Some(Box::new(SwiftDaemon {
             names: self.names.to_vec(),
             words: self.words.to_vec(),
             deeds: self.deeds_to_vec(),
@@ -50,7 +49,7 @@ impl Daemon<'_> {
         }))
     }
 
-    fn mother(self) -> Option<Arc<ArcDaemon>> {
+    fn mother(self) -> Option<Box<SwiftDaemon>> {
         if let Some(mother) = self.mother {
             let ret = *mother;
             ret.new()
@@ -59,7 +58,7 @@ impl Daemon<'_> {
         }
     }
 
-    fn teacher(self) -> Option<Arc<ArcDaemon>> {
+    fn teacher(self) -> Option<Box<SwiftDaemon>> {
         if let Some(teacher) = self.teacher {
             let ret = *teacher;
             ret.new()
@@ -68,7 +67,7 @@ impl Daemon<'_> {
         }
     }
 
-    fn predecessor(self) -> Option<Arc<ArcDaemon>> {
+    fn predecessor(self) -> Option<Box<SwiftDaemon>> {
         if let Some(predecessor) = self.predecessor {
             let ret = *predecessor;
             ret.new()
@@ -87,20 +86,20 @@ impl Daemon<'_> {
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
-pub struct ArcDaemon {
+pub struct SwiftDaemon {
     pub names: Vec<Name>,
     pub words: Vec<Source>,
     pub deeds: Vec<SwiftDeed>,
 
-    pub father: Option<Arc<ArcDaemon>>,
-    pub mother: Option<Arc<ArcDaemon>>,
-    pub teacher: Option<Arc<ArcDaemon>>,
+    pub father: Option<Box<SwiftDaemon>>,
+    pub mother: Option<Box<SwiftDaemon>>,
+    pub teacher: Option<Box<SwiftDaemon>>,
 
-    pub predecessor: Option<Arc<ArcDaemon>>,
+    pub predecessor: Option<Box<SwiftDaemon>>,
 }
 
-impl Ancestry for ArcDaemon {
-    fn father(&self) -> Option<Arc<ArcDaemon>> {
+impl Ancestry for SwiftDaemon {
+    fn father(&self) -> Option<Box<SwiftDaemon>> {
         self.father.clone()
     }
 }

@@ -1,7 +1,5 @@
 pub mod io;
 
-use std::sync::Arc;
-
 use book::Book;
 use deed::Deed;
 use source::Source;
@@ -1217,5 +1215,5 @@ fn yeshua() {
         }
     }
 
-    Arc::unwrap_or_clone(JESUS.new().unwrap()).genealogy();
+    JESUS.new().unwrap().genealogy();
 }
