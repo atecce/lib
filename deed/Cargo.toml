@@ -3,5 +3,10 @@ name = "deed"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["staticlib", "lib"]
+name = "deed"
+
 [dependencies]
 source = { path = "../source" }
+uniffi = "0.31"

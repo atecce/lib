@@ -3,6 +3,10 @@ name = "bible"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["staticlib", "lib"]
+name = "bible"
+
 [dependencies]
 book = { path = "../book" }
 daemon = { path = "../daemon" }
@@ -10,3 +14,4 @@ deed = { path = "../deed" }
 gutenberg = { path = "../gutenberg" }
 name = { path = "../name" }
 source = { path = "../source" }
+uniffi = "0.31"

@@ -1,0 +1,32 @@
+atec ~/lib/deed [swift] $ cargo build
+   Compiling source v0.1.0 (/Users/atec/lib/source)
+   Compiling deed v0.1.0 (/Users/atec/lib/deed)
+error[E0726]: implicit elided lifetime not allowed here
+ --> src/lib.rs:6:12
+  |
+6 | pub struct Deed<'a> {
+  |            ^^^^ expected lifetime parameter
+  |
+help: indicate the anonymous lifetime
+  |
+6 | pub struct Deed<'_><'a> {
+  |                ++++
+
+error[E0261]: use of undeclared lifetime name `'a`
+ --> src/lib.rs:7:16
+  |
+5 | #[derive(Debug, uniffi::Record)]
+  |                 -------------- lifetime `'a` is missing in item created through this procedural macro
+6 | pub struct Deed<'a> {
+7 |     pub desc: &'a str,
+  |                ^^ undeclared lifetime
+
+error[E0261]: use of undeclared lifetime name `'a`
+ --> src/lib.rs:8:16
+  |
+5 | #[derive(Debug, uniffi::Record)]
+  |                 -------------- lifetime `'a` is missing in item created through this procedural macro
+...
+8 |     pub srcs: &'a [Source],
+  |                ^^ undeclared lifetime
+

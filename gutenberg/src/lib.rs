@@ -26,9 +26,7 @@ pub struct Reader<R> {
     amen: bool,
 }
 
-pub fn new_reader<R: std::io::Read>(
-    r: BufReader<R>,
-) -> Reader<R> {
+pub fn new_reader<R: std::io::Read>(r: BufReader<R>) -> Reader<R> {
     Reader {
         r: r,
         b: Vec::new(),

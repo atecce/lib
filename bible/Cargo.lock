@@ -75,6 +75,7 @@ dependencies = [
  "gutenberg",
  "name",
  "source",
+ "uniffi",
 ]
 
 [[package]]
@@ -89,6 +90,7 @@ version = "0.1.0"
 dependencies = [
  "name",
  "serde",
+ "uniffi",
 ]
 
 [[package]]
@@ -142,6 +144,7 @@ dependencies = [
  "deed",
  "name",
  "source",
+ "uniffi",
 ]
 
 [[package]]
@@ -149,6 +152,7 @@ name = "deed"
 version = "0.1.0"
 dependencies = [
  "source",
+ "uniffi",
 ]
 
 [[package]]
@@ -495,6 +499,7 @@ version = "0.1.0"
 dependencies = [
  "book",
  "serde",
+ "uniffi",
 ]
 
 [[package]]

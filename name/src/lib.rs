@@ -3,21 +3,6 @@ uniffi::setup_scaffolding!();
 use serde::Serialize;
 use std::fmt;
 
-// ... data structs without methods ...
-// #[derive(uniffi::Record)]
-// pub struct Example {
-//     pub items: Vec<String>,
-//     pub value: Option<f64>,
-// }
-
-// ... classes with methods ...
-// #[derive(uniffi::Object)]
-// pub struct Greeter {
-//     name: String,
-// }
-
-// ... and much more! For more information about uniffi macros, read the UniFFI book: https://mozilla.github.io/uniffi-rs/proc_macro/index.html
-
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, uniffi::Enum)]
 pub enum Name {
     //

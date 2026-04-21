@@ -3,7 +3,12 @@ name = "daemon"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["staticlib", "lib"]
+name = "daemon"
+
 [dependencies]
 deed = { path = "../deed" }
 name = { path = "../name" }
 source = { path = "../source" }
+uniffi = "0.31"
