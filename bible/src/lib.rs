@@ -1186,7 +1186,8 @@ fn yeshua() {
         println!("book: {}", src.book.name);
         println!("chapter: {}", src.chapter);
         println!("verses: {:?}", src.verses);
-        let text = &word[&src.book.name][src.chapter as usize - 1][src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
+        let text = &word[&src.book.name][src.chapter as usize - 1]
+            [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
         println!("{:?}", text);
     }
 
@@ -1196,8 +1197,8 @@ fn yeshua() {
             println!("book: {}", src.book.name);
             println!("chapter: {}", src.chapter);
             println!("verses: {:?}", src.verses);
-            let text =
-                &word[&src.book.name][src.chapter as usize - 1][src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
+            let text = &word[&src.book.name][src.chapter as usize - 1]
+                [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
             println!("{:?}", text);
         }
     }
@@ -1214,4 +1215,6 @@ fn yeshua() {
     }
 
     JESUS.genealogy();
+
+    println!("{:#?}", JESUS.new());
 }

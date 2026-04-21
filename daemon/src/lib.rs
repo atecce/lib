@@ -20,7 +20,7 @@ pub struct Daemon<'a> {
 }
 
 impl Daemon<'_> {
-    fn new(&self) -> Option<Arc<ArcDaemon>> {
+    pub fn new(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
             names: self.names.to_vec(),
             words: self.words.to_vec(),
@@ -86,7 +86,7 @@ impl Daemon<'_> {
     }
 }
 
-#[derive(uniffi::Object)]
+#[derive(Debug, uniffi::Object)]
 pub struct ArcDaemon {
     pub names: Vec<Name>,
     pub words: Vec<Source>,
