@@ -1,10 +1,13 @@
 pub mod io;
 
+use std::sync::Arc;
+
 use book::Book;
 use deed::Deed;
 use source::Source;
 
 // Luke 3:23-38
+use daemon::Ancestry;
 use daemon::Daemon;
 use name::Name::Aaron;
 use name::Name::Abel;
@@ -1214,7 +1217,5 @@ fn yeshua() {
         }
     }
 
-    JESUS.genealogy();
-
-    println!("{:#?}", JESUS.new());
+    Arc::unwrap_or_clone(JESUS.new().unwrap()).genealogy();
 }

@@ -17,7 +17,7 @@ impl Deed<'_> {
     }
 }
 
-#[derive(Debug, uniffi::Object)]
+#[derive(Clone, Debug, uniffi::Object)]
 pub struct SwiftDeed {
     pub desc: Box<str>,
     pub srcs: Vec<Source>,

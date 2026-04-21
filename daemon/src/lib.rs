@@ -6,6 +6,18 @@ use deed::SwiftDeed;
 use name::Name;
 use source::Source;
 
+pub trait Ancestry {
+    fn father(&self) -> Option<Arc<ArcDaemon>>;
+    fn genealogy(&self) {
+        let mut cur = self.father();
+        while let Some(node) = cur {
+            // TODO(atec): probably some index check
+            println!("{:#?}", node.names[0]);
+            cur = node.father();
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct Daemon<'a> {
     pub names: &'a [Name],
@@ -19,6 +31,17 @@ pub struct Daemon<'a> {
     pub predecessor: Option<&'a Daemon<'a>>,
 }
 
+impl Ancestry for Daemon<'_> {
+    fn father(&self) -> Option<Arc<ArcDaemon>> {
+        if let Some(father) = self.father {
+            let ret = *father;
+            ret.new()
+        } else {
+            None
+        }
+    }
+}
+
 impl Daemon<'_> {
     pub fn new(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
@@ -30,15 +53,6 @@ impl Daemon<'_> {
             teacher: self.teacher(),
             predecessor: self.predecessor(),
         }))
-    }
-
-    fn father(self) -> Option<Arc<ArcDaemon>> {
-        if let Some(father) = self.father {
-            let ret = *father;
-            ret.new()
-        } else {
-            None
-        }
     }
 
     fn mother(self) -> Option<Arc<ArcDaemon>> {
@@ -75,18 +89,9 @@ impl Daemon<'_> {
         }
         swift_deeds
     }
-
-    pub fn genealogy(self) {
-        let mut cur = self.father;
-        while let Some(node) = cur {
-            // TODO(atec): probably some index check
-            println!("{:#?}", node.names[0]);
-            cur = node.father;
-        }
-    }
 }
 
-#[derive(Debug, uniffi::Object)]
+#[derive(Clone, Debug, uniffi::Object)]
 pub struct ArcDaemon {
     pub names: Vec<Name>,
     pub words: Vec<Source>,
@@ -97,4 +102,10 @@ pub struct ArcDaemon {
     pub teacher: Option<Arc<ArcDaemon>>,
 
     pub predecessor: Option<Arc<ArcDaemon>>,
+}
+
+impl Ancestry for ArcDaemon {
+    fn father(&self) -> Option<Arc<ArcDaemon>> {
+        self.father.clone()
+    }
 }
