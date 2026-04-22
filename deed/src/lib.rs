@@ -9,8 +9,8 @@ pub struct Deed<'a> {
 }
 
 impl Deed<'_> {
-    pub fn new(deed: Deed) -> SwiftDeed {
-        SwiftDeed {
+    pub fn new(deed: Deed) -> BoxDeed {
+        BoxDeed {
             desc: deed.desc.into(),
             srcs: deed.srcs.to_vec(),
         }
@@ -18,7 +18,7 @@ impl Deed<'_> {
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
-pub struct SwiftDeed {
+pub struct BoxDeed {
     pub desc: Box<str>,
     pub srcs: Vec<Source>,
 }
