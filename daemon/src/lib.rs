@@ -1,12 +1,12 @@
 uniffi::setup_scaffolding!();
 
 use deed::Deed;
-use deed::SwiftDeed;
+use deed::BoxDeed;
 use name::Name;
 use source::Source;
 
 pub trait Ancestry {
-    fn father(&self) -> Option<Box<SwiftDaemon>>;
+    fn father(&self) -> Option<Box<BoxDaemon>>;
     fn genealogy(&self) {
         let mut cur = self.father();
         while let Some(node) = cur {
@@ -31,14 +31,14 @@ pub struct Daemon<'a> {
 }
 
 impl Ancestry for Daemon<'_> {
-    fn father(&self) -> Option<Box<SwiftDaemon>> {
+    fn father(&self) -> Option<Box<BoxDaemon>> {
         self.father.and_then(|f| f.new())
     }
 }
 
 impl Daemon<'_> {
-    pub fn new(&self) -> Option<Box<SwiftDaemon>> {
-        Some(Box::new(SwiftDaemon {
+    pub fn new(&self) -> Option<Box<BoxDaemon>> {
+        Some(Box::new(BoxDaemon {
             names: self.names.to_vec(),
             words: self.words.to_vec(),
             deeds: self.deeds_to_vec(),
@@ -49,34 +49,19 @@ impl Daemon<'_> {
         }))
     }
 
-    fn mother(self) -> Option<Box<SwiftDaemon>> {
-        if let Some(mother) = self.mother {
-            let ret = *mother;
-            ret.new()
-        } else {
-            None
-        }
+    fn mother(self) -> Option<Box<BoxDaemon>> {
+	self.mother.and_then(|m| m.new())
     }
 
-    fn teacher(self) -> Option<Box<SwiftDaemon>> {
-        if let Some(teacher) = self.teacher {
-            let ret = *teacher;
-            ret.new()
-        } else {
-            None
-        }
+    fn teacher(self) -> Option<Box<BoxDaemon>> {
+	self.teacher.and_then(|t| t.new())
     }
 
-    fn predecessor(self) -> Option<Box<SwiftDaemon>> {
-        if let Some(predecessor) = self.predecessor {
-            let ret = *predecessor;
-            ret.new()
-        } else {
-            None
-        }
+    fn predecessor(self) -> Option<Box<BoxDaemon>> {
+	self.predecessor.and_then(|p| p.new())
     }
 
-    fn deeds_to_vec(self) -> Vec<SwiftDeed> {
+    fn deeds_to_vec(self) -> Vec<BoxDeed> {
         let mut swift_deeds = Vec::new();
         for deed in self.deeds {
             swift_deeds.push(Deed::new(*deed));
@@ -86,20 +71,20 @@ impl Daemon<'_> {
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
-pub struct SwiftDaemon {
+pub struct BoxDaemon {
     pub names: Vec<Name>,
     pub words: Vec<Source>,
-    pub deeds: Vec<SwiftDeed>,
+    pub deeds: Vec<BoxDeed>,
 
-    pub father: Option<Box<SwiftDaemon>>,
-    pub mother: Option<Box<SwiftDaemon>>,
-    pub teacher: Option<Box<SwiftDaemon>>,
+    pub father: Option<Box<BoxDaemon>>,
+    pub mother: Option<Box<BoxDaemon>>,
+    pub teacher: Option<Box<BoxDaemon>>,
 
-    pub predecessor: Option<Box<SwiftDaemon>>,
+    pub predecessor: Option<Box<BoxDaemon>>,
 }
 
-impl Ancestry for SwiftDaemon {
-    fn father(&self) -> Option<Box<SwiftDaemon>> {
+impl Ancestry for BoxDaemon {
+    fn father(&self) -> Option<Box<BoxDaemon>> {
         self.father.clone()
     }
 }
