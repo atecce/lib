@@ -37,33 +37,61 @@ pub struct Daemon<'a> {
 
 impl Ancestry for Daemon<'_> {
     fn father(&self) -> Option<Arc<ArcDaemon>> {
-        self.father.and_then(|f| f.new())
+        self.father.and_then(|f| f.new_arc())
     }
 }
 
 impl Daemon<'_> {
-    pub fn new(&self) -> Option<Arc<ArcDaemon>> {
+    pub fn new_arc(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
             names: self.names.to_vec(),
             words: self.words.to_vec(),
             deeds: self.deeds_to_vec(),
             father: self.father(),
-            mother: self.mother(),
-            teacher: self.teacher(),
-            predecessor: self.predecessor(),
+            mother: self.arc_mother(),
+            teacher: self.arc_teacher(),
+            predecessor: self.arc_predecessor(),
         }))
     }
 
-    fn mother(self) -> Option<Arc<ArcDaemon>> {
-        self.mother.and_then(|m| m.new())
+    pub fn new_box(&self) -> Option<Box<BoxDaemon>> {
+        Some(Box::new(BoxDaemon {
+            names: self.names.to_vec(),
+            words: self.words.to_vec(),
+            deeds: self.deeds_to_vec(),
+            father: self.box_father(),
+            mother: self.box_mother(),
+            teacher: self.box_teacher(),
+            predecessor: self.box_predecessor(),
+        }))
     }
 
-    fn teacher(self) -> Option<Arc<ArcDaemon>> {
-        self.teacher.and_then(|t| t.new())
+    fn arc_mother(self) -> Option<Arc<ArcDaemon>> {
+        self.mother.and_then(|m| m.new_arc())
     }
 
-    fn predecessor(self) -> Option<Arc<ArcDaemon>> {
-        self.predecessor.and_then(|p| p.new())
+    fn arc_teacher(self) -> Option<Arc<ArcDaemon>> {
+        self.teacher.and_then(|t| t.new_arc())
+    }
+
+    fn arc_predecessor(self) -> Option<Arc<ArcDaemon>> {
+        self.predecessor.and_then(|p| p.new_arc())
+    }
+
+    fn box_father(self) -> Option<Box<BoxDaemon>> {
+        self.mother.and_then(|f| f.new_box())
+    }
+
+    fn box_mother(self) -> Option<Box<BoxDaemon>> {
+        self.mother.and_then(|m| m.new_box())
+    }
+
+    fn box_teacher(self) -> Option<Box<BoxDaemon>> {
+        self.teacher.and_then(|t| t.new_box())
+    }
+
+    fn box_predecessor(self) -> Option<Box<BoxDaemon>> {
+        self.predecessor.and_then(|p| p.new_box())
     }
 
     fn deeds_to_vec(self) -> Vec<BoxDeed> {

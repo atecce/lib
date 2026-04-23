@@ -1191,8 +1191,12 @@ pub const JESUS: &Daemon = &Daemon {
 };
 
 #[uniffi::export]
-pub fn root_and_offspring_of_david() -> ArcDaemon {
-    Arc::unwrap_or_clone(JESUS.new().unwrap())
+pub fn arc_root_and_offspring_of_david() -> ArcDaemon {
+    Arc::unwrap_or_clone(JESUS.new_arc().unwrap())
+}
+
+pub fn box_root_and_offspring_of_david() -> BoxDaemon {
+    *JESUS.new_box().unwrap()
 }
 
 #[test]
@@ -1231,5 +1235,5 @@ fn yeshua() {
         }
     }
 
-    genealogy(JESUS.new().unwrap().clone());
+    genealogy(JESUS.new_arc().unwrap().clone());
 }
