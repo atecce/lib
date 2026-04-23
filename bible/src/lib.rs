@@ -1195,6 +1195,7 @@ pub fn arc_root_and_offspring_of_david() -> ArcDaemon {
     Arc::unwrap_or_clone(JESUS.new_arc().unwrap())
 }
 
+#[uniffi::export]
 pub fn box_root_and_offspring_of_david() -> BoxDaemon {
     *JESUS.new_box().unwrap()
 }

@@ -243,9 +243,15 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ROOT_AND_OFFSPRING_OF_DAVID
-#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ROOT_AND_OFFSPRING_OF_DAVID
-uint64_t uniffi_bible_fn_func_root_and_offspring_of_david(RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ARC_ROOT_AND_OFFSPRING_OF_DAVID
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ARC_ROOT_AND_OFFSPRING_OF_DAVID
+uint64_t uniffi_bible_fn_func_arc_root_and_offspring_of_david(RustCallStatus *_Nonnull out_status
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
+uint64_t uniffi_bible_fn_func_box_root_and_offspring_of_david(RustCallStatus *_Nonnull out_status
     
 );
 #endif
@@ -509,9 +515,15 @@ void ffi_bible_rust_future_free_void(uint64_t handle
 void ffi_bible_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_ROOT_AND_OFFSPRING_OF_DAVID
-#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_ROOT_AND_OFFSPRING_OF_DAVID
-uint16_t uniffi_bible_checksum_func_root_and_offspring_of_david(void
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_ARC_ROOT_AND_OFFSPRING_OF_DAVID
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_ARC_ROOT_AND_OFFSPRING_OF_DAVID
+uint16_t uniffi_bible_checksum_func_arc_root_and_offspring_of_david(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
+uint16_t uniffi_bible_checksum_func_box_root_and_offspring_of_david(void
     
 );
 #endif

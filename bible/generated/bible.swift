@@ -456,9 +456,15 @@ fileprivate struct FfiConverterString: FfiConverter {
         writeBytes(&buf, value.utf8)
     }
 }
-public func rootAndOffspringOfDavid() -> ArcDaemon  {
+public func arcRootAndOffspringOfDavid() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
-    uniffi_bible_fn_func_root_and_offspring_of_david($0
+    uniffi_bible_fn_func_arc_root_and_offspring_of_david($0
+    )
+})
+}
+public func boxRootAndOffspringOfDavid() -> BoxDaemon  {
+    return try!  FfiConverterTypeBoxDaemon_lift(try! rustCall() {
+    uniffi_bible_fn_func_box_root_and_offspring_of_david($0
     )
 })
 }
@@ -478,7 +484,10 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_bible_checksum_func_root_and_offspring_of_david() != 1210) {
+    if (uniffi_bible_checksum_func_arc_root_and_offspring_of_david() != 63166) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_bible_checksum_func_box_root_and_offspring_of_david() != 5020) {
         return InitializationResult.apiChecksumMismatch
     }
 
