@@ -25,6 +25,9 @@ pub enum Name {
     Cyrus,
 
     // israel
+    יֵשׁוּ,
+    יֵשׁוּעַ,
+
     // // books
     // // // old
     Genesis,

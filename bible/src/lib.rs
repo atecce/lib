@@ -7,8 +7,8 @@ use deed::Deed;
 use source::Source;
 
 // Luke 3:23-38
-use daemon::Daemon;
 use daemon::BoxDaemon;
+use daemon::Daemon;
 use name::Name::Aaron;
 use name::Name::Abel;
 use name::Name::Abraham;
@@ -86,6 +86,9 @@ use name::Name::Shem;
 use name::Name::Simeon;
 use name::Name::Terrah;
 use name::Name::Zerubbabel;
+
+use name::Name::יֵשׁוּ;
+use name::Name::יֵשׁוּעַ;
 
 const ALMIGHTY: &Daemon = &Daemon {
     names: &[God],
@@ -1132,7 +1135,8 @@ const JOSEPH: &Daemon = &Daemon {
 };
 
 pub const JESUS: &Daemon = &Daemon {
-    names: &[Jesus],
+    names: &[Jesus, יֵשׁוּ, יֵשׁוּעַ],
+
     words: &[
         Source {
             book: Book {

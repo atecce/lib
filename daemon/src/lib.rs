@@ -1,7 +1,7 @@
 uniffi::setup_scaffolding!();
 
-use deed::Deed;
 use deed::BoxDeed;
+use deed::Deed;
 use name::Name;
 use source::Source;
 
@@ -50,15 +50,15 @@ impl Daemon<'_> {
     }
 
     fn mother(self) -> Option<Box<BoxDaemon>> {
-	self.mother.and_then(|m| m.new())
+        self.mother.and_then(|m| m.new())
     }
 
     fn teacher(self) -> Option<Box<BoxDaemon>> {
-	self.teacher.and_then(|t| t.new())
+        self.teacher.and_then(|t| t.new())
     }
 
     fn predecessor(self) -> Option<Box<BoxDaemon>> {
-	self.predecessor.and_then(|p| p.new())
+        self.predecessor.and_then(|p| p.new())
     }
 
     fn deeds_to_vec(self) -> Vec<BoxDeed> {
