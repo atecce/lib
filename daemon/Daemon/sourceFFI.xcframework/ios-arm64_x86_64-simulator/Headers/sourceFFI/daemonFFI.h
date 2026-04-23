@@ -243,14 +243,19 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
-#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
-uint64_t uniffi_daemon_fn_clone_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
+uint64_t uniffi_daemon_fn_clone_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
-#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
-void uniffi_daemon_fn_free_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_BOXDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_BOXDAEMON
+void uniffi_daemon_fn_free_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
+RustBuffer uniffi_daemon_fn_method_boxdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC
@@ -511,6 +516,12 @@ void ffi_daemon_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 void ffi_daemon_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
+uint16_t uniffi_daemon_checksum_method_boxdaemon_names(void
+    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_UNIFFI_CONTRACT_VERSION

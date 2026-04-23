@@ -88,3 +88,10 @@ impl Ancestry for BoxDaemon {
         self.father.clone()
     }
 }
+
+#[uniffi::export]
+impl BoxDaemon {
+    pub fn names(&self) -> Vec<Name> {
+        self.names.clone()
+    }
+}

@@ -462,6 +462,8 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 public protocol BoxDaemonProtocol: AnyObject, Sendable {
     
+    func names()  -> [Name]
+    
 }
 open class BoxDaemon: BoxDaemonProtocol, @unchecked Sendable {
     fileprivate let handle: UInt64
@@ -516,6 +518,14 @@ open class BoxDaemon: BoxDaemonProtocol, @unchecked Sendable {
     
 
     
+open func names() -> [Name]  {
+    return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
+    uniffi_daemon_fn_method_boxdaemon_names(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
 
     
 }
@@ -563,6 +573,31 @@ public func FfiConverterTypeBoxDaemon_lower(_ value: BoxDaemon) -> UInt64 {
 
 
 
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeName: FfiConverterRustBuffer {
+    typealias SwiftType = [Name]
+
+    public static func write(_ value: [Name], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeName.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Name] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [Name]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeName.read(from: &buf))
+        }
+        return seq
+    }
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -578,7 +613,11 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
+    if (uniffi_daemon_checksum_method_boxdaemon_names() != 48507) {
+        return InitializationResult.apiChecksumMismatch
+    }
 
+    uniffiEnsureNameInitialized()
     return InitializationResult.ok
 }()
 

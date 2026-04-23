@@ -460,10 +460,12 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 
 
-public protocol ArcDaemonProtocol: AnyObject, Sendable {
+public protocol BoxDaemonProtocol: AnyObject, Sendable {
+    
+    func names()  -> [Name]
     
 }
-open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
+open class BoxDaemon: BoxDaemonProtocol, @unchecked Sendable {
     fileprivate let handle: UInt64
 
     /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
@@ -500,7 +502,7 @@ open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
     @_documentation(visibility: private)
 #endif
     public func uniffiCloneHandle() -> UInt64 {
-        return try! rustCall { uniffi_daemon_fn_clone_arcdaemon(self.handle, $0) }
+        return try! rustCall { uniffi_daemon_fn_clone_boxdaemon(self.handle, $0) }
     }
     // No primary constructor declared for this class.
 
@@ -510,11 +512,19 @@ open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
             return
         }
 
-        try! rustCall { uniffi_daemon_fn_free_arcdaemon(handle, $0) }
+        try! rustCall { uniffi_daemon_fn_free_boxdaemon(handle, $0) }
     }
 
     
 
+    
+open func names() -> [Name]  {
+    return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
+    uniffi_daemon_fn_method_boxdaemon_names(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
     
 
     
@@ -524,24 +534,24 @@ open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public struct FfiConverterTypeArcDaemon: FfiConverter {
+public struct FfiConverterTypeBoxDaemon: FfiConverter {
     typealias FfiType = UInt64
-    typealias SwiftType = ArcDaemon
+    typealias SwiftType = BoxDaemon
 
-    public static func lift(_ handle: UInt64) throws -> ArcDaemon {
-        return ArcDaemon(unsafeFromHandle: handle)
+    public static func lift(_ handle: UInt64) throws -> BoxDaemon {
+        return BoxDaemon(unsafeFromHandle: handle)
     }
 
-    public static func lower(_ value: ArcDaemon) -> UInt64 {
+    public static func lower(_ value: BoxDaemon) -> UInt64 {
         return value.uniffiCloneHandle()
     }
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ArcDaemon {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> BoxDaemon {
         let handle: UInt64 = try readInt(&buf)
         return try lift(handle)
     }
 
-    public static func write(_ value: ArcDaemon, into buf: inout [UInt8]) {
+    public static func write(_ value: BoxDaemon, into buf: inout [UInt8]) {
         writeInt(&buf, lower(value))
     }
 }
@@ -550,18 +560,43 @@ public struct FfiConverterTypeArcDaemon: FfiConverter {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeArcDaemon_lift(_ handle: UInt64) throws -> ArcDaemon {
-    return try FfiConverterTypeArcDaemon.lift(handle)
+public func FfiConverterTypeBoxDaemon_lift(_ handle: UInt64) throws -> BoxDaemon {
+    return try FfiConverterTypeBoxDaemon.lift(handle)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeArcDaemon_lower(_ value: ArcDaemon) -> UInt64 {
-    return FfiConverterTypeArcDaemon.lower(value)
+public func FfiConverterTypeBoxDaemon_lower(_ value: BoxDaemon) -> UInt64 {
+    return FfiConverterTypeBoxDaemon.lower(value)
 }
 
 
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeName: FfiConverterRustBuffer {
+    typealias SwiftType = [Name]
+
+    public static func write(_ value: [Name], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeName.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Name] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [Name]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeName.read(from: &buf))
+        }
+        return seq
+    }
+}
 
 private enum InitializationResult {
     case ok
@@ -578,7 +613,11 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
+    if (uniffi_daemon_checksum_method_boxdaemon_names() != 48507) {
+        return InitializationResult.apiChecksumMismatch
+    }
 
+    uniffiEnsureNameInitialized()
     return InitializationResult.ok
 }()
 

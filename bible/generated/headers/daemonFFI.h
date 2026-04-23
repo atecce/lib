@@ -253,6 +253,11 @@ uint64_t uniffi_daemon_fn_clone_boxdaemon(uint64_t handle, RustCallStatus *_Nonn
 void uniffi_daemon_fn_free_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
+RustBuffer uniffi_daemon_fn_method_boxdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC
 #define UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC
 RustBuffer ffi_daemon_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
@@ -511,6 +516,12 @@ void ffi_daemon_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 void ffi_daemon_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
+uint16_t uniffi_daemon_checksum_method_boxdaemon_names(void
+    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_UNIFFI_CONTRACT_VERSION
