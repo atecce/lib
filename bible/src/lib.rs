@@ -92,9 +92,6 @@ use name::Name::Simeon;
 use name::Name::Terrah;
 use name::Name::Zerubbabel;
 
-use name::Name::יֵשׁוּ;
-use name::Name::יֵשׁוּעַ;
-
 const ALMIGHTY: &Daemon = &Daemon {
     names: &[God],
     words: &[Source {
@@ -1140,7 +1137,13 @@ const JOSEPH: &Daemon = &Daemon {
 };
 
 pub const JESUS: &Daemon = &Daemon {
-    names: &[Jesus, יֵשׁוּ, יֵשׁוּעַ],
+    names: &[
+        name::Name::Jesus,
+        name::Name::Iesus,
+        name::Name::Ἰησοῦς,
+        name::Name::יֵשׁוּעַ,
+        name::Name::יֵשׁוּ,
+    ],
 
     words: &[
         Source {

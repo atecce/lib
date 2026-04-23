@@ -27,6 +27,8 @@ pub enum Name {
     // israel
     יֵשׁוּ,
     יֵשׁוּעַ,
+    Ἰησοῦς,
+    Iesus,
 
     // // books
     // // // old
