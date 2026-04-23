@@ -243,6 +243,52 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
+#ifndef UNIFFI_FFIDEF_CALLBACK_INTERFACE_ANCESTRY_METHOD0
+#define UNIFFI_FFIDEF_CALLBACK_INTERFACE_ANCESTRY_METHOD0
+typedef void (*UniffiCallbackInterfaceAncestryMethod0)(uint64_t, RustBuffer* _Nonnull, 
+        RustCallStatus *_Nonnull uniffiCallStatus
+    );
+
+#endif
+#ifndef UNIFFI_FFIDEF_V_TABLE_CALLBACK_INTERFACE_ANCESTRY
+#define UNIFFI_FFIDEF_V_TABLE_CALLBACK_INTERFACE_ANCESTRY
+typedef struct UniffiVTableCallbackInterfaceAncestry {
+    UniffiCallbackInterfaceFree _Nonnull uniffiFree;
+    UniffiCallbackInterfaceClone _Nonnull uniffiClone;
+    UniffiCallbackInterfaceAncestryMethod0 _Nonnull father;
+} UniffiVTableCallbackInterfaceAncestry;
+
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ANCESTRY
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ANCESTRY
+uint64_t uniffi_daemon_fn_clone_ancestry(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ANCESTRY
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ANCESTRY
+void uniffi_daemon_fn_free_ancestry(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ANCESTRY_FATHER
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ANCESTRY_FATHER
+RustBuffer uniffi_daemon_fn_method_ancestry_father(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
+uint64_t uniffi_daemon_fn_clone_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
+void uniffi_daemon_fn_free_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
+RustBuffer uniffi_daemon_fn_method_arcdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
 uint64_t uniffi_daemon_fn_clone_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
@@ -256,6 +302,11 @@ void uniffi_daemon_fn_free_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull o
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
 RustBuffer uniffi_daemon_fn_method_boxdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FUNC_GENEALOGY
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FUNC_GENEALOGY
+void uniffi_daemon_fn_func_genealogy(uint64_t daemon, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC
@@ -516,6 +567,24 @@ void ffi_daemon_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_DAEMON_RUST_FUTURE_COMPLETE_VOID
 void ffi_daemon_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_FUNC_GENEALOGY
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_FUNC_GENEALOGY
+uint16_t uniffi_daemon_checksum_func_genealogy(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ANCESTRY_FATHER
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ANCESTRY_FATHER
+uint16_t uniffi_daemon_checksum_method_ancestry_father(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_NAMES
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_NAMES
+uint16_t uniffi_daemon_checksum_method_arcdaemon_names(void
+    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES

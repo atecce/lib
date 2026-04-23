@@ -460,6 +460,238 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 
 
+public protocol AncestryProtocol: AnyObject, Sendable {
+    
+    func father()  -> ArcDaemon?
+    
+}
+open class Ancestry: AncestryProtocol, @unchecked Sendable {
+    fileprivate let handle: UInt64
+
+    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public struct NoHandle {
+        public init() {}
+    }
+
+    // TODO: We'd like this to be `private` but for Swifty reasons,
+    // we can't implement `FfiConverter` without making this `required` and we can't
+    // make it `required` without making it `public`.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    required public init(unsafeFromHandle handle: UInt64) {
+        self.handle = handle
+    }
+
+    // This constructor can be used to instantiate a fake object.
+    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
+    //
+    // - Warning:
+    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public init(noHandle: NoHandle) {
+        self.handle = 0
+    }
+
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public func uniffiCloneHandle() -> UInt64 {
+        return try! rustCall { uniffi_daemon_fn_clone_ancestry(self.handle, $0) }
+    }
+    // No primary constructor declared for this class.
+
+    deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
+        try! rustCall { uniffi_daemon_fn_free_ancestry(handle, $0) }
+    }
+
+    
+
+    
+open func father() -> ArcDaemon?  {
+    return try!  FfiConverterOptionTypeArcDaemon.lift(try! rustCall() {
+    uniffi_daemon_fn_method_ancestry_father(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
+
+    
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeAncestry: FfiConverter {
+    typealias FfiType = UInt64
+    typealias SwiftType = Ancestry
+
+    public static func lift(_ handle: UInt64) throws -> Ancestry {
+        return Ancestry(unsafeFromHandle: handle)
+    }
+
+    public static func lower(_ value: Ancestry) -> UInt64 {
+        return value.uniffiCloneHandle()
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Ancestry {
+        let handle: UInt64 = try readInt(&buf)
+        return try lift(handle)
+    }
+
+    public static func write(_ value: Ancestry, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeAncestry_lift(_ handle: UInt64) throws -> Ancestry {
+    return try FfiConverterTypeAncestry.lift(handle)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeAncestry_lower(_ value: Ancestry) -> UInt64 {
+    return FfiConverterTypeAncestry.lower(value)
+}
+
+
+
+
+
+
+public protocol ArcDaemonProtocol: AnyObject, Sendable {
+    
+    func names()  -> [Name]
+    
+}
+open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
+    fileprivate let handle: UInt64
+
+    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public struct NoHandle {
+        public init() {}
+    }
+
+    // TODO: We'd like this to be `private` but for Swifty reasons,
+    // we can't implement `FfiConverter` without making this `required` and we can't
+    // make it `required` without making it `public`.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    required public init(unsafeFromHandle handle: UInt64) {
+        self.handle = handle
+    }
+
+    // This constructor can be used to instantiate a fake object.
+    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
+    //
+    // - Warning:
+    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public init(noHandle: NoHandle) {
+        self.handle = 0
+    }
+
+#if swift(>=5.8)
+    @_documentation(visibility: private)
+#endif
+    public func uniffiCloneHandle() -> UInt64 {
+        return try! rustCall { uniffi_daemon_fn_clone_arcdaemon(self.handle, $0) }
+    }
+    // No primary constructor declared for this class.
+
+    deinit {
+        if handle == 0 {
+            // Mock objects have handle=0 don't try to free them
+            return
+        }
+
+        try! rustCall { uniffi_daemon_fn_free_arcdaemon(handle, $0) }
+    }
+
+    
+
+    
+open func names() -> [Name]  {
+    return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
+    uniffi_daemon_fn_method_arcdaemon_names(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
+
+    
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeArcDaemon: FfiConverter {
+    typealias FfiType = UInt64
+    typealias SwiftType = ArcDaemon
+
+    public static func lift(_ handle: UInt64) throws -> ArcDaemon {
+        return ArcDaemon(unsafeFromHandle: handle)
+    }
+
+    public static func lower(_ value: ArcDaemon) -> UInt64 {
+        return value.uniffiCloneHandle()
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ArcDaemon {
+        let handle: UInt64 = try readInt(&buf)
+        return try lift(handle)
+    }
+
+    public static func write(_ value: ArcDaemon, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeArcDaemon_lift(_ handle: UInt64) throws -> ArcDaemon {
+    return try FfiConverterTypeArcDaemon.lift(handle)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeArcDaemon_lower(_ value: ArcDaemon) -> UInt64 {
+    return FfiConverterTypeArcDaemon.lower(value)
+}
+
+
+
+
+
+
 public protocol BoxDaemonProtocol: AnyObject, Sendable {
     
     func names()  -> [Name]
@@ -576,6 +808,30 @@ public func FfiConverterTypeBoxDaemon_lower(_ value: BoxDaemon) -> UInt64 {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterOptionTypeArcDaemon: FfiConverterRustBuffer {
+    typealias SwiftType = ArcDaemon?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeArcDaemon.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeArcDaemon.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterSequenceTypeName: FfiConverterRustBuffer {
     typealias SwiftType = [Name]
 
@@ -597,6 +853,12 @@ fileprivate struct FfiConverterSequenceTypeName: FfiConverterRustBuffer {
         return seq
     }
 }
+public func genealogy(daemon: Ancestry)  {try! rustCall() {
+    uniffi_daemon_fn_func_genealogy(
+        FfiConverterTypeAncestry_lower(daemon),$0
+    )
+}
+}
 
 private enum InitializationResult {
     case ok
@@ -612,6 +874,15 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_daemon_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if (uniffi_daemon_checksum_func_genealogy() != 9126) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_daemon_checksum_method_ancestry_father() != 60899) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_daemon_checksum_method_arcdaemon_names() != 10817) {
+        return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_daemon_checksum_method_boxdaemon_names() != 48507) {
         return InitializationResult.apiChecksumMismatch
