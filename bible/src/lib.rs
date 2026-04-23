@@ -2,13 +2,18 @@ uniffi::setup_scaffolding!();
 
 pub mod io;
 
+use std::sync::Arc;
+
 use book::Book;
 use deed::Deed;
 use source::Source;
 
-// Luke 3:23-38
+use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
+use daemon::genealogy;
+
+// Luke 3:23-38
 use name::Name::Aaron;
 use name::Name::Abel;
 use name::Name::Abraham;
@@ -1186,8 +1191,8 @@ pub const JESUS: &Daemon = &Daemon {
 };
 
 #[uniffi::export]
-pub fn root_and_offspring_of_david() -> BoxDaemon {
-    *JESUS.new().unwrap()
+pub fn root_and_offspring_of_david() -> ArcDaemon {
+    Arc::unwrap_or_clone(JESUS.new().unwrap())
 }
 
 #[test]
@@ -1226,5 +1231,5 @@ fn yeshua() {
         }
     }
 
-    JESUS.new().unwrap().genealogy();
+    genealogy(JESUS.new().unwrap().clone());
 }
