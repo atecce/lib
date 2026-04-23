@@ -142,6 +142,7 @@ pub struct ArcDaemon {
     pub predecessor: Option<Arc<ArcDaemon>>,
 }
 
+#[uniffi::export]
 impl Ancestry for ArcDaemon {
     fn father(&self) -> Option<Arc<ArcDaemon>> {
         self.father.clone()

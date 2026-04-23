@@ -578,6 +578,8 @@ public func FfiConverterTypeAncestry_lower(_ value: Ancestry) -> UInt64 {
 
 public protocol ArcDaemonProtocol: AnyObject, Sendable {
     
+    func father()  -> ArcDaemon?
+    
     func names()  -> [Name]
     
 }
@@ -634,6 +636,14 @@ open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
     
 
     
+open func father() -> ArcDaemon?  {
+    return try!  FfiConverterOptionTypeArcDaemon.lift(try! rustCall() {
+    uniffi_daemon_fn_method_arcdaemon_father(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
 open func names() -> [Name]  {
     return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
     uniffi_daemon_fn_method_arcdaemon_names(
@@ -671,6 +681,8 @@ public struct FfiConverterTypeArcDaemon: FfiConverter {
         writeInt(&buf, lower(value))
     }
 }
+extension ArcDaemon: AncestryProtocol {}
+
 
 
 #if swift(>=5.8)
@@ -879,6 +891,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_daemon_checksum_method_ancestry_father() != 60899) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_daemon_checksum_method_arcdaemon_father() != 28436) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_daemon_checksum_method_arcdaemon_names() != 10817) {

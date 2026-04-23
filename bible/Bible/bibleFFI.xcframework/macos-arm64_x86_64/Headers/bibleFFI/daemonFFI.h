@@ -284,6 +284,11 @@ uint64_t uniffi_daemon_fn_clone_arcdaemon(uint64_t handle, RustCallStatus *_Nonn
 void uniffi_daemon_fn_free_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_FATHER
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_FATHER
+RustBuffer uniffi_daemon_fn_method_arcdaemon_father(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
 RustBuffer uniffi_daemon_fn_method_arcdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
@@ -578,6 +583,12 @@ uint16_t uniffi_daemon_checksum_func_genealogy(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ANCESTRY_FATHER
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ANCESTRY_FATHER
 uint16_t uniffi_daemon_checksum_method_ancestry_father(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_FATHER
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_FATHER
+uint16_t uniffi_daemon_checksum_method_arcdaemon_father(void
     
 );
 #endif
