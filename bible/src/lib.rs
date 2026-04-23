@@ -1239,9 +1239,5 @@ fn yeshua() {
         }
     }
 
-    println!("genealogy for Daemon");
-    genealogy(Arc::new(*JESUS));
-
-    println!("genealogy for ArcDaemon");
-    genealogy(JESUS.new_arc().unwrap().clone());
+    genealogy(*JESUS);
 }

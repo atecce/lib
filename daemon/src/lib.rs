@@ -7,18 +7,11 @@ use deed::Deed;
 use name::Name;
 use source::Source;
 
-#[uniffi::export]
-pub trait Ancestry: Send + Sync {
-    fn father(&self) -> Option<Arc<ArcDaemon>>;
-}
-
-#[uniffi::export]
-pub fn genealogy(daemon: Arc<dyn Ancestry>) {
-    let mut cur = daemon.father();
+pub fn genealogy(daemon: Daemon) {
+    let mut cur = daemon.father;
     while let Some(node) = cur {
-        // TODO(atec): probably some index check
-        println!("{:#?}", node.names[0]);
-        cur = node.father();
+        println!("{:#?}", node.names);
+        cur = node.father;
     }
 }
 
@@ -35,19 +28,13 @@ pub struct Daemon<'a> {
     pub predecessor: Option<&'a Daemon<'a>>,
 }
 
-impl Ancestry for Daemon<'_> {
-    fn father(&self) -> Option<Arc<ArcDaemon>> {
-        self.father.and_then(|f| f.new_arc())
-    }
-}
-
 impl Daemon<'_> {
     pub fn new_arc(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
             names: self.names.to_vec(),
             words: self.words.to_vec(),
             deeds: self.deeds_to_vec(),
-            father: self.father(),
+            father: self.arc_father(),
             mother: self.arc_mother(),
             teacher: self.arc_teacher(),
             predecessor: self.arc_predecessor(),
@@ -64,6 +51,10 @@ impl Daemon<'_> {
             teacher: self.box_teacher(),
             predecessor: self.box_predecessor(),
         }))
+    }
+
+    fn arc_father(&self) -> Option<Arc<ArcDaemon>> {
+        self.father.and_then(|f| f.new_arc())
     }
 
     fn arc_mother(self) -> Option<Arc<ArcDaemon>> {
@@ -104,32 +95,6 @@ impl Daemon<'_> {
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
-pub struct BoxDaemon {
-    pub names: Vec<Name>,
-    pub words: Vec<Source>,
-    pub deeds: Vec<BoxDeed>,
-
-    pub father: Option<Box<BoxDaemon>>,
-    pub mother: Option<Box<BoxDaemon>>,
-    pub teacher: Option<Box<BoxDaemon>>,
-
-    pub predecessor: Option<Box<BoxDaemon>>,
-}
-
-// impl Ancestry for BoxDaemon {
-//     fn father(&self) -> Option<Box<BoxDaemon>> {
-//         self.father.clone()
-//     }
-// }
-
-#[uniffi::export]
-impl BoxDaemon {
-    pub fn names(&self) -> Vec<Name> {
-        self.names.clone()
-    }
-}
-
-#[derive(Clone, Debug, uniffi::Object)]
 pub struct ArcDaemon {
     pub names: Vec<Name>,
     pub words: Vec<Source>,
@@ -143,14 +108,30 @@ pub struct ArcDaemon {
 }
 
 #[uniffi::export]
-impl Ancestry for ArcDaemon {
+impl ArcDaemon {
     fn father(&self) -> Option<Arc<ArcDaemon>> {
         self.father.clone()
     }
+    pub fn names(&self) -> Vec<Name> {
+        self.names.clone()
+    }
+}
+
+#[derive(Clone, Debug, uniffi::Object)]
+pub struct BoxDaemon {
+    pub names: Vec<Name>,
+    pub words: Vec<Source>,
+    pub deeds: Vec<BoxDeed>,
+
+    pub father: Option<Box<BoxDaemon>>,
+    pub mother: Option<Box<BoxDaemon>>,
+    pub teacher: Option<Box<BoxDaemon>>,
+
+    pub predecessor: Option<Box<BoxDaemon>>,
 }
 
 #[uniffi::export]
-impl ArcDaemon {
+impl BoxDaemon {
     pub fn names(&self) -> Vec<Name> {
         self.names.clone()
     }
