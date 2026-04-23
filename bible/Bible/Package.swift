@@ -17,11 +17,11 @@ let package = Package(
     ],
     dependencies: [ ],
     targets: [
-        .binaryTarget(name: "sourceFFI", path: "./sourceFFI.xcframework"),
+        .binaryTarget(name: "bibleFFI", path: "./bibleFFI.xcframework"),
         .target(
             name: "Bible",
             dependencies: [
-                .target(name: "sourceFFI")
+                .target(name: "bibleFFI")
             ]
         ),
     ]

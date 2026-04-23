@@ -1,3 +1,5 @@
+uniffi::setup_scaffolding!();
+
 pub mod io;
 
 use book::Book;
@@ -5,8 +7,8 @@ use deed::Deed;
 use source::Source;
 
 // Luke 3:23-38
-use daemon::Ancestry;
 use daemon::Daemon;
+use daemon::BoxDaemon;
 use name::Name::Aaron;
 use name::Name::Abel;
 use name::Name::Abraham;
@@ -1178,6 +1180,11 @@ pub const JESUS: &Daemon = &Daemon {
 
     predecessor: None,
 };
+
+#[uniffi::export]
+pub fn root_and_offspring_of_david() -> BoxDaemon {
+    *JESUS.new().unwrap()
+}
 
 #[test]
 fn yeshua() {

@@ -243,14 +243,14 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
-#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_ARCDAEMON
-uint64_t uniffi_daemon_fn_clone_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
+uint64_t uniffi_daemon_fn_clone_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
-#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_ARCDAEMON
-void uniffi_daemon_fn_free_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_BOXDAEMON
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_FREE_BOXDAEMON
+void uniffi_daemon_fn_free_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC

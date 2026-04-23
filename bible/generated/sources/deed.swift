@@ -460,10 +460,10 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 
 
-public protocol SwiftDeedProtocol: AnyObject, Sendable {
+public protocol BoxDeedProtocol: AnyObject, Sendable {
     
 }
-open class SwiftDeed: SwiftDeedProtocol, @unchecked Sendable {
+open class BoxDeed: BoxDeedProtocol, @unchecked Sendable {
     fileprivate let handle: UInt64
 
     /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
@@ -500,7 +500,7 @@ open class SwiftDeed: SwiftDeedProtocol, @unchecked Sendable {
     @_documentation(visibility: private)
 #endif
     public func uniffiCloneHandle() -> UInt64 {
-        return try! rustCall { uniffi_deed_fn_clone_swiftdeed(self.handle, $0) }
+        return try! rustCall { uniffi_deed_fn_clone_boxdeed(self.handle, $0) }
     }
     // No primary constructor declared for this class.
 
@@ -510,7 +510,7 @@ open class SwiftDeed: SwiftDeedProtocol, @unchecked Sendable {
             return
         }
 
-        try! rustCall { uniffi_deed_fn_free_swiftdeed(handle, $0) }
+        try! rustCall { uniffi_deed_fn_free_boxdeed(handle, $0) }
     }
 
     
@@ -524,24 +524,24 @@ open class SwiftDeed: SwiftDeedProtocol, @unchecked Sendable {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public struct FfiConverterTypeSwiftDeed: FfiConverter {
+public struct FfiConverterTypeBoxDeed: FfiConverter {
     typealias FfiType = UInt64
-    typealias SwiftType = SwiftDeed
+    typealias SwiftType = BoxDeed
 
-    public static func lift(_ handle: UInt64) throws -> SwiftDeed {
-        return SwiftDeed(unsafeFromHandle: handle)
+    public static func lift(_ handle: UInt64) throws -> BoxDeed {
+        return BoxDeed(unsafeFromHandle: handle)
     }
 
-    public static func lower(_ value: SwiftDeed) -> UInt64 {
+    public static func lower(_ value: BoxDeed) -> UInt64 {
         return value.uniffiCloneHandle()
     }
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftDeed {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> BoxDeed {
         let handle: UInt64 = try readInt(&buf)
         return try lift(handle)
     }
 
-    public static func write(_ value: SwiftDeed, into buf: inout [UInt8]) {
+    public static func write(_ value: BoxDeed, into buf: inout [UInt8]) {
         writeInt(&buf, lower(value))
     }
 }
@@ -550,15 +550,15 @@ public struct FfiConverterTypeSwiftDeed: FfiConverter {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeSwiftDeed_lift(_ handle: UInt64) throws -> SwiftDeed {
-    return try FfiConverterTypeSwiftDeed.lift(handle)
+public func FfiConverterTypeBoxDeed_lift(_ handle: UInt64) throws -> BoxDeed {
+    return try FfiConverterTypeBoxDeed.lift(handle)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeSwiftDeed_lower(_ value: SwiftDeed) -> UInt64 {
-    return FfiConverterTypeSwiftDeed.lower(value)
+public func FfiConverterTypeBoxDeed_lower(_ value: BoxDeed) -> UInt64 {
+    return FfiConverterTypeBoxDeed.lower(value)
 }
 
 
