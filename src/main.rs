@@ -6,6 +6,7 @@ use crate::rome::CICERO;
 
 use bible::JESUS;
 use book::Book;
+use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 use name::Name;
@@ -21,11 +22,11 @@ use gliner::util::result::Result;
 use orp::params::RuntimeParameters;
 
 fn print_optimates() {
-    println!("{:?}", JESUS);
-    println!("{:?}", APOLLO);
-    println!("{:?}", ALEXANDER);
-    println!("{:?}", CICERO);
-    println!("{:?}", CYRUS);
+    println!("{:?}", genealogy(*JESUS));
+    println!("{:?}", genealogy(*APOLLO));
+    println!("{:?}", genealogy(*ALEXANDER));
+    println!("{:?}", genealogy(*CICERO));
+    println!("{:?}", genealogy(*CYRUS));
     println!();
 }
 
