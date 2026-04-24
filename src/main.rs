@@ -95,8 +95,8 @@ fn things_that_can_be_named() -> Result<()> {
 
                     let src = Source {
                         book: Book { name: *book },
-                        chapter: i + 1,
-                        verses: [span.sequence() + 1, span.sequence() + 1],
+                        chapter: (i + 1).try_into().unwrap(),
+                        verses: [(span.sequence() + 1).try_into().unwrap(), (span.sequence() + 1).try_into().unwrap()],
                     };
 
                     if let Some(srcs) = index.get_mut(span.text()) {
@@ -109,7 +109,7 @@ fn things_that_can_be_named() -> Result<()> {
         }
     }
 
-    println!("{:#?}", serde_json::to_string(&index).unwrap());
+    println!("{:#?}", index);
 
     Ok(())
 }
