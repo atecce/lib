@@ -1,6 +1,6 @@
-uniffi::setup_scaffolding!();
-
 pub mod io;
+
+use crate::io::UniFfiTag;
 
 use std::sync::Arc;
 

@@ -255,6 +255,12 @@ uint64_t uniffi_bible_fn_func_box_root_and_offspring_of_david(RustCallStatus *_N
     
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_READ_ALL
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_READ_ALL
+RustBuffer uniffi_bible_fn_func_read_all(RustCallStatus *_Nonnull out_status
+    
+);
+#endif
 #ifndef UNIFFI_FFIDEF_FFI_BIBLE_RUSTBUFFER_ALLOC
 #define UNIFFI_FFIDEF_FFI_BIBLE_RUSTBUFFER_ALLOC
 RustBuffer ffi_bible_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
@@ -524,6 +530,12 @@ uint16_t uniffi_bible_checksum_func_arc_root_and_offspring_of_david(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
 #define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_ROOT_AND_OFFSPRING_OF_DAVID
 uint16_t uniffi_bible_checksum_func_box_root_and_offspring_of_david(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_READ_ALL
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_READ_ALL
+uint16_t uniffi_bible_checksum_func_read_all(void
     
 );
 #endif

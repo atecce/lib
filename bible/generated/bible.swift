@@ -456,6 +456,82 @@ fileprivate struct FfiConverterString: FfiConverter {
         writeBytes(&buf, value.utf8)
     }
 }
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]
+
+    public static func write(_ value: [String], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterString.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [String]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterString.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [[String]]
+
+    public static func write(_ value: [[String]], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterSequenceString.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [[String]] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [[String]]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterSequenceString.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterDictionaryTypeNameSequenceSequenceString: FfiConverterRustBuffer {
+    public static func write(_ value: [Name: [[String]]], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for (key, value) in value {
+            FfiConverterTypeName.write(key, into: &buf)
+            FfiConverterSequenceSequenceString.write(value, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [Name: [[String]]] {
+        let len: Int32 = try readInt(&buf)
+        var dict = [Name: [[String]]]()
+        dict.reserveCapacity(Int(len))
+        for _ in 0..<len {
+            let key = try FfiConverterTypeName.read(from: &buf)
+            let value = try FfiConverterSequenceSequenceString.read(from: &buf)
+            dict[key] = value
+        }
+        return dict
+    }
+}
 public func arcRootAndOffspringOfDavid() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
     uniffi_bible_fn_func_arc_root_and_offspring_of_david($0
@@ -465,6 +541,12 @@ public func arcRootAndOffspringOfDavid() -> ArcDaemon  {
 public func boxRootAndOffspringOfDavid() -> BoxDaemon  {
     return try!  FfiConverterTypeBoxDaemon_lift(try! rustCall() {
     uniffi_bible_fn_func_box_root_and_offspring_of_david($0
+    )
+})
+}
+public func readAll() -> [Name: [[String]]]  {
+    return try!  FfiConverterDictionaryTypeNameSequenceSequenceString.lift(try! rustCall() {
+    uniffi_bible_fn_func_read_all($0
     )
 })
 }
@@ -490,8 +572,12 @@ private let initializationResult: InitializationResult = {
     if (uniffi_bible_checksum_func_box_root_and_offspring_of_david() != 5020) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_bible_checksum_func_read_all() != 1787) {
+        return InitializationResult.apiChecksumMismatch
+    }
 
     uniffiEnsureDaemonInitialized()
+    uniffiEnsureNameInitialized()
     return InitializationResult.ok
 }()
 
