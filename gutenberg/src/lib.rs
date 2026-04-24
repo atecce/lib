@@ -26,9 +26,9 @@ pub struct Reader<R> {
     amen: bool,
 }
 
-pub fn new_reader<R: std::io::Read>(r: BufReader<R>) -> Reader<R> {
+pub fn new_reader() -> Reader<&'static [u8]> {
     Reader {
-        r: r,
+        r: BufReader::new(&include_bytes!("../../gutenberg/cache/epub/10/pg10.txt")[..]),
         b: Vec::new(),
         book: BIBLE[0],
         i: 0,

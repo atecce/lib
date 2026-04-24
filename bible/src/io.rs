@@ -83,11 +83,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
         };
     }
 
-    let r = new_reader(BufReader::new(
-        &include_bytes!("../../gutenberg/cache/epub/10/pg10.txt")[..],
-    ));
-
-    for (book, chapter, verse, text) in r {
+    for (book, chapter, verse, text) in new_reader() {
         if let Some(chapter_and_verse) = word.get_mut(&book) {
             chapter_and_verse[chapter - 1].push(text);
         }
