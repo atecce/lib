@@ -13,7 +13,11 @@ impl Deed<'_> {
     pub fn new(deed: Deed) -> UniffiDeed {
         UniffiDeed {
             desc: deed.desc.into(),
-            srcs: deed.srcs.into_iter().map(|src| Source::new(src.clone())).collect(),
+            srcs: deed
+                .srcs
+                .into_iter()
+                .map(|src| Source::new(src.clone()))
+                .collect(),
         }
     }
 }

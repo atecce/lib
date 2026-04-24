@@ -205,6 +205,15 @@ impl<R> Reader<R> {
 
         self.b.clear();
 
-        return (verse, s.replace("\r\n", " "));
+        return (
+            verse,
+            s.replace("\r\n", " ")
+                .trim_start_matches(|c: char| c.is_ascii_digit())
+                .trim_start()
+                .trim_end_matches(':')
+                .trim_end_matches(|c: char| c.is_ascii_digit())
+                .trim_end()
+                .to_string(),
+        );
     }
 }

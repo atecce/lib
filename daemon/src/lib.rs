@@ -87,11 +87,17 @@ impl Daemon<'_> {
     }
 
     fn words_to_vec(self) -> Vec<UniffiSource> {
-        self.words.into_iter().map(|word| Source::new(word.clone())).collect()
+        self.words
+            .into_iter()
+            .map(|word| Source::new(word.clone()))
+            .collect()
     }
 
     fn deeds_to_vec(self) -> Vec<UniffiDeed> {
-        self.deeds.into_iter().map(|deed| Deed::new(*deed)).collect()
+        self.deeds
+            .into_iter()
+            .map(|deed| Deed::new(*deed))
+            .collect()
     }
 }
 
