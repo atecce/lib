@@ -253,6 +253,11 @@ uint64_t uniffi_daemon_fn_clone_arcdaemon(uint64_t handle, RustCallStatus *_Nonn
 void uniffi_daemon_fn_free_arcdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_DEEDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_DEEDS
+RustBuffer uniffi_daemon_fn_method_arcdaemon_deeds(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_FATHER
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_FATHER
 RustBuffer uniffi_daemon_fn_method_arcdaemon_father(uint64_t ptr, RustCallStatus *_Nonnull out_status
@@ -261,6 +266,11 @@ RustBuffer uniffi_daemon_fn_method_arcdaemon_father(uint64_t ptr, RustCallStatus
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_NAMES
 RustBuffer uniffi_daemon_fn_method_arcdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_WORDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_ARCDAEMON_WORDS
+RustBuffer uniffi_daemon_fn_method_arcdaemon_words(uint64_t ptr, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_CLONE_BOXDAEMON
@@ -273,9 +283,19 @@ uint64_t uniffi_daemon_fn_clone_boxdaemon(uint64_t handle, RustCallStatus *_Nonn
 void uniffi_daemon_fn_free_boxdaemon(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_DEEDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_DEEDS
+RustBuffer uniffi_daemon_fn_method_boxdaemon_deeds(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_NAMES
 RustBuffer uniffi_daemon_fn_method_boxdaemon_names(uint64_t ptr, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_WORDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_FN_METHOD_BOXDAEMON_WORDS
+RustBuffer uniffi_daemon_fn_method_boxdaemon_words(uint64_t ptr, RustCallStatus *_Nonnull out_status
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_DAEMON_RUSTBUFFER_ALLOC
@@ -538,6 +558,12 @@ void ffi_daemon_rust_future_free_void(uint64_t handle
 void ffi_daemon_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_DEEDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_DEEDS
+uint16_t uniffi_daemon_checksum_method_arcdaemon_deeds(void
+    
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_FATHER
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_FATHER
 uint16_t uniffi_daemon_checksum_method_arcdaemon_father(void
@@ -550,9 +576,27 @@ uint16_t uniffi_daemon_checksum_method_arcdaemon_names(void
     
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_WORDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_ARCDAEMON_WORDS
+uint16_t uniffi_daemon_checksum_method_arcdaemon_words(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_DEEDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_DEEDS
+uint16_t uniffi_daemon_checksum_method_boxdaemon_deeds(void
+    
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
 #define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_NAMES
 uint16_t uniffi_daemon_checksum_method_boxdaemon_names(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_WORDS
+#define UNIFFI_FFIDEF_UNIFFI_DAEMON_CHECKSUM_METHOD_BOXDAEMON_WORDS
+uint16_t uniffi_daemon_checksum_method_boxdaemon_words(void
     
 );
 #endif

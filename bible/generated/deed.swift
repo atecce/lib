@@ -458,110 +458,83 @@ fileprivate struct FfiConverterString: FfiConverter {
 }
 
 
+public struct UniffiDeed: Equatable, Hashable {
+    public var desc: String
+    public var srcs: [UniffiSource]
 
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(desc: String, srcs: [UniffiSource]) {
+        self.desc = desc
+        self.srcs = srcs
+    }
 
-public protocol BoxDeedProtocol: AnyObject, Sendable {
+    
+
     
 }
-open class BoxDeed: BoxDeedProtocol, @unchecked Sendable {
-    fileprivate let handle: UInt64
 
-    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
+#if compiler(>=6)
+extension UniffiDeed: Sendable {}
 #endif
-    public struct NoHandle {
-        public init() {}
-    }
-
-    // TODO: We'd like this to be `private` but for Swifty reasons,
-    // we can't implement `FfiConverter` without making this `required` and we can't
-    // make it `required` without making it `public`.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    required public init(unsafeFromHandle handle: UInt64) {
-        self.handle = handle
-    }
-
-    // This constructor can be used to instantiate a fake object.
-    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
-    //
-    // - Warning:
-    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    public init(noHandle: NoHandle) {
-        self.handle = 0
-    }
 
 #if swift(>=5.8)
-    @_documentation(visibility: private)
+@_documentation(visibility: private)
 #endif
-    public func uniffiCloneHandle() -> UInt64 {
-        return try! rustCall { uniffi_deed_fn_clone_boxdeed(self.handle, $0) }
+public struct FfiConverterTypeUniffiDeed: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UniffiDeed {
+        return
+            try UniffiDeed(
+                desc: FfiConverterString.read(from: &buf), 
+                srcs: FfiConverterSequenceTypeUniffiSource.read(from: &buf)
+        )
     }
-    // No primary constructor declared for this class.
 
-    deinit {
-        if handle == 0 {
-            // Mock objects have handle=0 don't try to free them
-            return
+    public static func write(_ value: UniffiDeed, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.desc, into: &buf)
+        FfiConverterSequenceTypeUniffiSource.write(value.srcs, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUniffiDeed_lift(_ buf: RustBuffer) throws -> UniffiDeed {
+    return try FfiConverterTypeUniffiDeed.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUniffiDeed_lower(_ value: UniffiDeed) -> RustBuffer {
+    return FfiConverterTypeUniffiDeed.lower(value)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeUniffiSource: FfiConverterRustBuffer {
+    typealias SwiftType = [UniffiSource]
+
+    public static func write(_ value: [UniffiSource], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeUniffiSource.write(item, into: &buf)
         }
-
-        try! rustCall { uniffi_deed_fn_free_boxdeed(handle, $0) }
     }
 
-    
-
-    
-
-    
-}
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public struct FfiConverterTypeBoxDeed: FfiConverter {
-    typealias FfiType = UInt64
-    typealias SwiftType = BoxDeed
-
-    public static func lift(_ handle: UInt64) throws -> BoxDeed {
-        return BoxDeed(unsafeFromHandle: handle)
-    }
-
-    public static func lower(_ value: BoxDeed) -> UInt64 {
-        return value.uniffiCloneHandle()
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> BoxDeed {
-        let handle: UInt64 = try readInt(&buf)
-        return try lift(handle)
-    }
-
-    public static func write(_ value: BoxDeed, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [UniffiSource] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [UniffiSource]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeUniffiSource.read(from: &buf))
+        }
+        return seq
     }
 }
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeBoxDeed_lift(_ handle: UInt64) throws -> BoxDeed {
-    return try FfiConverterTypeBoxDeed.lift(handle)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeBoxDeed_lower(_ value: BoxDeed) -> UInt64 {
-    return FfiConverterTypeBoxDeed.lower(value)
-}
-
-
 
 private enum InitializationResult {
     case ok
@@ -579,6 +552,7 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.contractVersionMismatch
     }
 
+    uniffiEnsureSourceInitialized()
     return InitializationResult.ok
 }()
 

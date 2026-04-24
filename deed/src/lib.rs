@@ -1,6 +1,7 @@
 uniffi::setup_scaffolding!();
 
 use source::Source;
+use source::UniffiSource;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Deed<'a> {
@@ -9,16 +10,16 @@ pub struct Deed<'a> {
 }
 
 impl Deed<'_> {
-    pub fn new(deed: Deed) -> BoxDeed {
-        BoxDeed {
+    pub fn new(deed: Deed) -> UniffiDeed {
+        UniffiDeed {
             desc: deed.desc.into(),
-            srcs: deed.srcs.to_vec(),
+            srcs: deed.srcs.into_iter().map(|src| Source::new(src.clone())).collect(),
         }
     }
 }
 
-#[derive(Clone, Debug, uniffi::Object)]
-pub struct BoxDeed {
-    pub desc: Box<str>,
-    pub srcs: Vec<Source>,
+#[derive(Clone, Debug, uniffi::Record)]
+pub struct UniffiDeed {
+    pub desc: String,
+    pub srcs: Vec<UniffiSource>,
 }

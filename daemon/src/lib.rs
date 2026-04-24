@@ -2,10 +2,11 @@ uniffi::setup_scaffolding!();
 
 use std::sync::Arc;
 
-use deed::BoxDeed;
 use deed::Deed;
+use deed::UniffiDeed;
 use name::Name;
 use source::Source;
+use source::UniffiSource;
 
 pub fn genealogy(daemon: Daemon) {
     let mut cur = daemon.father;
@@ -32,7 +33,7 @@ impl Daemon<'_> {
     pub fn new_arc(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
             names: self.names.to_vec(),
-            words: self.words.to_vec(),
+            words: self.words_to_vec(),
             deeds: self.deeds_to_vec(),
             father: self.arc_father(),
             mother: self.arc_mother(),
@@ -44,7 +45,7 @@ impl Daemon<'_> {
     pub fn new_box(&self) -> Option<Box<BoxDaemon>> {
         Some(Box::new(BoxDaemon {
             names: self.names.to_vec(),
-            words: self.words.to_vec(),
+            words: self.words_to_vec(),
             deeds: self.deeds_to_vec(),
             father: self.box_father(),
             mother: self.box_mother(),
@@ -85,20 +86,20 @@ impl Daemon<'_> {
         self.predecessor.and_then(|p| p.new_box())
     }
 
-    fn deeds_to_vec(self) -> Vec<BoxDeed> {
-        let mut swift_deeds = Vec::new();
-        for deed in self.deeds {
-            swift_deeds.push(Deed::new(*deed));
-        }
-        swift_deeds
+    fn words_to_vec(self) -> Vec<UniffiSource> {
+        self.words.into_iter().map(|word| Source::new(word.clone())).collect()
+    }
+
+    fn deeds_to_vec(self) -> Vec<UniffiDeed> {
+        self.deeds.into_iter().map(|deed| Deed::new(*deed)).collect()
     }
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
 pub struct ArcDaemon {
     pub names: Vec<Name>,
-    pub words: Vec<Source>,
-    pub deeds: Vec<BoxDeed>,
+    pub words: Vec<UniffiSource>,
+    pub deeds: Vec<UniffiDeed>,
 
     pub father: Option<Arc<ArcDaemon>>,
     pub mother: Option<Arc<ArcDaemon>>,
@@ -115,13 +116,19 @@ impl ArcDaemon {
     pub fn names(&self) -> Vec<Name> {
         self.names.clone()
     }
+    pub fn words(&self) -> Vec<UniffiSource> {
+        self.words.clone()
+    }
+    pub fn deeds(&self) -> Vec<UniffiDeed> {
+        self.deeds.clone()
+    }
 }
 
 #[derive(Clone, Debug, uniffi::Object)]
 pub struct BoxDaemon {
     pub names: Vec<Name>,
-    pub words: Vec<Source>,
-    pub deeds: Vec<BoxDeed>,
+    pub words: Vec<UniffiSource>,
+    pub deeds: Vec<UniffiDeed>,
 
     pub father: Option<Box<BoxDaemon>>,
     pub mother: Option<Box<BoxDaemon>>,
@@ -134,5 +141,11 @@ pub struct BoxDaemon {
 impl BoxDaemon {
     pub fn names(&self) -> Vec<Name> {
         self.names.clone()
+    }
+    pub fn words(&self) -> Vec<UniffiSource> {
+        self.words.clone()
+    }
+    pub fn deeds(&self) -> Vec<UniffiDeed> {
+        self.deeds.clone()
     }
 }

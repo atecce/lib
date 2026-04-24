@@ -462,9 +462,13 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 public protocol ArcDaemonProtocol: AnyObject, Sendable {
     
+    func deeds()  -> [UniffiDeed]
+    
     func father()  -> ArcDaemon?
     
     func names()  -> [Name]
+    
+    func words()  -> [UniffiSource]
     
 }
 open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
@@ -520,6 +524,14 @@ open class ArcDaemon: ArcDaemonProtocol, @unchecked Sendable {
     
 
     
+open func deeds() -> [UniffiDeed]  {
+    return try!  FfiConverterSequenceTypeUniffiDeed.lift(try! rustCall() {
+    uniffi_daemon_fn_method_arcdaemon_deeds(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
 open func father() -> ArcDaemon?  {
     return try!  FfiConverterOptionTypeArcDaemon.lift(try! rustCall() {
     uniffi_daemon_fn_method_arcdaemon_father(
@@ -531,6 +543,14 @@ open func father() -> ArcDaemon?  {
 open func names() -> [Name]  {
     return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
     uniffi_daemon_fn_method_arcdaemon_names(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
+open func words() -> [UniffiSource]  {
+    return try!  FfiConverterSequenceTypeUniffiSource.lift(try! rustCall() {
+    uniffi_daemon_fn_method_arcdaemon_words(
             self.uniffiCloneHandle(),$0
     )
 })
@@ -588,7 +608,11 @@ public func FfiConverterTypeArcDaemon_lower(_ value: ArcDaemon) -> UInt64 {
 
 public protocol BoxDaemonProtocol: AnyObject, Sendable {
     
+    func deeds()  -> [UniffiDeed]
+    
     func names()  -> [Name]
+    
+    func words()  -> [UniffiSource]
     
 }
 open class BoxDaemon: BoxDaemonProtocol, @unchecked Sendable {
@@ -644,9 +668,25 @@ open class BoxDaemon: BoxDaemonProtocol, @unchecked Sendable {
     
 
     
+open func deeds() -> [UniffiDeed]  {
+    return try!  FfiConverterSequenceTypeUniffiDeed.lift(try! rustCall() {
+    uniffi_daemon_fn_method_boxdaemon_deeds(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
 open func names() -> [Name]  {
     return try!  FfiConverterSequenceTypeName.lift(try! rustCall() {
     uniffi_daemon_fn_method_boxdaemon_names(
+            self.uniffiCloneHandle(),$0
+    )
+})
+}
+    
+open func words() -> [UniffiSource]  {
+    return try!  FfiConverterSequenceTypeUniffiSource.lift(try! rustCall() {
+    uniffi_daemon_fn_method_boxdaemon_words(
             self.uniffiCloneHandle(),$0
     )
 })
@@ -726,6 +766,56 @@ fileprivate struct FfiConverterOptionTypeArcDaemon: FfiConverterRustBuffer {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterSequenceTypeUniffiDeed: FfiConverterRustBuffer {
+    typealias SwiftType = [UniffiDeed]
+
+    public static func write(_ value: [UniffiDeed], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeUniffiDeed.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [UniffiDeed] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [UniffiDeed]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeUniffiDeed.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeUniffiSource: FfiConverterRustBuffer {
+    typealias SwiftType = [UniffiSource]
+
+    public static func write(_ value: [UniffiSource], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeUniffiSource.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [UniffiSource] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [UniffiSource]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeUniffiSource.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterSequenceTypeName: FfiConverterRustBuffer {
     typealias SwiftType = [Name]
 
@@ -763,17 +853,31 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
+    if (uniffi_daemon_checksum_method_arcdaemon_deeds() != 64005) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_daemon_checksum_method_arcdaemon_father() != 28436) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_daemon_checksum_method_arcdaemon_names() != 10817) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_daemon_checksum_method_arcdaemon_words() != 5298) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_daemon_checksum_method_boxdaemon_deeds() != 15846) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_daemon_checksum_method_boxdaemon_names() != 48507) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_daemon_checksum_method_boxdaemon_words() != 26640) {
+        return InitializationResult.apiChecksumMismatch
+    }
 
+    uniffiEnsureDeedInitialized()
     uniffiEnsureNameInitialized()
+    uniffiEnsureSourceInitialized()
     return InitializationResult.ok
 }()
 

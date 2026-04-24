@@ -419,6 +419,22 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterUInt8: FfiConverterPrimitive {
+    typealias FfiType = UInt8
+    typealias SwiftType = UInt8
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UInt8 {
+        return try lift(readInt(&buf))
+    }
+
+    public static func write(_ value: UInt8, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
@@ -457,92 +473,64 @@ fileprivate struct FfiConverterString: FfiConverter {
     }
 }
 
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterData: FfiConverterRustBuffer {
+    typealias SwiftType = Data
 
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Data {
+        let len: Int32 = try readInt(&buf)
+        return Data(try readBytes(&buf, count: Int(len)))
+    }
 
-
-public protocol SourceProtocol: AnyObject, Sendable {
-    
+    public static func write(_ value: Data, into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        writeBytes(&buf, value)
+    }
 }
-open class Source: SourceProtocol, @unchecked Sendable {
-    fileprivate let handle: UInt64
 
-    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    public struct NoHandle {
-        public init() {}
+
+public struct UniffiSource: Equatable, Hashable {
+    public var book: Book
+    public var chapter: UInt8
+    public var verses: Data
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(book: Book, chapter: UInt8, verses: Data) {
+        self.book = book
+        self.chapter = chapter
+        self.verses = verses
     }
-
-    // TODO: We'd like this to be `private` but for Swifty reasons,
-    // we can't implement `FfiConverter` without making this `required` and we can't
-    // make it `required` without making it `public`.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    required public init(unsafeFromHandle handle: UInt64) {
-        self.handle = handle
-    }
-
-    // This constructor can be used to instantiate a fake object.
-    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
-    //
-    // - Warning:
-    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    public init(noHandle: NoHandle) {
-        self.handle = 0
-    }
-
-#if swift(>=5.8)
-    @_documentation(visibility: private)
-#endif
-    public func uniffiCloneHandle() -> UInt64 {
-        return try! rustCall { uniffi_source_fn_clone_source(self.handle, $0) }
-    }
-    // No primary constructor declared for this class.
-
-    deinit {
-        if handle == 0 {
-            // Mock objects have handle=0 don't try to free them
-            return
-        }
-
-        try! rustCall { uniffi_source_fn_free_source(handle, $0) }
-    }
-
-    
 
     
 
     
 }
 
+#if compiler(>=6)
+extension UniffiSource: Sendable {}
+#endif
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public struct FfiConverterTypeSource: FfiConverter {
-    typealias FfiType = UInt64
-    typealias SwiftType = Source
-
-    public static func lift(_ handle: UInt64) throws -> Source {
-        return Source(unsafeFromHandle: handle)
+public struct FfiConverterTypeUniffiSource: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UniffiSource {
+        return
+            try UniffiSource(
+                book: FfiConverterTypeBook.read(from: &buf), 
+                chapter: FfiConverterUInt8.read(from: &buf), 
+                verses: FfiConverterData.read(from: &buf)
+        )
     }
 
-    public static func lower(_ value: Source) -> UInt64 {
-        return value.uniffiCloneHandle()
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Source {
-        let handle: UInt64 = try readInt(&buf)
-        return try lift(handle)
-    }
-
-    public static func write(_ value: Source, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
+    public static func write(_ value: UniffiSource, into buf: inout [UInt8]) {
+        FfiConverterTypeBook.write(value.book, into: &buf)
+        FfiConverterUInt8.write(value.chapter, into: &buf)
+        FfiConverterData.write(value.verses, into: &buf)
     }
 }
 
@@ -550,18 +538,16 @@ public struct FfiConverterTypeSource: FfiConverter {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeSource_lift(_ handle: UInt64) throws -> Source {
-    return try FfiConverterTypeSource.lift(handle)
+public func FfiConverterTypeUniffiSource_lift(_ buf: RustBuffer) throws -> UniffiSource {
+    return try FfiConverterTypeUniffiSource.lift(buf)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeSource_lower(_ value: Source) -> UInt64 {
-    return FfiConverterTypeSource.lower(value)
+public func FfiConverterTypeUniffiSource_lower(_ value: UniffiSource) -> RustBuffer {
+    return FfiConverterTypeUniffiSource.lower(value)
 }
-
-
 
 private enum InitializationResult {
     case ok
@@ -579,6 +565,7 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.contractVersionMismatch
     }
 
+    uniffiEnsureBookInitialized()
     return InitializationResult.ok
 }()
 

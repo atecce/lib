@@ -243,16 +243,6 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DEED_FN_CLONE_BOXDEED
-#define UNIFFI_FFIDEF_UNIFFI_DEED_FN_CLONE_BOXDEED
-uint64_t uniffi_deed_fn_clone_boxdeed(uint64_t handle, RustCallStatus *_Nonnull out_status
-);
-#endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_DEED_FN_FREE_BOXDEED
-#define UNIFFI_FFIDEF_UNIFFI_DEED_FN_FREE_BOXDEED
-void uniffi_deed_fn_free_boxdeed(uint64_t handle, RustCallStatus *_Nonnull out_status
-);
-#endif
 #ifndef UNIFFI_FFIDEF_FFI_DEED_RUSTBUFFER_ALLOC
 #define UNIFFI_FFIDEF_FFI_DEED_RUSTBUFFER_ALLOC
 RustBuffer ffi_deed_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
