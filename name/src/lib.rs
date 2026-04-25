@@ -25,6 +25,7 @@ pub enum Name {
     Cyrus,
 
     // israel
+    מֹשֶׁה,
     יֵשׁוּ,
     יֵשׁוּעַ,
     Ἰησοῦς,

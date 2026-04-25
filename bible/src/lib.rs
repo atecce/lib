@@ -480,7 +480,7 @@ const JOCHEBED: &Daemon = &Daemon {
 };
 
 const MOSES: &Daemon = &Daemon {
-    names: &[Moses],
+    names: &[name::Name::מֹשֶׁה],
     words: &[],
     deeds: &[],
 
