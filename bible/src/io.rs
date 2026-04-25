@@ -11,7 +11,61 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
     for book in BIBLE {
         match book {
-            name::Name::Genesis => word.insert(book, vec![Vec::new(); 50]),
+            name::Name::Genesis => word.insert(
+                book,
+                vec![
+                    vec!["".to_string(); 31],
+                    vec!["".to_string(); 25],
+                    vec!["".to_string(); 24],
+                    vec!["".to_string(); 26],
+                    vec!["".to_string(); 32],
+                    vec!["".to_string(); 22],
+                    vec!["".to_string(); 24],
+                    vec!["".to_string(); 22],
+                    vec!["".to_string(); 29],
+                    vec!["".to_string(); 32],
+                    vec!["".to_string(); 32],
+                    vec!["".to_string(); 20],
+                    vec!["".to_string(); 18],
+                    vec!["".to_string(); 24],
+                    vec!["".to_string(); 21],
+                    vec!["".to_string(); 16],
+                    vec!["".to_string(); 27],
+                    vec!["".to_string(); 33],
+                    vec!["".to_string(); 38],
+                    vec!["".to_string(); 18],
+                    vec!["".to_string(); 34],
+                    vec!["".to_string(); 24],
+                    vec!["".to_string(); 20],
+                    vec!["".to_string(); 67],
+                    vec!["".to_string(); 34],
+                    vec!["".to_string(); 35],
+                    vec!["".to_string(); 46],
+                    vec!["".to_string(); 22],
+                    vec!["".to_string(); 35],
+                    vec!["".to_string(); 43],
+                    vec!["".to_string(); 55],
+                    vec!["".to_string(); 32],
+                    vec!["".to_string(); 20],
+                    vec!["".to_string(); 31],
+                    vec!["".to_string(); 29],
+                    vec!["".to_string(); 43],
+                    vec!["".to_string(); 36],
+                    vec!["".to_string(); 30],
+                    vec!["".to_string(); 23],
+                    vec!["".to_string(); 23],
+                    vec!["".to_string(); 57],
+                    vec!["".to_string(); 38],
+                    vec!["".to_string(); 34],
+                    vec!["".to_string(); 34],
+                    vec!["".to_string(); 28],
+                    vec!["".to_string(); 34],
+                    vec!["".to_string(); 31],
+                    vec!["".to_string(); 22],
+                    vec!["".to_string(); 33],
+                    vec!["".to_string(); 26],
+                ],
+            ),
             name::Name::Exodus => word.insert(book, vec![Vec::new(); 40]),
             name::Name::Leviticus => word.insert(book, vec![Vec::new(); 27]),
             name::Name::Numbers => word.insert(book, vec![Vec::new(); 36]),
@@ -85,7 +139,11 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
 
     for (book, chapter, verse, text) in new_reader() {
         if let Some(chapter_and_verse) = word.get_mut(&book) {
-            chapter_and_verse[chapter - 1].push(text);
+            if chapter_and_verse[chapter - 1].get(verse - 1).is_none() {
+                chapter_and_verse[chapter - 1].push(text);
+            } else {
+                chapter_and_verse[chapter - 1][verse - 1] = text;
+            }
         }
     }
 
