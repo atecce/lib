@@ -475,6 +475,7 @@ public enum Name: Equatable, Hashable {
     case achilles
     case philip
     case cyrus
+    case מֹשֶׁה
     case יֵשׁוּ
     case יֵשׁוּעַ
     case ἰησοῦς
@@ -679,319 +680,321 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
         
         case 13: return .cyrus
         
-        case 14: return .יֵשׁוּ
+        case 14: return .מֹשֶׁה
         
-        case 15: return .יֵשׁוּעַ
+        case 15: return .יֵשׁוּ
         
-        case 16: return .ἰησοῦς
+        case 16: return .יֵשׁוּעַ
         
-        case 17: return .iesus
+        case 17: return .ἰησοῦς
         
-        case 18: return .genesis
+        case 18: return .iesus
         
-        case 19: return .exodus
+        case 19: return .genesis
         
-        case 20: return .leviticus
+        case 20: return .exodus
         
-        case 21: return .numbers
+        case 21: return .leviticus
         
-        case 22: return .deuteronomy
+        case 22: return .numbers
         
-        case 23: return .joshua
+        case 23: return .deuteronomy
         
-        case 24: return .judges
+        case 24: return .joshua
         
-        case 25: return .ruth
+        case 25: return .judges
         
-        case 26: return .samuelI
+        case 26: return .ruth
         
-        case 27: return .samuelIi
+        case 27: return .samuelI
         
-        case 28: return .kingsI
+        case 28: return .samuelIi
         
-        case 29: return .kingsIi
+        case 29: return .kingsI
         
-        case 30: return .chroniclesI
+        case 30: return .kingsIi
         
-        case 31: return .chroniclesIi
+        case 31: return .chroniclesI
         
-        case 32: return .ezra
+        case 32: return .chroniclesIi
         
-        case 33: return .nehemiah
+        case 33: return .ezra
         
-        case 34: return .esther
+        case 34: return .nehemiah
         
-        case 35: return .job
+        case 35: return .esther
         
-        case 36: return .psalms
+        case 36: return .job
         
-        case 37: return .proverbs
+        case 37: return .psalms
         
-        case 38: return .ecclesiastes
+        case 38: return .proverbs
         
-        case 39: return .songOfSolomon
+        case 39: return .ecclesiastes
         
-        case 40: return .isaiah
+        case 40: return .songOfSolomon
         
-        case 41: return .jeremiah
+        case 41: return .isaiah
         
-        case 42: return .lamentations
+        case 42: return .jeremiah
         
-        case 43: return .ezekiel
+        case 43: return .lamentations
         
-        case 44: return .daniel
+        case 44: return .ezekiel
         
-        case 45: return .hosea
+        case 45: return .daniel
         
-        case 46: return .joel
+        case 46: return .hosea
         
-        case 47: return .amos
+        case 47: return .joel
         
-        case 48: return .obadiah
+        case 48: return .amos
         
-        case 49: return .jonah
+        case 49: return .obadiah
         
-        case 50: return .micah
+        case 50: return .jonah
         
-        case 51: return .nahum
+        case 51: return .micah
         
-        case 52: return .habakkuk
+        case 52: return .nahum
         
-        case 53: return .zephaniah
+        case 53: return .habakkuk
         
-        case 54: return .haggai
+        case 54: return .zephaniah
         
-        case 55: return .zechariah
+        case 55: return .haggai
         
-        case 56: return .malachi
+        case 56: return .zechariah
         
-        case 57: return .matthew
+        case 57: return .malachi
         
-        case 58: return .mark
+        case 58: return .matthew
         
-        case 59: return .luke
+        case 59: return .mark
         
-        case 60: return .john
+        case 60: return .luke
         
-        case 61: return .acts
+        case 61: return .john
         
-        case 62: return .romans
+        case 62: return .acts
         
-        case 63: return .corinthiansI
+        case 63: return .romans
         
-        case 64: return .corinthiansIi
+        case 64: return .corinthiansI
         
-        case 65: return .galatians
+        case 65: return .corinthiansIi
         
-        case 66: return .ephesians
+        case 66: return .galatians
         
-        case 67: return .philippians
+        case 67: return .ephesians
         
-        case 68: return .colossians
+        case 68: return .philippians
         
-        case 69: return .thessaloniansI
+        case 69: return .colossians
         
-        case 70: return .thessaloniansIi
+        case 70: return .thessaloniansI
         
-        case 71: return .timothyI
+        case 71: return .thessaloniansIi
         
-        case 72: return .timothyIi
+        case 72: return .timothyI
         
-        case 73: return .titus
+        case 73: return .timothyIi
         
-        case 74: return .philemon
+        case 74: return .titus
         
-        case 75: return .hebrews
+        case 75: return .philemon
         
-        case 76: return .james
+        case 76: return .hebrews
         
-        case 77: return .peterI
+        case 77: return .james
         
-        case 78: return .peterIi
+        case 78: return .peterI
         
-        case 79: return .johnI
+        case 79: return .peterIi
         
-        case 80: return .johnIi
+        case 80: return .johnI
         
-        case 81: return .johnIii
+        case 81: return .johnIi
         
-        case 82: return .jude
+        case 82: return .johnIii
         
-        case 83: return .revelation
+        case 83: return .jude
         
-        case 84: return .yahweh
+        case 84: return .revelation
         
-        case 85: return .mary
+        case 85: return .yahweh
         
-        case 86: return .adam
+        case 86: return .mary
         
-        case 87: return .eve
+        case 87: return .adam
         
-        case 88: return .cain
+        case 88: return .eve
         
-        case 89: return .abel
+        case 89: return .cain
         
-        case 90: return .seth
+        case 90: return .abel
         
-        case 91: return .enosh
+        case 91: return .seth
         
-        case 92: return .kenan
+        case 92: return .enosh
         
-        case 93: return .mahalalel
+        case 93: return .kenan
         
-        case 94: return .jared
+        case 94: return .mahalalel
         
-        case 95: return .enoch
+        case 95: return .jared
         
-        case 96: return .methuselah
+        case 96: return .enoch
         
-        case 97: return .lamech
+        case 97: return .methuselah
         
-        case 98: return .noah
+        case 98: return .lamech
         
-        case 99: return .shem
+        case 99: return .noah
         
-        case 100: return .arphaxad
+        case 100: return .shem
         
-        case 101: return .cainan
+        case 101: return .arphaxad
         
-        case 102: return .shelah
+        case 102: return .cainan
         
-        case 103: return .eber
+        case 103: return .shelah
         
-        case 104: return .peleg
+        case 104: return .eber
         
-        case 105: return .reu
+        case 105: return .peleg
         
-        case 106: return .serug
+        case 106: return .reu
         
-        case 107: return .nahor
+        case 107: return .serug
         
-        case 108: return .terrah
+        case 108: return .nahor
         
-        case 109: return .abraham
+        case 109: return .terrah
         
-        case 110: return .isaac
+        case 110: return .abraham
         
-        case 111: return .jacob
+        case 111: return .isaac
         
-        case 112: return .israel
+        case 112: return .jacob
         
-        case 113: return .reuben
+        case 113: return .israel
         
-        case 114: return .amram
+        case 114: return .reuben
         
-        case 115: return .jochebed
+        case 115: return .amram
         
-        case 116: return .moses
+        case 116: return .jochebed
         
-        case 117: return .aaron
+        case 117: return .moses
         
-        case 118: return .perez
+        case 118: return .aaron
         
-        case 119: return .hezron
+        case 119: return .perez
         
-        case 120: return .ram
+        case 120: return .hezron
         
-        case 121: return .amminadab
+        case 121: return .ram
         
-        case 122: return .nashon
+        case 122: return .amminadab
         
-        case 123: return .salmon
+        case 123: return .nashon
         
-        case 124: return .boaz
+        case 124: return .salmon
         
-        case 125: return .obed
+        case 125: return .boaz
         
-        case 126: return .jesse
+        case 126: return .obed
         
-        case 127: return .david
+        case 127: return .jesse
         
-        case 128: return .nathan
+        case 128: return .david
         
-        case 129: return .mattatha
+        case 129: return .nathan
         
-        case 130: return .menna
+        case 130: return .mattatha
         
-        case 131: return .melea
+        case 131: return .menna
         
-        case 132: return .eliakim
+        case 132: return .melea
         
-        case 133: return .jonam
+        case 133: return .eliakim
         
-        case 134: return .judah
+        case 134: return .jonam
         
-        case 135: return .simeon
+        case 135: return .judah
         
-        case 136: return .jorim
+        case 136: return .simeon
         
-        case 137: return .eliezer
+        case 137: return .jorim
         
-        case 138: return .er
+        case 138: return .eliezer
         
-        case 139: return .elmadam
+        case 139: return .er
         
-        case 140: return .cosam
+        case 140: return .elmadam
         
-        case 141: return .addi
+        case 141: return .cosam
         
-        case 142: return .neri
+        case 142: return .addi
         
-        case 143: return .shealtiel
+        case 143: return .neri
         
-        case 144: return .zerubbabel
+        case 144: return .shealtiel
         
-        case 145: return .rhesa
+        case 145: return .zerubbabel
         
-        case 146: return .joanan
+        case 146: return .rhesa
         
-        case 147: return .joda
+        case 147: return .joanan
         
-        case 148: return .josek
+        case 148: return .joda
         
-        case 149: return .semein
+        case 149: return .josek
         
-        case 150: return .maath
+        case 150: return .semein
         
-        case 151: return .naggai
+        case 151: return .maath
         
-        case 152: return .esli
+        case 152: return .naggai
         
-        case 153: return .mattathias
+        case 153: return .esli
         
-        case 154: return .jannai
+        case 154: return .mattathias
         
-        case 155: return .melki
+        case 155: return .jannai
         
-        case 156: return .levi
+        case 156: return .melki
         
-        case 157: return .matthat
+        case 157: return .levi
         
-        case 158: return .heli
+        case 158: return .matthat
         
-        case 159: return .joseph
+        case 159: return .heli
         
-        case 160: return .mercury
+        case 160: return .joseph
         
-        case 161: return .diana
+        case 161: return .mercury
         
-        case 162: return .romulus
+        case 162: return .diana
         
-        case 163: return .remus
+        case 163: return .romulus
         
-        case 164: return .socrates
+        case 164: return .remus
         
-        case 165: return .plato
+        case 165: return .socrates
         
-        case 166: return .aristotle
+        case 166: return .plato
         
-        case 167: return .alexander
+        case 167: return .aristotle
         
-        case 168: return .caesar
+        case 168: return .alexander
         
-        case 169: return .cicero
+        case 169: return .caesar
         
-        case 170: return .jesus
+        case 170: return .cicero
+        
+        case 171: return .jesus
         
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -1053,632 +1056,636 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
             writeInt(&buf, Int32(13))
         
         
-        case .יֵשׁוּ:
+        case .מֹשֶׁה:
             writeInt(&buf, Int32(14))
         
         
-        case .יֵשׁוּעַ:
+        case .יֵשׁוּ:
             writeInt(&buf, Int32(15))
         
         
-        case .ἰησοῦς:
+        case .יֵשׁוּעַ:
             writeInt(&buf, Int32(16))
         
         
-        case .iesus:
+        case .ἰησοῦς:
             writeInt(&buf, Int32(17))
         
         
-        case .genesis:
+        case .iesus:
             writeInt(&buf, Int32(18))
         
         
-        case .exodus:
+        case .genesis:
             writeInt(&buf, Int32(19))
         
         
-        case .leviticus:
+        case .exodus:
             writeInt(&buf, Int32(20))
         
         
-        case .numbers:
+        case .leviticus:
             writeInt(&buf, Int32(21))
         
         
-        case .deuteronomy:
+        case .numbers:
             writeInt(&buf, Int32(22))
         
         
-        case .joshua:
+        case .deuteronomy:
             writeInt(&buf, Int32(23))
         
         
-        case .judges:
+        case .joshua:
             writeInt(&buf, Int32(24))
         
         
-        case .ruth:
+        case .judges:
             writeInt(&buf, Int32(25))
         
         
-        case .samuelI:
+        case .ruth:
             writeInt(&buf, Int32(26))
         
         
-        case .samuelIi:
+        case .samuelI:
             writeInt(&buf, Int32(27))
         
         
-        case .kingsI:
+        case .samuelIi:
             writeInt(&buf, Int32(28))
         
         
-        case .kingsIi:
+        case .kingsI:
             writeInt(&buf, Int32(29))
         
         
-        case .chroniclesI:
+        case .kingsIi:
             writeInt(&buf, Int32(30))
         
         
-        case .chroniclesIi:
+        case .chroniclesI:
             writeInt(&buf, Int32(31))
         
         
-        case .ezra:
+        case .chroniclesIi:
             writeInt(&buf, Int32(32))
         
         
-        case .nehemiah:
+        case .ezra:
             writeInt(&buf, Int32(33))
         
         
-        case .esther:
+        case .nehemiah:
             writeInt(&buf, Int32(34))
         
         
-        case .job:
+        case .esther:
             writeInt(&buf, Int32(35))
         
         
-        case .psalms:
+        case .job:
             writeInt(&buf, Int32(36))
         
         
-        case .proverbs:
+        case .psalms:
             writeInt(&buf, Int32(37))
         
         
-        case .ecclesiastes:
+        case .proverbs:
             writeInt(&buf, Int32(38))
         
         
-        case .songOfSolomon:
+        case .ecclesiastes:
             writeInt(&buf, Int32(39))
         
         
-        case .isaiah:
+        case .songOfSolomon:
             writeInt(&buf, Int32(40))
         
         
-        case .jeremiah:
+        case .isaiah:
             writeInt(&buf, Int32(41))
         
         
-        case .lamentations:
+        case .jeremiah:
             writeInt(&buf, Int32(42))
         
         
-        case .ezekiel:
+        case .lamentations:
             writeInt(&buf, Int32(43))
         
         
-        case .daniel:
+        case .ezekiel:
             writeInt(&buf, Int32(44))
         
         
-        case .hosea:
+        case .daniel:
             writeInt(&buf, Int32(45))
         
         
-        case .joel:
+        case .hosea:
             writeInt(&buf, Int32(46))
         
         
-        case .amos:
+        case .joel:
             writeInt(&buf, Int32(47))
         
         
-        case .obadiah:
+        case .amos:
             writeInt(&buf, Int32(48))
         
         
-        case .jonah:
+        case .obadiah:
             writeInt(&buf, Int32(49))
         
         
-        case .micah:
+        case .jonah:
             writeInt(&buf, Int32(50))
         
         
-        case .nahum:
+        case .micah:
             writeInt(&buf, Int32(51))
         
         
-        case .habakkuk:
+        case .nahum:
             writeInt(&buf, Int32(52))
         
         
-        case .zephaniah:
+        case .habakkuk:
             writeInt(&buf, Int32(53))
         
         
-        case .haggai:
+        case .zephaniah:
             writeInt(&buf, Int32(54))
         
         
-        case .zechariah:
+        case .haggai:
             writeInt(&buf, Int32(55))
         
         
-        case .malachi:
+        case .zechariah:
             writeInt(&buf, Int32(56))
         
         
-        case .matthew:
+        case .malachi:
             writeInt(&buf, Int32(57))
         
         
-        case .mark:
+        case .matthew:
             writeInt(&buf, Int32(58))
         
         
-        case .luke:
+        case .mark:
             writeInt(&buf, Int32(59))
         
         
-        case .john:
+        case .luke:
             writeInt(&buf, Int32(60))
         
         
-        case .acts:
+        case .john:
             writeInt(&buf, Int32(61))
         
         
-        case .romans:
+        case .acts:
             writeInt(&buf, Int32(62))
         
         
-        case .corinthiansI:
+        case .romans:
             writeInt(&buf, Int32(63))
         
         
-        case .corinthiansIi:
+        case .corinthiansI:
             writeInt(&buf, Int32(64))
         
         
-        case .galatians:
+        case .corinthiansIi:
             writeInt(&buf, Int32(65))
         
         
-        case .ephesians:
+        case .galatians:
             writeInt(&buf, Int32(66))
         
         
-        case .philippians:
+        case .ephesians:
             writeInt(&buf, Int32(67))
         
         
-        case .colossians:
+        case .philippians:
             writeInt(&buf, Int32(68))
         
         
-        case .thessaloniansI:
+        case .colossians:
             writeInt(&buf, Int32(69))
         
         
-        case .thessaloniansIi:
+        case .thessaloniansI:
             writeInt(&buf, Int32(70))
         
         
-        case .timothyI:
+        case .thessaloniansIi:
             writeInt(&buf, Int32(71))
         
         
-        case .timothyIi:
+        case .timothyI:
             writeInt(&buf, Int32(72))
         
         
-        case .titus:
+        case .timothyIi:
             writeInt(&buf, Int32(73))
         
         
-        case .philemon:
+        case .titus:
             writeInt(&buf, Int32(74))
         
         
-        case .hebrews:
+        case .philemon:
             writeInt(&buf, Int32(75))
         
         
-        case .james:
+        case .hebrews:
             writeInt(&buf, Int32(76))
         
         
-        case .peterI:
+        case .james:
             writeInt(&buf, Int32(77))
         
         
-        case .peterIi:
+        case .peterI:
             writeInt(&buf, Int32(78))
         
         
-        case .johnI:
+        case .peterIi:
             writeInt(&buf, Int32(79))
         
         
-        case .johnIi:
+        case .johnI:
             writeInt(&buf, Int32(80))
         
         
-        case .johnIii:
+        case .johnIi:
             writeInt(&buf, Int32(81))
         
         
-        case .jude:
+        case .johnIii:
             writeInt(&buf, Int32(82))
         
         
-        case .revelation:
+        case .jude:
             writeInt(&buf, Int32(83))
         
         
-        case .yahweh:
+        case .revelation:
             writeInt(&buf, Int32(84))
         
         
-        case .mary:
+        case .yahweh:
             writeInt(&buf, Int32(85))
         
         
-        case .adam:
+        case .mary:
             writeInt(&buf, Int32(86))
         
         
-        case .eve:
+        case .adam:
             writeInt(&buf, Int32(87))
         
         
-        case .cain:
+        case .eve:
             writeInt(&buf, Int32(88))
         
         
-        case .abel:
+        case .cain:
             writeInt(&buf, Int32(89))
         
         
-        case .seth:
+        case .abel:
             writeInt(&buf, Int32(90))
         
         
-        case .enosh:
+        case .seth:
             writeInt(&buf, Int32(91))
         
         
-        case .kenan:
+        case .enosh:
             writeInt(&buf, Int32(92))
         
         
-        case .mahalalel:
+        case .kenan:
             writeInt(&buf, Int32(93))
         
         
-        case .jared:
+        case .mahalalel:
             writeInt(&buf, Int32(94))
         
         
-        case .enoch:
+        case .jared:
             writeInt(&buf, Int32(95))
         
         
-        case .methuselah:
+        case .enoch:
             writeInt(&buf, Int32(96))
         
         
-        case .lamech:
+        case .methuselah:
             writeInt(&buf, Int32(97))
         
         
-        case .noah:
+        case .lamech:
             writeInt(&buf, Int32(98))
         
         
-        case .shem:
+        case .noah:
             writeInt(&buf, Int32(99))
         
         
-        case .arphaxad:
+        case .shem:
             writeInt(&buf, Int32(100))
         
         
-        case .cainan:
+        case .arphaxad:
             writeInt(&buf, Int32(101))
         
         
-        case .shelah:
+        case .cainan:
             writeInt(&buf, Int32(102))
         
         
-        case .eber:
+        case .shelah:
             writeInt(&buf, Int32(103))
         
         
-        case .peleg:
+        case .eber:
             writeInt(&buf, Int32(104))
         
         
-        case .reu:
+        case .peleg:
             writeInt(&buf, Int32(105))
         
         
-        case .serug:
+        case .reu:
             writeInt(&buf, Int32(106))
         
         
-        case .nahor:
+        case .serug:
             writeInt(&buf, Int32(107))
         
         
-        case .terrah:
+        case .nahor:
             writeInt(&buf, Int32(108))
         
         
-        case .abraham:
+        case .terrah:
             writeInt(&buf, Int32(109))
         
         
-        case .isaac:
+        case .abraham:
             writeInt(&buf, Int32(110))
         
         
-        case .jacob:
+        case .isaac:
             writeInt(&buf, Int32(111))
         
         
-        case .israel:
+        case .jacob:
             writeInt(&buf, Int32(112))
         
         
-        case .reuben:
+        case .israel:
             writeInt(&buf, Int32(113))
         
         
-        case .amram:
+        case .reuben:
             writeInt(&buf, Int32(114))
         
         
-        case .jochebed:
+        case .amram:
             writeInt(&buf, Int32(115))
         
         
-        case .moses:
+        case .jochebed:
             writeInt(&buf, Int32(116))
         
         
-        case .aaron:
+        case .moses:
             writeInt(&buf, Int32(117))
         
         
-        case .perez:
+        case .aaron:
             writeInt(&buf, Int32(118))
         
         
-        case .hezron:
+        case .perez:
             writeInt(&buf, Int32(119))
         
         
-        case .ram:
+        case .hezron:
             writeInt(&buf, Int32(120))
         
         
-        case .amminadab:
+        case .ram:
             writeInt(&buf, Int32(121))
         
         
-        case .nashon:
+        case .amminadab:
             writeInt(&buf, Int32(122))
         
         
-        case .salmon:
+        case .nashon:
             writeInt(&buf, Int32(123))
         
         
-        case .boaz:
+        case .salmon:
             writeInt(&buf, Int32(124))
         
         
-        case .obed:
+        case .boaz:
             writeInt(&buf, Int32(125))
         
         
-        case .jesse:
+        case .obed:
             writeInt(&buf, Int32(126))
         
         
-        case .david:
+        case .jesse:
             writeInt(&buf, Int32(127))
         
         
-        case .nathan:
+        case .david:
             writeInt(&buf, Int32(128))
         
         
-        case .mattatha:
+        case .nathan:
             writeInt(&buf, Int32(129))
         
         
-        case .menna:
+        case .mattatha:
             writeInt(&buf, Int32(130))
         
         
-        case .melea:
+        case .menna:
             writeInt(&buf, Int32(131))
         
         
-        case .eliakim:
+        case .melea:
             writeInt(&buf, Int32(132))
         
         
-        case .jonam:
+        case .eliakim:
             writeInt(&buf, Int32(133))
         
         
-        case .judah:
+        case .jonam:
             writeInt(&buf, Int32(134))
         
         
-        case .simeon:
+        case .judah:
             writeInt(&buf, Int32(135))
         
         
-        case .jorim:
+        case .simeon:
             writeInt(&buf, Int32(136))
         
         
-        case .eliezer:
+        case .jorim:
             writeInt(&buf, Int32(137))
         
         
-        case .er:
+        case .eliezer:
             writeInt(&buf, Int32(138))
         
         
-        case .elmadam:
+        case .er:
             writeInt(&buf, Int32(139))
         
         
-        case .cosam:
+        case .elmadam:
             writeInt(&buf, Int32(140))
         
         
-        case .addi:
+        case .cosam:
             writeInt(&buf, Int32(141))
         
         
-        case .neri:
+        case .addi:
             writeInt(&buf, Int32(142))
         
         
-        case .shealtiel:
+        case .neri:
             writeInt(&buf, Int32(143))
         
         
-        case .zerubbabel:
+        case .shealtiel:
             writeInt(&buf, Int32(144))
         
         
-        case .rhesa:
+        case .zerubbabel:
             writeInt(&buf, Int32(145))
         
         
-        case .joanan:
+        case .rhesa:
             writeInt(&buf, Int32(146))
         
         
-        case .joda:
+        case .joanan:
             writeInt(&buf, Int32(147))
         
         
-        case .josek:
+        case .joda:
             writeInt(&buf, Int32(148))
         
         
-        case .semein:
+        case .josek:
             writeInt(&buf, Int32(149))
         
         
-        case .maath:
+        case .semein:
             writeInt(&buf, Int32(150))
         
         
-        case .naggai:
+        case .maath:
             writeInt(&buf, Int32(151))
         
         
-        case .esli:
+        case .naggai:
             writeInt(&buf, Int32(152))
         
         
-        case .mattathias:
+        case .esli:
             writeInt(&buf, Int32(153))
         
         
-        case .jannai:
+        case .mattathias:
             writeInt(&buf, Int32(154))
         
         
-        case .melki:
+        case .jannai:
             writeInt(&buf, Int32(155))
         
         
-        case .levi:
+        case .melki:
             writeInt(&buf, Int32(156))
         
         
-        case .matthat:
+        case .levi:
             writeInt(&buf, Int32(157))
         
         
-        case .heli:
+        case .matthat:
             writeInt(&buf, Int32(158))
         
         
-        case .joseph:
+        case .heli:
             writeInt(&buf, Int32(159))
         
         
-        case .mercury:
+        case .joseph:
             writeInt(&buf, Int32(160))
         
         
-        case .diana:
+        case .mercury:
             writeInt(&buf, Int32(161))
         
         
-        case .romulus:
+        case .diana:
             writeInt(&buf, Int32(162))
         
         
-        case .remus:
+        case .romulus:
             writeInt(&buf, Int32(163))
         
         
-        case .socrates:
+        case .remus:
             writeInt(&buf, Int32(164))
         
         
-        case .plato:
+        case .socrates:
             writeInt(&buf, Int32(165))
         
         
-        case .aristotle:
+        case .plato:
             writeInt(&buf, Int32(166))
         
         
-        case .alexander:
+        case .aristotle:
             writeInt(&buf, Int32(167))
         
         
-        case .caesar:
+        case .alexander:
             writeInt(&buf, Int32(168))
         
         
-        case .cicero:
+        case .caesar:
             writeInt(&buf, Int32(169))
         
         
-        case .jesus:
+        case .cicero:
             writeInt(&buf, Int32(170))
+        
+        
+        case .jesus:
+            writeInt(&buf, Int32(171))
         
         }
     }

@@ -532,15 +532,15 @@ fileprivate struct FfiConverterDictionaryTypeNameSequenceSequenceString: FfiConv
         return dict
     }
 }
-public func arcRootAndOffspringOfDavid() -> ArcDaemon  {
+public func arcMorningStar() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
-    uniffi_bible_fn_func_arc_root_and_offspring_of_david($0
+    uniffi_bible_fn_func_arc_morning_star($0
     )
 })
 }
-public func boxRootAndOffspringOfDavid() -> BoxDaemon  {
+public func boxMorningStar() -> BoxDaemon  {
     return try!  FfiConverterTypeBoxDaemon_lift(try! rustCall() {
-    uniffi_bible_fn_func_box_root_and_offspring_of_david($0
+    uniffi_bible_fn_func_box_morning_star($0
     )
 })
 }
@@ -566,10 +566,10 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_bible_checksum_func_arc_root_and_offspring_of_david() != 63166) {
+    if (uniffi_bible_checksum_func_arc_morning_star() != 2322) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_bible_checksum_func_box_root_and_offspring_of_david() != 5020) {
+    if (uniffi_bible_checksum_func_box_morning_star() != 32419) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_read_all() != 1787) {

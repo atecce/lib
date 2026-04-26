@@ -1193,13 +1193,14 @@ pub const JESUS: &Daemon = &Daemon {
     predecessor: None,
 };
 
+// Ἐγὼ Ἰησοῦς ἔπεμψα τὸν ἄγγελόν μου μαρτυρῆσαι ὑμῖν ταῦτα ἐπὶ ταῖς ἐκκλησίαις. ἐγώ εἰμι ἡ ῥίζα καὶ τὸ γένος Δαυείδ, ὁ ἀστὴρ ὁ λαμπρός, ὁ πρωϊνός.
 #[uniffi::export]
-pub fn arc_root_and_offspring_of_david() -> ArcDaemon {
+pub fn arc_morning_star() -> ArcDaemon {
     Arc::unwrap_or_clone(JESUS.new_arc().unwrap())
 }
 
 #[uniffi::export]
-pub fn box_root_and_offspring_of_david() -> BoxDaemon {
+pub fn box_morning_star() -> BoxDaemon {
     *JESUS.new_box().unwrap()
 }
 
