@@ -4,12 +4,12 @@ mod rome;
 use crate::persia::CYRUS;
 use crate::rome::CICERO;
 
-use std::io::BufWriter;
-use std::fs::File;
 use std::error::Error;
+use std::fs::File;
+use std::io::BufWriter;
 
-use bible::io::read_all;
 use bible::JESUS;
+use bible::io::read_all;
 use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
@@ -39,10 +39,18 @@ fn print_optimates() {
 //     Ok(records)
 // }
 
-fn main() -> Result <(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     print_optimates();
 
-    let word = read_all();
+    let mut word = read_all();
+    for chapters in word.values_mut() {
+        for verses in chapters {
+            for verse in verses {
+                verse.push_str(".to_string()")
+            }
+        }
+    }
+
     let f = File::create("word.json")?;
     let w = BufWriter::new(f);
     serde_json::to_writer(w, &word)?;
