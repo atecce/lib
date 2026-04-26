@@ -3875,7 +3875,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
             name::Name::Isaiah => word.insert(book, vec![Vec::new(); 66]),
             name::Name::Jeremiah => word.insert(book, vec![Vec::new(); 52]),
             // TODO(atec): Lamentations
-            name::Name::Lamentations => word.insert(book, vec![Vec::new(); 48]),
+            name::Name::Lamentations => word.insert(book, vec![Vec::new(); 5]),
             name::Name::Ezekiel => word.insert(book, vec![Vec::new(); 48]),
             name::Name::Daniel => word.insert(book, vec![Vec::new(); 12]),
             name::Name::Hosea => word.insert(book, vec![Vec::new(); 14]),
