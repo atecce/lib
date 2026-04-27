@@ -8,7 +8,8 @@ pub struct Source {
     pub book: Book,
     pub chapter: u8,
     // TODO(atec): perhaps some enforcement of verses[0] <= verses[1]
-    pub verses: [u8; 2],
+    //             hack to avoid cast to Data. should use .udl file with sequence<u8>
+    pub verses: [u16; 2],
 }
 
 impl Source {
@@ -25,5 +26,6 @@ impl Source {
 pub struct UniffiSource {
     pub book: Book,
     pub chapter: u8,
-    pub verses: Vec<u8>,
+    // TODO(atec): hack to avoid cast to Data. should use .udl file with sequence<u8>
+    pub verses: Vec<u16>,
 }

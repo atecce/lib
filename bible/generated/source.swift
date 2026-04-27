@@ -435,6 +435,22 @@ fileprivate struct FfiConverterUInt8: FfiConverterPrimitive {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterUInt16: FfiConverterPrimitive {
+    typealias FfiType = UInt16
+    typealias SwiftType = UInt16
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UInt16 {
+        return try lift(readInt(&buf))
+    }
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
@@ -473,33 +489,15 @@ fileprivate struct FfiConverterString: FfiConverter {
     }
 }
 
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterData: FfiConverterRustBuffer {
-    typealias SwiftType = Data
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Data {
-        let len: Int32 = try readInt(&buf)
-        return Data(try readBytes(&buf, count: Int(len)))
-    }
-
-    public static func write(_ value: Data, into buf: inout [UInt8]) {
-        let len = Int32(value.count)
-        writeInt(&buf, len)
-        writeBytes(&buf, value)
-    }
-}
-
 
 public struct UniffiSource: Equatable, Hashable, Codable {
     public var book: Book
     public var chapter: UInt8
-    public var verses: Data
+    public var verses: [UInt16]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(book: Book, chapter: UInt8, verses: Data) {
+    public init(book: Book, chapter: UInt8, verses: [UInt16]) {
         self.book = book
         self.chapter = chapter
         self.verses = verses
@@ -523,14 +521,14 @@ public struct FfiConverterTypeUniffiSource: FfiConverterRustBuffer {
             try UniffiSource(
                 book: FfiConverterTypeBook.read(from: &buf), 
                 chapter: FfiConverterUInt8.read(from: &buf), 
-                verses: FfiConverterData.read(from: &buf)
+                verses: FfiConverterSequenceUInt16.read(from: &buf)
         )
     }
 
     public static func write(_ value: UniffiSource, into buf: inout [UInt8]) {
         FfiConverterTypeBook.write(value.book, into: &buf)
         FfiConverterUInt8.write(value.chapter, into: &buf)
-        FfiConverterData.write(value.verses, into: &buf)
+        FfiConverterSequenceUInt16.write(value.verses, into: &buf)
     }
 }
 
@@ -547,6 +545,31 @@ public func FfiConverterTypeUniffiSource_lift(_ buf: RustBuffer) throws -> Uniff
 #endif
 public func FfiConverterTypeUniffiSource_lower(_ value: UniffiSource) -> RustBuffer {
     return FfiConverterTypeUniffiSource.lower(value)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceUInt16: FfiConverterRustBuffer {
+    typealias SwiftType = [UInt16]
+
+    public static func write(_ value: [UInt16], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterUInt16.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [UInt16] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [UInt16]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterUInt16.read(from: &buf))
+        }
+        return seq
+    }
 }
 
 private enum InitializationResult {
