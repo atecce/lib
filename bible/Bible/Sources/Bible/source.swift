@@ -492,7 +492,7 @@ fileprivate struct FfiConverterData: FfiConverterRustBuffer {
 }
 
 
-public struct UniffiSource: Equatable, Hashable {
+public struct UniffiSource: Equatable, Hashable, Codable {
     public var book: Book
     public var chapter: UInt8
     public var verses: Data

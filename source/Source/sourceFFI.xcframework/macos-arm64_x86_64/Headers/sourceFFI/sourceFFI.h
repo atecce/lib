@@ -243,16 +243,6 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_SOURCE_FN_CLONE_SOURCE
-#define UNIFFI_FFIDEF_UNIFFI_SOURCE_FN_CLONE_SOURCE
-uint64_t uniffi_source_fn_clone_source(uint64_t handle, RustCallStatus *_Nonnull out_status
-);
-#endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_SOURCE_FN_FREE_SOURCE
-#define UNIFFI_FFIDEF_UNIFFI_SOURCE_FN_FREE_SOURCE
-void uniffi_source_fn_free_source(uint64_t handle, RustCallStatus *_Nonnull out_status
-);
-#endif
 #ifndef UNIFFI_FFIDEF_FFI_SOURCE_RUSTBUFFER_ALLOC
 #define UNIFFI_FFIDEF_FFI_SOURCE_RUSTBUFFER_ALLOC
 RustBuffer ffi_source_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
