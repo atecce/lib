@@ -1,6 +1,7 @@
 uniffi::setup_scaffolding!();
 
 use book::Book;
+use book::UniffiBook;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize)]
@@ -15,7 +16,7 @@ pub struct Source {
 impl Source {
     pub fn new(src: Source) -> UniffiSource {
         UniffiSource {
-            book: src.book,
+            book: Book::new(src.book),
             chapter: src.chapter,
             verses: src.verses.to_vec(),
         }
@@ -24,7 +25,7 @@ impl Source {
 
 #[derive(Debug, Clone, uniffi::Record)]
 pub struct UniffiSource {
-    pub book: Book,
+    pub book: UniffiBook,
     pub chapter: u8,
     // TODO(atec): hack to avoid cast to Data. should use .udl file with sequence<u8>
     pub verses: Vec<u16>,
