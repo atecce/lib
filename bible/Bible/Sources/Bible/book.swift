@@ -458,7 +458,7 @@ fileprivate struct FfiConverterString: FfiConverter {
 }
 
 
-public struct Book: Equatable, Hashable {
+public struct Book: Equatable, Hashable, Codable {
     public var name: Name
 
     // Default memberwise initializers are never public by default, so we
