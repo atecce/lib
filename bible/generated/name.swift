@@ -460,7 +460,7 @@ fileprivate struct FfiConverterString: FfiConverter {
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 
-public enum Name: Equatable, Hashable {
+public enum Name: Equatable, Hashable, Codable {
     
     case god
     case cronos
