@@ -1,4 +1,5 @@
 pub mod io;
+pub mod kjv;
 
 use crate::io::UniFfiTag;
 

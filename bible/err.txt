@@ -1,0 +1,6 @@
+error[E0599]: no method named `genealogy` found for struct `ArcDaemon` in the current scope
+    --> src/lib.rs:1219:48
+     |
+1219 |     Arc::unwrap_or_clone(JESUS.new().unwrap()).genealogy();
+     |                                                ^^^^^^^^^ method not found in `ArcDaemon`
+
