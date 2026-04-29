@@ -550,6 +550,12 @@ public func readAll() -> [Name: [[String]]]  {
     )
 })
 }
+public func getWord() -> [Name: [[String]]]  {
+    return try!  FfiConverterDictionaryTypeNameSequenceSequenceString.lift(try! rustCall() {
+    uniffi_bible_fn_func_get_word($0
+    )
+})
+}
 
 private enum InitializationResult {
     case ok
@@ -573,6 +579,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_read_all() != 1787) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_bible_checksum_func_get_word() != 13386) {
         return InitializationResult.apiChecksumMismatch
     }
 
