@@ -200,6 +200,11 @@ impl fmt::Display for Name {
     }
 }
 
+#[uniffi::export]
+pub fn name_to_string(name: Name) -> String {
+    format!("{:?}", name)
+}
+
 pub const BIBLE: [Name; 66] = [
     Name::Genesis,
     Name::Exodus,

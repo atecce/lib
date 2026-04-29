@@ -1207,7 +1207,7 @@ pub fn box_morning_star() -> BoxDaemon {
 
 #[test]
 fn yeshua() {
-    let word = io::read_all();
+    let word = kjv::get_word();
 
     for src in JESUS.words {
         println!("book: {}", src.book.name);

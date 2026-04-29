@@ -507,56 +507,6 @@ public func FfiConverterTypeBook_lower(_ value: Book) -> RustBuffer {
     return FfiConverterTypeBook.lower(value)
 }
 
-
-public struct UniffiBook: Equatable, Hashable, Codable {
-    public var name: String
-
-    // Default memberwise initializers are never public by default, so we
-    // declare one manually.
-    public init(name: String) {
-        self.name = name
-    }
-
-    
-
-    
-}
-
-#if compiler(>=6)
-extension UniffiBook: Sendable {}
-#endif
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public struct FfiConverterTypeUniffiBook: FfiConverterRustBuffer {
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UniffiBook {
-        return
-            try UniffiBook(
-                name: FfiConverterString.read(from: &buf)
-        )
-    }
-
-    public static func write(_ value: UniffiBook, into buf: inout [UInt8]) {
-        FfiConverterString.write(value.name, into: &buf)
-    }
-}
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeUniffiBook_lift(_ buf: RustBuffer) throws -> UniffiBook {
-    return try FfiConverterTypeUniffiBook.lift(buf)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeUniffiBook_lower(_ value: UniffiBook) -> RustBuffer {
-    return FfiConverterTypeUniffiBook.lower(value)
-}
-
 private enum InitializationResult {
     case ok
     case contractVersionMismatch

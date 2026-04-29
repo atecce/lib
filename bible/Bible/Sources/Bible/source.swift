@@ -491,13 +491,13 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 
 public struct UniffiSource: Equatable, Hashable, Codable {
-    public var book: UniffiBook
+    public var book: Book
     public var chapter: UInt8
     public var verses: [UInt16]
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(book: UniffiBook, chapter: UInt8, verses: [UInt16]) {
+    public init(book: Book, chapter: UInt8, verses: [UInt16]) {
         self.book = book
         self.chapter = chapter
         self.verses = verses
@@ -519,14 +519,14 @@ public struct FfiConverterTypeUniffiSource: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UniffiSource {
         return
             try UniffiSource(
-                book: FfiConverterTypeUniffiBook.read(from: &buf), 
+                book: FfiConverterTypeBook.read(from: &buf), 
                 chapter: FfiConverterUInt8.read(from: &buf), 
                 verses: FfiConverterSequenceUInt16.read(from: &buf)
         )
     }
 
     public static func write(_ value: UniffiSource, into buf: inout [UInt8]) {
-        FfiConverterTypeUniffiBook.write(value.book, into: &buf)
+        FfiConverterTypeBook.write(value.book, into: &buf)
         FfiConverterUInt8.write(value.chapter, into: &buf)
         FfiConverterSequenceUInt16.write(value.verses, into: &buf)
     }
