@@ -11,6 +11,8 @@ use std::io::BufWriter;
 use bible::JESUS;
 use bible::io::read_all;
 use bible::kjv::word;
+use bible::kjv::get_word;
+
 use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
@@ -43,9 +45,11 @@ fn print_optimates() {
 fn main() -> Result<(), Box<dyn Error>> {
     print_optimates();
 
-    for book in name::BIBLE {
-        println!("{:#?}", word(book));
-    }
+//    for book in name::BIBLE {
+//        println!("{:#?}", word(book));
+//    }
+
+    println!("{:#?}", get_word());
 
 //    let f = File::create("word.json")?;
 //    let w = BufWriter::new(f);
