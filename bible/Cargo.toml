@@ -8,7 +8,6 @@ crate-type = ["staticlib", "lib"]
 name = "bible"
 
 [dependencies]
-book = { path = "../book" }
 daemon = { path = "../daemon" }
 deed = { path = "../deed" }
 gutenberg = { path = "../gutenberg" }

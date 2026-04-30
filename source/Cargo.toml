@@ -8,6 +8,6 @@ crate-type = ["staticlib", "lib"]
 name = "source"
 
 [dependencies]
-book = { path = "../book" }
+name = { path = "../name" }
 serde = {version="1.0", features=["derive"]}
 uniffi = "0.31"

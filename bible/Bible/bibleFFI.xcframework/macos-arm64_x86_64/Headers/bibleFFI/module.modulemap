@@ -26,13 +26,6 @@ module nameFFI {
     use "_Builtin_stdbool"
     use "_Builtin_stdint"
 }
-module bookFFI {
-    header "bookFFI.h"
-    export *
-    use "Darwin"
-    use "_Builtin_stdbool"
-    use "_Builtin_stdint"
-}
 module bibleFFI {
     header "bibleFFI.h"
     export *

@@ -1,4 +1,3 @@
-use book::Book;
 use daemon::Daemon;
 use deed::Deed;
 use name::Name::Cyrus;
@@ -11,7 +10,7 @@ pub const CYRUS: &Daemon = &Daemon {
     deeds: &[Deed {
         desc: "allowed the Israelites to return to the Promised Land",
         srcs: &[Source {
-            book: Book { name: Ezra },
+            book: Ezra,
             chapter: 1,
             verses: [1, 1],
         }],
