@@ -1226,3 +1226,50 @@ fn yeshua() {
 
     genealogy(*JESUS);
 }
+
+#[test]
+fn test_get_word() {
+
+    let word1 = kjv::get_word();
+    let word2 = io::read_all();
+
+    let books_word1: Vec<_> = word1.keys().collect();
+    let books_word2: Vec<_> = word2.keys().collect();
+
+// TODO(atec): Name isn't sortable yet
+//    books_word1.sort();
+//    books_word2.sort();
+//    assert_eq!(books_word1, books_word2, "books didn't match");
+
+    for book in books_word1 {
+        let chapters_word1 = &word1[book];
+        let chapters_word2 = &word2[book];
+
+        assert_eq!(
+            chapters_word1.len(), chapters_word2.len(),
+            "unequal chapters at book: {:?}. get_word has {}, read_all has {}",
+            book, chapters_word1.len(), chapters_word2.len()
+        );
+
+        for (i, (verses_word1, verses_word2)) in chapters_word1.iter().zip(chapters_word2.iter()).enumerate() {
+            assert_eq!(
+                verses_word1.len(), verses_word2.len(),
+                "unequal verses at book: {:?}, chapter: {}",
+                book, i+1
+            );
+
+            for (j, (verse_word1, verse_word2)) in verses_word1.iter().zip(verses_word2.iter()).enumerate() {
+                if verse_word1 != verse_word2 {
+                    println!("\nverse mismatch\nbook: {:?}\nchapter and verse: [{}][{}]\nget_word: {:?}\nread_all: {:?}\n",
+                    book, i+1, j+1, verse_word1, verse_word2);
+                }
+
+                assert_eq!(
+                    verse_word1, verse_word2,
+                    "\nverse mismatch\nbook: {:?}\nchapter and verse: [{}][{}]\n",
+                    book, i+1, j+1
+                );
+            }
+        }
+    }
+}

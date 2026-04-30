@@ -44,17 +44,28 @@ fn print_optimates() {
 
 fn main() -> Result<(), Box<dyn Error>> {
 
-    println!("{:#?}", get_word());
+    let word = bible::io::read_all();
+    println!("pub const fn word(book: Name) -> &'static [&'static [&'static str]] {{");
+    println!("    match book {{");
 
     for book in name::BIBLE {
-        println!("{:#?}", word(book));
+        let chapters = &word[&book];
+
+        println!("        name::Name::{} => &[", book);
+        for chapter in chapters {
+            println!("            &[");
+
+            for verse in chapter {
+                let escaped_verse = verse.replace('"', "\\\"");
+                println!("                \"{}\",", escaped_verse);
+            }
+            println!("            ],");
+        }
+        println!("        ],");
     }
-
-    print_optimates();
-
-//    let f = File::create("word.json")?;
-//    let w = BufWriter::new(f);
-//    serde_json::to_writer(w, &word)?;
+    println!("        _ => panic!(\"unknown book\"),");
+    println!("    }}");
+    println!("}}");
 
     Ok(())
 }
