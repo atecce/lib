@@ -4,6 +4,7 @@ use name::Name::Cicero;
 use name::Name::Remus;
 use name::Name::Romulus;
 
+// 753 - 716
 pub const ROMULUS: &Daemon = &Daemon {
     names: &[Romulus],
     words: &[],
@@ -38,6 +39,84 @@ pub const CICERO: &Daemon = &Daemon {
     teacher: None,
 
     predecessor: None,
+};
+
+// 715 - 672
+pub const NUMA_POMPILIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ROMULUS),
+};
+
+// 672 - 640
+pub const TULLUS_HOSTILIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(NUMA_POMPILIUS),
+};
+
+// 640 - 616
+pub const ANCUS_MARCIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(TULLUS_HOSTILIUS),
+};
+
+// 616 - 578
+pub const TARQUINIUS_PRISCUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ANCUS_MARCIUS),
+};
+
+// 578 - 534
+pub const SERVIUS_TULLIUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(TARQUINIUS_PRISCUS),
+};
+
+// 534 -509
+pub const TARQUINIUS_SUPERBUS: &Daemon = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(SERVIUS_TULLIUS),
 };
 
 pub const CAESAR: &Daemon = &Daemon {
