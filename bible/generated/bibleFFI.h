@@ -255,12 +255,6 @@ uint64_t uniffi_bible_fn_func_box_morning_star(RustCallStatus *_Nonnull out_stat
     
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_READ_ALL
-#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_READ_ALL
-RustBuffer uniffi_bible_fn_func_read_all(RustCallStatus *_Nonnull out_status
-    
-);
-#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_GET_WORD
 #define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_GET_WORD
 RustBuffer uniffi_bible_fn_func_get_word(RustCallStatus *_Nonnull out_status
@@ -536,12 +530,6 @@ uint16_t uniffi_bible_checksum_func_arc_morning_star(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_MORNING_STAR
 #define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_BOX_MORNING_STAR
 uint16_t uniffi_bible_checksum_func_box_morning_star(void
-    
-);
-#endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_READ_ALL
-#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_READ_ALL
-uint16_t uniffi_bible_checksum_func_read_all(void
     
 );
 #endif

@@ -544,12 +544,6 @@ public func boxMorningStar() -> BoxDaemon  {
     )
 })
 }
-public func readAll() -> [Name: [[String]]]  {
-    return try!  FfiConverterDictionaryTypeNameSequenceSequenceString.lift(try! rustCall() {
-    uniffi_bible_fn_func_read_all($0
-    )
-})
-}
 public func getWord() -> [Name: [[String]]]  {
     return try!  FfiConverterDictionaryTypeNameSequenceSequenceString.lift(try! rustCall() {
     uniffi_bible_fn_func_get_word($0
@@ -576,9 +570,6 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_box_morning_star() != 32419) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_bible_checksum_func_read_all() != 1787) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_get_word() != 13386) {
