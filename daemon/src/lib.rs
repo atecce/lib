@@ -8,12 +8,18 @@ use name::Name;
 use source::Source;
 use source::UniffiSource;
 
-pub fn genealogy(daemon: Daemon) {
+pub fn genealogy(daemon: Daemon) -> Vec<Daemon> {
+
+    let mut ret = Vec::<Daemon>::new();
+    ret.push(daemon);
+
     let mut cur = daemon.father;
     while let Some(node) = cur {
-        println!("{:#?}", node.names);
-        cur = node.father;
+        ret.push(*cur.unwrap());
+        cur = node.father
     }
+
+    ret
 }
 
 #[derive(Clone, Copy, Debug)]

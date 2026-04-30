@@ -18,11 +18,11 @@ use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 
 fn print_optimates() {
-    println!("{:?}", genealogy(*JESUS));
-    println!("{:?}", genealogy(*APOLLO));
-    println!("{:?}", genealogy(*ALEXANDER));
-    println!("{:?}", genealogy(*CICERO));
-    println!("{:?}", genealogy(*CYRUS));
+    println!("{:?}", genealogy(*JESUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
+    println!("{:?}", genealogy(*APOLLO).into_iter().map(|f| f.names).collect::<Vec<_>>());
+    println!("{:?}", genealogy(*ALEXANDER).into_iter().map(|f| f.names).collect::<Vec<_>>());
+    println!("{:?}", genealogy(*CICERO).into_iter().map(|f| f.names).collect::<Vec<_>>());
+    println!("{:?}", genealogy(*CYRUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
     println!();
 }
 
@@ -43,13 +43,14 @@ fn print_optimates() {
 // }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    print_optimates();
-
-//    for book in name::BIBLE {
-//        println!("{:#?}", word(book));
-//    }
 
     println!("{:#?}", get_word());
+
+    for book in name::BIBLE {
+        println!("{:#?}", word(book));
+    }
+
+    print_optimates();
 
 //    let f = File::create("word.json")?;
 //    let w = BufWriter::new(f);
