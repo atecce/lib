@@ -1706,13 +1706,6 @@ public func FfiConverterTypeName_lower(_ value: Name) -> RustBuffer {
     return FfiConverterTypeName.lower(value)
 }
 
-public func nameToString(name: Name) -> String  {
-    return try!  FfiConverterString.lift(try! rustCall() {
-    uniffi_name_fn_func_name_to_string(
-        FfiConverterTypeName_lower(name),$0
-    )
-})
-}
 
 private enum InitializationResult {
     case ok
@@ -1728,9 +1721,6 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_name_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
-    }
-    if (uniffi_name_checksum_func_name_to_string() != 21791) {
-        return InitializationResult.apiChecksumMismatch
     }
 
     return InitializationResult.ok

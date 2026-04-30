@@ -243,11 +243,6 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_NAME_FN_FUNC_NAME_TO_STRING
-#define UNIFFI_FFIDEF_UNIFFI_NAME_FN_FUNC_NAME_TO_STRING
-RustBuffer uniffi_name_fn_func_name_to_string(RustBuffer name, RustCallStatus *_Nonnull out_status
-);
-#endif
 #ifndef UNIFFI_FFIDEF_FFI_NAME_RUSTBUFFER_ALLOC
 #define UNIFFI_FFIDEF_FFI_NAME_RUSTBUFFER_ALLOC
 RustBuffer ffi_name_rustbuffer_alloc(uint64_t size, RustCallStatus *_Nonnull out_status
@@ -506,12 +501,6 @@ void ffi_name_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_NAME_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_NAME_RUST_FUTURE_COMPLETE_VOID
 void ffi_name_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
-);
-#endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_NAME_CHECKSUM_FUNC_NAME_TO_STRING
-#define UNIFFI_FFIDEF_UNIFFI_NAME_CHECKSUM_FUNC_NAME_TO_STRING
-uint16_t uniffi_name_checksum_func_name_to_string(void
-    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_FFI_NAME_UNIFFI_CONTRACT_VERSION
