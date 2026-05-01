@@ -28,7 +28,7 @@ pub const CRONUS: &Daemon = &Daemon {
 };
 
 pub const ZEUS: &Daemon = &Daemon {
-    names: &[Zeus],
+    names: &[Ζεύς, Zeus],
     words: &[],
     deeds: &[],
 

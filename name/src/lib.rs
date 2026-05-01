@@ -14,6 +14,7 @@ pub enum Name {
     Cronus,
     Kronos,
     Zeus,
+    Ζεύς,
     Hera,
     Leto,
     Hermes,
