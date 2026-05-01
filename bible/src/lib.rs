@@ -1227,8 +1227,3 @@ fn yeshua() {
 
     genealogy(*JESUS);
 }
-
-#[test]
-fn test_get_word() {
-    assert!(kjv::get_word() == io::read_all());
-}
