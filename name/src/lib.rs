@@ -9,6 +9,7 @@ pub enum Name {
     God,
 
     // greece
+    Κρόνος,
     Cronos,
     Cronus,
     Kronos,

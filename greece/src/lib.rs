@@ -16,7 +16,7 @@ use name::Name::Socrates;
 use name::Name::Zeus;
 
 pub const CRONUS: &Daemon = &Daemon {
-    names: &[Cronus, Cronos, Kronos],
+    names: &[Κρόνος, Cronus, Cronos, Kronos],
     words: &[],
     deeds: &[],
 
