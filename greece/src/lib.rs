@@ -16,7 +16,7 @@ use name::Name::Socrates;
 use name::Name::Zeus;
 
 pub const CRONUS: &Daemon = &Daemon {
-    names: &[Κρόνος, Cronus, Cronos, Kronos],
+    names: &[name::Name::Κρόνος, Cronus, Cronos, Kronos],
     words: &[],
     deeds: &[],
 
@@ -28,7 +28,7 @@ pub const CRONUS: &Daemon = &Daemon {
 };
 
 pub const ZEUS: &Daemon = &Daemon {
-    names: &[Ζεύς, Zeus],
+    names: &[name::Name::Ζεύς, Zeus],
     words: &[],
     deeds: &[],
 
@@ -52,7 +52,7 @@ pub const HERA: &Daemon = &Daemon {
 };
 
 const LETO: &Daemon = &Daemon {
-    names: &[Λατώ, Leto],
+    names: &[name::Name::Λατώ, Leto],
     words: &[],
     deeds: &[],
 
@@ -64,7 +64,7 @@ const LETO: &Daemon = &Daemon {
 };
 
 pub const HERMES: &Daemon = &Daemon {
-    names: &[Ἑρμῆς, Hermes],
+    names: &[name::Name::Ἑρμῆς, Hermes],
     words: &[],
     deeds: &[],
 
@@ -76,7 +76,7 @@ pub const HERMES: &Daemon = &Daemon {
 };
 
 pub const APOLLO: &Daemon = &Daemon {
-    names: &[Ἀπόλλων, Apollo],
+    names: &[name::Name::Ἀπόλλων, Apollo],
     words: &[],
     deeds: &[],
 
@@ -88,7 +88,7 @@ pub const APOLLO: &Daemon = &Daemon {
 };
 
 pub const ARTEMIS: &Daemon = &Daemon {
-    names: &[Ἄρτεμις, Artemis],
+    names: &[name::Name::Ἄρτεμις, Artemis],
     words: &[],
     deeds: &[],
 

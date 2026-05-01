@@ -9,8 +9,6 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter};
 
 use bible::JESUS;
-use bible::io::read_all;
-use bible::kjv::word;
 use bible::kjv::get_word;
 
 use daemon::genealogy;
@@ -107,7 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 fn generate_word() {
 
-    let word = bible::io::read_all();
+    let word = get_word();
     println!("pub const fn word(book: Name) -> &'static [&'static [&'static str]] {{");
     println!("    match book {{");
 

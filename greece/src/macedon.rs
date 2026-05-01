@@ -17,7 +17,7 @@ const PHILIP: &Daemon = &Daemon {
 };
 
 pub const ALEXANDER: &Daemon = &Daemon {
-    names: &[Ἀλέξανδρος, Alexander],
+    names: &[name::Name::Ἀλέξανδρος, Alexander],
     words: &[],
     deeds: &[],
 
