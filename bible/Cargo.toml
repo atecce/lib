@@ -10,7 +10,9 @@ name = "bible"
 [dependencies]
 daemon = { path = "../daemon" }
 deed = { path = "../deed" }
-gutenberg = { path = "../gutenberg" }
 name = { path = "../name" }
 source = { path = "../source" }
 uniffi = "0.31"
+
+[dev-dependencies]
+gutenberg = { path = "../gutenberg" }
