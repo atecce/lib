@@ -1,7 +1,7 @@
-pub mod io;
-pub mod kjv;
 
-use crate::io::UniFfiTag;
+uniffi::setup_scaffolding!();
+
+pub mod kjv;
 
 use std::sync::Arc;
 
