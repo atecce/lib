@@ -34,6 +34,8 @@ pub enum Name {
     Achilles,
     Philip,
 
+    Ἀλέξανδρος,
+
     // persia
     Cyrus,
 
