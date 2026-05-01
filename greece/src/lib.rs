@@ -88,7 +88,7 @@ pub const APOLLO: &Daemon = &Daemon {
 };
 
 pub const ARTEMIS: &Daemon = &Daemon {
-    names: &[Artemis],
+    names: &[Ἄρτεμις, Artemis],
     words: &[],
     deeds: &[],
 
