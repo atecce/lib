@@ -64,7 +64,7 @@ const LETO: &Daemon = &Daemon {
 };
 
 pub const HERMES: &Daemon = &Daemon {
-    names: &[Hermes],
+    names: &[Ἑρμῆς, Hermes],
     words: &[],
     deeds: &[],
 

@@ -22,9 +22,12 @@ pub enum Name {
     Λατώ,
     Leto,
 
+    Ἑρμῆς,
     Hermes,
-    Apollo,
+
     Ἀπόλλων,
+    Apollo,
+
     Artemis,
     Achilles,
     Philip,
