@@ -24,6 +24,7 @@ pub enum Name {
 
     Hermes,
     Apollo,
+    Ἀπόλλων,
     Artemis,
     Achilles,
     Philip,

@@ -76,7 +76,7 @@ pub const HERMES: &Daemon = &Daemon {
 };
 
 pub const APOLLO: &Daemon = &Daemon {
-    names: &[Apollo],
+    names: &[Ἀπόλλων, Apollo],
     words: &[],
     deeds: &[],
 
