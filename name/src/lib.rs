@@ -13,10 +13,15 @@ pub enum Name {
     Cronos,
     Cronus,
     Kronos,
-    Zeus,
+
     Ζεύς,
+    Zeus,
+
     Hera,
+
+    Λατώ,
     Leto,
+
     Hermes,
     Apollo,
     Artemis,

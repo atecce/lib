@@ -52,7 +52,7 @@ pub const HERA: &Daemon = &Daemon {
 };
 
 const LETO: &Daemon = &Daemon {
-    names: &[Leto],
+    names: &[Λατώ, Leto],
     words: &[],
     deeds: &[],
 
