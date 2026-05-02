@@ -87,7 +87,6 @@ fn print_optimates() {
 //    THE RAPE OF LUCRECE
 //    VENUS AND ADONIS
 
-
 fn main() -> Result<(), Box<dyn Error>> {
 
     let r = BufReader::new(&include_bytes!("../gutenberg/cache/epub/100/pg100.txt")[..]);

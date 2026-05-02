@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 daemon = { path = "../daemon" }
 name = { path = "../name" }
+uniffi = "0.31"

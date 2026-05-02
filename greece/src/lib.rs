@@ -1,3 +1,5 @@
+uniffi::setup_scaffolding!();
+
 pub mod macedon;
 
 use daemon::Daemon;

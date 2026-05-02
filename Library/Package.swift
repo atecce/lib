@@ -1,27 +1,27 @@
 // swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
-// Swift Package: Bible
+// Swift Package: Library
 
 import PackageDescription;
 
 let package = Package(
-    name: "Bible",
+    name: "Library",
     platforms: [
         .macOS(.v10_15), .iOS(.v13)
     ],
     products: [
         .library(
-            name: "Bible",
-            targets: ["Bible"]
+            name: "Library",
+            targets: ["Library"]
         )
     ],
     dependencies: [ ],
     targets: [
-        .binaryTarget(name: "bibleFFI", path: "./bibleFFI.xcframework"),
+        .binaryTarget(name: "libFFI", path: "./libFFI.xcframework"),
         .target(
-            name: "Bible",
+            name: "Library",
             dependencies: [
-                .target(name: "bibleFFI")
+                .target(name: "libFFI")
             ]
         ),
     ]

@@ -1,6 +1,11 @@
 use crate::ARISTOTLE;
 
+use std::sync::Arc;
+
+use daemon::ArcDaemon;
+use daemon::BoxDaemon;
 use daemon::Daemon;
+
 use name::Name::Alexander;
 use name::Name::Philip;
 
@@ -27,3 +32,13 @@ pub const ALEXANDER: &Daemon = &Daemon {
 
     predecessor: None,
 };
+
+#[uniffi::export]
+pub fn arcDefenderOfMen() -> ArcDaemon {
+    Arc::unwrap_or_clone(ALEXANDER.new_arc().unwrap())
+}
+
+#[uniffi::export]
+pub fn boxDefenderOfMen() -> BoxDaemon {
+    *ALEXANDER.new_box().unwrap()
+}
