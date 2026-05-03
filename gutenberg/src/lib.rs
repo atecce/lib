@@ -56,7 +56,9 @@ impl<R: std::io::Read> Iterator for Reader<R> {
             return Some((Revelation, 22, 21, text.to_string()));
         }
 
-        // TODO(atec): hack to avoid index error on s[0..1] at beginning
+        // TODO(atec): flushes the boilerplate at the start of pg10
+        //             maybe some kind of "parent" struct or trait which
+        //             handles this for gutenberg's entire corpora
         if !self.started {
             while self.r.read_until(b':', &mut self.b).is_ok() {
                 let mut s = String::from_utf8_lossy(&self.b).to_string();
@@ -102,12 +104,14 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                     // special case for Philemon, JohnII, JohnIII, and Jude
                     // these books only have one chapter so we will just
                     // hard code the final verse
-                    if (self.book == Obadiah && verse == 21)
-                        || (self.book == Philemon && verse == 25)
-                        || (self.book == JohnII && verse == 13)
-                        || (self.book == JohnIII && verse == 14)
-                        || (self.book == Jude && verse == 25)
-                    {
+                    if match self.book {
+                        Obadiah => verse == 21,
+                        Philemon => verse == 25,
+                        JohnII => verse == 13,
+                        JohnIII => verse == 14,
+                        Jude => verse == 25,
+                        _ => false,
+                    } {
                         self.new_book = true;
                         self.new_chapter = true;
                     }

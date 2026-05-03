@@ -138,6 +138,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     }
 
     for (book, chapter, verse, text) in new_reader() {
+        println!("{} {}:{} {}", book, chapter, verse, text);
         if let Some(chapter_and_verse) = word.get_mut(&book) {
             if chapter_and_verse[chapter - 1].get(verse - 1).is_none() {
                 chapter_and_verse[chapter - 1].push(text);
