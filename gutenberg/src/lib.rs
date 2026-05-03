@@ -60,10 +60,8 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         if !self.started {
             while self.r.read_until(b':', &mut self.b).is_ok() {
                 let mut s = String::from_utf8_lossy(&self.b).to_string();
-
-                if s.is_char_boundary(s.len() - 1)
-                    && s.is_char_boundary(s.len() - 2)
-                    && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok()
+                if s.trim_end_matches(':')
+                    .ends_with(|c: char| c.is_ascii_digit())
                 {
                     self.started = true;
                     self.b.clear();
@@ -134,28 +132,16 @@ impl<R: std::io::Read> Iterator for Reader<R> {
 impl<R> Reader<R> {
     fn extract_chapter(&self) -> Result<usize, ParseIntError> {
         let s = String::from_utf8_lossy(&self.b).to_string();
-        let mut chapter = 0;
 
-        if s.is_char_boundary(s.len() - 1) && s.is_char_boundary(s.len() - 2) {
-            for i in 0..3 {
-                match &s[s.len() - (2 + i)..s.len() - 1].parse::<usize>() {
-                    Ok(n) => {
-                        chapter = *n;
-                    }
-                    Err(e) => {
-                        if i == 0 {
-                            return Err(e.clone());
-                        }
-                        // TODO(atec): warn about nested fallbacks
-                    }
-                }
-            }
-        } else {
-            // TODO(atec): perhaps create own err type
-            return "is not character boundary".parse::<usize>();
-        }
-
-        return Ok(chapter);
+        s.trim_end_matches(':')
+            .chars()
+            .rev()
+            .take_while(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .chars()
+            .rev()
+            .collect::<String>()
+            .parse::<usize>()
     }
 
     fn extract_verse(&mut self) -> (usize, String)
@@ -170,37 +156,20 @@ impl<R> Reader<R> {
             return (verse, "".to_string());
         }
 
-        for i in 0..3 {
-            match &s[0..(1 + i)].parse::<usize>() {
-                Ok(n) => {
-                    verse = *n;
-                }
-                Err(e) => {
-                    if i == 0 {
-                        // TODO(atec): perhaps panic
-                        println!("failed conversion extracting verse: {}", e);
-                        println!(
-                            "should not happen because we read to the end of the verse as soon as we match"
-                        );
-                    } else {
-                        // TODO(atec): warn about fallbacks
-                    }
-                }
-            }
-        }
+        let verse = s
+            .chars()
+            .take_while(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse::<usize>()
+            .unwrap_or(0);
 
-        let mut next_verse = s.is_char_boundary(s.len() - 1)
-            && s.is_char_boundary(s.len() - 2)
-            && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok();
-
-        while !next_verse {
+        while !s
+            .trim_end_matches(':')
+            .ends_with(|c: char| c.is_ascii_digit())
+        {
             // TODO(atec); perhaps use returned byte number
             let _ = self.r.read_until(b':', &mut self.b);
             s = String::from_utf8_lossy(&self.b).to_string();
-
-            next_verse = s.is_char_boundary(s.len() - 1)
-                && s.is_char_boundary(s.len() - 2)
-                && s[s.len() - 2..s.len() - 1].parse::<usize>().is_ok()
         }
 
         self.b.clear();
