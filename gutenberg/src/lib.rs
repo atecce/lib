@@ -73,6 +73,20 @@ impl<R: std::io::Read> Reader<R> {
             self.clear();
         }
     }
+    fn read_until_next_verse(&mut self) -> String {
+        let mut s = self.cur_str();
+
+        while !s
+            .trim_end_matches(':')
+            .ends_with(|c: char| c.is_ascii_digit())
+        {
+            s = self.next_str().unwrap();
+        }
+
+        self.clear();
+
+        return s;
+    }
 }
 
 impl<R: std::io::Read> Iterator for Reader<R> {
@@ -157,26 +171,14 @@ impl<R> Reader<R> {
     where
         R: std::io::Read,
     {
-        let mut s = self.cur_str();
-
-        let verse = s
-            .chars()
-            .take_while(|c| c.is_ascii_digit())
-            .collect::<String>()
-            .parse::<usize>()
-            .unwrap_or(0);
-
-        while !s
-            .trim_end_matches(':')
-            .ends_with(|c: char| c.is_ascii_digit())
-        {
-            s = self.next_str().unwrap();
-        }
-
-        self.clear();
+        let s = self.read_until_next_verse();
 
         return (
-            verse,
+            s.chars()
+                .take_while(|c| c.is_ascii_digit())
+                .collect::<String>()
+                .parse::<usize>()
+                .unwrap_or(0),
             s.replace("\r\n", " ")
                 .trim_start_matches(|c: char| c.is_ascii_digit())
                 .trim_start()
