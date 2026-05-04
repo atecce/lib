@@ -174,7 +174,7 @@ impl<R> Reader<R> {
                 .take_while(|c| c.is_ascii_digit())
                 .collect::<String>()
                 .parse::<usize>()
-                .unwrap_or(0),
+                .unwrap(),
             s.replace("\r\n", " ")
                 .trim_start_matches(|c: char| c.is_ascii_digit())
                 .trim_start()
