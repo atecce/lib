@@ -148,12 +148,6 @@ impl<R> Reader<R> {
         R: std::io::Read,
     {
         let mut s = self.cur_str();
-        let mut verse = 0;
-
-        // TODO(atec): hack at the end
-        if s.len() == 0 {
-            return (verse, "".to_string());
-        }
 
         let verse = s
             .chars()
