@@ -5,7 +5,6 @@ use name::BIBLE;
 use name::Name;
 
 use std::collections::HashMap;
-use std::io::BufReader;
 
 pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
