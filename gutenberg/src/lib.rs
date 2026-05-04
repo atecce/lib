@@ -89,7 +89,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
 
         // TODO(atec); perhaps use returned byte number
         while self.r.read_until(b':', &mut self.b).is_ok() {
-            match extract_chapter(&self.b) {
+            match extract_chapter(self.cur_str()) {
                 Ok(n) => {
                     if self.new_book {
                         self.i += 1;
@@ -186,8 +186,8 @@ impl<R> Reader<R> {
     }
 }
 
-fn extract_chapter(b: &[u8]) -> Result<usize, ParseIntError> {
-    String::from_utf8_lossy(b).to_string().trim_end_matches(':')
+fn extract_chapter(str: String) -> Result<usize, ParseIntError> {
+    str.trim_end_matches(':')
         .chars()
         .rev()
         .take_while(|c| c.is_ascii_digit())
