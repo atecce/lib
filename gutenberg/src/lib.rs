@@ -42,6 +42,12 @@ pub fn new_reader() -> Reader<&'static [u8]> {
     }
 }
 
+impl<R> Reader<R> {
+    fn cur_str(&self) -> String {
+        String::from_utf8_lossy(&self.b).to_string()
+    }
+}
+
 impl<R: std::io::Read> Iterator for Reader<R> {
     type Item = (Name, usize, usize, String);
 
@@ -61,14 +67,14 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         //             handles this for gutenberg's entire corpora
         if !self.started {
             while self.r.read_until(b':', &mut self.b).is_ok() {
-                let mut s = String::from_utf8_lossy(&self.b).to_string();
+                let mut s = self.cur_str();
                 if s.trim_end_matches(':')
                     .ends_with(|c: char| c.is_ascii_digit())
                 {
                     self.started = true;
                     self.b.clear();
                     let _ = self.r.read_until(b':', &mut self.b);
-                    s = String::from_utf8_lossy(&self.b).to_string();
+                    s = self.cur_str();
 
                     let (verse, text) = self.extract_verse();
                     return Some((self.book, self.chapter, verse, text));
@@ -80,7 +86,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
 
         // TODO(atec); perhaps use returned byte number
         while self.r.read_until(b':', &mut self.b).is_ok() {
-            match self.extract_chapter() {
+            match extract_chapter(&self.b) {
                 Ok(n) => {
                     if self.new_book {
                         self.i += 1;
@@ -134,25 +140,11 @@ impl<R: std::io::Read> Iterator for Reader<R> {
 }
 
 impl<R> Reader<R> {
-    fn extract_chapter(&self) -> Result<usize, ParseIntError> {
-        let s = String::from_utf8_lossy(&self.b).to_string();
-
-        s.trim_end_matches(':')
-            .chars()
-            .rev()
-            .take_while(|c| c.is_ascii_digit())
-            .collect::<String>()
-            .chars()
-            .rev()
-            .collect::<String>()
-            .parse::<usize>()
-    }
-
     fn extract_verse(&mut self) -> (usize, String)
     where
         R: std::io::Read,
     {
-        let mut s = String::from_utf8_lossy(&self.b).to_string();
+        let mut s = self.cur_str();
         let mut verse = 0;
 
         // TODO(atec): hack at the end
@@ -173,7 +165,7 @@ impl<R> Reader<R> {
         {
             // TODO(atec); perhaps use returned byte number
             let _ = self.r.read_until(b':', &mut self.b);
-            s = String::from_utf8_lossy(&self.b).to_string();
+            s = self.cur_str();
         }
 
         self.b.clear();
@@ -189,4 +181,16 @@ impl<R> Reader<R> {
                 .to_string(),
         );
     }
+}
+
+fn extract_chapter(b: &[u8]) -> Result<usize, ParseIntError> {
+    String::from_utf8_lossy(b).to_string().trim_end_matches(':')
+        .chars()
+        .rev()
+        .take_while(|c| c.is_ascii_digit())
+        .collect::<String>()
+        .chars()
+        .rev()
+        .collect::<String>()
+        .parse::<usize>()
 }
