@@ -57,6 +57,22 @@ impl<R: std::io::Read> Reader<R> {
     fn clear(&mut self) {
         self.b.clear()
     }
+    fn read_until_started(&mut self) {
+        while let Some(mut s) = self.next_str() {
+            if s.trim_end_matches(':')
+                .ends_with(|c: char| c.is_ascii_digit())
+            {
+                self.started = true;
+                self.clear();
+
+                // TODO(atec): s unused here. maybe we can just do this with cur_str
+                s = self.next_str().unwrap();
+                return
+            }
+
+            self.clear();
+        }
+    }
 }
 
 impl<R: std::io::Read> Iterator for Reader<R> {
@@ -77,25 +93,11 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         //             maybe some kind of "parent" struct or trait which
         //             handles this for gutenberg's entire corpora
         if !self.started {
-            while let Some(mut s) = self.next_str() {
-
-                if s.trim_end_matches(':')
-                    .ends_with(|c: char| c.is_ascii_digit())
-                {
-                    self.started = true;
-                    self.clear();
-
-                    s = self.next_str().unwrap();
-
-                    let (verse, text) = self.extract_verse();
-                    return Some((self.book, self.chapter, verse, text));
-                }
-
-                self.clear();
-            }
+            self.read_until_started();
+            let (verse, text) = self.extract_verse();
+            return Some((self.book, self.chapter, verse, text));
         }
 
-        // TODO(atec); perhaps use returned byte number
         while let Some(s) = self.next_str() {
             match extract_chapter(s) {
                 Ok(n) => {
