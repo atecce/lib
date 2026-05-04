@@ -43,6 +43,9 @@ pub fn new_reader() -> Reader<&'static [u8]> {
 }
 
 impl<R> Reader<R> {
+    fn clear(&mut self) {
+        self.b.clear()
+    }
     fn cur_str(&self) -> String {
         String::from_utf8_lossy(&self.b).to_string()
     }
@@ -72,7 +75,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                     .ends_with(|c: char| c.is_ascii_digit())
                 {
                     self.started = true;
-                    self.b.clear();
+                    self.clear();
                     let _ = self.r.read_until(b':', &mut self.b);
                     s = self.cur_str();
 
@@ -80,7 +83,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                     return Some((self.book, self.chapter, verse, text));
                 }
 
-                self.b.clear();
+                self.clear();
             }
         }
 
@@ -168,7 +171,7 @@ impl<R> Reader<R> {
             s = self.cur_str();
         }
 
-        self.b.clear();
+        self.clear();
 
         return (
             verse,
