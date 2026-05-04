@@ -104,7 +104,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         //             handles this for gutenberg's entire corpora
         if !self.started {
             self.read_until_started();
-            let (verse, text) = self.extract_verse();
+            let (verse, text) = extract_verse(self.read_until_next_verse());
             return Some((self.book, self.chapter, verse, text));
         }
 
@@ -128,7 +128,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                         self.last_chapter = n;
                     }
 
-                    let (verse, text) = self.extract_verse();
+                    let (verse, text) = extract_verse(self.read_until_next_verse());
 
                     // special case for Philemon, JohnII, JohnIII, and Jude
                     // these books only have one chapter so we will just
@@ -162,28 +162,21 @@ impl<R: std::io::Read> Iterator for Reader<R> {
     }
 }
 
-impl<R> Reader<R> {
-    fn extract_verse(&mut self) -> (usize, String)
-    where
-        R: std::io::Read,
-    {
-        let s = self.read_until_next_verse();
-
-        return (
-            s.chars()
-                .take_while(|c| c.is_ascii_digit())
-                .collect::<String>()
-                .parse::<usize>()
-                .unwrap(),
-            s.replace("\r\n", " ")
-                .trim_start_matches(|c: char| c.is_ascii_digit())
-                .trim_start()
-                .trim_end_matches(':')
-                .trim_end_matches(|c: char| c.is_ascii_digit())
-                .trim_end()
-                .to_string(),
-        );
-    }
+fn extract_verse(s: String) -> (usize, String) {
+    return (
+        s.chars()
+            .take_while(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse::<usize>()
+            .unwrap(),
+        s.replace("\r\n", " ")
+            .trim_start_matches(|c: char| c.is_ascii_digit())
+            .trim_start()
+            .trim_end_matches(':')
+            .trim_end_matches(|c: char| c.is_ascii_digit())
+            .trim_end()
+            .to_string(),
+    );
 }
 
 fn extract_chapter(s: String) -> Result<usize, ParseIntError> {
