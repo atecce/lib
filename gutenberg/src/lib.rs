@@ -29,7 +29,7 @@ pub struct Reader<R> {
 pub fn new_reader() -> Reader<&'static [u8]> {
     Reader {
         r: BufReader::new(&include_bytes!("../../gutenberg/cache/epub/10/pg10.txt")[..]),
-        b: Vec::new(),
+        b: [0u8; 4096].to_vec(),
         book: BIBLE[0],
         i: 0,
         new_book: false,
@@ -42,12 +42,20 @@ pub fn new_reader() -> Reader<&'static [u8]> {
     }
 }
 
-impl<R> Reader<R> {
-    fn clear(&mut self) {
-        self.b.clear()
-    }
+impl<R: std::io::Read> Reader<R> {
     fn cur_str(&self) -> String {
         String::from_utf8_lossy(&self.b).to_string()
+    }
+    fn next_str(&mut self) -> Option<String> {
+        match self.r.read_until(b':', &mut self.b) {
+            Ok(0) => None,
+            Ok(n) => Some(self.cur_str()),
+            // TODO(atec): log or even panic on error
+            Err(_) => None,
+        }
+    }
+    fn clear(&mut self) {
+        self.b.clear()
     }
 }
 
@@ -69,15 +77,15 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         //             maybe some kind of "parent" struct or trait which
         //             handles this for gutenberg's entire corpora
         if !self.started {
-            while self.r.read_until(b':', &mut self.b).is_ok() {
-                let mut s = self.cur_str();
+            while let Some(mut s) = self.next_str() {
+
                 if s.trim_end_matches(':')
                     .ends_with(|c: char| c.is_ascii_digit())
                 {
                     self.started = true;
                     self.clear();
-                    let _ = self.r.read_until(b':', &mut self.b);
-                    s = self.cur_str();
+
+                    s = self.next_str().unwrap();
 
                     let (verse, text) = self.extract_verse();
                     return Some((self.book, self.chapter, verse, text));
@@ -88,8 +96,8 @@ impl<R: std::io::Read> Iterator for Reader<R> {
         }
 
         // TODO(atec); perhaps use returned byte number
-        while self.r.read_until(b':', &mut self.b).is_ok() {
-            match extract_chapter(self.cur_str()) {
+        while let Some(s) = self.next_str() {
+            match extract_chapter(s) {
                 Ok(n) => {
                     if self.new_book {
                         self.i += 1;
@@ -160,9 +168,7 @@ impl<R> Reader<R> {
             .trim_end_matches(':')
             .ends_with(|c: char| c.is_ascii_digit())
         {
-            // TODO(atec); perhaps use returned byte number
-            let _ = self.r.read_until(b':', &mut self.b);
-            s = self.cur_str();
+            s = self.next_str().unwrap();
         }
 
         self.clear();
