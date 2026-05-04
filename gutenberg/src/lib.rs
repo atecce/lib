@@ -59,9 +59,8 @@ impl<R: std::io::Read> Reader<R> {
     }
     fn read_until_started(&mut self) {
         while let Some(mut s) = self.next_str() {
-            if s.trim_end_matches(':')
-                .ends_with(|c: char| c.is_ascii_digit())
-            {
+            if is_delimited_string(s) {
+
                 self.started = true;
                 self.clear();
 
@@ -76,10 +75,7 @@ impl<R: std::io::Read> Reader<R> {
     fn read_until_next_verse(&mut self) -> String {
         let mut s = self.cur_str();
 
-        while !s
-            .trim_end_matches(':')
-            .ends_with(|c: char| c.is_ascii_digit())
-        {
+        while !is_delimited_string(s.clone()) {
             s = self.next_str().unwrap();
         }
 
@@ -190,8 +186,8 @@ impl<R> Reader<R> {
     }
 }
 
-fn extract_chapter(str: String) -> Result<usize, ParseIntError> {
-    str.trim_end_matches(':')
+fn extract_chapter(s: String) -> Result<usize, ParseIntError> {
+    s.trim_end_matches(':')
         .chars()
         .rev()
         .take_while(|c| c.is_ascii_digit())
@@ -200,4 +196,8 @@ fn extract_chapter(str: String) -> Result<usize, ParseIntError> {
         .rev()
         .collect::<String>()
         .parse::<usize>()
+}
+
+fn is_delimited_string(s: String) -> bool {
+    s.trim_end_matches(':').ends_with(|c: char| c.is_ascii_digit())
 }
