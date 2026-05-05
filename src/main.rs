@@ -116,11 +116,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             .take(18)
             .map(|l| l.map(|s| s.trim().to_string()))
             .filter(|l| l.as_ref().map_or(true, |s| !s.is_empty()))
+            .skip(1)
             .collect::<Result<_, _>>()?;
         sonnets.push(sonnet);
     }
 
-    for sonnet in sonnets {
+    for (i, sonnet) in sonnets.into_iter().enumerate() {
+       println!("{}", i+1);
        println!("{:?}", sonnet);
     }
 
