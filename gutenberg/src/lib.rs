@@ -65,7 +65,7 @@ impl<R: std::io::Read> Reader<R> {
                 self.clear();
 
                 // TODO(atec): s unused here. maybe we can just do this with cur_str
-                s = self.next_str().unwrap();
+                _ = self.next_str().unwrap();
                 return
             }
 
