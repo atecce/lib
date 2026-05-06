@@ -126,5 +126,15 @@ fn main() -> Result<(), Box<dyn Error>> {
        println!("{:?}", sonnet);
     }
 
+    let alls_well_that_ends_well_act_i: Vec<String> = lines
+        .map_while(Result::ok)
+        .skip_while(|l| !l.contains("ACT I"))
+        .skip_while(|l| !l.contains("ACT I"))
+        .take_while(|l| !l.contains("[_Exeunt._]"))
+        .filter(|l| !l.trim().is_empty())
+        .collect();
+
+    println!("{:?}", alls_well_that_ends_well_act_i);
+
     Ok(())
 }
