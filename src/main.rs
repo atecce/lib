@@ -93,7 +93,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut lines = r.lines()
         .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")))
-        .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")));
+        .skip(1)
+        .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")))
+        .skip(1);
 
     let mut sonnets = Vec::new();
     for _ in 1..=154 {
@@ -114,7 +116,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let alls_well_that_ends_well_act_i: Vec<String> = lines
         .map_while(Result::ok)
         .skip_while(|l| !l.contains("ACT I"))
+        .skip(1)
         .skip_while(|l| !l.contains("ACT I"))
+        .skip(1)
         .take_while(|l| !l.contains("[_Exeunt._]"))
         .filter(|l| !l.trim().is_empty())
         .collect();
