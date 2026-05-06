@@ -89,30 +89,15 @@ fn print_optimates() {
 
 fn main() -> Result<(), Box<dyn Error>> {
 
-    let mut sonnets = Vec::new();
-
     let r = BufReader::new(&include_bytes!("../gutenberg/cache/epub/100/pg100.txt")[..]);
 
-    let mut preamble = true;
+    let mut lines = r.lines()
+        .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")))
+        .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")));
 
-    let mut tmp = r.lines();
-    let mut lines = tmp.by_ref();
-
-    for line in &mut *lines {
-        let line = line?;
-
-        if line.contains("THE SONNETS") && !preamble {
-            break;
-        }
-
-        if line.contains("THE SONNETS") && preamble {
-            preamble = false;
-        }
-
-    }
-
+    let mut sonnets = Vec::new();
     for i in 1..=154 {
-        let sonnet: Vec<String> = lines
+        let sonnet: Vec<String> = lines.by_ref()
             .take(18)
             .map(|l| l.map(|s| s.trim().to_string()))
             .filter(|l| l.as_ref().map_or(true, |s| !s.is_empty()))
