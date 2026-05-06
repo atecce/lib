@@ -96,7 +96,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")));
 
     let mut sonnets = Vec::new();
-    for i in 1..=154 {
+    for _ in 1..=154 {
         let sonnet: Vec<String> = lines.by_ref()
             .take(18)
             .map(|l| l.map(|s| s.trim().to_string()))
