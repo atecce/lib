@@ -137,7 +137,6 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     }
 
     for (book, chapter, verse, text) in new_reader() {
-        println!("{} {}:{} {}", book, chapter, verse, text);
         if let Some(chapter_and_verse) = word.get_mut(&book) {
             if chapter_and_verse[chapter - 1].get(verse - 1).is_none() {
                 chapter_and_verse[chapter - 1].push(text);
@@ -150,6 +149,7 @@ pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     word
 }
 
+// TODO(atec): maybe first "lib/bible/examples"
 fn generate_word() {
     let word = read_all();
     println!("pub const fn word(book: Name) -> &'static [&'static [&'static str]] {{");
@@ -177,6 +177,5 @@ fn generate_word() {
 
 #[test]
 fn word() {
-    generate_word();
     assert!(kjv::get_word() == read_all())
 }

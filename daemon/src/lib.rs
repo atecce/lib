@@ -9,17 +9,8 @@ use source::Source;
 use source::UniffiSource;
 
 pub fn genealogy(daemon: Daemon) -> Vec<Daemon> {
-
-    let mut ret = Vec::<Daemon>::new();
-    ret.push(daemon);
-
-    let mut cur = daemon.father;
-    while let Some(node) = cur {
-        ret.push(*cur.unwrap());
-        cur = node.father
-    }
-
-    ret
+    std::iter::successors(Some(daemon), |d| d.father.map(|boxed| *boxed))
+        .collect()
 }
 
 #[derive(Clone, Copy, Debug)]

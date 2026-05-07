@@ -125,5 +125,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{:?}", alls_well_that_ends_well_act_i);
 
+    print_optimates();
+
     Ok(())
 }
