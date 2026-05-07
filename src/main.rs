@@ -19,6 +19,7 @@ use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, 
 // }
 
 enum Item {
+
     CurrentAssets,
     CashAndCashEquivalents,
     MarketableSecurities,
@@ -44,25 +45,67 @@ enum Item {
     LongTermOperatingLeaseLiabilities,
     OtherLongTermLiabilities,
     TotalLiabilities,
+
+    Revenue,
+    CostOfRevenue,
+    GrossProfit,
+
+    OperatingExpenses,
+    ResearchAndDevelopment,
+    SalesGeneralAndAdministrative,
+    TotalOperatingExpenses,
+    OperatingIncome,
+
+    InterestIncome,
+    InterestExpense,
+    OtherIncomeNet,
+    TotalOtherIncomeNet,
+    IncomeBeforeIncomeTax,
+
+    IncomeTaxExpense,
+    NetIncome,
+}
+
+struct ReportedItem {
+    t: std::time::SystemTime,
+    item: Item,
+    val: f64,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
 
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
+    let balance_sheet = workbook.worksheet_range("BALANCE_SHEET");
+    let income_statement = workbook.worksheet_range("INCOME_STATEMENT");
 
-    print_non_empties(workbook.worksheet_range("BALANCE_SHEET"));
-    print_non_empties(workbook.worksheet_range("INCOME_STATEMENT"));
+    print_non_empties(&balance_sheet);
+    println!();
+    print_non_empties(&income_statement);
+
+    print_col(&balance_sheet, 1);
+    print_col(&balance_sheet, 2);
+    print_col(&balance_sheet, 3);
+
+    print_col(&income_statement, 1);
+    print_col(&income_statement, 2);
+    print_col(&income_statement, 3);
 
     Ok(())
 }
 
-fn print_non_empties(range: Result<calamine::Range<Data>, calamine::Error>) {
+fn print_non_empties(range: &Result<calamine::Range<Data>, calamine::Error>) {
     if let Ok(range) = range {
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             println!("\trow: {:?}", row);
+        }
+    }
+}
 
-            for cell in row.iter().filter(|cell| !cell.is_empty()) {
-                println!("\t\tcell: {:?}", cell);
+fn print_col(range: &Result<calamine::Range<Data>, calamine::Error>, col: usize) {
+    if let Ok(range) = range {
+        for row in range.rows() {
+            if let Some(val) = row.get(col) {
+                println!("{}", val);
             }
         }
     }
