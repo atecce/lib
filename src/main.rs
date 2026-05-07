@@ -15,7 +15,7 @@ use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 
-use calamine::{open_workbook_auto, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder};
+use calamine::{open_workbook_auto, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder};
 
 fn print_optimates() {
     println!("{:?}", genealogy(*JESUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
@@ -134,18 +134,23 @@ fn read_pg100() -> Result<(), Box<dyn Error>> {
 fn main() -> Result<(), Box<dyn Error>> {
 
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
-    let sheets = workbook.sheet_names();
 
-    for sheet in sheets {
-        println!("processing sheet {}", sheet);
+    if let Ok(range) = workbook.worksheet_range("INCOME_STATEMENT") {
+        for row in range.rows() {
+            println!("\trow: {:?}", row);
 
-        if let Ok(range) = workbook.worksheet_range(&sheet) {
-            for row in range.rows() {
-                println!("row: {:?}", row);
+            for cell in row.iter().filter(|cell| !cell.is_empty()) {
+                println!("\t\tcell: {:?}", cell);
+            }
+        }
+    }
 
-                for cell in row {
-                    println!("cell: {:?}", cell);
-                }
+    if let Ok(range) = workbook.worksheet_range("BALANCE_SHEET") {
+        for row in range.rows() {
+            println!("\trow: {:?}", row);
+
+            for cell in row.iter().filter(|cell| !cell.is_empty()) {
+                println!("\t\tcell: {:?}", cell);
             }
         }
     }
