@@ -15,7 +15,7 @@ use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 
-use calamine::{open_workbook_auto, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder};
+use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder, Sheets};
 
 fn print_optimates() {
     println!("{:?}", genealogy(*JESUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
@@ -135,25 +135,20 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
-    if let Ok(range) = workbook.worksheet_range("INCOME_STATEMENT") {
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            println!("\trow: {:?}", row);
-
-            for cell in row.iter().filter(|cell| !cell.is_empty()) {
-                println!("\t\tcell: {:?}", cell);
-            }
-        }
-    }
-
-    if let Ok(range) = workbook.worksheet_range("BALANCE_SHEET") {
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            println!("\trow: {:?}", row);
-
-            for cell in row.iter().filter(|cell| !cell.is_empty()) {
-                println!("\t\tcell: {:?}", cell);
-            }
-        }
-    }
+    print_non_empties(workbook.worksheet_range("BALANCE_SHEET"));
+    print_non_empties(workbook.worksheet_range("INCOME_STATEMENT"));
 
     Ok(())
+}
+
+fn print_non_empties(range: Result<calamine::Range<Data>, calamine::Error>) {
+    if let Ok(range) = range {
+        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+            println!("\trow: {:?}", row);
+
+            for cell in row.iter().filter(|cell| !cell.is_empty()) {
+                println!("\t\tcell: {:?}", cell);
+            }
+        }
+    }
 }
