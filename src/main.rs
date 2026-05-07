@@ -15,6 +15,8 @@ use daemon::genealogy;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 
+use calamine::{open_workbook_auto, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder};
+
 fn print_optimates() {
     println!("{:?}", genealogy(*JESUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
     println!("{:?}", genealogy(*APOLLO).into_iter().map(|f| f.names).collect::<Vec<_>>());
@@ -87,8 +89,7 @@ fn print_optimates() {
 //    THE RAPE OF LUCRECE
 //    VENUS AND ADONIS
 
-fn main() -> Result<(), Box<dyn Error>> {
-
+fn read_pg100() -> Result<(), Box<dyn Error>> {
     let r = BufReader::new(&include_bytes!("../gutenberg/cache/epub/100/pg100.txt")[..]);
 
     let mut lines = r.lines()
@@ -126,6 +127,28 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("{:?}", alls_well_that_ends_well_act_i);
 
     print_optimates();
+
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+
+    let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
+    let sheets = workbook.sheet_names();
+
+    for sheet in sheets {
+        println!("processing sheet {}", sheet);
+
+        if let Ok(range) = workbook.worksheet_range(&sheet) {
+            for row in range.rows() {
+                println!("row: {:?}", row);
+
+                for cell in row {
+                    println!("cell: {:?}", cell);
+                }
+            }
+        }
+    }
 
     Ok(())
 }

@@ -18,6 +18,7 @@ source = { path = "source" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.149"
 uniffi = { version = "0.31", features = ["cli"] }
+calamine = "0.34.0"
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
