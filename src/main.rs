@@ -1,30 +1,7 @@
-mod persia;
-mod rome;
-
-use crate::persia::CYRUS;
-use crate::rome::CICERO;
-
 use std::error::Error;
-use std::fs::File;
-use std::io::{BufRead, BufReader, BufWriter};
-
-use bible::JESUS;
-use bible::kjv::get_word;
-
-use daemon::genealogy;
-use greece::APOLLO;
-use greece::macedon::ALEXANDER;
+use std::io::{BufRead, BufReader};
 
 use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder, Sheets};
-
-fn print_optimates() {
-    println!("{:?}", genealogy(*JESUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
-    println!("{:?}", genealogy(*APOLLO).into_iter().map(|f| f.names).collect::<Vec<_>>());
-    println!("{:?}", genealogy(*ALEXANDER).into_iter().map(|f| f.names).collect::<Vec<_>>());
-    println!("{:?}", genealogy(*CICERO).into_iter().map(|f| f.names).collect::<Vec<_>>());
-    println!("{:?}", genealogy(*CYRUS).into_iter().map(|f| f.names).collect::<Vec<_>>());
-    println!();
-}
 
 // type Record = (String, f32, f32, f32, f32);
 //
@@ -125,8 +102,6 @@ fn read_pg100() -> Result<(), Box<dyn Error>> {
         .collect();
 
     println!("{:?}", alls_well_that_ends_well_act_i);
-
-    print_optimates();
 
     Ok(())
 }
