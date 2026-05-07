@@ -97,16 +97,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")))
         .skip(1);
 
-    let mut sonnets = Vec::new();
-    for _ in 1..=154 {
-        let sonnet: Vec<String> = lines.by_ref()
-            .take(18)
-            .map(|l| l.map(|s| s.trim().to_string()))
-            .filter(|l| l.as_ref().map_or(true, |s| !s.is_empty()))
-            .skip(1)
-            .collect::<Result<_, _>>()?;
-        sonnets.push(sonnet);
-    }
+    let sonnets: Vec<Vec<String>> = (0..154)
+        .map(|_| {
+            lines.by_ref()
+                .take(18)
+                .map(|l| l.map(|s| s.trim().to_string()))
+                .filter(|l| l.as_ref().map_or(true, |s| !s.is_empty()))
+                .skip(1)
+                .collect::<Result<Vec<String>, _>>()
+        })
+        .collect::<Result<_, _>>()?;
 
     for (i, sonnet) in sonnets.into_iter().enumerate() {
        println!("{}", i+1);
