@@ -136,7 +136,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
     if let Ok(range) = workbook.worksheet_range("INCOME_STATEMENT") {
-        for row in range.rows() {
+        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             println!("\trow: {:?}", row);
 
             for cell in row.iter().filter(|cell| !cell.is_empty()) {
@@ -146,7 +146,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if let Ok(range) = workbook.worksheet_range("BALANCE_SHEET") {
-        for row in range.rows() {
+        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             println!("\trow: {:?}", row);
 
             for cell in row.iter().filter(|cell| !cell.is_empty()) {
