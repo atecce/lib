@@ -1,11 +1,9 @@
 fn main() {
-    let word = bible::kjv::get_word();
-
     for src in bible::JESUS.words {
         println!("book: {}", src.book);
         println!("chapter: {}", src.chapter);
         println!("verses: {:?}", src.verses);
-        let text = &word[&src.book][src.chapter as usize - 1]
+        let text = &bible::kjv::word(src.book)[src.chapter as usize - 1]
             [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
         println!("{:?}", text);
     }
@@ -16,14 +14,14 @@ fn main() {
             println!("book: {}", src.book);
             println!("chapter: {}", src.chapter);
             println!("verses: {:?}", src.verses);
-            let text = &word[&src.book][src.chapter as usize - 1]
+            let text = &bible::kjv::word(src.book)[src.chapter as usize - 1]
                 [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
             println!("{:?}", text);
         }
     }
 
-    for (book, chapter_and_verse) in &word {
-        for (i, chapter) in chapter_and_verse.iter().enumerate() {
+    for book in name::BIBLE {
+        for (i, chapter) in bible::kjv::word(book).iter().enumerate() {
             for (j, verse) in chapter.iter().enumerate() {
                 if verse.contains("Joshua") {
                     println!("{} {}:{}", book, i + 1, j + 1);
