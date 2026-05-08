@@ -18,8 +18,8 @@ use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, 
 //     Ok(records)
 // }
 
+#[derive(Clone, Debug)]
 enum Item {
-
     CurrentAssets,
     CashAndCashEquivalents,
     MarketableSecurities,
@@ -81,7 +81,7 @@ impl Item {
     // Diluted | 2026: 4.9 | 2025: 2.94
     // Basic | 2026: 24359 | 2025: 24555
     // Diluted | 2026: 24514 | 2025: 24804
-    fn from_label(s: &str) -> Option<Self> {
+    fn from(s: &str) -> Option<Self> {
         match s.trim() {
             "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
             "Marketable securities" => Some(Item::MarketableSecurities),
@@ -126,8 +126,9 @@ impl Item {
     }
 }
 
+#[derive(Debug)]
 struct ReportedItem {
-    t: std::time::SystemTime,
+//    t: std::time::SystemTime,
     item: Item,
     val: f64,
 }
@@ -152,6 +153,18 @@ fn print_items(range: &Result<calamine::Range<Data>, calamine::Error>) {
                 let val_2025 = row.get(3)?;
 
                 if !label.is_empty() && (val_2026.is_float() || val_2025.is_float()) {
+
+                    if let Some(item) = Item::from(label.get_string().expect("failed to cast label to &str")) {
+                        println!("{:#?}", ReportedItem {
+                            item: item.clone(),
+                            val: val_2025.get_float().expect("failed to cast val 2025 to float"),
+                        });
+                        println!("{:#?}", ReportedItem {
+                            item: item,
+                            val: val_2026.get_float().expect("failed to cast val 2026 to float"),
+                        });
+                    }
+
                     Some((label, val_2026, val_2025))
                 } else {
                     None
