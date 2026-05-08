@@ -73,40 +73,33 @@ struct ReportedItem {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
-    let balance_sheet = workbook.worksheet_range("BALANCE_SHEET");
-    let income_statement = workbook.worksheet_range("INCOME_STATEMENT");
 
-    print_non_empties(&balance_sheet);
+    print_items(&workbook.worksheet_range("BALANCE_SHEET"));
     println!();
-    print_non_empties(&income_statement);
-
-    print_col(&balance_sheet, 1);
-    print_col(&balance_sheet, 2);
-    print_col(&balance_sheet, 3);
-
-    print_col(&income_statement, 1);
-    print_col(&income_statement, 2);
-    print_col(&income_statement, 3);
+    print_items(&workbook.worksheet_range("INCOME_STATEMENT"));
 
     Ok(())
 }
 
-fn print_non_empties(range: &Result<calamine::Range<Data>, calamine::Error>) {
+fn print_items(range: &Result<calamine::Range<Data>, calamine::Error>) {
     if let Ok(range) = range {
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            println!("{:?}", row);
-        }
-    }
-}
+        let zipped = range.rows()
+            .filter(|row| !row.iter().all(|c| c.is_empty()))
+            .filter_map(|row| {
+                let label = row.get(1)?;
+                let val_2026 = row.get(2)?;
+                let val_2025 = row.get(3)?;
 
-fn print_col(range: &Result<calamine::Range<Data>, calamine::Error>, col: usize) {
-    if let Ok(range) = range {
-        for row in range.rows() {
-            if let Some(val) = row.get(col) {
-                println!("{}", val);
-            }
+                if !label.is_empty() && (val_2026.is_float() || val_2025.is_float()) {
+                    Some((label, val_2026, val_2025))
+                } else {
+                    None
+                }
+            });
+
+        for (label, val26, val25) in zipped {
+            println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val26, val25);
         }
     }
 }
