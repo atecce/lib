@@ -34,11 +34,11 @@ pub const ALEXANDER: &Daemon = &Daemon {
 };
 
 #[uniffi::export]
-pub fn arcDefenderOfMen() -> ArcDaemon {
+pub fn arc_defender_of_men() -> ArcDaemon {
     Arc::unwrap_or_clone(ALEXANDER.new_arc().unwrap())
 }
 
 #[uniffi::export]
-pub fn boxDefenderOfMen() -> BoxDaemon {
+pub fn box_defender_of_men() -> BoxDaemon {
     *ALEXANDER.new_box().unwrap()
 }
