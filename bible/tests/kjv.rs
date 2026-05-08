@@ -6,7 +6,7 @@ use name::Name;
 
 use std::collections::HashMap;
 
-pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
+fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
     for book in BIBLE {
         match book {

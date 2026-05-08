@@ -96,7 +96,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn print_non_empties(range: &Result<calamine::Range<Data>, calamine::Error>) {
     if let Ok(range) = range {
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            println!("\trow: {:?}", row);
+            println!("{:?}", row);
         }
     }
 }
