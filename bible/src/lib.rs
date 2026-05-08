@@ -10,7 +10,6 @@ use source::Source;
 use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
-use daemon::genealogy;
 
 // Luke 3:23-38
 use name::Name::Aaron;
@@ -44,7 +43,6 @@ use name::Name::Jacob;
 use name::Name::Jannai;
 use name::Name::Jared;
 use name::Name::Jesse;
-use name::Name::Jesus;
 use name::Name::Joanan;
 use name::Name::Jochebed;
 use name::Name::Joda;
@@ -66,7 +64,6 @@ use name::Name::Melea;
 use name::Name::Melki;
 use name::Name::Menna;
 use name::Name::Methuselah;
-use name::Name::Moses;
 use name::Name::Naggai;
 use name::Name::Nahor;
 use name::Name::Nashon;
@@ -475,7 +472,7 @@ const JOCHEBED: &Daemon = &Daemon {
 };
 
 const MOSES: &Daemon = &Daemon {
-    names: &[name::Name::מֹשֶׁה],
+    names: &[name::Name::מֹשֶׁה, name::Name::Moses],
     words: &[],
     deeds: &[],
 
@@ -1186,43 +1183,4 @@ pub fn arc_morning_star() -> ArcDaemon {
 #[uniffi::export]
 pub fn box_morning_star() -> BoxDaemon {
     *JESUS.new_box().unwrap()
-}
-
-#[test]
-fn yeshua() {
-    let word = kjv::get_word();
-
-    for src in JESUS.words {
-        println!("book: {}", src.book);
-        println!("chapter: {}", src.chapter);
-        println!("verses: {:?}", src.verses);
-        let text = &word[&src.book][src.chapter as usize - 1]
-            [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
-        println!("{:?}", text);
-    }
-
-    for deed in JESUS.deeds {
-        println!("desc: {}", deed.desc);
-        for src in deed.srcs {
-            println!("book: {}", src.book);
-            println!("chapter: {}", src.chapter);
-            println!("verses: {:?}", src.verses);
-            let text = &word[&src.book][src.chapter as usize - 1]
-                [src.verses[0] as usize - 1..=src.verses[1] as usize - 1];
-            println!("{:?}", text);
-        }
-    }
-
-    for (book, chapter_and_verse) in &word {
-        for (i, chapter) in chapter_and_verse.iter().enumerate() {
-            for (j, verse) in chapter.iter().enumerate() {
-                if verse.contains("Joshua") {
-                    println!("{} {}:{}", book, i + 1, j + 1);
-                    println!("{}", verse);
-                }
-            }
-        }
-    }
-
-    genealogy(*JESUS);
 }
