@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder, Sheets};
+use chrono::{DateTime, NaiveDate, Utc};
 
 // type Record = (String, f32, f32, f32, f32);
 //
@@ -121,19 +122,24 @@ impl Item {
             "Income before income tax" => Some(Item::IncomeBeforeIncomeTax),
             "Income tax expense" => Some(Item::IncomeTaxExpense),
             "Net income" => Some(Item::NetIncome),
-            &_ => todo!(),
+            &_ => None,
         }
     }
 }
 
 #[derive(Debug)]
 struct ReportedItem {
-//    t: std::time::SystemTime,
+    t: NaiveDate,
     item: Item,
     val: f64,
 }
 
+// TODO(atec): scrape these
+const DATE_2026: NaiveDate = NaiveDate::from_ymd_opt(2026, 1, 25).unwrap();
+const DATE_2025: NaiveDate = NaiveDate::from_ymd_opt(2025, 1, 26).unwrap();
+
 fn main() -> Result<(), Box<dyn Error>> {
+
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
     print_items(&workbook.worksheet_range("BALANCE_SHEET"));
@@ -156,13 +162,17 @@ fn print_items(range: &Result<calamine::Range<Data>, calamine::Error>) {
 
                     if let Some(item) = Item::from(label.get_string().expect("failed to cast label to &str")) {
                         println!("{:#?}", ReportedItem {
+                            t: DATE_2025,
                             item: item.clone(),
                             val: val_2025.get_float().expect("failed to cast val 2025 to float"),
                         });
                         println!("{:#?}", ReportedItem {
+                            t: DATE_2026,
                             item: item,
                             val: val_2026.get_float().expect("failed to cast val 2026 to float"),
                         });
+                    } else {
+                        println!("failed to get item from label: {}", label);
                     }
 
                     Some((label, val_2026, val_2025))
