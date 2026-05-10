@@ -23,4 +23,4 @@ chrono = "0.4.44"
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "source"]
+members = ["bible", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "shakespeare", "source"]
