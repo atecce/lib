@@ -59,7 +59,6 @@ pub fn new_reader() -> Reader<&'static [u8]> {
 
 impl<R: std::io::Read> Reader<R> {
     pub fn read_until_sonnets(self) -> Vec<Vec<String>> {
-
         let mut lines = self.r.lines()
             .skip_while(|l| l.as_ref().map_or(true, |s| !s.contains("THE SONNETS")))
             .skip(1)
@@ -79,18 +78,15 @@ impl<R: std::io::Read> Reader<R> {
     }
 
     // TODO(atec): obviously get whole play instead
-//    fn read_until_alls_well_that_ends_well_act_i(self) -> Vec<String> {
-//
-//     let alls_well_that_ends_well_act_i: Vec<String> = lines
-//         .map_while(Result::ok)
-//         .skip_while(|l| !l.contains("ACT I"))
-//         .skip(1)
-//         .skip_while(|l| !l.contains("ACT I"))
-//         .skip(1)
-//         .take_while(|l| !l.contains("[_Exeunt._]"))
-//         .filter(|l| !l.trim().is_empty())
-//         .collect();
-//
-//     println!("{:?}", alls_well_that_ends_well_act_i);
-//    }
+    pub fn read_until_alls_well_that_ends_well_act_i(self) -> Vec<String> {
+        self.r.lines()
+            .map_while(Result::ok)
+            .skip_while(|l| !l.contains("ACT I"))
+            .skip(1)
+            .skip_while(|l| !l.contains("ACT I"))
+            .skip(1)
+            .take_while(|l| !l.contains("[_Exeunt._]"))
+            .filter(|l| !l.trim().is_empty())
+            .collect()
+    }
 }
