@@ -1,3 +1,5 @@
+pub mod shakespeare;
+
 use name::BIBLE;
 use name::Name;
 use name::Name::JohnII;
