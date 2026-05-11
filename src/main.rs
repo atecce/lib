@@ -4,6 +4,22 @@ use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, 
 use chrono::{DateTime, NaiveDate, Utc};
 use prometheus::{register_gauge_vec, GaugeVec};
 
+// type Record = (String, f32, f32, f32, f32);
+//
+// fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
+//     let mut r = csv::Reader::from_reader(
+//         File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"),
+//     );
+//     let mut records = Vec::new();
+//
+//     for res in r.deserialize() {
+//         let record: Record = res?;
+//         records.push(record);
+//     }
+//
+//     Ok(records)
+// }
+
 #[derive(Clone, Debug)]
 enum Item {
     CurrentAssets,
@@ -53,6 +69,20 @@ enum Item {
 }
 
 impl Item {
+    // TODO(atec): start tracking share counts and these stats
+    // Commitments and contingencies - see Note 12 | 2026: 0 | 2025: 0
+    // Preferred stock, $0.001 par value; 2 shares authorized; none issued | 2026: 0 | 2025: 0
+    // outstanding as of January 26, 2025 | 2026: 24 | 2025: 24
+    // Additional paid-in capital | 2026: 10118 | 2025: 11237
+    // Accumulated other comprehensive income | 2026: 178 | 2025: 28
+    // Retained earnings | 2026: 146973 | 2025: 68038
+    // Total shareholders' equity | 2026: 157293 | 2025: 79327
+    // Total liabilities and shareholders' equity | 2026: 206803 | 2025: 111601
+
+    // Basic | 2026: 4.93 | 2025: 2.97
+    // Diluted | 2026: 4.9 | 2025: 2.94
+    // Basic | 2026: 24359 | 2025: 24555
+    // Diluted | 2026: 24514 | 2025: 24804
     fn from(s: &str) -> Option<Self> {
         match s.trim() {
             "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
@@ -161,7 +191,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     process_items(&workbook.worksheet_range("INCOME_STATEMENT"), &gauge);
 
     prometheus::push_metrics(
-        "financial_reports",
+        "nvda",
         std::collections::HashMap::new(),
         "localhost:9091",
         prometheus::gather(),
