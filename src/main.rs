@@ -137,14 +137,15 @@ struct ReportedItem {
 
 const DATE_2026: NaiveDate = NaiveDate::from_ymd_opt(2026, 1, 25).unwrap();
 const DATE_2025: NaiveDate = NaiveDate::from_ymd_opt(2025, 1, 26).unwrap();
+const DATE_2024: NaiveDate = NaiveDate::from_ymd_opt(2024, 1, 28).unwrap();
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
     let gauge = register_gauge_vec!("reported_item", "Reported financial items", &["item", "date"])?;
 
-    process_items(&workbook.worksheet_range("BALANCE_SHEET"), &gauge);
-    process_items(&workbook.worksheet_range("INCOME_STATEMENT"), &gauge);
+    process_balance_sheet(&workbook.worksheet_range("BALANCE_SHEET"), &gauge);
+    process_income_statement(&workbook.worksheet_range("INCOME_STATEMENT"), &gauge);
 
     prometheus::push_metrics(
         "nvda",
@@ -157,7 +158,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn process_items(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: &GaugeVec) {
+fn process_balance_sheet(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: &GaugeVec) {
     if let Ok(range) = range {
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             let label = match row.get(1) {
@@ -173,13 +174,47 @@ fn process_items(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: 
                 _ => f64::NAN,
             };
 
-            if !val_2025.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
-            }
             if !val_2026.is_nan() {
                 gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
             }
+            if !val_2025.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
+            }
             println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
+        }
+    }
+}
+
+fn process_income_statement(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: &GaugeVec) {
+    if let Ok(range) = range {
+        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+            let label = match row.get(1) {
+                Some(l) if !l.is_empty() => l,
+                _ => continue,
+            };
+            let val_2026 = match row.get(2) {
+                Some(v) if v.is_float() => v.get_float().unwrap(),
+                _ => f64::NAN,
+            };
+            let val_2025 = match row.get(3) {
+                Some(v) if v.is_float() => v.get_float().unwrap(),
+                _ => f64::NAN,
+            };
+            let val_2024 = match row.get(4) {
+                Some(v) if v.is_float() => v.get_float().unwrap(),
+                _ => f64::NAN,
+            };
+
+            if !val_2026.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
+            }
+            if !val_2025.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
+            }
+            if !val_2024.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2024.to_string()]).set(val_2024);
+            }
+            println!("{:<40} | 2026: {:<10} | 2025: {:<10} | 2024: {:<10}", label, val_2026, val_2025, val_2024);
         }
     }
 }
