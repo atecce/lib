@@ -173,15 +173,13 @@ fn process_items(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: 
                 _ => f64::NAN,
             };
 
-            if let Some(item) = Item::from(label.get_string().expect("failed to cast label to &str")) {
-                if !val_2025.is_nan() {
-                    gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
-                }
-                if !val_2026.is_nan() {
-                    gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
-                }
-                println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
+            if !val_2025.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
             }
+            if !val_2026.is_nan() {
+                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
+            }
+            println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
         }
     }
 }
