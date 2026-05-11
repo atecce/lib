@@ -126,50 +126,6 @@ impl Item {
             &_ => None,
         }
     }
-
-    fn as_str(&self) -> &'static str {
-        match self {
-            Item::CurrentAssets => "CurrentAssets",
-            Item::CashAndCashEquivalents => "CashAndCashEquivalents",
-            Item::MarketableSecurities => "MarketableSecurities",
-            Item::AccountsReceivableNet => "AccountsReceivableNet",
-            Item::Inventories => "Inventories",
-            Item::PrepaidExpensesAndOtherCurrentAssets => "PrepaidExpensesAndOtherCurrentAssets",
-            Item::TotalCurrentAssets => "TotalCurrentAssets",
-            Item::PropertyAndEquipmentNet => "PropertyAndEquipmentNet",
-            Item::OperatingLeaseAssets => "OperatingLeaseAssets",
-            Item::Goodwill => "Goodwill",
-            Item::IntangibleAssetsNet => "IntangibleAssetsNet",
-            Item::DeferredIncomeTaxAssets => "DeferredIncomeTaxAssets",
-            Item::NonMarketableEquitySecurities => "NonMarketableEquitySecurities",
-            Item::OtherAssets => "OtherAssets",
-            Item::TotalAssets => "TotalAssets",
-            Item::CurrentLiabilities => "CurrentLiabilities",
-            Item::AccountsPayable => "AccountsPayable",
-            Item::AccruedAndOtherCurrentLiabilities => "AccruedAndOtherCurrentLiabilities",
-            Item::ShortTermDebt => "ShortTermDebt",
-            Item::TotalCurrentLiabilities => "TotalCurrentLiabilities",
-            Item::LongTermDebt => "LongTermDebt",
-            Item::LongTermOperatingLeaseLiabilities => "LongTermOperatingLeaseLiabilities",
-            Item::OtherLongTermLiabilities => "OtherLongTermLiabilities",
-            Item::TotalLiabilities => "TotalLiabilities",
-            Item::Revenue => "Revenue",
-            Item::CostOfRevenue => "CostOfRevenue",
-            Item::GrossProfit => "GrossProfit",
-            Item::OperatingExpenses => "OperatingExpenses",
-            Item::ResearchAndDevelopment => "ResearchAndDevelopment",
-            Item::SalesGeneralAndAdministrative => "SalesGeneralAndAdministrative",
-            Item::TotalOperatingExpenses => "TotalOperatingExpenses",
-            Item::OperatingIncome => "OperatingIncome",
-            Item::InterestIncome => "InterestIncome",
-            Item::InterestExpense => "InterestExpense",
-            Item::OtherIncomeNet => "OtherIncomeNet",
-            Item::TotalOtherIncomeNet => "TotalOtherIncomeNet",
-            Item::IncomeBeforeIncomeTax => "IncomeBeforeIncomeTax",
-            Item::IncomeTaxExpense => "IncomeTaxExpense",
-            Item::NetIncome => "NetIncome",
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -219,10 +175,10 @@ fn process_items(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: 
 
             if let Some(item) = Item::from(label.get_string().expect("failed to cast label to &str")) {
                 if !val_2025.is_nan() {
-                    gauge.with_label_values(&[item.as_str(), &DATE_2025.to_string()]).set(val_2025);
+                    gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
                 }
                 if !val_2026.is_nan() {
-                    gauge.with_label_values(&[item.as_str(), &DATE_2026.to_string()]).set(val_2026);
+                    gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
                 }
                 println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
             }
