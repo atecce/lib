@@ -30,6 +30,4 @@ fn main() {
             }
         }
     }
-
-    daemon::genealogy(*bible::JESUS);
 }

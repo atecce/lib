@@ -8,11 +8,6 @@ use name::Name;
 use source::Source;
 use source::UniffiSource;
 
-pub fn genealogy(daemon: Daemon) -> Vec<Daemon> {
-    std::iter::successors(Some(daemon), |d| d.father.map(|boxed| *boxed))
-        .collect()
-}
-
 #[derive(Clone, Copy, Debug)]
 pub struct Daemon<'a> {
     pub names: &'a [Name],
