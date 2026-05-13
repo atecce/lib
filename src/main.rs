@@ -1,25 +1,8 @@
 use std::error::Error;
 use std::fs;
 
-use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder, Sheets};
-use chrono::{DateTime, NaiveDate, Utc};
-use prometheus::{register_gauge_vec, GaugeVec};
-
-// type Record = (String, f32, f32, f32, f32);
-//
-// fn read_csv() -> Result<Vec<Record>, Box<dyn Error>> {
-//     let mut r = csv::Reader::from_reader(
-//         File::open("./MacroTrends_Data_Download_BRK.A.trimmed.csv").expect("can't open file"),
-//     );
-//     let mut records = Vec::new();
-//
-//     for res in r.deserialize() {
-//         let record: Record = res?;
-//         records.push(record);
-//     }
-//
-//     Ok(records)
-// }
+use calamine::{open_workbook_auto, Data, DataType, Reader};
+use chrono::NaiveDate;
 
 #[derive(Clone, Debug)]
 enum Item {
@@ -70,20 +53,6 @@ enum Item {
 }
 
 impl Item {
-    // TODO(atec): start tracking share counts and these stats
-    // Commitments and contingencies - see Note 12 | 2026: 0 | 2025: 0
-    // Preferred stock, $0.001 par value; 2 shares authorized; none issued | 2026: 0 | 2025: 0
-    // outstanding as of January 26, 2025 | 2026: 24 | 2025: 24
-    // Additional paid-in capital | 2026: 10118 | 2025: 11237
-    // Accumulated other comprehensive income | 2026: 178 | 2025: 28
-    // Retained earnings | 2026: 146973 | 2025: 68038
-    // Total shareholders' equity | 2026: 157293 | 2025: 79327
-    // Total liabilities and shareholders' equity | 2026: 206803 | 2025: 111601
-
-    // Basic | 2026: 4.93 | 2025: 2.97
-    // Diluted | 2026: 4.9 | 2025: 2.94
-    // Basic | 2026: 24359 | 2025: 24555
-    // Diluted | 2026: 24514 | 2025: 24804
     fn from(s: &str) -> Option<Self> {
         match s.trim() {
             "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
@@ -118,13 +87,57 @@ impl Item {
             "Total operating expenses" => Some(Item::TotalOperatingExpenses),
             "Operating income" => Some(Item::OperatingIncome),
             "Interest income" => Some(Item::InterestIncome),
-            "Interese expense" => Some(Item::InterestExpense),
+            "Interest expense" => Some(Item::InterestExpense),
             "Other income, net" => Some(Item::OtherIncomeNet),
             "Total other income, net" => Some(Item::TotalOtherIncomeNet),
             "Income before income tax" => Some(Item::IncomeBeforeIncomeTax),
             "Income tax expense" => Some(Item::IncomeTaxExpense),
             "Net income" => Some(Item::NetIncome),
             &_ => None,
+        }
+    }
+
+    fn as_str(&self) -> &'static str {
+        match self {
+            Item::CurrentAssets => "CurrentAssets",
+            Item::CashAndCashEquivalents => "CashAndCashEquivalents",
+            Item::MarketableSecurities => "MarketableSecurities",
+            Item::AccountsReceivableNet => "AccountsReceivableNet",
+            Item::Inventories => "Inventories",
+            Item::PrepaidExpensesAndOtherCurrentAssets => "PrepaidExpensesAndOtherCurrentAssets",
+            Item::TotalCurrentAssets => "TotalCurrentAssets",
+            Item::PropertyAndEquipmentNet => "PropertyAndEquipmentNet",
+            Item::OperatingLeaseAssets => "OperatingLeaseAssets",
+            Item::Goodwill => "Goodwill",
+            Item::IntangibleAssetsNet => "IntangibleAssetsNet",
+            Item::DeferredIncomeTaxAssets => "DeferredIncomeTaxAssets",
+            Item::NonMarketableEquitySecurities => "NonMarketableEquitySecurities",
+            Item::OtherAssets => "OtherAssets",
+            Item::TotalAssets => "TotalAssets",
+            Item::CurrentLiabilities => "CurrentLiabilities",
+            Item::AccountsPayable => "AccountsPayable",
+            Item::AccruedAndOtherCurrentLiabilities => "AccruedAndOtherCurrentLiabilities",
+            Item::ShortTermDebt => "ShortTermDebt",
+            Item::TotalCurrentLiabilities => "TotalCurrentLiabilities",
+            Item::LongTermDebt => "LongTermDebt",
+            Item::LongTermOperatingLeaseLiabilities => "LongTermOperatingLeaseLiabilities",
+            Item::OtherLongTermLiabilities => "OtherLongTermLiabilities",
+            Item::TotalLiabilities => "TotalLiabilities",
+            Item::Revenue => "Revenue",
+            Item::CostOfRevenue => "CostOfRevenue",
+            Item::GrossProfit => "GrossProfit",
+            Item::OperatingExpenses => "OperatingExpenses",
+            Item::ResearchAndDevelopment => "ResearchAndDevelopment",
+            Item::SalesGeneralAndAdministrative => "SalesGeneralAndAdministrative",
+            Item::TotalOperatingExpenses => "TotalOperatingExpenses",
+            Item::OperatingIncome => "OperatingIncome",
+            Item::InterestIncome => "InterestIncome",
+            Item::InterestExpense => "InterestExpense",
+            Item::OtherIncomeNet => "OtherIncomeNet",
+            Item::TotalOtherIncomeNet => "TotalOtherIncomeNet",
+            Item::IncomeBeforeIncomeTax => "IncomeBeforeIncomeTax",
+            Item::IncomeTaxExpense => "IncomeTaxExpense",
+            Item::NetIncome => "NetIncome",
         }
     }
 }
@@ -158,27 +171,45 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
-    let gauge = register_gauge_vec!("reported_item", "Reported financial items", &["item", "date"])?;
+    let mut items = Vec::new();
 
-    process_balance_sheet(&workbook.worksheet_range("BALANCE_SHEET"), &gauge);
-    process_income_statement(&workbook.worksheet_range("INCOME_STATEMENT"), &gauge);
+    process_balance_sheet(&workbook.worksheet_range("BALANCE_SHEET"), &mut items);
+    process_income_statement(&workbook.worksheet_range("INCOME_STATEMENT"), &mut items);
 
-    prometheus::push_metrics(
-        "nvda",
-        std::collections::HashMap::new(),
-        "localhost:9091",
-        prometheus::gather(),
-        None,
-    )?;
+    push_to_influx(&items)?;
 
     Ok(())
 }
 
-fn process_balance_sheet(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: &GaugeVec) {
+fn push_to_influx(items: &[ReportedItem]) -> Result<(), Box<dyn Error>> {
+    let mut payload = String::new();
+    for item in items {
+        let ts = item.t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
+        payload.push_str(&format!(
+            "reported_item,item={} value={} {}\n",
+            item.item.as_str(),
+            item.val,
+            ts
+        ));
+    }
+
+    let client = reqwest::blocking::Client::new();
+    let res = client.post("http://localhost:8181/write?db=financials")
+        .body(payload)
+        .send()?;
+
+    if !res.status().is_success() {
+        return Err(format!("InfluxDB write failed: {}", res.text()?).into());
+    }
+
+    Ok(())
+}
+
+fn process_balance_sheet(range: &Result<calamine::Range<Data>, calamine::Error>, items: &mut Vec<ReportedItem>) {
     if let Ok(range) = range {
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l,
+                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
                 _ => continue,
             };
             let val_2026 = match row.get(2) {
@@ -190,22 +221,24 @@ fn process_balance_sheet(range: &Result<calamine::Range<Data>, calamine::Error>,
                 _ => f64::NAN,
             };
 
-            if !val_2026.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
+            if let Some(item) = Item::from(label) {
+                if !val_2026.is_nan() {
+                    items.push(ReportedItem { t: DATE_2026, item: item.clone(), val: val_2026 });
+                }
+                if !val_2025.is_nan() {
+                    items.push(ReportedItem { t: DATE_2025, item, val: val_2025 });
+                }
+                println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
             }
-            if !val_2025.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
-            }
-            println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
         }
     }
 }
 
-fn process_income_statement(range: &Result<calamine::Range<Data>, calamine::Error>, gauge: &GaugeVec) {
+fn process_income_statement(range: &Result<calamine::Range<Data>, calamine::Error>, items: &mut Vec<ReportedItem>) {
     if let Ok(range) = range {
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l,
+                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
                 _ => continue,
             };
             let val_2026 = match row.get(2) {
@@ -221,16 +254,18 @@ fn process_income_statement(range: &Result<calamine::Range<Data>, calamine::Erro
                 _ => f64::NAN,
             };
 
-            if !val_2026.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2026.to_string()]).set(val_2026);
+            if let Some(item) = Item::from(label) {
+                if !val_2026.is_nan() {
+                    items.push(ReportedItem { t: DATE_2026, item: item.clone(), val: val_2026 });
+                }
+                if !val_2025.is_nan() {
+                    items.push(ReportedItem { t: DATE_2025, item: item.clone(), val: val_2025 });
+                }
+                if !val_2024.is_nan() {
+                    items.push(ReportedItem { t: DATE_2024, item, val: val_2024 });
+                }
+                println!("{:<40} | 2026: {:<10} | 2025: {:<10} | 2024: {:<10}", label, val_2026, val_2025, val_2024);
             }
-            if !val_2025.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2025.to_string()]).set(val_2025);
-            }
-            if !val_2024.is_nan() {
-                gauge.with_label_values(&[label.get_string().expect("failed to get label as &str"), &DATE_2024.to_string()]).set(val_2024);
-            }
-            println!("{:<40} | 2026: {:<10} | 2025: {:<10} | 2024: {:<10}", label, val_2026, val_2025, val_2024);
         }
     }
 }
