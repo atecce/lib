@@ -1,5 +1,7 @@
 uniffi::setup_scaffolding!();
 
+use std::fmt;
+
 use name::Name;
 use serde::Serialize;
 
@@ -18,6 +20,20 @@ impl Source {
             book: src.book,
             chapter: src.chapter,
             verses: src.verses.to_vec(),
+        }
+    }
+}
+
+impl fmt::Display for Source {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.verses[0] == self.verses[1] {
+            write!(f, "{} {}:{}", self.book, self.chapter, self.verses[0])
+        } else {
+            write!(
+                f,
+                "{} {}:{}-{}",
+                self.book, self.chapter, self.verses[0], self.verses[1]
+            )
         }
     }
 }
