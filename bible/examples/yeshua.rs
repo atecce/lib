@@ -22,7 +22,7 @@ fn main() {
                 if verse.contains("Joshua") {
                     println!(
                         "{}",
-                        bible::source::Source {
+                        bible::Source {
                             book: book,
                             chapter: (i + 1).try_into().unwrap(),
                             verses: [(j + 1).try_into().unwrap(), (j + 1).try_into().unwrap()],
