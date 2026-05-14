@@ -243,15 +243,15 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_ARCDEFENDEROFMEN
-#define UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_ARCDEFENDEROFMEN
-uint64_t uniffi_greece_fn_func_arcdefenderofmen(RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_ARC_DEFENDER_OF_MEN
+#define UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_ARC_DEFENDER_OF_MEN
+uint64_t uniffi_greece_fn_func_arc_defender_of_men(RustCallStatus *_Nonnull out_status
     
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_BOXDEFENDEROFMEN
-#define UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_BOXDEFENDEROFMEN
-uint64_t uniffi_greece_fn_func_boxdefenderofmen(RustCallStatus *_Nonnull out_status
+#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_BOX_DEFENDER_OF_MEN
+#define UNIFFI_FFIDEF_UNIFFI_GREECE_FN_FUNC_BOX_DEFENDER_OF_MEN
+uint64_t uniffi_greece_fn_func_box_defender_of_men(RustCallStatus *_Nonnull out_status
     
 );
 #endif
@@ -515,15 +515,15 @@ void ffi_greece_rust_future_free_void(uint64_t handle
 void ffi_greece_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_ARCDEFENDEROFMEN
-#define UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_ARCDEFENDEROFMEN
-uint16_t uniffi_greece_checksum_func_arcdefenderofmen(void
+#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_ARC_DEFENDER_OF_MEN
+#define UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_ARC_DEFENDER_OF_MEN
+uint16_t uniffi_greece_checksum_func_arc_defender_of_men(void
     
 );
 #endif
-#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_BOXDEFENDEROFMEN
-#define UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_BOXDEFENDEROFMEN
-uint16_t uniffi_greece_checksum_func_boxdefenderofmen(void
+#ifndef UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_BOX_DEFENDER_OF_MEN
+#define UNIFFI_FFIDEF_UNIFFI_GREECE_CHECKSUM_FUNC_BOX_DEFENDER_OF_MEN
+uint16_t uniffi_greece_checksum_func_box_defender_of_men(void
     
 );
 #endif

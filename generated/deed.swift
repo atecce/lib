@@ -457,85 +457,6 @@ fileprivate struct FfiConverterString: FfiConverter {
     }
 }
 
-
-public struct UniffiDeed: Equatable, Hashable {
-    public var desc: String
-    public var srcs: [UniffiSource]
-
-    // Default memberwise initializers are never public by default, so we
-    // declare one manually.
-    public init(desc: String, srcs: [UniffiSource]) {
-        self.desc = desc
-        self.srcs = srcs
-    }
-
-    
-
-    
-}
-
-#if compiler(>=6)
-extension UniffiDeed: Sendable {}
-#endif
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public struct FfiConverterTypeUniffiDeed: FfiConverterRustBuffer {
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UniffiDeed {
-        return
-            try UniffiDeed(
-                desc: FfiConverterString.read(from: &buf), 
-                srcs: FfiConverterSequenceTypeUniffiSource.read(from: &buf)
-        )
-    }
-
-    public static func write(_ value: UniffiDeed, into buf: inout [UInt8]) {
-        FfiConverterString.write(value.desc, into: &buf)
-        FfiConverterSequenceTypeUniffiSource.write(value.srcs, into: &buf)
-    }
-}
-
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeUniffiDeed_lift(_ buf: RustBuffer) throws -> UniffiDeed {
-    return try FfiConverterTypeUniffiDeed.lift(buf)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-public func FfiConverterTypeUniffiDeed_lower(_ value: UniffiDeed) -> RustBuffer {
-    return FfiConverterTypeUniffiDeed.lower(value)
-}
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterSequenceTypeUniffiSource: FfiConverterRustBuffer {
-    typealias SwiftType = [UniffiSource]
-
-    public static func write(_ value: [UniffiSource], into buf: inout [UInt8]) {
-        let len = Int32(value.count)
-        writeInt(&buf, len)
-        for item in value {
-            FfiConverterTypeUniffiSource.write(item, into: &buf)
-        }
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [UniffiSource] {
-        let len: Int32 = try readInt(&buf)
-        var seq = [UniffiSource]()
-        seq.reserveCapacity(Int(len))
-        for _ in 0 ..< len {
-            seq.append(try FfiConverterTypeUniffiSource.read(from: &buf))
-        }
-        return seq
-    }
-}
-
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -552,7 +473,6 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.contractVersionMismatch
     }
 
-    uniffiEnsureSourceInitialized()
     return InitializationResult.ok
 }()
 

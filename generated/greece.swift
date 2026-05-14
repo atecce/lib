@@ -458,13 +458,13 @@ fileprivate struct FfiConverterString: FfiConverter {
 }
 public func arcDefenderOfMen() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
-    uniffi_greece_fn_func_arcdefenderofmen($0
+    uniffi_greece_fn_func_arc_defender_of_men($0
     )
 })
 }
 public func boxDefenderOfMen() -> BoxDaemon  {
     return try!  FfiConverterTypeBoxDaemon_lift(try! rustCall() {
-    uniffi_greece_fn_func_boxdefenderofmen($0
+    uniffi_greece_fn_func_box_defender_of_men($0
     )
 })
 }
@@ -484,10 +484,10 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_greece_checksum_func_arcdefenderofmen() != 28971) {
+    if (uniffi_greece_checksum_func_arc_defender_of_men() != 929) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_greece_checksum_func_boxdefenderofmen() != 61613) {
+    if (uniffi_greece_checksum_func_box_defender_of_men() != 31070) {
         return InitializationResult.apiChecksumMismatch
     }
 

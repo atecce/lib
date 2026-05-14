@@ -19,13 +19,6 @@ module deedFFI {
     use "_Builtin_stdbool"
     use "_Builtin_stdint"
 }
-module sourceFFI {
-    header "sourceFFI.h"
-    export *
-    use "Darwin"
-    use "_Builtin_stdbool"
-    use "_Builtin_stdint"
-}
 module daemonFFI {
     header "daemonFFI.h"
     export *
