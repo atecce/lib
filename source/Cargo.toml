@@ -8,6 +8,7 @@ crate-type = ["staticlib", "lib"]
 name = "source"
 
 [dependencies]
+citation = { path = "../citation" }
 name = { path = "../name" }
 serde = {version="1.0", features=["derive"]}
 uniffi = "0.31"

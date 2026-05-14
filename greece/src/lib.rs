@@ -17,7 +17,14 @@ use name::Name::Plato;
 use name::Name::Socrates;
 use name::Name::Zeus;
 
-pub const CRONUS: &Daemon = &Daemon {
+pub struct Source;
+impl citation::Citation for Source {
+    fn cite(&self) -> String {
+        "".to_string()
+    }
+}
+
+pub const CRONUS: &Daemon<Source> = &Daemon {
     names: &[name::Name::Κρόνος, Cronus, Cronos, Kronos],
     words: &[],
     deeds: &[],
@@ -29,7 +36,7 @@ pub const CRONUS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const ZEUS: &Daemon = &Daemon {
+pub const ZEUS: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ζεύς, Zeus],
     words: &[],
     deeds: &[],
@@ -41,7 +48,7 @@ pub const ZEUS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const HERA: &Daemon = &Daemon {
+pub const HERA: &Daemon<Source> = &Daemon {
     names: &[Hera],
     words: &[],
     deeds: &[],
@@ -53,7 +60,7 @@ pub const HERA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const LETO: &Daemon = &Daemon {
+const LETO: &Daemon<Source> = &Daemon {
     names: &[name::Name::Λατώ, Leto],
     words: &[],
     deeds: &[],
@@ -65,7 +72,7 @@ const LETO: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const HERMES: &Daemon = &Daemon {
+pub const HERMES: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ἑρμῆς, Hermes],
     words: &[],
     deeds: &[],
@@ -77,7 +84,7 @@ pub const HERMES: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const APOLLO: &Daemon = &Daemon {
+pub const APOLLO: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ἀπόλλων, Apollo],
     words: &[],
     deeds: &[],
@@ -89,7 +96,7 @@ pub const APOLLO: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const ARTEMIS: &Daemon = &Daemon {
+pub const ARTEMIS: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ἄρτεμις, Artemis],
     words: &[],
     deeds: &[],
@@ -101,7 +108,7 @@ pub const ARTEMIS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const ACHILLES: &Daemon = &Daemon {
+pub const ACHILLES: &Daemon<Source> = &Daemon {
     names: &[Achilles],
     words: &[],
     deeds: &[],
@@ -113,7 +120,7 @@ pub const ACHILLES: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const SOCRATES: &Daemon = &Daemon {
+pub const SOCRATES: &Daemon<Source> = &Daemon {
     names: &[Socrates],
     words: &[],
     deeds: &[],
@@ -125,7 +132,7 @@ pub const SOCRATES: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const PLATO: &Daemon = &Daemon {
+pub const PLATO: &Daemon<Source> = &Daemon {
     names: &[Plato],
     words: &[],
     deeds: &[],
@@ -137,7 +144,7 @@ pub const PLATO: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const ARISTOTLE: &Daemon = &Daemon {
+pub const ARISTOTLE: &Daemon<Source> = &Daemon {
     names: &[Aristotle],
     words: &[],
     deeds: &[],

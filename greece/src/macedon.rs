@@ -1,4 +1,5 @@
 use crate::ARISTOTLE;
+use crate::Source;
 
 use std::sync::Arc;
 
@@ -9,7 +10,7 @@ use daemon::Daemon;
 use name::Name::Alexander;
 use name::Name::Philip;
 
-const PHILIP: &Daemon = &Daemon {
+const PHILIP: &Daemon<Source> = &Daemon {
     names: &[Philip],
     words: &[],
     deeds: &[],
@@ -21,7 +22,7 @@ const PHILIP: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const ALEXANDER: &Daemon = &Daemon {
+pub const ALEXANDER: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ἀλέξανδρος, Alexander],
     words: &[],
     deeds: &[],

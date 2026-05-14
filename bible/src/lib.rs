@@ -88,7 +88,7 @@ use name::Name::Simeon;
 use name::Name::Terrah;
 use name::Name::Zerubbabel;
 
-const ALMIGHTY: &Daemon = &Daemon {
+const ALMIGHTY: &Daemon<Source> = &Daemon {
     names: &[God],
     words: &[Source {
         book: name::Name::Leviticus,
@@ -111,7 +111,7 @@ const ALMIGHTY: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MARY: &Daemon = &Daemon {
+const MARY: &Daemon<Source> = &Daemon {
     names: &[Mary],
     words: &[],
     deeds: &[],
@@ -123,7 +123,7 @@ const MARY: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ADAM: &Daemon = &Daemon {
+const ADAM: &Daemon<Source> = &Daemon {
     names: &[Adam],
     words: &[],
     deeds: &[],
@@ -135,7 +135,7 @@ const ADAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const EVE: &Daemon = &Daemon {
+const EVE: &Daemon<Source> = &Daemon {
     names: &[Eve],
     words: &[],
     deeds: &[],
@@ -147,7 +147,7 @@ const EVE: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const CAIN: &Daemon = &Daemon {
+const CAIN: &Daemon<Source> = &Daemon {
     names: &[Cain],
     words: &[],
     deeds: &[],
@@ -159,7 +159,7 @@ const CAIN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ABEL: &Daemon = &Daemon {
+const ABEL: &Daemon<Source> = &Daemon {
     names: &[Abel],
     words: &[],
     deeds: &[],
@@ -171,7 +171,7 @@ const ABEL: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SETH: &Daemon = &Daemon {
+const SETH: &Daemon<Source> = &Daemon {
     names: &[Seth],
     words: &[],
     deeds: &[],
@@ -183,7 +183,7 @@ const SETH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ENOSH: &Daemon = &Daemon {
+const ENOSH: &Daemon<Source> = &Daemon {
     names: &[Enosh],
     words: &[],
     deeds: &[],
@@ -195,7 +195,7 @@ const ENOSH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const KENAN: &Daemon = &Daemon {
+const KENAN: &Daemon<Source> = &Daemon {
     names: &[Kenan],
     words: &[],
     deeds: &[],
@@ -207,7 +207,7 @@ const KENAN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MAHALALEL: &Daemon = &Daemon {
+const MAHALALEL: &Daemon<Source> = &Daemon {
     names: &[Mahalalel],
     words: &[],
     deeds: &[],
@@ -219,7 +219,7 @@ const MAHALALEL: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JARED: &Daemon = &Daemon {
+const JARED: &Daemon<Source> = &Daemon {
     names: &[Jared],
     words: &[],
     deeds: &[],
@@ -231,7 +231,7 @@ const JARED: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ENOCH: &Daemon = &Daemon {
+const ENOCH: &Daemon<Source> = &Daemon {
     names: &[Enoch],
     words: &[],
     deeds: &[],
@@ -243,7 +243,7 @@ const ENOCH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const METHUSELAH: &Daemon = &Daemon {
+const METHUSELAH: &Daemon<Source> = &Daemon {
     names: &[Methuselah],
     words: &[],
     deeds: &[],
@@ -255,7 +255,7 @@ const METHUSELAH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const LAMECH: &Daemon = &Daemon {
+const LAMECH: &Daemon<Source> = &Daemon {
     names: &[Lamech],
     words: &[],
     deeds: &[],
@@ -267,7 +267,7 @@ const LAMECH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NOAH: &Daemon = &Daemon {
+const NOAH: &Daemon<Source> = &Daemon {
     names: &[Noah],
     words: &[],
     deeds: &[],
@@ -279,7 +279,7 @@ const NOAH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SHEM: &Daemon = &Daemon {
+const SHEM: &Daemon<Source> = &Daemon {
     names: &[Shem],
     words: &[],
     deeds: &[],
@@ -291,7 +291,7 @@ const SHEM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ARPHAXAD: &Daemon = &Daemon {
+const ARPHAXAD: &Daemon<Source> = &Daemon {
     names: &[Arphaxad],
     words: &[],
     deeds: &[],
@@ -303,7 +303,7 @@ const ARPHAXAD: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const CAINAN: &Daemon = &Daemon {
+const CAINAN: &Daemon<Source> = &Daemon {
     names: &[Cainan],
     words: &[],
     deeds: &[],
@@ -315,7 +315,7 @@ const CAINAN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SHELAH: &Daemon = &Daemon {
+const SHELAH: &Daemon<Source> = &Daemon {
     names: &[Shelah],
     words: &[],
     deeds: &[],
@@ -327,7 +327,7 @@ const SHELAH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const EBER: &Daemon = &Daemon {
+const EBER: &Daemon<Source> = &Daemon {
     names: &[Eber],
     words: &[],
     deeds: &[],
@@ -339,7 +339,7 @@ const EBER: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const PELEG: &Daemon = &Daemon {
+const PELEG: &Daemon<Source> = &Daemon {
     names: &[Peleg],
     words: &[],
     deeds: &[],
@@ -351,7 +351,7 @@ const PELEG: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const REU: &Daemon = &Daemon {
+const REU: &Daemon<Source> = &Daemon {
     names: &[Reu],
     words: &[],
     deeds: &[],
@@ -363,7 +363,7 @@ const REU: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SERUG: &Daemon = &Daemon {
+const SERUG: &Daemon<Source> = &Daemon {
     names: &[Serug],
     words: &[],
     deeds: &[],
@@ -375,7 +375,7 @@ const SERUG: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NAHOR: &Daemon = &Daemon {
+const NAHOR: &Daemon<Source> = &Daemon {
     names: &[Nahor],
     words: &[],
     deeds: &[],
@@ -387,7 +387,7 @@ const NAHOR: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const TERRAH: &Daemon = &Daemon {
+const TERRAH: &Daemon<Source> = &Daemon {
     names: &[Terrah],
     words: &[],
     deeds: &[],
@@ -399,7 +399,7 @@ const TERRAH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ABRAHAM: &Daemon = &Daemon {
+const ABRAHAM: &Daemon<Source> = &Daemon {
     names: &[Abraham],
     words: &[],
     deeds: &[],
@@ -411,7 +411,7 @@ const ABRAHAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ISAAC: &Daemon = &Daemon {
+const ISAAC: &Daemon<Source> = &Daemon {
     names: &[Isaac],
     words: &[],
     deeds: &[],
@@ -423,7 +423,7 @@ const ISAAC: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JACOB: &Daemon = &Daemon {
+const JACOB: &Daemon<Source> = &Daemon {
     names: &[Jacob, Israel],
     words: &[],
     deeds: &[],
@@ -435,7 +435,7 @@ const JACOB: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const REUBEN: &Daemon = &Daemon {
+const REUBEN: &Daemon<Source> = &Daemon {
     names: &[Reuben],
     words: &[],
     deeds: &[],
@@ -447,7 +447,7 @@ const REUBEN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const AMRAM: &Daemon = &Daemon {
+const AMRAM: &Daemon<Source> = &Daemon {
     names: &[Amram],
     words: &[],
     deeds: &[],
@@ -459,7 +459,7 @@ const AMRAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOCHEBED: &Daemon = &Daemon {
+const JOCHEBED: &Daemon<Source> = &Daemon {
     names: &[Jochebed],
     words: &[],
     deeds: &[],
@@ -471,7 +471,7 @@ const JOCHEBED: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MOSES: &Daemon = &Daemon {
+const MOSES: &Daemon<Source> = &Daemon {
     names: &[name::Name::מֹשֶׁה, name::Name::Moses],
     words: &[],
     deeds: &[],
@@ -483,7 +483,7 @@ const MOSES: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const AARON: &Daemon = &Daemon {
+const AARON: &Daemon<Source> = &Daemon {
     names: &[Aaron],
     words: &[],
     deeds: &[],
@@ -495,7 +495,7 @@ const AARON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
+const JUDAH_SON_OF_JACOB: &Daemon<Source> = &Daemon {
     names: &[Judah],
     words: &[],
     deeds: &[],
@@ -507,7 +507,7 @@ const JUDAH_SON_OF_JACOB: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const PEREZ: &Daemon = &Daemon {
+const PEREZ: &Daemon<Source> = &Daemon {
     names: &[Perez],
     words: &[],
     deeds: &[],
@@ -519,7 +519,7 @@ const PEREZ: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const HEZRON: &Daemon = &Daemon {
+const HEZRON: &Daemon<Source> = &Daemon {
     names: &[Hezron],
     words: &[],
     deeds: &[],
@@ -531,7 +531,7 @@ const HEZRON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const RAM: &Daemon = &Daemon {
+const RAM: &Daemon<Source> = &Daemon {
     names: &[Ram],
     words: &[],
     deeds: &[],
@@ -543,7 +543,7 @@ const RAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const AMMINADAB: &Daemon = &Daemon {
+const AMMINADAB: &Daemon<Source> = &Daemon {
     names: &[Amminadab],
     words: &[],
     deeds: &[],
@@ -555,7 +555,7 @@ const AMMINADAB: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NASHON: &Daemon = &Daemon {
+const NASHON: &Daemon<Source> = &Daemon {
     names: &[Nashon],
     words: &[],
     deeds: &[],
@@ -567,7 +567,7 @@ const NASHON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SALMON: &Daemon = &Daemon {
+const SALMON: &Daemon<Source> = &Daemon {
     names: &[Salmon],
     words: &[],
     deeds: &[],
@@ -579,7 +579,7 @@ const SALMON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const BOAZ: &Daemon = &Daemon {
+const BOAZ: &Daemon<Source> = &Daemon {
     names: &[Boaz],
     words: &[],
     deeds: &[],
@@ -591,7 +591,7 @@ const BOAZ: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const OBED: &Daemon = &Daemon {
+const OBED: &Daemon<Source> = &Daemon {
     names: &[Obed],
     words: &[],
     deeds: &[],
@@ -603,7 +603,7 @@ const OBED: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JESSE: &Daemon = &Daemon {
+const JESSE: &Daemon<Source> = &Daemon {
     names: &[Jesse],
     words: &[],
     deeds: &[],
@@ -615,7 +615,7 @@ const JESSE: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const DAVID: &Daemon = &Daemon {
+const DAVID: &Daemon<Source> = &Daemon {
     names: &[David],
     words: &[],
     deeds: &[],
@@ -627,7 +627,7 @@ const DAVID: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NATHAN: &Daemon = &Daemon {
+const NATHAN: &Daemon<Source> = &Daemon {
     names: &[Nathan],
     words: &[],
     deeds: &[],
@@ -639,7 +639,7 @@ const NATHAN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MATTATHA: &Daemon = &Daemon {
+const MATTATHA: &Daemon<Source> = &Daemon {
     names: &[Mattatha],
     words: &[],
     deeds: &[],
@@ -651,7 +651,7 @@ const MATTATHA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MENNA: &Daemon = &Daemon {
+const MENNA: &Daemon<Source> = &Daemon {
     names: &[Menna],
     words: &[],
     deeds: &[],
@@ -663,7 +663,7 @@ const MENNA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MELEA: &Daemon = &Daemon {
+const MELEA: &Daemon<Source> = &Daemon {
     names: &[Melea],
     words: &[],
     deeds: &[],
@@ -675,7 +675,7 @@ const MELEA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ELIAKIM: &Daemon = &Daemon {
+const ELIAKIM: &Daemon<Source> = &Daemon {
     names: &[Eliakim],
     words: &[],
     deeds: &[],
@@ -687,7 +687,7 @@ const ELIAKIM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JONAM: &Daemon = &Daemon {
+const JONAM: &Daemon<Source> = &Daemon {
     names: &[Jonam],
     words: &[],
     deeds: &[],
@@ -699,7 +699,7 @@ const JONAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
+const JOSEPH_SON_OF_JONAM: &Daemon<Source> = &Daemon {
     names: &[Joseph],
     words: &[],
     deeds: &[],
@@ -711,7 +711,7 @@ const JOSEPH_SON_OF_JONAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JUDAH: &Daemon = &Daemon {
+const JUDAH: &Daemon<Source> = &Daemon {
     names: &[Judah],
     words: &[],
     deeds: &[],
@@ -723,7 +723,7 @@ const JUDAH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SIMEON: &Daemon = &Daemon {
+const SIMEON: &Daemon<Source> = &Daemon {
     names: &[Simeon],
     words: &[],
     deeds: &[],
@@ -735,7 +735,7 @@ const SIMEON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
+const LEVI_SON_OF_SIMEON: &Daemon<Source> = &Daemon {
     names: &[Levi],
     words: &[],
     deeds: &[],
@@ -747,7 +747,7 @@ const LEVI_SON_OF_SIMEON: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
+const MATTHAT_SON_OF_LEVI: &Daemon<Source> = &Daemon {
     names: &[Matthat],
     words: &[],
     deeds: &[],
@@ -759,7 +759,7 @@ const MATTHAT_SON_OF_LEVI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JORIM: &Daemon = &Daemon {
+const JORIM: &Daemon<Source> = &Daemon {
     names: &[Jorim],
     words: &[],
     deeds: &[],
@@ -771,7 +771,7 @@ const JORIM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ELIEZER: &Daemon = &Daemon {
+const ELIEZER: &Daemon<Source> = &Daemon {
     names: &[Eliezer],
     words: &[],
     deeds: &[],
@@ -783,7 +783,7 @@ const ELIEZER: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOSHUA: &Daemon = &Daemon {
+const JOSHUA: &Daemon<Source> = &Daemon {
     names: &[name::Name::Joshua],
     words: &[],
     deeds: &[],
@@ -795,7 +795,7 @@ const JOSHUA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ER: &Daemon = &Daemon {
+const ER: &Daemon<Source> = &Daemon {
     names: &[Er],
     words: &[],
     deeds: &[],
@@ -807,7 +807,7 @@ const ER: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ELMADAM: &Daemon = &Daemon {
+const ELMADAM: &Daemon<Source> = &Daemon {
     names: &[Elmadam],
     words: &[],
     deeds: &[],
@@ -819,7 +819,7 @@ const ELMADAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const COSAM: &Daemon = &Daemon {
+const COSAM: &Daemon<Source> = &Daemon {
     names: &[Cosam],
     words: &[],
     deeds: &[],
@@ -831,7 +831,7 @@ const COSAM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ADDI: &Daemon = &Daemon {
+const ADDI: &Daemon<Source> = &Daemon {
     names: &[Addi],
     words: &[],
     deeds: &[],
@@ -843,7 +843,7 @@ const ADDI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
+const MELKI_SON_OF_ADDI: &Daemon<Source> = &Daemon {
     names: &[Melki],
     words: &[],
     deeds: &[],
@@ -855,7 +855,7 @@ const MELKI_SON_OF_ADDI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NERI: &Daemon = &Daemon {
+const NERI: &Daemon<Source> = &Daemon {
     names: &[Neri],
     words: &[],
     deeds: &[],
@@ -867,7 +867,7 @@ const NERI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SHEALTIEL: &Daemon = &Daemon {
+const SHEALTIEL: &Daemon<Source> = &Daemon {
     names: &[Shealtiel],
     words: &[],
     deeds: &[],
@@ -879,7 +879,7 @@ const SHEALTIEL: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ZERUBBABEL: &Daemon = &Daemon {
+const ZERUBBABEL: &Daemon<Source> = &Daemon {
     names: &[Zerubbabel],
     words: &[],
     deeds: &[],
@@ -891,7 +891,7 @@ const ZERUBBABEL: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const RHESA: &Daemon = &Daemon {
+const RHESA: &Daemon<Source> = &Daemon {
     names: &[Rhesa],
     words: &[],
     deeds: &[],
@@ -903,7 +903,7 @@ const RHESA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOANAN: &Daemon = &Daemon {
+const JOANAN: &Daemon<Source> = &Daemon {
     names: &[Joanan],
     words: &[],
     deeds: &[],
@@ -915,7 +915,7 @@ const JOANAN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JODA: &Daemon = &Daemon {
+const JODA: &Daemon<Source> = &Daemon {
     names: &[Joda],
     words: &[],
     deeds: &[],
@@ -927,7 +927,7 @@ const JODA: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOSEK: &Daemon = &Daemon {
+const JOSEK: &Daemon<Source> = &Daemon {
     names: &[Josek],
     words: &[],
     deeds: &[],
@@ -939,7 +939,7 @@ const JOSEK: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const SEMEIN: &Daemon = &Daemon {
+const SEMEIN: &Daemon<Source> = &Daemon {
     names: &[Semein],
     words: &[],
     deeds: &[],
@@ -951,7 +951,7 @@ const SEMEIN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
+const MATTATHIAS_SON_OF_SEMEIN: &Daemon<Source> = &Daemon {
     names: &[Mattathias],
     words: &[],
     deeds: &[],
@@ -963,7 +963,7 @@ const MATTATHIAS_SON_OF_SEMEIN: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MAATH: &Daemon = &Daemon {
+const MAATH: &Daemon<Source> = &Daemon {
     names: &[Maath],
     words: &[],
     deeds: &[],
@@ -975,7 +975,7 @@ const MAATH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NAGGAI: &Daemon = &Daemon {
+const NAGGAI: &Daemon<Source> = &Daemon {
     names: &[Naggai],
     words: &[],
     deeds: &[],
@@ -987,7 +987,7 @@ const NAGGAI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const ESLI: &Daemon = &Daemon {
+const ESLI: &Daemon<Source> = &Daemon {
     names: &[Esli],
     words: &[],
     deeds: &[],
@@ -999,7 +999,7 @@ const ESLI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const NAHUM: &Daemon = &Daemon {
+const NAHUM: &Daemon<Source> = &Daemon {
     names: &[name::Name::Nahum],
     words: &[],
     deeds: &[],
@@ -1011,7 +1011,7 @@ const NAHUM: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const AMOS: &Daemon = &Daemon {
+const AMOS: &Daemon<Source> = &Daemon {
     names: &[name::Name::Amos],
     words: &[],
     deeds: &[],
@@ -1023,7 +1023,7 @@ const AMOS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MATTATHIAS: &Daemon = &Daemon {
+const MATTATHIAS: &Daemon<Source> = &Daemon {
     names: &[Mattathias],
     words: &[],
     deeds: &[],
@@ -1035,7 +1035,7 @@ const MATTATHIAS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
+const JOSEPH_SON_OF_MATTATHIAS: &Daemon<Source> = &Daemon {
     names: &[Joseph],
     words: &[],
     deeds: &[],
@@ -1047,7 +1047,7 @@ const JOSEPH_SON_OF_MATTATHIAS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JANNAI: &Daemon = &Daemon {
+const JANNAI: &Daemon<Source> = &Daemon {
     names: &[Jannai],
     words: &[],
     deeds: &[],
@@ -1059,7 +1059,7 @@ const JANNAI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MELKI: &Daemon = &Daemon {
+const MELKI: &Daemon<Source> = &Daemon {
     names: &[Melki],
     words: &[],
     deeds: &[],
@@ -1071,7 +1071,7 @@ const MELKI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const LEVI: &Daemon = &Daemon {
+const LEVI: &Daemon<Source> = &Daemon {
     names: &[Levi],
     words: &[],
     deeds: &[],
@@ -1083,7 +1083,7 @@ const LEVI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const MATTHAT: &Daemon = &Daemon {
+const MATTHAT: &Daemon<Source> = &Daemon {
     names: &[Matthat],
     words: &[],
     deeds: &[],
@@ -1095,7 +1095,7 @@ const MATTHAT: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const HELI: &Daemon = &Daemon {
+const HELI: &Daemon<Source> = &Daemon {
     names: &[Heli],
     words: &[],
     deeds: &[],
@@ -1107,7 +1107,7 @@ const HELI: &Daemon = &Daemon {
     predecessor: None,
 };
 
-const JOSEPH: &Daemon = &Daemon {
+const JOSEPH: &Daemon<Source> = &Daemon {
     names: &[Joseph],
     words: &[],
     deeds: &[Deed {
@@ -1126,7 +1126,7 @@ const JOSEPH: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const JESUS: &Daemon = &Daemon {
+pub const JESUS: &Daemon<Source> = &Daemon {
     names: &[
         name::Name::Jesus,
         name::Name::Iesus,

@@ -133,6 +133,7 @@ dependencies = [
 name = "bible"
 version = "0.1.0"
 dependencies = [
+ "citation",
  "daemon",
  "deed",
  "gutenberg",
@@ -256,6 +257,10 @@ dependencies = [
  "wasm-bindgen",
  "windows-link",
 ]
+
+[[package]]
+name = "citation"
+version = "0.1.0"
 
 [[package]]
 name = "clap"
@@ -407,6 +412,7 @@ dependencies = [
 name = "daemon"
 version = "0.1.0"
 dependencies = [
+ "citation",
  "deed",
  "name",
  "source",
@@ -729,6 +735,7 @@ dependencies = [
 name = "greece"
 version = "0.1.0"
 dependencies = [
+ "citation",
  "daemon",
  "name",
  "uniffi",
@@ -1137,6 +1144,7 @@ dependencies = [
  "bible",
  "calamine",
  "chrono",
+ "citation",
  "csv",
  "daemon",
  "deed",
@@ -2097,6 +2105,7 @@ dependencies = [
 name = "source"
 version = "0.1.0"
 dependencies = [
+ "citation",
  "name",
  "serde",
  "uniffi",

@@ -3,9 +3,10 @@ use name::Name::Caesar;
 use name::Name::Cicero;
 use name::Name::Remus;
 use name::Name::Romulus;
+use source::Source;
 
 // 753 - 716
-pub const ROMULUS: &Daemon = &Daemon {
+pub const ROMULUS: &Daemon<Source> = &Daemon {
     names: &[Romulus],
     words: &[],
     deeds: &[],
@@ -17,7 +18,7 @@ pub const ROMULUS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const REMUS: &Daemon = &Daemon {
+pub const REMUS: &Daemon<Source> = &Daemon {
     names: &[Remus],
     words: &[],
     deeds: &[],
@@ -29,7 +30,7 @@ pub const REMUS: &Daemon = &Daemon {
     predecessor: None,
 };
 
-pub const CICERO: &Daemon = &Daemon {
+pub const CICERO: &Daemon<Source> = &Daemon {
     names: &[Cicero],
     words: &[],
     deeds: &[],
@@ -42,7 +43,7 @@ pub const CICERO: &Daemon = &Daemon {
 };
 
 // 715 - 672
-pub const NUMA_POMPILIUS: &Daemon = &Daemon {
+pub const NUMA_POMPILIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -55,7 +56,7 @@ pub const NUMA_POMPILIUS: &Daemon = &Daemon {
 };
 
 // 672 - 640
-pub const TULLUS_HOSTILIUS: &Daemon = &Daemon {
+pub const TULLUS_HOSTILIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -68,7 +69,7 @@ pub const TULLUS_HOSTILIUS: &Daemon = &Daemon {
 };
 
 // 640 - 616
-pub const ANCUS_MARCIUS: &Daemon = &Daemon {
+pub const ANCUS_MARCIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -81,7 +82,7 @@ pub const ANCUS_MARCIUS: &Daemon = &Daemon {
 };
 
 // 616 - 578
-pub const TARQUINIUS_PRISCUS: &Daemon = &Daemon {
+pub const TARQUINIUS_PRISCUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -94,7 +95,7 @@ pub const TARQUINIUS_PRISCUS: &Daemon = &Daemon {
 };
 
 // 578 - 534
-pub const SERVIUS_TULLIUS: &Daemon = &Daemon {
+pub const SERVIUS_TULLIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -107,7 +108,7 @@ pub const SERVIUS_TULLIUS: &Daemon = &Daemon {
 };
 
 // 534 -509
-pub const TARQUINIUS_SUPERBUS: &Daemon = &Daemon {
+pub const TARQUINIUS_SUPERBUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -119,7 +120,7 @@ pub const TARQUINIUS_SUPERBUS: &Daemon = &Daemon {
     predecessor: Some(SERVIUS_TULLIUS),
 };
 
-pub const CAESAR: &Daemon = &Daemon {
+pub const CAESAR: &Daemon<Source> = &Daemon {
     names: &[Caesar],
     words: &[],
     deeds: &[],
@@ -133,7 +134,7 @@ pub const CAESAR: &Daemon = &Daemon {
 
 // // Julio-Claudian dynasty
 // Causar Augustus, "Augustus"; 16 January 27 BC - 19 August AD 14
-pub const AUGUSTUS: &Daemon = &Daemon {
+pub const AUGUSTUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -146,7 +147,7 @@ pub const AUGUSTUS: &Daemon = &Daemon {
 };
 
 // Tiberius Caesar Augustus, "Tiberius"; 17 September 14 - 16 March 37
-pub const TIBERIUS: &Daemon = &Daemon {
+pub const TIBERIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -159,7 +160,7 @@ pub const TIBERIUS: &Daemon = &Daemon {
 };
 
 // Gaius Caesar Augustus Germanicus, "Caligula"; 18 March 37 - 24 January 41
-pub const CALIGULA: &Daemon = &Daemon {
+pub const CALIGULA: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -172,7 +173,7 @@ pub const CALIGULA: &Daemon = &Daemon {
 };
 
 // Tiberius Claudius Caesar Augustus Germanicus, "Claudius"; 24 January 31 - 13 October 54
-pub const CLAUDIUS: &Daemon = &Daemon {
+pub const CLAUDIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -185,7 +186,7 @@ pub const CLAUDIUS: &Daemon = &Daemon {
 };
 
 // Nero Claudius Caesar Augustus Germanicus, "Nero"; 13 October 54 - 9 June 68
-pub const NERO: &Daemon = &Daemon {
+pub const NERO: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -199,7 +200,7 @@ pub const NERO: &Daemon = &Daemon {
 
 // // Year of the Four Emperors
 // Servius Galba Caesar Augustus, "Galba"; 8 June 68 - 15 January 69
-pub const GALBA: &Daemon = &Daemon {
+pub const GALBA: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -212,7 +213,7 @@ pub const GALBA: &Daemon = &Daemon {
 };
 
 // Marcus Otho Caesar Augustus, "Otho", 15 January - 16 April 69
-pub const OTHO: &Daemon = &Daemon {
+pub const OTHO: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -225,7 +226,7 @@ pub const OTHO: &Daemon = &Daemon {
 };
 
 // Aulus Vitellius Germanicus Augustus, "Vitellius"; 19 April - 20 December 69
-pub const VITELLIUS: &Daemon = &Daemon {
+pub const VITELLIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -239,7 +240,7 @@ pub const VITELLIUS: &Daemon = &Daemon {
 
 // // Flavian dynasty
 // Caesar Vespasianus Augustus, "Vespasian"; 1 July 69 - 23 June 79
-pub const VESPASIAN: &Daemon = &Daemon {
+pub const VESPASIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -252,7 +253,7 @@ pub const VESPASIAN: &Daemon = &Daemon {
 };
 
 // Caesar Domitianus Augustus, "Domitian"; 14 September 81 - 18 September 96
-pub const DOMITIAN: &Daemon = &Daemon {
+pub const DOMITIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -266,7 +267,7 @@ pub const DOMITIAN: &Daemon = &Daemon {
 
 // // Nerva-Antonine dynasty
 // Nerva Caesar Augustus, "Nerva"; 18 September 96 - 27 January 98
-pub const NERVA: &Daemon = &Daemon {
+pub const NERVA: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -279,7 +280,7 @@ pub const NERVA: &Daemon = &Daemon {
 };
 
 // Caesar Nerva Traianus Augustus, "Trajan"; 28 January 98 - 9 August (?) 117
-pub const TRAJAN: &Daemon = &Daemon {
+pub const TRAJAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -292,7 +293,7 @@ pub const TRAJAN: &Daemon = &Daemon {
 };
 
 // Caesar Traianus Hadrianus Augustus, "Hadrian"; 11 August 117 - 10 July 138
-pub const HADRIAN: &Daemon = &Daemon {
+pub const HADRIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -305,7 +306,7 @@ pub const HADRIAN: &Daemon = &Daemon {
 };
 
 // Titus Aelius Hadrianus Antoninus Pius, "Antoninus Pius"; 10 July 138 - 7 March 161
-pub const ANTONINUS_PIUS: &Daemon = &Daemon {
+pub const ANTONINUS_PIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -318,7 +319,7 @@ pub const ANTONINUS_PIUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Antoninus, "Marcus Aurelius"; 7 March 161 - 17 March 180
-pub const MARCUS_AURELIUS: &Daemon = &Daemon {
+pub const MARCUS_AURELIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -331,7 +332,7 @@ pub const MARCUS_AURELIUS: &Daemon = &Daemon {
 };
 
 // Lucius Aurelius Verus, "Lucius Verus"; 7 March 161 - January/February 169
-pub const LUCIUS_VERUS: &Daemon = &Daemon {
+pub const LUCIUS_VERUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -345,7 +346,7 @@ pub const LUCIUS_VERUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Commodus Antoninus / Lucius Aelius Aurelius Commodus, "Commodus"; 17 March 180 - 31 December 192
-pub const COMMODUS: &Daemon = &Daemon {
+pub const COMMODUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -359,7 +360,7 @@ pub const COMMODUS: &Daemon = &Daemon {
 
 // // Year of the Five Emperors
 // Publius Helvius Pertinax, "Pertinax"; 1 January - 28 March 193
-pub const PERTINAX: &Daemon = &Daemon {
+pub const PERTINAX: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -372,7 +373,7 @@ pub const PERTINAX: &Daemon = &Daemon {
 };
 
 // Marcus Didius Severus Julianus, "Didius Julianus"; 28 March - 1 June 193
-pub const DIDIUS_JULIANUS: &Daemon = &Daemon {
+pub const DIDIUS_JULIANUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -386,7 +387,7 @@ pub const DIDIUS_JULIANUS: &Daemon = &Daemon {
 
 // // Severan dynasty
 // Lucius Septimius Severus Pertinax, "Septimius Severus"; 9 April 193 - 4 February 211
-pub const SEPTIMIUS_SEVERUS: &Daemon = &Daemon {
+pub const SEPTIMIUS_SEVERUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -399,7 +400,7 @@ pub const SEPTIMIUS_SEVERUS: &Daemon = &Daemon {
 };
 
 // Publius Septimius Geta, "Geta"; 4 February 211 - 26 December 211
-pub const GETA: &Daemon = &Daemon {
+pub const GETA: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -412,7 +413,7 @@ pub const GETA: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Antoninus, "Caracalla"; 4 February 211 - 8 April 217
-pub const CARACALLA: &Daemon = &Daemon {
+pub const CARACALLA: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -425,7 +426,7 @@ pub const CARACALLA: &Daemon = &Daemon {
 };
 
 // Marcus Opelius Severus Macrinus, "Macrinus"; 11 April 217 - 8 June 218
-pub const MACRINUS: &Daemon = &Daemon {
+pub const MACRINUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -438,7 +439,7 @@ pub const MACRINUS: &Daemon = &Daemon {
 };
 
 // Marcus Opelius Antoninus Diadumenianus, "Diadumenian"; Late May - June 218
-pub const DIADUMENIAN: &Daemon = &Daemon {
+pub const DIADUMENIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -451,7 +452,7 @@ pub const DIADUMENIAN: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Antoninus, "Elegabalus"; 16 May 218 - 13 March 222
-pub const ELEGABALUS: &Daemon = &Daemon {
+pub const ELEGABALUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -464,7 +465,7 @@ pub const ELEGABALUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Severus Alexander, "Severus Alexander"; 14 March 222 - March 235
-pub const SEVERUS_ALEXANDER: &Daemon = &Daemon {
+pub const SEVERUS_ALEXANDER: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -478,7 +479,7 @@ pub const SEVERUS_ALEXANDER: &Daemon = &Daemon {
 
 // // Crisis of the Third Century
 // Gaius Julius Verus Maximinus, "Maximinus I (Thrax)"; March 235 - June 238
-pub const MAXIMUS_I_THRAX: &Daemon = &Daemon {
+pub const MAXIMUS_I_THRAX: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -491,7 +492,7 @@ pub const MAXIMUS_I_THRAX: &Daemon = &Daemon {
 };
 
 // Marcus Antonius Gordianus Sempronianus Romanus, "Gordian I"; April - May 238
-pub const GORDIAN_I: &Daemon = &Daemon {
+pub const GORDIAN_I: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -504,7 +505,7 @@ pub const GORDIAN_I: &Daemon = &Daemon {
 };
 
 // Marcus Antonius Gordianus Sempronianus Romanus, "Gordian II"; April - May 238
-pub const GORDIAN_II: &Daemon = &Daemon {
+pub const GORDIAN_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -518,7 +519,7 @@ pub const GORDIAN_II: &Daemon = &Daemon {
 };
 
 // Marcus Clodius Pupienus Maximus, "Pupienus"; May - August 238
-pub const PUPIENUS: &Daemon = &Daemon {
+pub const PUPIENUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -532,7 +533,7 @@ pub const PUPIENUS: &Daemon = &Daemon {
 };
 
 // Decimus Caelius Calvinus Balbinus, "Balbinus"; May - August 238
-pub const BALBINUS: &Daemon = &Daemon {
+pub const BALBINUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -546,7 +547,7 @@ pub const BALBINUS: &Daemon = &Daemon {
 };
 
 // Marcus Antonius Gordianus, "Gordian III"; August 238 - February 244
-pub const GORDIAN_III: &Daemon = &Daemon {
+pub const GORDIAN_III: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -560,7 +561,7 @@ pub const GORDIAN_III: &Daemon = &Daemon {
 };
 
 // Marcus Julius Philippus, "Philip I (the Arab)"; February 244 - September/October 249
-pub const PHILIP_I_THE_ARAB: &Daemon = &Daemon {
+pub const PHILIP_I_THE_ARAB: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -574,7 +575,7 @@ pub const PHILIP_I_THE_ARAB: &Daemon = &Daemon {
 };
 
 // Marcus Julius Severus Philippus, "Philip II (the Younger)"; July/August 247 - September/October 249
-pub const PHILIP_II_THE_YOUNGER: &Daemon = &Daemon {
+pub const PHILIP_II_THE_YOUNGER: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -588,7 +589,7 @@ pub const PHILIP_II_THE_YOUNGER: &Daemon = &Daemon {
 };
 
 // Gaius Messius Quintus Traianus Decius, "Decius"; September/October 249 - June 251
-pub const DECIUS: &Daemon = &Daemon {
+pub const DECIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -602,7 +603,7 @@ pub const DECIUS: &Daemon = &Daemon {
 };
 
 // Quintus Herennius Etruscus Messius Decius, "Herennius Etruscus"; May/June - June 251
-pub const HERENNIUS_ETRUSCUS: &Daemon = &Daemon {
+pub const HERENNIUS_ETRUSCUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -616,7 +617,7 @@ pub const HERENNIUS_ETRUSCUS: &Daemon = &Daemon {
 };
 
 // Gaius Vibius Trebonianus Gallus, "Trebonianus Gallus"; June 251 - August 253
-pub const TREBONIANUS_GALLUS: &Daemon = &Daemon {
+pub const TREBONIANUS_GALLUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -630,7 +631,7 @@ pub const TREBONIANUS_GALLUS: &Daemon = &Daemon {
 };
 
 // Gaius Valens Hostilianus Messius Quintus, "Hostilian"; June - July 251
-pub const HOSTILIAN: &Daemon = &Daemon {
+pub const HOSTILIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -644,7 +645,7 @@ pub const HOSTILIAN: &Daemon = &Daemon {
 };
 
 // Gaius Vibius Afinius Gallus Veldumnianus Volusianus, "Volusianus"; August 251 - August 253
-pub const VOLUSIANUS: &Daemon = &Daemon {
+pub const VOLUSIANUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -658,7 +659,7 @@ pub const VOLUSIANUS: &Daemon = &Daemon {
 };
 
 // Marcus Aemilius Aemilianus, "Aemilianus"; July - September 253
-pub const AEMILIANUS: &Daemon = &Daemon {
+pub const AEMILIANUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -672,7 +673,7 @@ pub const AEMILIANUS: &Daemon = &Daemon {
 };
 
 // Mar. Silbannacus, "Silbannacus"; September/October 253
-pub const SILBANNACUS: &Daemon = &Daemon {
+pub const SILBANNACUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -686,7 +687,7 @@ pub const SILBANNACUS: &Daemon = &Daemon {
 };
 
 // Publius Licinius Valerianus, "Valerian"; September 253 - June 260
-pub const VALERIAN: &Daemon = &Daemon {
+pub const VALERIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -700,7 +701,7 @@ pub const VALERIAN: &Daemon = &Daemon {
 };
 
 // Publius Licinius Egnatius Gallienus, "Gallienus"; September 253 - September 268
-pub const GALLIENUS: &Daemon = &Daemon {
+pub const GALLIENUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -714,7 +715,7 @@ pub const GALLIENUS: &Daemon = &Daemon {
 };
 
 // Publius Licinius Cornelius Saloninus Valerianus, "Saloninus", Autumn 260
-pub const SALONINUS: &Daemon = &Daemon {
+pub const SALONINUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -728,7 +729,7 @@ pub const SALONINUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Claudius, "Claudius II (Gothicus)"; September 268 - August 270
-pub const CLAUDIUS_II_GOTHICUS: &Daemon = &Daemon {
+pub const CLAUDIUS_II_GOTHICUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -742,7 +743,7 @@ pub const CLAUDIUS_II_GOTHICUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Claudius Quintillus, "Quintillus"; August - September 270
-pub const QUINTILLUS: &Daemon = &Daemon {
+pub const QUINTILLUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -756,7 +757,7 @@ pub const QUINTILLUS: &Daemon = &Daemon {
 };
 
 // Lucius Domitius Aurelianus, "Aurelian"; August 270 - November 275
-pub const AURELIAN: &Daemon = &Daemon {
+pub const AURELIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -770,7 +771,7 @@ pub const AURELIAN: &Daemon = &Daemon {
 };
 
 // Marcus Claudius Tacitus, "Tacitus"; December 275 - June 276
-pub const TACITUS: &Daemon = &Daemon {
+pub const TACITUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -784,7 +785,7 @@ pub const TACITUS: &Daemon = &Daemon {
 };
 
 // Marcus Annius Florianus, "Florianus"; June - September 276
-pub const FLORIANUS: &Daemon = &Daemon {
+pub const FLORIANUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -798,7 +799,7 @@ pub const FLORIANUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Probus, "Probus"; June 276 - September 282
-pub const PROBUS: &Daemon = &Daemon {
+pub const PROBUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -812,7 +813,7 @@ pub const PROBUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Carus, "Carus"; September 282 - July/August 283
-pub const CARUS: &Daemon = &Daemon {
+pub const CARUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -826,7 +827,7 @@ pub const CARUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Carinus, "Carinus"; Spring 283 - August/September 285
-pub const CARINUS: &Daemon = &Daemon {
+pub const CARINUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -840,7 +841,7 @@ pub const CARINUS: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Numerianus, "Numerian"; July/August 283 - November 284
-pub const NUMERIAN: &Daemon = &Daemon {
+pub const NUMERIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -856,7 +857,7 @@ pub const NUMERIAN: &Daemon = &Daemon {
 // // // Dominate
 // // Tetrarchy
 // Gaius Aurelius Valerius Diocletianus, "Diocletian (Jovius)"; 20 November 284 - 1 May 305
-pub const DIOCLETIAN: &Daemon = &Daemon {
+pub const DIOCLETIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -870,7 +871,7 @@ pub const DIOCLETIAN: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Valerius Maximianus, "Maximian"; 1 April 286 - 1 May 305
-pub const MAXIMIAN: &Daemon = &Daemon {
+pub const MAXIMIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -884,7 +885,7 @@ pub const MAXIMIAN: &Daemon = &Daemon {
 };
 
 // Gaius Galerius Valerius Maximianus, "Galerius"; 1 May 305 - May 311
-pub const GALERIUS: &Daemon = &Daemon {
+pub const GALERIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -898,7 +899,7 @@ pub const GALERIUS: &Daemon = &Daemon {
 };
 
 // Marcus Flavius Valerius Constantius, "Constantius I (Chlorus)"; 1 May 305 - 25 July 306
-pub const CONSTANTIUS_I: &Daemon = &Daemon {
+pub const CONSTANTIUS_I: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -912,7 +913,7 @@ pub const CONSTANTIUS_I: &Daemon = &Daemon {
 };
 
 // Flavius Valerius Severus, "Severus II"; August 306 - March/April 307
-pub const SEVERUS_II: &Daemon = &Daemon {
+pub const SEVERUS_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -926,7 +927,7 @@ pub const SEVERUS_II: &Daemon = &Daemon {
 };
 
 // Lucius Domitius Alexander, "Alexander"; 308 - 310
-pub const ALEXANDER: &Daemon = &Daemon {
+pub const ALEXANDER: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -940,7 +941,7 @@ pub const ALEXANDER: &Daemon = &Daemon {
 };
 
 // Marcus Aurelius Valerius Maxentius, "Maxentius"; 28 October 306 - 28 October 312
-pub const MAXENTIUS: &Daemon = &Daemon {
+pub const MAXENTIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -954,7 +955,7 @@ pub const MAXENTIUS: &Daemon = &Daemon {
 };
 
 // Valerius Licinianus Licinius, "Licinius"; 11 November 308 - 19 September 324
-pub const LICINIUS: &Daemon = &Daemon {
+pub const LICINIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -968,7 +969,7 @@ pub const LICINIUS: &Daemon = &Daemon {
 };
 
 // Galerius Valerius Maximinus, "Maximinus II (Daza)"; 310 - July 313
-pub const MAXIMUS_II: &Daemon = &Daemon {
+pub const MAXIMUS_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -982,7 +983,7 @@ pub const MAXIMUS_II: &Daemon = &Daemon {
 };
 
 // Aurelius Valerius Valens, "Valerius Valens"; October 316 - January 317
-pub const VALERIUS_VALENS: &Daemon = &Daemon {
+pub const VALERIUS_VALENS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -996,7 +997,7 @@ pub const VALERIUS_VALENS: &Daemon = &Daemon {
 };
 
 // Mar. Martinianus, "Martinian"; July - 19 September 324 ;
-pub const MARTINIAN: &Daemon = &Daemon {
+pub const MARTINIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1011,7 +1012,7 @@ pub const MARTINIAN: &Daemon = &Daemon {
 
 // // Constantinian dynasty
 // Flavius Valerius Constantinus, "Constantine I (the Great)"; 25 July 306 - 22 May 337
-pub const CONSTANTINE_I: &Daemon = &Daemon {
+pub const CONSTANTINE_I: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1025,7 +1026,7 @@ pub const CONSTANTINE_I: &Daemon = &Daemon {
 };
 
 // Falvius Claudius Constantinus, "Constantine II"; 9 September 337 - April 340
-pub const CONSTANTINE_II: &Daemon = &Daemon {
+pub const CONSTANTINE_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1039,7 +1040,7 @@ pub const CONSTANTINE_II: &Daemon = &Daemon {
 };
 
 // Flavius Julius Constans, "Constans I"; 9 September 337 - January 350
-pub const CONSTANS_I: &Daemon = &Daemon {
+pub const CONSTANS_I: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1053,7 +1054,7 @@ pub const CONSTANS_I: &Daemon = &Daemon {
 };
 
 // Flavius Julius Constantius, "Constantius II"; 9 September 337 - 3 November 361
-pub const CONSTANTIUS_II: &Daemon = &Daemon {
+pub const CONSTANTIUS_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1067,7 +1068,7 @@ pub const CONSTANTIUS_II: &Daemon = &Daemon {
 };
 
 // Magnus Magnentius, "Magnentius"; 18 January 350 - 10 August 353
-pub const MAGNENTIUS: &Daemon = &Daemon {
+pub const MAGNENTIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1081,7 +1082,7 @@ pub const MAGNENTIUS: &Daemon = &Daemon {
 };
 
 // "Vetranio"; 1 March - 25 December 350
-pub const VETRANIO: &Daemon = &Daemon {
+pub const VETRANIO: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1095,7 +1096,7 @@ pub const VETRANIO: &Daemon = &Daemon {
 };
 
 // Julius Nepotianus, "Nepotianus"; 3 June - 30 June 350
-pub const NEPOTIANUS: &Daemon = &Daemon {
+pub const NEPOTIANUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1109,7 +1110,7 @@ pub const NEPOTIANUS: &Daemon = &Daemon {
 };
 
 // Flavius Claudius Julianus, "Julian (the Apostate)"; 3 November 361 - 26 June 363
-pub const JULIAN_THE_APOSTATE: &Daemon = &Daemon {
+pub const JULIAN_THE_APOSTATE: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1123,7 +1124,7 @@ pub const JULIAN_THE_APOSTATE: &Daemon = &Daemon {
 };
 
 // Jovianus, "Jovian"; 27 June 363 - 17 February 364
-pub const JOVIAN: &Daemon = &Daemon {
+pub const JOVIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1137,7 +1138,7 @@ pub const JOVIAN: &Daemon = &Daemon {
 };
 
 // Valentinianus, "Valentinian I (the Great)"; 25/26 February 364 - 17 November 375
-pub const VALENTINIAN_I_THE_GREAT: &Daemon = &Daemon {
+pub const VALENTINIAN_I_THE_GREAT: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1151,7 +1152,7 @@ pub const VALENTINIAN_I_THE_GREAT: &Daemon = &Daemon {
 };
 
 // "Valens"; 28 March 364 - 9 August 378
-pub const VALENS: &Daemon = &Daemon {
+pub const VALENS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1165,7 +1166,7 @@ pub const VALENS: &Daemon = &Daemon {
 };
 
 // "Procopius"; 28 September 365 - 27 May 366
-pub const PROCOPIUS: &Daemon = &Daemon {
+pub const PROCOPIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1179,7 +1180,7 @@ pub const PROCOPIUS: &Daemon = &Daemon {
 };
 
 // Gratianus, "Gratian"; 17 November 375 - 25 August 383
-pub const GRATIAN: &Daemon = &Daemon {
+pub const GRATIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1193,7 +1194,7 @@ pub const GRATIAN: &Daemon = &Daemon {
 };
 
 // "Magnus Maximus"; 25 August 383 - 28 August 388
-pub const MAGNUS_MAXIMUS: &Daemon = &Daemon {
+pub const MAGNUS_MAXIMUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1207,7 +1208,7 @@ pub const MAGNUS_MAXIMUS: &Daemon = &Daemon {
 };
 
 // "Victor"; 383/387 - 388
-pub const VICTOR: &Daemon = &Daemon {
+pub const VICTOR: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1221,7 +1222,7 @@ pub const VICTOR: &Daemon = &Daemon {
 };
 
 // Valentinianus, "Valentinian II"; 28 August 388 - 15 May 392
-pub const VALENTINIAN_II: &Daemon = &Daemon {
+pub const VALENTINIAN_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1235,7 +1236,7 @@ pub const VALENTINIAN_II: &Daemon = &Daemon {
 };
 
 // "Eugenius"; 22 August 392 - 6 September 394
-pub const EUGENIUS: &Daemon = &Daemon {
+pub const EUGENIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1250,7 +1251,7 @@ pub const EUGENIUS: &Daemon = &Daemon {
 
 // Theodosian dynasty
 // "Theodosius I (the Great)"; 19 January 379 - 17 January 395
-pub const THEODOSIUS_I: &Daemon = &Daemon {
+pub const THEODOSIUS_I: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1264,7 +1265,7 @@ pub const THEODOSIUS_I: &Daemon = &Daemon {
 };
 
 // "Arcadius"; 17 January 395 - 1 May 408
-pub const ARCADIUS: &Daemon = &Daemon {
+pub const ARCADIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1278,7 +1279,7 @@ pub const ARCADIUS: &Daemon = &Daemon {
 };
 
 // "Honorius"; 17 January 395 - 15 August 423
-pub const HONORIUS: &Daemon = &Daemon {
+pub const HONORIUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1292,7 +1293,7 @@ pub const HONORIUS: &Daemon = &Daemon {
 };
 
 // Flavius Claudius Constantinus, "Constantine III"; 407 - 411
-pub const CONSTANTINE_III: &Daemon = &Daemon {
+pub const CONSTANTINE_III: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1306,7 +1307,7 @@ pub const CONSTANTINE_III: &Daemon = &Daemon {
 };
 
 // "Theodosius II (the Calligrapher)"; 1 May 408 - 28 July 450
-pub const THEODOSIUS_II: &Daemon = &Daemon {
+pub const THEODOSIUS_II: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1320,7 +1321,7 @@ pub const THEODOSIUS_II: &Daemon = &Daemon {
 };
 
 // "Priscus Attalus"; late 409 - summer 410
-pub const PRISCUS_ATTALUS: &Daemon = &Daemon {
+pub const PRISCUS_ATTALUS: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1334,7 +1335,7 @@ pub const PRISCUS_ATTALUS: &Daemon = &Daemon {
 };
 
 // "Constantius III"; 8 February - 2 September 421
-pub const CONSTANTIUS_III: &Daemon = &Daemon {
+pub const CONSTANTIUS_III: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1348,7 +1349,7 @@ pub const CONSTANTIUS_III: &Daemon = &Daemon {
 };
 
 // "Joannes"; 20 November 423 - May 425
-pub const JOANNES: &Daemon = &Daemon {
+pub const JOANNES: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1362,7 +1363,7 @@ pub const JOANNES: &Daemon = &Daemon {
 };
 
 // Placidus Valentinianus, "Valentinian III"; 20 November 423 - May 425
-pub const VALENTINIAN_III: &Daemon = &Daemon {
+pub const VALENTINIAN_III: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],
@@ -1376,7 +1377,7 @@ pub const VALENTINIAN_III: &Daemon = &Daemon {
 };
 
 // Marcianus, "Marcian"; 25 August 450 - 27 January 457
-pub const MARCIAN: &Daemon = &Daemon {
+pub const MARCIAN: &Daemon<Source> = &Daemon {
     names: &[],
     words: &[],
     deeds: &[],

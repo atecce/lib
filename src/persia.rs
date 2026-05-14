@@ -4,7 +4,7 @@ use name::Name::Cyrus;
 use name::Name::Ezra;
 use source::Source;
 
-pub const CYRUS: &Daemon = &Daemon {
+pub const CYRUS: &Daemon<Source> = &Daemon {
     names: &[Cyrus],
     words: &[],
     deeds: &[Deed {

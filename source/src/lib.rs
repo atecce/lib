@@ -14,16 +14,6 @@ pub struct Source {
     pub verses: [u16; 2],
 }
 
-impl Source {
-    pub fn new(src: Source) -> UniffiSource {
-        UniffiSource {
-            book: src.book,
-            chapter: src.chapter,
-            verses: src.verses.to_vec(),
-        }
-    }
-}
-
 impl fmt::Display for Source {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.verses[0] == self.verses[1] {
@@ -38,10 +28,8 @@ impl fmt::Display for Source {
     }
 }
 
-#[derive(Debug, Clone, uniffi::Record)]
-pub struct UniffiSource {
-    pub book: Name,
-    pub chapter: u8,
-    // TODO(atec): hack to avoid cast to Data. should use .udl file with sequence<u8>
-    pub verses: Vec<u16>,
+impl citation::Citation for Source {
+    fn cite(&self) -> String {
+        self.to_string()
+    }
 }
