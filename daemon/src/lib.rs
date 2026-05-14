@@ -6,7 +6,6 @@ use std::sync::Arc;
 use citation::Citation;
 use deed::Deed;
 use name::Name;
-use source::Source;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Daemon<'a, C> {

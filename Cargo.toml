@@ -15,7 +15,6 @@ daemon = { path = "daemon" }
 deed = { path = "deed" }
 greece = { path = "greece" }
 name = { path = "name" }
-source = { path = "source" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.149"
 uniffi = { version = "0.31", features = ["cli"] }
@@ -26,4 +25,4 @@ reqwest = { version = "0.13.3", features = ["blocking"] }
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "citation", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "shakespeare", "source"]
+members = ["bible", "citation", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "shakespeare"]

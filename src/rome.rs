@@ -3,7 +3,7 @@ use name::Name::Caesar;
 use name::Name::Cicero;
 use name::Name::Remus;
 use name::Name::Romulus;
-use source::Source;
+use bible::source::Source;
 
 // 753 - 716
 pub const ROMULUS: &Daemon<Source> = &Daemon {

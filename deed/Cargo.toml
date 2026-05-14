@@ -8,5 +8,4 @@ crate-type = ["staticlib", "lib"]
 name = "deed"
 
 [dependencies]
-source = { path = "../source" }
 uniffi = "0.31"

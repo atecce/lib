@@ -11,5 +11,4 @@ name = "daemon"
 citation = { path = "../citation" }
 deed = { path = "../deed" }
 name = { path = "../name" }
-source = { path = "../source" }
 uniffi = "0.31"

@@ -138,7 +138,6 @@ dependencies = [
  "deed",
  "gutenberg",
  "name",
- "source",
  "uniffi",
 ]
 
@@ -415,7 +414,6 @@ dependencies = [
  "citation",
  "deed",
  "name",
- "source",
  "uniffi",
 ]
 
@@ -429,7 +427,6 @@ checksum = "7eed2c4702fa172d1ce21078faa7c5203e69f5394d48cc436d25928394a867a2"
 name = "deed"
 version = "0.1.0"
 dependencies = [
- "source",
  "uniffi",
 ]
 
@@ -1154,7 +1151,6 @@ dependencies = [
  "reqwest 0.13.3",
  "serde",
  "serde_json",
- "source",
  "uniffi",
 ]
 
@@ -2099,16 +2095,6 @@ checksum = "3a766e1110788c36f4fa1c2b71b387a7815aa65f88ce0229841826633d93723e"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "source"
-version = "0.1.0"
-dependencies = [
- "citation",
- "name",
- "serde",
- "uniffi",
 ]
 
 [[package]]

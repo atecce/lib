@@ -1,11 +1,13 @@
 uniffi::setup_scaffolding!();
 
 pub mod kjv;
+pub mod source;
+
+use crate::source::Source;
 
 use std::sync::Arc;
 
 use deed::Deed;
-use source::Source;
 
 use daemon::ArcDaemon;
 use daemon::BoxDaemon;

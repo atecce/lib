@@ -2,14 +2,13 @@ use daemon::Daemon;
 use deed::Deed;
 use name::Name::Cyrus;
 use name::Name::Ezra;
-use source::Source;
 
-pub const CYRUS: &Daemon<Source> = &Daemon {
+pub const CYRUS: &Daemon<bible::source::Source> = &Daemon {
     names: &[Cyrus],
     words: &[],
     deeds: &[Deed {
         desc: "allowed the Israelites to return to the Promised Land",
-        srcs: &[Source {
+        srcs: &[bible::source::Source {
             book: Ezra,
             chapter: 1,
             verses: [1, 1],

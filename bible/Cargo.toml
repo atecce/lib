@@ -8,7 +8,6 @@ citation = { path = "../citation" }
 daemon = { path = "../daemon" }
 deed = { path = "../deed" }
 name = { path = "../name" }
-source = { path = "../source" }
 uniffi = "0.31"
 
 [dev-dependencies]
