@@ -136,6 +136,7 @@ dependencies = [
  "daemon",
  "gutenberg",
  "name",
+ "serde",
  "uniffi",
 ]
 

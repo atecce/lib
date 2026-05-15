@@ -8,7 +8,9 @@ use name::Name;
 use std::fmt;
 use std::num;
 
-#[derive(Clone, Debug, uniffi::Record)]
+use serde::Serialize;
+
+#[derive(Clone, Debug, Serialize, uniffi::Record)]
 pub struct Source {
     pub book: Name,
     pub chapter: i64,
