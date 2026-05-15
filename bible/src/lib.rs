@@ -10,22 +10,22 @@ use std::fmt;
 #[derive(Clone, Debug)]
 pub struct Source {
     pub book: Name,
-    pub chapter: u8,
-    // TODO(atec): perhaps some enforcement of verses[0] <= verses[1]
-    //             hack to avoid cast to Data. should use .udl file with sequence<u8>
-    pub verses: [u16; 2],
+    pub chapter: usize,
+    // TODO(atec): perhaps some enforcement of start <= end
+    pub start: usize,
+    pub end: Option<usize>,
 }
 
 impl fmt::Display for Source {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.verses[0] == self.verses[1] {
-            write!(f, "{} {}:{}", self.book, self.chapter, self.verses[0])
-        } else {
+        if let Some(end) = self.end {
             write!(
                 f,
                 "{} {}:{}-{}",
-                self.book, self.chapter, self.verses[0], self.verses[1]
+                self.book, self.chapter, self.start, end
             )
+        } else {
+            write!(f, "{} {}:{}", self.book, self.chapter, self.start)
         }
     }
 }

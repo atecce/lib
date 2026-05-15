@@ -93,14 +93,16 @@ const ALMIGHTY: &Daemon<Source> = &Daemon {
     words: &[Source {
         book: name::Name::Leviticus,
         chapter: 20,
-        verses: [26, 26],
+        start: 26,
+        end: None,
     }],
     deeds: &[Deed {
         desc: "created the heavens and the earth",
         srcs: &[Source {
             book: name::Name::Genesis,
             chapter: 1,
-            verses: [1, 1],
+            start: 1,
+            end: None,
         }],
     }],
 
@@ -1115,7 +1117,8 @@ const JOSEPH: &Daemon<Source> = &Daemon {
         srcs: &[Source {
             book: name::Name::Matthew,
             chapter: 1,
-            verses: [19, 19],
+            start: 19,
+            end: None,
         }],
     }],
 
@@ -1139,22 +1142,26 @@ pub const JESUS: &Daemon<Source> = &Daemon {
         Source {
             book: name::Name::Matthew,
             chapter: 5,
-            verses: [13, 16],
+            start: 13,
+            end: Some(16),
         },
         Source {
             book: name::Name::Matthew,
             chapter: 7,
-            verses: [6, 7],
+            start: 6,
+            end: Some(7),
         },
         Source {
             book: name::Name::Matthew,
             chapter: 22,
-            verses: [21, 21],
+            start: 21,
+            end: None,
         },
         Source {
             book: name::Name::Revelation,
             chapter: 22,
-            verses: [15, 16],
+            start: 15,
+            end: Some(16),
         },
     ],
     deeds: &[Deed {
@@ -1162,7 +1169,8 @@ pub const JESUS: &Daemon<Source> = &Daemon {
         srcs: &[Source {
             book: name::Name::Matthew,
             chapter: 14,
-            verses: [25, 25],
+            start: 25,
+            end: None,
         }],
     }],
 

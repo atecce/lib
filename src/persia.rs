@@ -11,7 +11,8 @@ pub const CYRUS: &Daemon<bible::Source> = &Daemon {
         srcs: &[bible::Source {
             book: Ezra,
             chapter: 1,
-            verses: [1, 1],
+            start: 1,
+            end: None,
         }],
     }],
 
