@@ -1,7 +1,7 @@
 use lib::persia::CYRUS;
 use lib::rome::CICERO;
 
-use bible::JESUS;
+use bible::genealogy::JESUS;
 use greece::APOLLO;
 use greece::macedon::ALEXANDER;
 

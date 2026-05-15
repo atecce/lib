@@ -1,212 +1,255 @@
 uniffi::setup_scaffolding!();
 
-use serde::Serialize;
 use std::fmt;
+use std::str::FromStr;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, uniffi::Enum)]
-pub enum Name {
-    //
-    God,
+use serde::Serialize;
 
-    // greece
-    Κρόνος,
-    Cronos,
-    Cronus,
-    Kronos,
+#[derive(Debug, PartialEq, Eq)]
+pub struct ParseNameError;
 
-    Ζεύς,
-    Zeus,
+macro_rules! names {
+    (
+        pub enum $name:ident {
+            $(
+                $variant:ident $(=> [$($alias:literal),+])?
+            ),* $(,)?
+        }
+    ) => {
+        #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, uniffi::Enum)]
+        pub enum $name {
+            $($variant),*
+        }
 
-    Hera,
+        impl FromStr for $name {
+            type Err = ParseNameError;
 
-    Λατώ,
-    Leto,
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                let trimmed = s.trim();
+                $(
+                    $(
+                        $(
+                            if trimmed.eq_ignore_ascii_case($alias) {
+                                return Ok($name::$variant);
+                            }
+                        )+
+                    )?
 
-    Ἑρμῆς,
-    Hermes,
+                    if trimmed.eq_ignore_ascii_case(stringify!($variant)) {
+                        return Ok($name::$variant);
+                    }
+                )*
+                Err(ParseNameError)
+            }
+        }
+    };
+}
 
-    Ἀπόλλων,
-    Apollo,
+names! {
+    pub enum Name {
+        //
+        God,
 
-    Ἄρτεμις,
-    Artemis,
+        // greece
+        Κρόνος,
+        Cronos,
+        Cronus,
+        Kronos,
 
-    Achilles,
-    Philip,
+        Ζεύς,
+        Zeus,
 
-    Ἀλέξανδρος,
+        Hera,
 
-    // persia
-    Cyrus,
+        Λατώ,
+        Leto,
 
-    // israel
-    מֹשֶׁה,
-    יֵשׁוּ,
-    יֵשׁוּעַ,
-    Ἰησοῦς,
-    Iesus,
+        Ἑρμῆς,
+        Hermes,
 
-    // // books
-    // // // old
-    Genesis,
-    Exodus,
-    Leviticus,
-    Numbers,
-    Deuteronomy,
-    Joshua,
-    Judges,
-    Ruth,
-    SamuelI,
-    SamuelII,
-    KingsI,
-    KingsII,
-    ChroniclesI,
-    ChroniclesII,
-    Ezra,
-    Nehemiah,
-    Esther,
-    Job,
-    Psalms,
-    Proverbs,
-    Ecclesiastes,
-    SongOfSolomon,
-    Isaiah,
-    Jeremiah,
-    Lamentations,
-    Ezekiel,
-    Daniel,
-    Hosea,
-    Joel,
-    Amos,
-    Obadiah,
-    Jonah,
-    Micah,
-    Nahum,
-    Habakkuk,
-    Zephaniah,
-    Haggai,
-    Zechariah,
-    Malachi,
+        Ἀπόλλων,
+        Apollo,
 
-    // // // new
-    Matthew,
-    Mark,
-    Luke,
-    John,
-    Acts,
-    Romans,
-    CorinthiansI,
-    CorinthiansII,
-    Galatians,
-    Ephesians,
-    Philippians,
-    Colossians,
-    ThessaloniansI,
-    ThessaloniansII,
-    TimothyI,
-    TimothyII,
-    Titus,
-    Philemon,
-    Hebrews,
-    James,
-    PeterI,
-    PeterII,
-    JohnI,
-    JohnII,
-    JohnIII,
-    Jude,
-    Revelation,
+        Ἄρτεμις,
+        Artemis,
 
-    // // characters
-    Yahweh,
-    Mary,
-    Adam,
-    Eve,
-    Cain,
-    Abel,
-    Seth,
-    Enosh,
-    Kenan,
-    Mahalalel,
-    Jared,
-    Enoch,
-    Methuselah,
-    Lamech,
-    Noah,
-    Shem,
-    Arphaxad,
-    Cainan,
-    Shelah,
-    Eber,
-    Peleg,
-    Reu,
-    Serug,
-    Nahor,
-    Terrah,
-    Abraham,
-    Isaac,
-    Jacob,
-    Israel,
-    Reuben,
-    Amram,
-    Jochebed,
-    Moses,
-    Aaron,
-    Perez,
-    Hezron,
-    Ram,
-    Amminadab,
-    Nashon,
-    Salmon,
-    Boaz,
-    Obed,
-    Jesse,
-    David,
-    Nathan,
-    Mattatha,
-    Menna,
-    Melea,
-    Eliakim,
-    Jonam,
-    Judah,
-    Simeon,
-    Jorim,
-    Eliezer,
-    Er,
-    Elmadam,
-    Cosam,
-    Addi,
-    Neri,
-    Shealtiel,
-    Zerubbabel,
-    Rhesa,
-    Joanan,
-    Joda,
-    Josek,
-    Semein,
-    Maath,
-    Naggai,
-    Esli,
-    Mattathias,
-    Jannai,
-    Melki,
-    Levi,
-    Matthat,
-    Heli,
-    Joseph,
+        Achilles,
+        Philip,
 
-    // rome
-    Mercury,
-    Diana,
-    Romulus,
-    Remus,
-    Socrates,
-    Plato,
-    Aristotle,
-    Alexander,
-    Caesar,
-    Cicero,
-    Jesus,
+        Ἀλέξανδρος,
+
+        // persia
+        Cyrus,
+
+        // israel
+        מֹשֶׁה,
+        יֵשׁוּ,
+        יֵשׁוּעַ,
+        Ἰησοῦς,
+        Iesus,
+
+        // // books
+        // // // old
+        Genesis,
+        Exodus,
+        Leviticus,
+        Numbers,
+        Deuteronomy,
+        Joshua,
+        Judges,
+        Ruth,
+        SamuelI,
+        SamuelII,
+        KingsI,
+        KingsII,
+        ChroniclesI,
+        ChroniclesII,
+        Ezra,
+        Nehemiah,
+        Esther,
+        Job,
+        Psalms,
+        Proverbs,
+        Ecclesiastes,
+        SongOfSolomon,
+        Isaiah,
+        Jeremiah,
+        Lamentations,
+        Ezekiel,
+        Daniel,
+        Hosea,
+        Joel,
+        Amos,
+        Obadiah,
+        Jonah,
+        Micah,
+        Nahum,
+        Habakkuk,
+        Zephaniah,
+        Haggai,
+        Zechariah,
+        Malachi,
+
+        // // // new
+        Matthew,
+        Mark,
+        Luke,
+        John,
+        Acts,
+        Romans,
+        CorinthiansI,
+        CorinthiansII,
+        Galatians,
+        Ephesians,
+        Philippians,
+        Colossians,
+        ThessaloniansI,
+        ThessaloniansII,
+        TimothyI,
+        TimothyII,
+        Titus,
+        Philemon,
+        Hebrews,
+        James,
+        PeterI,
+        PeterII,
+        JohnI,
+        JohnII,
+        JohnIII,
+        Jude,
+        Revelation,
+
+        // // characters
+        Yahweh,
+        Mary,
+        Adam,
+        Eve,
+        Cain,
+        Abel,
+        Seth,
+        Enosh,
+        Kenan,
+        Mahalalel,
+        Jared,
+        Enoch,
+        Methuselah,
+        Lamech,
+        Noah,
+        Shem,
+        Arphaxad,
+        Cainan,
+        Shelah,
+        Eber,
+        Peleg,
+        Reu,
+        Serug,
+        Nahor,
+        Terrah,
+        Abraham,
+        Isaac,
+        Jacob,
+        Israel,
+        Reuben,
+        Amram,
+        Jochebed,
+        Moses,
+        Aaron,
+        Perez,
+        Hezron,
+        Ram,
+        Amminadab,
+        Nashon,
+        Salmon,
+        Boaz,
+        Obed,
+        Jesse,
+        David,
+        Nathan,
+        Mattatha,
+        Menna,
+        Melea,
+        Eliakim,
+        Jonam,
+        Judah,
+        Simeon,
+        Jorim,
+        Eliezer,
+        Er,
+        Elmadam,
+        Cosam,
+        Addi,
+        Neri,
+        Shealtiel,
+        Zerubbabel,
+        Rhesa,
+        Joanan,
+        Joda,
+        Josek,
+        Semein,
+        Maath,
+        Naggai,
+        Esli,
+        Mattathias,
+        Jannai,
+        Melki,
+        Levi,
+        Matthat,
+        Heli,
+        Joseph,
+
+        // rome
+        Mercury,
+        Diana,
+        Romulus,
+        Remus,
+        Socrates,
+        Plato,
+        Aristotle,
+        Alexander,
+        Caesar,
+        Cicero,
+        Jesus,
+    }
 }
 
 impl fmt::Display for Name {
