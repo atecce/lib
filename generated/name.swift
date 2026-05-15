@@ -1756,6 +1756,83 @@ public func FfiConverterTypeName_lower(_ value: Name) -> RustBuffer {
 }
 
 
+
+public enum ParseNameError: Swift.Error, Equatable, Hashable, Codable, Foundation.LocalizedError {
+
+    
+    
+    case NameNotFound
+
+    
+
+    
+
+    
+    public var errorDescription: String? {
+        String(reflecting: self)
+    }
+    
+}
+
+#if compiler(>=6)
+extension ParseNameError: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeParseNameError: FfiConverterRustBuffer {
+    typealias SwiftType = ParseNameError
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ParseNameError {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+
+        
+
+        
+        case 1: return .NameNotFound
+
+         default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: ParseNameError, into buf: inout [UInt8]) {
+        switch value {
+
+        
+
+        
+        
+        case .NameNotFound:
+            writeInt(&buf, Int32(1))
+        
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeParseNameError_lift(_ buf: RustBuffer) throws -> ParseNameError {
+    return try FfiConverterTypeParseNameError.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeParseNameError_lower(_ value: ParseNameError) -> RustBuffer {
+    return FfiConverterTypeParseNameError.lower(value)
+}
+public func parseName(string: String)throws  -> Name  {
+    return try  FfiConverterTypeName_lift(try rustCallWithError(FfiConverterTypeParseNameError_lift) {
+    uniffi_name_fn_func_parse_name(
+        FfiConverterString.lower(string),$0
+    )
+})
+}
+
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -1770,6 +1847,9 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_name_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if (uniffi_name_checksum_func_parse_name() != 25338) {
+        return InitializationResult.apiChecksumMismatch
     }
 
     return InitializationResult.ok

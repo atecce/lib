@@ -566,10 +566,10 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_bible_checksum_func_arc_morning_star() != 2322) {
+    if (uniffi_bible_checksum_func_arc_morning_star() != 34170) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_bible_checksum_func_box_morning_star() != 32419) {
+    if (uniffi_bible_checksum_func_box_morning_star() != 52681) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_get_word() != 13386) {
