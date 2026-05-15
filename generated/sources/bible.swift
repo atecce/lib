@@ -733,6 +733,13 @@ public func parseSource(string: String)throws  -> Source  {
     )
 })
 }
+public func printSource(src: Source) -> String  {
+    return try!  FfiConverterString.lift(try! rustCall() {
+    uniffi_bible_fn_func_print_source(
+        FfiConverterTypeSource_lower(src),$0
+    )
+})
+}
 public func arcMorningStar() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
     uniffi_bible_fn_func_arc_morning_star($0
@@ -768,6 +775,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.contractVersionMismatch
     }
     if (uniffi_bible_checksum_func_parse_source() != 36851) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_bible_checksum_func_print_source() != 51970) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_arc_morning_star() != 34170) {

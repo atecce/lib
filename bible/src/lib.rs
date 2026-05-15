@@ -95,3 +95,8 @@ impl From<num::ParseIntError> for SourceError {
 pub fn parse_source(string: String) -> Result<Source, SourceError> {
     string.parse::<Source>()
 }
+
+#[uniffi::export]
+pub fn print_source(src: Source) -> String {
+    format!("{}", src)
+}
