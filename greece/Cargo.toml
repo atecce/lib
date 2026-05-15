@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-citation = { path = "../citation" }
 daemon = { path = "../daemon" }
 name = { path = "../name" }
 uniffi = "0.31"

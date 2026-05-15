@@ -8,7 +8,6 @@ crate-type = ["staticlib", "lib"]
 name = "daemon"
 
 [dependencies]
-citation = { path = "../citation" }
 deed = { path = "../deed" }
 name = { path = "../name" }
 uniffi = "0.31"

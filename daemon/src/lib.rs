@@ -3,28 +3,27 @@ uniffi::setup_scaffolding!();
 use std::clone::Clone;
 use std::sync::Arc;
 
-use citation::Citation;
 use deed::Deed;
 use name::Name;
 
 #[derive(Clone, Copy, Debug)]
-pub struct Daemon<'a, C> {
+pub struct Daemon<'a, D> {
     pub names: &'a [Name],
-    pub words: &'a [C],
-    pub deeds: &'a [Deed<'a, C>],
+    pub words: &'a [D],
+    pub deeds: &'a [Deed<'a, D>],
 
-    pub father: Option<&'a Daemon<'a, C>>,
-    pub mother: Option<&'a Daemon<'a, C>>,
-    pub teacher: Option<&'a Daemon<'a, C>>,
+    pub father: Option<&'a Daemon<'a, D>>,
+    pub mother: Option<&'a Daemon<'a, D>>,
+    pub teacher: Option<&'a Daemon<'a, D>>,
 
-    pub predecessor: Option<&'a Daemon<'a, C>>,
+    pub predecessor: Option<&'a Daemon<'a, D>>,
 }
 
-impl<C: Citation> Daemon<'_, C> {
+impl<D: std::fmt::Display> Daemon<'_, D> {
     pub fn new_arc(&self) -> Option<Arc<ArcDaemon>> {
         Some(Arc::new(ArcDaemon {
             names: self.names.to_vec(),
-            words: self.words.into_iter().map(|word| word.cite()).collect(),
+            words: self.words.into_iter().map(|word| word.to_string()).collect(),
 //            deeds: self.deeds.to_vec(),
             father: self.arc_father(),
             mother: self.arc_mother(),
@@ -36,7 +35,7 @@ impl<C: Citation> Daemon<'_, C> {
     pub fn new_box(&self) -> Option<Box<BoxDaemon>> {
         Some(Box::new(BoxDaemon {
             names: self.names.to_vec(),
-            words: self.words.into_iter().map(|word| word.cite()).collect(),
+            words: self.words.into_iter().map(|word| word.to_string()).collect(),
 //            deeds: self.deeds.to_vec(),
             father: self.box_father(),
             mother: self.box_mother(),

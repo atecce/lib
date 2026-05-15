@@ -17,12 +17,6 @@ pub struct Source {
     pub end: Option<i64>,
 }
 
-impl citation::Citation for Source {
-    fn cite(&self) -> String {
-        self.to_string()
-    }
-}
-
 impl fmt::Display for Source {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(end) = self.end {

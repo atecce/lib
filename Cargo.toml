@@ -9,7 +9,6 @@ name = "lib"
 
 [dependencies]
 bible = { path = "bible" }
-citation = { path = "citation" }
 csv = "1.3.1"
 daemon = { path = "daemon" }
 deed = { path = "deed" }
@@ -25,4 +24,4 @@ reqwest = { version = "0.13.3", features = ["blocking"] }
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "citation", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "shakespeare"]
+members = ["bible", "daemon", "deed", "greece", "gutenberg", "name", "scrape", "shakespeare"]

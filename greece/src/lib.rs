@@ -17,10 +17,11 @@ use name::Name::Plato;
 use name::Name::Socrates;
 use name::Name::Zeus;
 
+#[derive(Debug)]
 pub struct Source;
-impl citation::Citation for Source {
-    fn cite(&self) -> String {
-        "".to_string()
+impl std::fmt::Display for Source {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
