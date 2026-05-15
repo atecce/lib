@@ -1757,7 +1757,7 @@ public func FfiConverterTypeName_lower(_ value: Name) -> RustBuffer {
 
 
 
-public enum ParseNameError: Swift.Error, Equatable, Hashable, Codable, Foundation.LocalizedError {
+public enum NameError: Swift.Error, Equatable, Hashable, Codable, Foundation.LocalizedError {
 
     
     
@@ -1775,16 +1775,16 @@ public enum ParseNameError: Swift.Error, Equatable, Hashable, Codable, Foundatio
 }
 
 #if compiler(>=6)
-extension ParseNameError: Sendable {}
+extension NameError: Sendable {}
 #endif
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public struct FfiConverterTypeParseNameError: FfiConverterRustBuffer {
-    typealias SwiftType = ParseNameError
+public struct FfiConverterTypeNameError: FfiConverterRustBuffer {
+    typealias SwiftType = NameError
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ParseNameError {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> NameError {
         let variant: Int32 = try readInt(&buf)
         switch variant {
 
@@ -1797,7 +1797,7 @@ public struct FfiConverterTypeParseNameError: FfiConverterRustBuffer {
         }
     }
 
-    public static func write(_ value: ParseNameError, into buf: inout [UInt8]) {
+    public static func write(_ value: NameError, into buf: inout [UInt8]) {
         switch value {
 
         
@@ -1815,18 +1815,18 @@ public struct FfiConverterTypeParseNameError: FfiConverterRustBuffer {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeParseNameError_lift(_ buf: RustBuffer) throws -> ParseNameError {
-    return try FfiConverterTypeParseNameError.lift(buf)
+public func FfiConverterTypeNameError_lift(_ buf: RustBuffer) throws -> NameError {
+    return try FfiConverterTypeNameError.lift(buf)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeParseNameError_lower(_ value: ParseNameError) -> RustBuffer {
-    return FfiConverterTypeParseNameError.lower(value)
+public func FfiConverterTypeNameError_lower(_ value: NameError) -> RustBuffer {
+    return FfiConverterTypeNameError.lower(value)
 }
 public func parseName(string: String)throws  -> Name  {
-    return try  FfiConverterTypeName_lift(try rustCallWithError(FfiConverterTypeParseNameError_lift) {
+    return try  FfiConverterTypeName_lift(try rustCallWithError(FfiConverterTypeNameError_lift) {
     uniffi_name_fn_func_parse_name(
         FfiConverterString.lower(string),$0
     )
@@ -1848,7 +1848,7 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_name_checksum_func_parse_name() != 25338) {
+    if (uniffi_name_checksum_func_parse_name() != 60732) {
         return InitializationResult.apiChecksumMismatch
     }
 

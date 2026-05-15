@@ -5,9 +5,6 @@ use std::str::FromStr;
 
 use serde::Serialize;
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct NameError;
-
 macro_rules! names {
     (
         pub enum $name:ident {
@@ -39,7 +36,7 @@ macro_rules! names {
                         return Ok($name::$variant);
                     }
                 )*
-                Err(NameError)
+                Err(NameError::NameNotFound)
             }
         }
     };
@@ -327,18 +324,18 @@ pub const BIBLE: [Name; 66] = [
     Name::Revelation,
 ];
 
-#[derive(Debug, uniffi::Error)]
-pub enum ParseNameError {
+#[derive(Debug, PartialEq, Eq, uniffi::Error)]
+pub enum NameError {
     NameNotFound,
 }
 
-impl fmt::Display for ParseNameError {
+impl fmt::Display for NameError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
 }
 
 #[uniffi::export]
-pub fn parse_name(string: String) -> Result<Name, ParseNameError> {
-    string.parse::<Name>().map_err(|_| ParseNameError::NameNotFound)
+pub fn parse_name(string: String) -> Result<Name, NameError> {
+    string.parse::<Name>()
 }

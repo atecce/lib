@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::fmt;
 
 use crate::Source;
 
@@ -8,8 +7,6 @@ use deed::Deed;
 use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
-
-use name::Name;
 
 // Luke 3:23-38
 use name::Name::Aaron;

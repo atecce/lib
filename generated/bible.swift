@@ -419,6 +419,22 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterInt64: FfiConverterPrimitive {
+    typealias FfiType = Int64
+    typealias SwiftType = Int64
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Int64 {
+        return try lift(readInt(&buf))
+    }
+
+    public static func write(_ value: Int64, into buf: inout [UInt8]) {
+        writeInt(&buf, lower(value))
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
@@ -454,6 +470,184 @@ fileprivate struct FfiConverterString: FfiConverter {
         let len = Int32(value.utf8.count)
         writeInt(&buf, len)
         writeBytes(&buf, value.utf8)
+    }
+}
+
+
+public struct Source: Equatable, Hashable {
+    public var book: Name
+    public var chapter: Int64
+    public var start: Int64
+    public var end: Int64?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(book: Name, chapter: Int64, start: Int64, end: Int64?) {
+        self.book = book
+        self.chapter = chapter
+        self.start = start
+        self.end = end
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension Source: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeSource: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Source {
+        return
+            try Source(
+                book: FfiConverterTypeName.read(from: &buf), 
+                chapter: FfiConverterInt64.read(from: &buf), 
+                start: FfiConverterInt64.read(from: &buf), 
+                end: FfiConverterOptionInt64.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: Source, into buf: inout [UInt8]) {
+        FfiConverterTypeName.write(value.book, into: &buf)
+        FfiConverterInt64.write(value.chapter, into: &buf)
+        FfiConverterInt64.write(value.start, into: &buf)
+        FfiConverterOptionInt64.write(value.end, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSource_lift(_ buf: RustBuffer) throws -> Source {
+    return try FfiConverterTypeSource.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSource_lower(_ value: Source) -> RustBuffer {
+    return FfiConverterTypeSource.lower(value)
+}
+
+
+public enum SourceError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
+
+    
+    
+    case FailedToSplitOnSpace
+    case FailedToParseName(NameError
+    )
+    case FailedToSplitOnColon
+    case FailedToParseNumber
+
+    
+
+    
+
+    
+    public var errorDescription: String? {
+        String(reflecting: self)
+    }
+    
+}
+
+#if compiler(>=6)
+extension SourceError: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeSourceError: FfiConverterRustBuffer {
+    typealias SwiftType = SourceError
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SourceError {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+
+        
+
+        
+        case 1: return .FailedToSplitOnSpace
+        case 2: return .FailedToParseName(
+            try FfiConverterTypeNameError.read(from: &buf)
+            )
+        case 3: return .FailedToSplitOnColon
+        case 4: return .FailedToParseNumber
+
+         default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: SourceError, into buf: inout [UInt8]) {
+        switch value {
+
+        
+
+        
+        
+        case .FailedToSplitOnSpace:
+            writeInt(&buf, Int32(1))
+        
+        
+        case let .FailedToParseName(v1):
+            writeInt(&buf, Int32(2))
+            FfiConverterTypeNameError.write(v1, into: &buf)
+            
+        
+        case .FailedToSplitOnColon:
+            writeInt(&buf, Int32(3))
+        
+        
+        case .FailedToParseNumber:
+            writeInt(&buf, Int32(4))
+        
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSourceError_lift(_ buf: RustBuffer) throws -> SourceError {
+    return try FfiConverterTypeSourceError.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeSourceError_lower(_ value: SourceError) -> RustBuffer {
+    return FfiConverterTypeSourceError.lower(value)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionInt64: FfiConverterRustBuffer {
+    typealias SwiftType = Int64?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterInt64.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterInt64.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
     }
 }
 
@@ -532,6 +726,13 @@ fileprivate struct FfiConverterDictionaryTypeNameSequenceSequenceString: FfiConv
         return dict
     }
 }
+public func parseSource(string: String)throws  -> Source  {
+    return try  FfiConverterTypeSource_lift(try rustCallWithError(FfiConverterTypeSourceError_lift) {
+    uniffi_bible_fn_func_parse_source(
+        FfiConverterString.lower(string),$0
+    )
+})
+}
 public func arcMorningStar() -> ArcDaemon  {
     return try!  FfiConverterTypeArcDaemon_lift(try! rustCall() {
     uniffi_bible_fn_func_arc_morning_star($0
@@ -565,6 +766,9 @@ private let initializationResult: InitializationResult = {
     let scaffolding_contract_version = ffi_bible_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
+    }
+    if (uniffi_bible_checksum_func_parse_source() != 36851) {
+        return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_arc_morning_star() != 34170) {
         return InitializationResult.apiChecksumMismatch

@@ -243,6 +243,11 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_PARSE_SOURCE
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_PARSE_SOURCE
+RustBuffer uniffi_bible_fn_func_parse_source(RustBuffer string, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ARC_MORNING_STAR
 #define UNIFFI_FFIDEF_UNIFFI_BIBLE_FN_FUNC_ARC_MORNING_STAR
 uint64_t uniffi_bible_fn_func_arc_morning_star(RustCallStatus *_Nonnull out_status
@@ -519,6 +524,12 @@ void ffi_bible_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_BIBLE_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_BIBLE_RUST_FUTURE_COMPLETE_VOID
 void ffi_bible_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_PARSE_SOURCE
+#define UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_PARSE_SOURCE
+uint16_t uniffi_bible_checksum_func_parse_source(void
+    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_BIBLE_CHECKSUM_FUNC_ARC_MORNING_STAR
