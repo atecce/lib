@@ -195,6 +195,7 @@ fn push_to_influx(items: &[ReportedItem]) -> Result<(), Box<dyn Error>> {
 
     let client = reqwest::blocking::Client::new();
     let res = client.post("http://localhost:8181/write?db=financials")
+        .bearer_auth(std::env::var("INFLUXDB3_AUTH_TOKEN").unwrap())
         .body(payload)
         .send()?;
 
