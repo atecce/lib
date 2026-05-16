@@ -3,7 +3,6 @@ use std::io::{BufRead, BufReader};
 
 //                   Contents
 //
-//    THE SONNETS
 //    ALL’S WELL THAT ENDS WELL
 //    THE TRAGEDY OF ANTONY AND CLEOPATRA
 //    AS YOU LIKE IT
