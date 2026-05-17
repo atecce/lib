@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 daemon = { path = "../daemon" }
-deed = { path = "../deed" }
 name = { path = "../name" }
 uniffi = "0.31"
 

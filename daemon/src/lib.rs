@@ -3,7 +3,6 @@ uniffi::setup_scaffolding!();
 use std::clone::Clone;
 use std::sync::Arc;
 
-use deed::Deed;
 use name::Name;
 
 #[derive(Clone, Copy, Debug)]
@@ -130,4 +129,10 @@ impl BoxDaemon {
 //    pub fn deeds(&self) -> Vec<Deed<C>> {
 //        self.deeds.clone()
 //    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Deed<'a, C> {
+    pub desc: &'a str,
+    pub srcs: &'a [C],
 }

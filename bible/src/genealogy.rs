@@ -2,11 +2,10 @@ use std::sync::Arc;
 
 use crate::Source;
 
-use deed::Deed;
-
 use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
+use daemon::Deed;
 
 // Luke 3:23-38
 use name::Name::Aaron;

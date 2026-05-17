@@ -8,6 +8,5 @@ crate-type = ["staticlib", "lib"]
 name = "daemon"
 
 [dependencies]
-deed = { path = "../deed" }
 name = { path = "../name" }
 uniffi = "0.31"

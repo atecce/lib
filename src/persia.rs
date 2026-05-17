@@ -1,5 +1,5 @@
 use daemon::Daemon;
-use deed::Deed;
+use daemon::Deed;
 use name::Name::Cyrus;
 use name::Name::Ezra;
 
