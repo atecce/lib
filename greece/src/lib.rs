@@ -7,7 +7,6 @@ use name::Name::Achilles;
 use name::Name::Aristotle;
 use name::Name::Artemis;
 use name::Name::Hera;
-use name::Name::Hermes;
 use name::Name::Plato;
 use name::Name::Socrates;
 
@@ -67,8 +66,8 @@ const ΛΑΤΩ: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const HERMES: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Ἑρμῆς, Hermes],
+pub const ΕΡΜΗΣ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Ἑρμῆς],
     words: &[],
     deeds: &[],
 
