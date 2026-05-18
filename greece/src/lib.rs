@@ -7,11 +7,8 @@ use name::Name::Achilles;
 use name::Name::Apollo;
 use name::Name::Aristotle;
 use name::Name::Artemis;
-use name::Name::Cronos;
-use name::Name::Cronus;
 use name::Name::Hera;
 use name::Name::Hermes;
-use name::Name::Kronos;
 use name::Name::Leto;
 use name::Name::Plato;
 use name::Name::Socrates;
@@ -26,7 +23,7 @@ impl std::fmt::Display for Source {
 }
 
 pub const CRONUS: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Κρόνος, Cronus, Cronos, Kronos],
+    names: &[name::Name::Κρόνος],
     words: &[],
     deeds: &[],
 

@@ -48,10 +48,7 @@ names! {
         God,
 
         // greece
-        Κρόνος,
-        Cronos,
-        Cronus,
-        Kronos,
+        Κρόνος => ["Cronos", "Cronus", "Kronos"],
 
         Ζεύς,
         Zeus,
