@@ -12,7 +12,6 @@ use name::Name::Hermes;
 use name::Name::Leto;
 use name::Name::Plato;
 use name::Name::Socrates;
-use name::Name::Zeus;
 
 #[derive(Debug)]
 pub struct Source;
@@ -35,7 +34,7 @@ pub const CRONUS: &Daemon<Source> = &Daemon {
 };
 
 pub const ZEUS: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Ζεύς, Zeus],
+    names: &[name::Name::Ζεύς],
     words: &[],
     deeds: &[],
 

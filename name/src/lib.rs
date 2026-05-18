@@ -50,8 +50,7 @@ names! {
         // greece
         Κρόνος => ["Cronos", "Cronus", "Kronos"],
 
-        Ζεύς,
-        Zeus,
+        Ζεύς => ["Zeus"],
 
         Hera,
 
