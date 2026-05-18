@@ -5,7 +5,6 @@ pub mod macedon;
 use daemon::Daemon;
 use name::Name::Achilles;
 use name::Name::Hera;
-use name::Name::Plato;
 
 #[derive(Debug)]
 pub struct Source;
@@ -123,8 +122,8 @@ pub const ΣΩΚΡΑΤΗΣ: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const PLATO: &Daemon<Source> = &Daemon {
-    names: &[Plato],
+pub const ΠΛΑΤΩΝ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Πλάτων],
     words: &[],
     deeds: &[],
 
@@ -142,7 +141,7 @@ pub const ΑΡΙΣΤΟΤΕΛΗΣ: &Daemon<Source> = &Daemon {
 
     father: None,
     mother: None,
-    teacher: Some(PLATO),
+    teacher: Some(ΠΛΑΤΩΝ),
 
     predecessor: None,
 };
