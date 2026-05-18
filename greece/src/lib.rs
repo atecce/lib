@@ -33,7 +33,7 @@ pub const ΚΡΌΝΟΣ: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const ZEUS: &Daemon<Source> = &Daemon {
+pub const ΖΕΥΣ: &Daemon<Source> = &Daemon {
     names: &[name::Name::Ζεύς],
     words: &[],
     deeds: &[],
@@ -86,7 +86,7 @@ pub const APOLLO: &Daemon<Source> = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: Some(ZEUS),
+    father: Some(ΖΕΥΣ),
     mother: Some(LETO),
     teacher: None,
 
@@ -98,7 +98,7 @@ pub const ARTEMIS: &Daemon<Source> = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: Some(ZEUS),
+    father: Some(ΖΕΥΣ),
     mother: Some(LETO),
     teacher: None,
 
