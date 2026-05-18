@@ -5,13 +5,25 @@ use name::Name::Remus;
 use name::Name::Romulus;
 use bible::Source;
 
+pub const MARS: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Mars],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: None,
+};
+
 // 753 - 716
 pub const ROMULUS: &Daemon<Source> = &Daemon {
     names: &[Romulus],
     words: &[],
     deeds: &[],
 
-    father: None,
+    father: Some(MARS),
     mother: None,
     teacher: None,
 
