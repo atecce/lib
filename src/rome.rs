@@ -5,13 +5,37 @@ use name::Name::Remus;
 use name::Name::Romulus;
 use bible::Source;
 
-pub const MARS: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Mars],
+pub const JUPITER: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Jupiter],
     words: &[],
     deeds: &[],
 
     father: None,
     mother: None,
+    teacher: None,
+
+    predecessor: None,
+};
+
+pub const JUNO: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Juno],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: None,
+};
+
+pub const MARS: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Mars],
+    words: &[],
+    deeds: &[],
+
+    father: Some(JUPITER),
+    mother: Some(JUNO),
     teacher: None,
 
     predecessor: None,

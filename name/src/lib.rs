@@ -227,6 +227,8 @@ names! {
         Joseph,
 
         // rome
+        Jupiter,
+        Juno,
         Mars,
         Mercury,
         Diana,
