@@ -60,8 +60,7 @@ names! {
         Ἑρμῆς,
         Hermes,
 
-        Ἀπόλλων,
-        Apollo,
+        Ἀπόλλων => ["Apollo"],
 
         Ἄρτεμις,
         Artemis,
