@@ -72,10 +72,7 @@ names! {
 
         // israel
         מֹשֶׁה,
-        יֵשׁוּ,
-        יֵשׁוּעַ,
-        Ἰησοῦς,
-        Iesus,
+ יֵשׁוּ  => ["יֵשׁוּעַ" ,"Ἰησοῦς", "Iesus", "Jesus"],
 
         // // books
         // // // old
@@ -236,7 +233,6 @@ names! {
         Aristotle,
         Caesar,
         Cicero,
-        Jesus,
     }
 }
 

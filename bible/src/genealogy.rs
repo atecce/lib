@@ -1125,12 +1125,8 @@ const JOSEPH: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const JESUS: &Daemon<Source> = &Daemon {
+pub const יֵשׁוּ: &Daemon<Source> = &Daemon {
     names: &[
-        name::Name::Jesus,
-        name::Name::Iesus,
-        name::Name::Ἰησοῦς,
-        name::Name::יֵשׁוּעַ,
         name::Name::יֵשׁוּ,
     ],
 
@@ -1181,10 +1177,10 @@ pub const JESUS: &Daemon<Source> = &Daemon {
 // ἐγώ εἰμι ἡ ῥίζα καὶ τὸ γένος Δαυείδ, ὁ ἀστὴρ ὁ λαμπρός, ὁ πρωϊνός.
 #[uniffi::export]
 pub fn arc_morning_star() -> ArcDaemon {
-    Arc::unwrap_or_clone(JESUS.new_arc().unwrap())
+    Arc::unwrap_or_clone(יֵשׁוּ.new_arc().unwrap())
 }
 
 #[uniffi::export]
 pub fn box_morning_star() -> BoxDaemon {
-    *JESUS.new_box().unwrap()
+    *יֵשׁוּ.new_box().unwrap()
 }
