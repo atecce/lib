@@ -8,7 +8,6 @@ use name::Name::Aristotle;
 use name::Name::Artemis;
 use name::Name::Hera;
 use name::Name::Hermes;
-use name::Name::Leto;
 use name::Name::Plato;
 use name::Name::Socrates;
 
@@ -56,8 +55,8 @@ pub const HERA: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const LETO: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Λατώ, Leto],
+const ΛΑΤΩ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Λατώ],
     words: &[],
     deeds: &[],
 
@@ -86,7 +85,7 @@ pub const ΑΠΟΛΛΩΝ: &Daemon<Source> = &Daemon {
     deeds: &[],
 
     father: Some(ΖΕΥΣ),
-    mother: Some(LETO),
+    mother: Some(ΛΑΤΩ),
     teacher: None,
 
     predecessor: None,
@@ -98,7 +97,7 @@ pub const ARTEMIS: &Daemon<Source> = &Daemon {
     deeds: &[],
 
     father: Some(ΖΕΥΣ),
-    mother: Some(LETO),
+    mother: Some(ΛΑΤΩ),
     teacher: None,
 
     predecessor: None,

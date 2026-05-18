@@ -54,8 +54,7 @@ names! {
 
         Hera,
 
-        Λατώ,
-        Leto,
+        Λατώ => ["Leto"],
 
         Ἑρμῆς,
         Hermes,
