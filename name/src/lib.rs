@@ -65,7 +65,7 @@ names! {
         Achilles,
         Philip,
 
-        Ἀλέξανδρος,
+        Ἀλέξανδρος => ["Alexander", "Alessandro"],
 
         // persia
         Cyrus,
@@ -234,7 +234,6 @@ names! {
         Socrates,
         Plato,
         Aristotle,
-        Alexander,
         Caesar,
         Cicero,
         Jesus,

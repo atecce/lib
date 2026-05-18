@@ -7,7 +7,6 @@ use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
 
-use name::Name::Alexander;
 use name::Name::Philip;
 
 const PHILIP: &Daemon<Source> = &Daemon {
@@ -22,8 +21,8 @@ const PHILIP: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const ALEXANDER: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Ἀλέξανδρος, Alexander],
+pub const ΑΛΕΞΑΝΔΡΟΣ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Ἀλέξανδρος],
     words: &[],
     deeds: &[],
 
@@ -36,10 +35,10 @@ pub const ALEXANDER: &Daemon<Source> = &Daemon {
 
 #[uniffi::export]
 pub fn arc_defender_of_men() -> ArcDaemon {
-    Arc::unwrap_or_clone(ALEXANDER.new_arc().unwrap())
+    Arc::unwrap_or_clone(ΑΛΕΞΑΝΔΡΟΣ.new_arc().unwrap())
 }
 
 #[uniffi::export]
 pub fn box_defender_of_men() -> BoxDaemon {
-    *ALEXANDER.new_box().unwrap()
+    *ΑΛΕΞΑΝΔΡΟΣ.new_box().unwrap()
 }
