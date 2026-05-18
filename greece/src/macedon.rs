@@ -1,4 +1,4 @@
-use crate::ARISTOTLE;
+use crate::ΑΡΙΣΤΟΤΕΛΗΣ;
 use crate::Source;
 
 use std::sync::Arc;
@@ -28,7 +28,7 @@ pub const ΑΛΕΞΑΝΔΡΟΣ: &Daemon<Source> = &Daemon {
 
     father: Some(PHILIP),
     mother: None,
-    teacher: Some(ARISTOTLE),
+    teacher: Some(ΑΡΙΣΤΟΤΕΛΗΣ),
 
     predecessor: None,
 };

@@ -63,6 +63,8 @@ names! {
         Ἄρτεμις => ["Artemis"],
 
         Achilles,
+
+        Ἀριστοτέλης => ["Aristotle"],
         Philip,
 
         Ἀλέξανδρος => ["Alexander", "Alessandro"],
@@ -229,7 +231,6 @@ names! {
         Remus,
         Socrates,
         Plato,
-        Aristotle,
         Caesar,
         Cicero,
     }
