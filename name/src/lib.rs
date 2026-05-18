@@ -1,5 +1,7 @@
 uniffi::setup_scaffolding!();
 
+pub mod bible;
+
 use std::fmt;
 use std::str::FromStr;
 
@@ -244,75 +246,6 @@ impl fmt::Display for Name {
         write!(f, "{:?}", self)
     }
 }
-
-pub const BIBLE: [Name; 66] = [
-    Name::Genesis,
-    Name::Exodus,
-    Name::Leviticus,
-    Name::Numbers,
-    Name::Deuteronomy,
-    Name::Joshua,
-    Name::Judges,
-    Name::Ruth,
-    Name::SamuelI,
-    Name::SamuelII,
-    Name::KingsI,
-    Name::KingsII,
-    Name::ChroniclesI,
-    Name::ChroniclesII,
-    Name::Ezra,
-    Name::Nehemiah,
-    Name::Esther,
-    Name::Job,
-    Name::Psalms,
-    Name::Proverbs,
-    Name::Ecclesiastes,
-    Name::SongOfSolomon,
-    Name::Isaiah,
-    Name::Jeremiah,
-    Name::Lamentations,
-    Name::Ezekiel,
-    Name::Daniel,
-    Name::Hosea,
-    Name::Joel,
-    Name::Amos,
-    Name::Obadiah,
-    Name::Jonah,
-    Name::Micah,
-    Name::Nahum,
-    Name::Habakkuk,
-    Name::Zephaniah,
-    Name::Haggai,
-    Name::Zechariah,
-    Name::Malachi,
-    Name::Matthew,
-    Name::Mark,
-    Name::Luke,
-    Name::John,
-    Name::Acts,
-    Name::Romans,
-    Name::CorinthiansI,
-    Name::CorinthiansII,
-    Name::Galatians,
-    Name::Ephesians,
-    Name::Philippians,
-    Name::Colossians,
-    Name::ThessaloniansI,
-    Name::ThessaloniansII,
-    Name::TimothyI,
-    Name::TimothyII,
-    Name::Titus,
-    Name::Philemon,
-    Name::Hebrews,
-    Name::James,
-    Name::PeterI,
-    Name::PeterII,
-    Name::JohnI,
-    Name::JohnII,
-    Name::JohnIII,
-    Name::Jude,
-    Name::Revelation,
-];
 
 #[derive(Debug, PartialEq, Eq, uniffi::Error)]
 pub enum NameError {

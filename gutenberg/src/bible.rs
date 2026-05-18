@@ -1,4 +1,4 @@
-use name::BIBLE;
+use name::bible::BOOKS;
 use name::Name;
 use name::Name::JohnII;
 use name::Name::JohnIII;
@@ -29,7 +29,7 @@ pub fn new_reader() -> Reader<&'static [u8]> {
     Reader {
         r: BufReader::new(&include_bytes!("../../gutenberg/cache/epub/10/pg10.txt")[..]),
         b: [0u8; 4096].to_vec(),
-        book: BIBLE[0],
+        book: BOOKS[0],
         i: 0,
         new_book: false,
         chapter: 1,
@@ -112,7 +112,7 @@ impl<R: std::io::Read> Iterator for Reader<R> {
                 Ok(n) => {
                     if self.new_book {
                         self.i += 1;
-                        self.book = BIBLE[self.i];
+                        self.book = BOOKS[self.i];
                         self.new_book = false;
                     }
                     if self.new_chapter {
@@ -196,7 +196,7 @@ fn is_delimited_string(s: String) -> bool {
 
 pub fn read_all() -> HashMap<Name, Vec<Vec<String>>> {
     let mut word = HashMap::<Name, Vec<Vec<String>>>::new();
-    for book in name::BIBLE {
+    for book in name::bible::BOOKS {
         match book {
             name::Name::Genesis => word.insert(
                 book,

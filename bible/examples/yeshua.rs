@@ -26,7 +26,7 @@ fn main() {
         }
     }
 
-    for book in name::BIBLE {
+    for book in name::bible::BOOKS {
         for (i, chapter) in bible::kjv::word(book).iter().enumerate() {
             for (j, verse) in chapter.iter().enumerate() {
                 if verse.contains("Joshua") {
