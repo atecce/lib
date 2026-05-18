@@ -21,7 +21,7 @@ impl std::fmt::Display for Source {
     }
 }
 
-pub const CRONUS: &Daemon<Source> = &Daemon {
+pub const ΚΡΌΝΟΣ: &Daemon<Source> = &Daemon {
     names: &[name::Name::Κρόνος],
     words: &[],
     deeds: &[],
@@ -38,7 +38,7 @@ pub const ZEUS: &Daemon<Source> = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: Some(CRONUS),
+    father: Some(ΚΡΌΝΟΣ),
     mother: None,
     teacher: None,
 
