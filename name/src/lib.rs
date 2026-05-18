@@ -67,8 +67,8 @@ names! {
         Σωκράτης => ["Socrates"],
         Πλάτων => ["Plato"],
         Ἀριστοτέλης => ["Aristotle"],
-        Philip,
 
+        Φίλιππος => ["Phillip"],
         Ἀλέξανδρος => ["Alexander", "Alessandro"],
 
         // persia

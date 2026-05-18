@@ -7,10 +7,8 @@ use daemon::ArcDaemon;
 use daemon::BoxDaemon;
 use daemon::Daemon;
 
-use name::Name::Philip;
-
-const PHILIP: &Daemon<Source> = &Daemon {
-    names: &[Philip],
+const ΦΙΛΙΠΠΟΣ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Φίλιππος],
     words: &[],
     deeds: &[],
 
@@ -26,7 +24,7 @@ pub const ΑΛΕΞΑΝΔΡΟΣ: &Daemon<Source> = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: Some(PHILIP),
+    father: Some(ΦΙΛΙΠΠΟΣ),
     mother: None,
     teacher: Some(ΑΡΙΣΤΟΤΕΛΗΣ),
 
