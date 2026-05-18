@@ -71,7 +71,7 @@ names! {
         Cyrus,
 
         // israel
-        מֹשֶׁה,
+ מֹשֶׁה => ["Moses"],
  יֵשׁוּ  => ["יֵשׁוּעַ" ,"Ἰησοῦς", "Iesus", "Jesus"],
 
         // // books
@@ -178,7 +178,6 @@ names! {
         Reuben,
         Amram,
         Jochebed,
-        Moses,
         Aaron,
         Perez,
         Hezron,

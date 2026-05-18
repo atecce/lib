@@ -469,8 +469,8 @@ const JOCHEBED: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const MOSES: &Daemon<Source> = &Daemon {
-    names: &[name::Name::מֹשֶׁה, name::Name::Moses],
+const מֹשֶׁה: &Daemon<Source> = &Daemon {
+    names: &[name::Name::מֹשֶׁה],
     words: &[],
     deeds: &[],
 
@@ -1170,7 +1170,7 @@ pub const יֵשׁוּ: &Daemon<Source> = &Daemon {
     mother: Some(MARY),
     teacher: None,
 
-    predecessor: None,
+    predecessor: Some(מֹשֶׁה),
 };
 
 // Ἐγὼ Ἰησοῦς ἔπεμψα τὸν ἄγγελόν μου μαρτυρῆσαι ὑμῖν ταῦτα ἐπὶ ταῖς ἐκκλησίαις.
