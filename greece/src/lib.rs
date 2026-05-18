@@ -6,7 +6,6 @@ use daemon::Daemon;
 use name::Name::Achilles;
 use name::Name::Hera;
 use name::Name::Plato;
-use name::Name::Socrates;
 
 #[derive(Debug)]
 pub struct Source;
@@ -112,8 +111,8 @@ pub const ACHILLES: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const SOCRATES: &Daemon<Source> = &Daemon {
-    names: &[Socrates],
+pub const ΣΩΚΡΑΤΗΣ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Σωκράτης],
     words: &[],
     deeds: &[],
 
@@ -131,7 +130,7 @@ pub const PLATO: &Daemon<Source> = &Daemon {
 
     father: None,
     mother: None,
-    teacher: Some(SOCRATES),
+    teacher: Some(ΣΩΚΡΑΤΗΣ),
 
     predecessor: None,
 };

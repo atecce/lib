@@ -64,6 +64,7 @@ names! {
 
         Achilles,
 
+        Σωκράτης => ["Socrates"],
         Ἀριστοτέλης => ["Aristotle"],
         Philip,
 
