@@ -1,5 +1,5 @@
 fn main() {
-    for src in bible::genealogy::JESUS.words {
+    for src in bible::genealogy::יֵשׁוּ.words {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
         println!("{}", src);
         let text: &[&str];
@@ -11,7 +11,7 @@ fn main() {
         println!("{:?}", text);
     }
 
-    for deed in bible::genealogy::JESUS.deeds {
+    for deed in bible::genealogy::יֵשׁוּ.deeds {
         println!("desc: {}", deed.desc);
         for src in deed.srcs {
             let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
