@@ -60,8 +60,7 @@ names! {
 
         Ἀπόλλων => ["Apollo"],
 
-        Ἄρτεμις,
-        Artemis,
+        Ἄρτεμις => ["Artemis"],
 
         Achilles,
         Philip,

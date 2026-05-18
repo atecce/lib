@@ -5,7 +5,6 @@ pub mod macedon;
 use daemon::Daemon;
 use name::Name::Achilles;
 use name::Name::Aristotle;
-use name::Name::Artemis;
 use name::Name::Hera;
 use name::Name::Plato;
 use name::Name::Socrates;
@@ -90,8 +89,8 @@ pub const ΑΠΟΛΛΩΝ: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const ARTEMIS: &Daemon<Source> = &Daemon {
-    names: &[name::Name::Ἄρτεμις, Artemis],
+pub const ΑΡΤΕΜΙΣS: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Ἄρτεμις],
     words: &[],
     deeds: &[],
 
