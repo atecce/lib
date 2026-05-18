@@ -64,8 +64,8 @@ names! {
 
         Achilles,
 
-        Πλάτων => ["Plato"],
         Σωκράτης => ["Socrates"],
+        Πλάτων => ["Plato"],
         Ἀριστοτέλης => ["Aristotle"],
         Philip,
 
@@ -231,7 +231,6 @@ names! {
         Diana,
         Romulus,
         Remus,
-        Socrates,
         Caesar,
         Cicero,
     }
