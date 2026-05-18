@@ -59,7 +59,7 @@ pub const REMUS: &Daemon<Source> = &Daemon {
     words: &[],
     deeds: &[],
 
-    father: None,
+    father: Some(MARS),
     mother: None,
     teacher: None,
 
