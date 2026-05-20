@@ -726,17 +726,17 @@ fileprivate struct FfiConverterDictionaryTypeNameSequenceSequenceString: FfiConv
         return dict
     }
 }
+public func fmtSource(src: Source) -> String  {
+    return try!  FfiConverterString.lift(try! rustCall() {
+    uniffi_bible_fn_func_fmt_source(
+        FfiConverterTypeSource_lower(src),$0
+    )
+})
+}
 public func parseSource(string: String)throws  -> Source  {
     return try  FfiConverterTypeSource_lift(try rustCallWithError(FfiConverterTypeSourceError_lift) {
     uniffi_bible_fn_func_parse_source(
         FfiConverterString.lower(string),$0
-    )
-})
-}
-public func printSource(src: Source) -> String  {
-    return try!  FfiConverterString.lift(try! rustCall() {
-    uniffi_bible_fn_func_print_source(
-        FfiConverterTypeSource_lower(src),$0
     )
 })
 }
@@ -774,10 +774,10 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_bible_checksum_func_parse_source() != 36851) {
+    if (uniffi_bible_checksum_func_fmt_source() != 32537) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_bible_checksum_func_print_source() != 51970) {
+    if (uniffi_bible_checksum_func_parse_source() != 36851) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_bible_checksum_func_arc_morning_star() != 34170) {

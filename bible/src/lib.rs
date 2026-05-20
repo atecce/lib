@@ -91,6 +91,6 @@ pub fn parse_source(string: String) -> Result<Source, SourceError> {
 }
 
 #[uniffi::export]
-pub fn print_source(src: Source) -> String {
+pub fn fmt_source(src: Source) -> String {
     format!("{}", src)
 }

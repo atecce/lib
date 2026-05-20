@@ -474,7 +474,7 @@ public enum Name: Equatable, Hashable, Codable {
     case σωκράτης
     case πλάτων
     case ἀριστοτέλης
-    case philip
+    case φίλιππος
     case ἀλέξανδρος
     case cyrus
     case מֹשֶׁה
@@ -620,6 +620,9 @@ public enum Name: Equatable, Hashable, Codable {
     case matthat
     case heli
     case joseph
+    case jupiter
+    case juno
+    case mars
     case mercury
     case diana
     case romulus
@@ -671,7 +674,7 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
         
         case 12: return .ἀριστοτέλης
         
-        case 13: return .philip
+        case 13: return .φίλιππος
         
         case 14: return .ἀλέξανδρος
         
@@ -963,17 +966,23 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
         
         case 158: return .joseph
         
-        case 159: return .mercury
+        case 159: return .jupiter
         
-        case 160: return .diana
+        case 160: return .juno
         
-        case 161: return .romulus
+        case 161: return .mars
         
-        case 162: return .remus
+        case 162: return .mercury
         
-        case 163: return .caesar
+        case 163: return .diana
         
-        case 164: return .cicero
+        case 164: return .romulus
+        
+        case 165: return .remus
+        
+        case 166: return .caesar
+        
+        case 167: return .cicero
         
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -1031,7 +1040,7 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
             writeInt(&buf, Int32(12))
         
         
-        case .philip:
+        case .φίλιππος:
             writeInt(&buf, Int32(13))
         
         
@@ -1615,28 +1624,40 @@ public struct FfiConverterTypeName: FfiConverterRustBuffer {
             writeInt(&buf, Int32(158))
         
         
-        case .mercury:
+        case .jupiter:
             writeInt(&buf, Int32(159))
         
         
-        case .diana:
+        case .juno:
             writeInt(&buf, Int32(160))
         
         
-        case .romulus:
+        case .mars:
             writeInt(&buf, Int32(161))
         
         
-        case .remus:
+        case .mercury:
             writeInt(&buf, Int32(162))
         
         
-        case .caesar:
+        case .diana:
             writeInt(&buf, Int32(163))
         
         
-        case .cicero:
+        case .romulus:
             writeInt(&buf, Int32(164))
+        
+        
+        case .remus:
+            writeInt(&buf, Int32(165))
+        
+        
+        case .caesar:
+            writeInt(&buf, Int32(166))
+        
+        
+        case .cicero:
+            writeInt(&buf, Int32(167))
         
         }
     }
