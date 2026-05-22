@@ -1,7 +1,9 @@
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
+use std::path::Path;
 
-use calamine::{open_workbook_auto, Data, DataType, Reader};
+use calamine::{open_workbook_auto, Data, DataType, Reader, Range};
 use chrono::NaiveDate;
 
 #[derive(Clone, Debug)]
@@ -142,131 +144,287 @@ impl Item {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Period {
+    ThreeMonths,
+    SixMonths,
+    NineMonths,
+    TwelveMonths,
+    PointInTime,
+}
+
+impl Period {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Period::ThreeMonths => "3m",
+            Period::SixMonths => "6m",
+            Period::NineMonths => "9m",
+            Period::TwelveMonths => "12m",
+            Period::PointInTime => "pit",
+        }
+    }
+}
+
 #[derive(Debug)]
 struct ReportedItem {
     t: NaiveDate,
+    p: Period,
     item: Item,
     val: f64,
 }
 
-const DATE_2026: NaiveDate = NaiveDate::from_ymd_opt(2026, 1, 25).unwrap();
-const DATE_2025: NaiveDate = NaiveDate::from_ymd_opt(2025, 1, 26).unwrap();
-const DATE_2024: NaiveDate = NaiveDate::from_ymd_opt(2024, 1, 28).unwrap();
-
 fn main() -> Result<(), Box<dyn Error>> {
-
-    let files: Vec<_> = fs::read_dir("./nvda")?
-        .filter_map(|f| f.ok())
-        .filter(|f| {
-             f.path().extension()
-                .and_then(|ext| ext.to_str()) == Some("xlsx")
-        })
-        .map(|f| f.path().file_stem()
-            .and_then(|os_str| os_str.to_str())
-            .map(|s| s.to_string())
-        )
-        .collect();
-
-    println!("{:#?}", files);
-
-    let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
-
     let mut items = Vec::new();
 
-    process_balance_sheet(&workbook.worksheet_range("BALANCE_SHEET"), &mut items);
-    process_income_statement(&workbook.worksheet_range("INCOME_STATEMENT"), &mut items);
+    let paths: Vec<_> = fs::read_dir("./nvda")?
+        .filter_map(|f| f.ok())
+        .filter(|f| {
+             let path = f.path();
+             let ext = path.extension().and_then(|ext| ext.to_str());
+             ext == Some("xlsx")
+        })
+        .map(|f| f.path())
+        .collect();
 
-    push_to_influx(&items)?;
+    for path in paths {
+        if let Err(e) = process_file(&path, &mut items) {
+            eprintln!("Failed to process {:?}: {}", path, e);
+        }
+    }
+
+    if !items.is_empty() {
+        push_to_influx(&items)?;
+        println!("Successfully pushed {} items to InfluxDB", items.len());
+    }
 
     Ok(())
+}
+
+fn process_file(path: &Path, items: &mut Vec<ReportedItem>) -> Result<(), Box<dyn Error>> {
+    let mut workbook = open_workbook_auto(path)?;
+
+    if let Ok(range) = workbook.worksheet_range("BALANCE_SHEET") {
+        process_balance_sheet(&range, items);
+    }
+    if let Ok(range) = workbook.worksheet_range("INCOME_STATEMENT") {
+        process_income_statement(&range, items);
+    }
+
+    Ok(())
+}
+
+fn process_balance_sheet(range: &Range<Data>, items: &mut Vec<ReportedItem>) {
+    let mut dates = HashMap::new();
+    let rows: Vec<_> = range.rows().take(25).collect();
+
+    for (r, row) in rows.iter().enumerate() {
+        for (c, cell) in row.iter().enumerate() {
+            if let Some(date) = parse_date(cell) {
+                dates.entry(c).or_insert(date);
+            } else if let Some(month_day) = cell.get_string() {
+                if month_day.trim().ends_with(',') || month_day.trim().split_whitespace().count() >= 2 {
+                     if let Some(next_row) = rows.get(r + 1) {
+                         if let Some(year_cell) = next_row.get(c) {
+                             let year = match year_cell {
+                                 Data::Float(f) => *f as i32,
+                                 Data::Int(i) => *i as i32,
+                                 _ => 0,
+                             };
+                             if year > 1900 && year < 2100 {
+                                 let date_str = format!("{} {}", month_day, year);
+                                 if let Some(date) = parse_date_str(&date_str) {
+                                     dates.entry(c).or_insert(date);
+                                 }
+                             }
+                         }
+                     }
+                }
+            }
+        }
+    }
+
+    if dates.is_empty() { return; }
+
+    let multiplier = find_multiplier(range);
+
+    for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+        let label = match row.get(1) {
+            Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
+            _ => continue,
+        };
+
+        if let Some(item) = Item::from(label) {
+            for (col, date) in &dates {
+                if let Some(v) = row.get(*col) {
+                    let val = match v {
+                        Data::Float(f) => *f,
+                        Data::Int(i) => *i as f64,
+                        _ => f64::NAN,
+                    };
+                    if !val.is_nan() {
+                        items.push(ReportedItem { t: *date, p: Period::PointInTime, item: item.clone(), val: val * multiplier });
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn process_income_statement(range: &Range<Data>, items: &mut Vec<ReportedItem>) {
+    let mut is_10k = false;
+    let rows: Vec<_> = range.rows().take(25).collect();
+    for row in rows.iter().take(10) {
+        for cell in row.iter() {
+            if let Some(s) = cell.get_string() {
+                if s.to_lowercase().contains("form type: 10-k") {
+                    is_10k = true;
+                }
+            }
+        }
+    }
+
+    let mut col_periods: HashMap<usize, Period> = HashMap::new();
+    for row in &rows {
+        for (c, cell) in row.iter().enumerate() {
+            if let Some(s) = cell.get_string() {
+                let s = s.to_lowercase();
+                let p = if s.contains("three months") { Some(Period::ThreeMonths) }
+                    else if s.contains("six months") { Some(Period::SixMonths) }
+                    else if s.contains("nine months") { Some(Period::NineMonths) }
+                    else if s.contains("year ended") || s.contains("annual") || s.contains("twelve months") { Some(Period::TwelveMonths) }
+                    else { None };
+                
+                if let Some(period) = p {
+                    col_periods.insert(c, period);
+                    col_periods.insert(c + 1, period);
+                    col_periods.insert(c + 2, period);
+                }
+            }
+        }
+    }
+
+    let mut col_info = HashMap::new();
+    for (r, row) in rows.iter().enumerate() {
+        for (c, cell) in row.iter().enumerate() {
+            if let Some(date) = parse_date(cell) {
+                let p = col_periods.get(&c).cloned().unwrap_or_else(|| {
+                    if is_10k { Period::TwelveMonths } else { Period::ThreeMonths }
+                });
+                col_info.entry(c).or_insert((date, p));
+            } else if let Some(month_day) = cell.get_string() {
+                if month_day.trim().ends_with(',') || month_day.trim().split_whitespace().count() >= 2 {
+                     if let Some(next_row) = rows.get(r + 1) {
+                         if let Some(year_cell) = next_row.get(c) {
+                             let year = match year_cell {
+                                 Data::Float(f) => *f as i32,
+                                 Data::Int(i) => *i as i32,
+                                 _ => 0,
+                             };
+                             if year > 1900 && year < 2100 {
+                                 let date_str = format!("{} {}", month_day, year);
+                                 if let Some(date) = parse_date_str(&date_str) {
+                                     let p = col_periods.get(&c).cloned().unwrap_or_else(|| {
+                                         if is_10k { Period::TwelveMonths } else { Period::ThreeMonths }
+                                     });
+                                     col_info.entry(c).or_insert((date, p));
+                                 }
+                             }
+                         }
+                     }
+                }
+            }
+        }
+    }
+
+    if col_info.is_empty() { return; }
+
+    let multiplier = find_multiplier(range);
+
+    for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+        let label = match row.get(1) {
+            Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
+            _ => continue,
+        };
+
+        if let Some(item) = Item::from(label) {
+            for (col, (date, period)) in &col_info {
+                if let Some(v) = row.get(*col) {
+                    let val = match v {
+                        Data::Float(f) => *f,
+                        Data::Int(i) => *i as f64,
+                        _ => f64::NAN,
+                    };
+                    if !val.is_nan() {
+                        items.push(ReportedItem { t: *date, p: *period, item: item.clone(), val: val * multiplier });
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn find_multiplier(range: &Range<Data>) -> f64 {
+    for row in range.rows().take(20) {
+        for cell in row.iter() {
+            if let Some(s) = cell.get_string() {
+                let s = s.to_lowercase();
+                if s.contains("in millions") {
+                    return 1_000_000.0;
+                }
+                if s.contains("in thousands") {
+                    return 1_000.0;
+                }
+            }
+        }
+    }
+    1.0
+}
+
+fn parse_date(cell: &Data) -> Option<NaiveDate> {
+    match cell {
+        Data::String(s) => parse_date_str(s),
+        _ => None,
+    }
+}
+
+fn parse_date_str(s: &str) -> Option<NaiveDate> {
+    let s = s.trim().replace(",", "");
+    let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d"];
+    for fmt in formats {
+        if let Ok(date) = NaiveDate::parse_from_str(&s, fmt) {
+            return Some(date);
+        }
+    }
+    None
 }
 
 fn push_to_influx(items: &[ReportedItem]) -> Result<(), Box<dyn Error>> {
-    let mut payload = String::new();
-    for item in items {
-        let ts = item.t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
-        payload.push_str(&format!(
-            "reported_item,item={} value={} {}\n",
-            item.item.as_str(),
-            item.val,
-            ts
-        ));
-    }
-
     let client = reqwest::blocking::Client::new();
-    let res = client.post("http://localhost:8181/write?db=financials")
-        .bearer_auth(std::env::var("INFLUXDB3_AUTH_TOKEN").unwrap())
-        .body(payload)
-        .send()?;
+    let auth_token = std::env::var("INFLUXDB3_AUTH_TOKEN")
+        .map_err(|_| "INFLUXDB3_AUTH_TOKEN environment variable not set")?;
 
-    if !res.status().is_success() {
-        return Err(format!("InfluxDB write failed: {}", res.text()?).into());
+    for chunk in items.chunks(1000) {
+        let mut payload = String::new();
+        for item in chunk {
+            let ts = item.t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
+            payload.push_str(&format!(
+                "reported_item_v3,item={},period={} value={} {}\n",
+                item.item.as_str(),
+                item.p.as_str(),
+                item.val,
+                ts
+            ));
+        }
+
+        let res = client.post("http://localhost:8181/write?db=financials")
+            .bearer_auth(&auth_token)
+            .body(payload)
+            .send()?;
+
+        if !res.status().is_success() {
+            return Err(format!("InfluxDB write failed: {}", res.text()?).into());
+        }
     }
 
     Ok(())
-}
-
-fn process_balance_sheet(range: &Result<calamine::Range<Data>, calamine::Error>, items: &mut Vec<ReportedItem>) {
-    if let Ok(range) = range {
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
-                _ => continue,
-            };
-            let val_2026 = match row.get(2) {
-                Some(v) if v.is_float() => v.get_float().unwrap(),
-                _ => f64::NAN,
-            };
-            let val_2025 = match row.get(3) {
-                Some(v) if v.is_float() => v.get_float().unwrap(),
-                _ => f64::NAN,
-            };
-
-            if let Some(item) = Item::from(label) {
-                if !val_2026.is_nan() {
-                    items.push(ReportedItem { t: DATE_2026, item: item.clone(), val: val_2026 });
-                }
-                if !val_2025.is_nan() {
-                    items.push(ReportedItem { t: DATE_2025, item, val: val_2025 });
-                }
-                println!("{:<40} | 2026: {:<10} | 2025: {:<10}", label, val_2026, val_2025);
-            }
-        }
-    }
-}
-
-fn process_income_statement(range: &Result<calamine::Range<Data>, calamine::Error>, items: &mut Vec<ReportedItem>) {
-    if let Ok(range) = range {
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
-                _ => continue,
-            };
-            let val_2026 = match row.get(2) {
-                Some(v) if v.is_float() => v.get_float().unwrap(),
-                _ => f64::NAN,
-            };
-            let val_2025 = match row.get(3) {
-                Some(v) if v.is_float() => v.get_float().unwrap(),
-                _ => f64::NAN,
-            };
-            let val_2024 = match row.get(4) {
-                Some(v) if v.is_float() => v.get_float().unwrap(),
-                _ => f64::NAN,
-            };
-
-            if let Some(item) = Item::from(label) {
-                if !val_2026.is_nan() {
-                    items.push(ReportedItem { t: DATE_2026, item: item.clone(), val: val_2026 });
-                }
-                if !val_2025.is_nan() {
-                    items.push(ReportedItem { t: DATE_2025, item: item.clone(), val: val_2025 });
-                }
-                if !val_2024.is_nan() {
-                    items.push(ReportedItem { t: DATE_2024, item, val: val_2024 });
-                }
-                println!("{:<40} | 2026: {:<10} | 2025: {:<10} | 2024: {:<10}", label, val_2026, val_2025, val_2024);
-            }
-        }
-    }
 }
