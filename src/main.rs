@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::fs;
 
 use calamine::{open_workbook_auto, Data, DataType, Error as CalamineError, Xls, Reader, RangeDeserializer, RangeDeserializerBuilder, Sheets};
 use chrono::{DateTime, NaiveDate, Utc};
@@ -140,6 +141,21 @@ const DATE_2025: NaiveDate = NaiveDate::from_ymd_opt(2025, 1, 26).unwrap();
 const DATE_2024: NaiveDate = NaiveDate::from_ymd_opt(2024, 1, 28).unwrap();
 
 fn main() -> Result<(), Box<dyn Error>> {
+
+    let files: Vec<_> = fs::read_dir("./nvda")?
+        .filter_map(|f| f.ok())
+        .filter(|f| {
+             f.path().extension()
+                .and_then(|ext| ext.to_str()) == Some("xlsx")
+        })
+        .map(|f| f.path().file_stem()
+            .and_then(|os_str| os_str.to_str())
+            .map(|s| s.to_string())
+        )
+        .collect();
+
+    println!("{:#?}", files);
+
     let mut workbook = open_workbook_auto("2-25-26.xlsx")?;
 
     let gauge = register_gauge_vec!("reported_item", "Reported financial items", &["item", "date"])?;
