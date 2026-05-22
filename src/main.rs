@@ -5,173 +5,7 @@ use std::path::Path;
 
 use calamine::{open_workbook_auto, Data, DataType, Reader, Range};
 use chrono::NaiveDate;
-
-#[derive(Clone, Debug)]
-enum Item {
-    CurrentAssets,
-    CashAndCashEquivalents,
-    MarketableSecurities,
-    AccountsReceivableNet,
-    Inventories,
-    PrepaidExpensesAndOtherCurrentAssets,
-    TotalCurrentAssets,
-    PropertyAndEquipmentNet,
-    OperatingLeaseAssets,
-    Goodwill,
-    IntangibleAssetsNet,
-    DeferredIncomeTaxAssets,
-    NonMarketableEquitySecurities,
-    OtherAssets,
-    TotalAssets,
-
-    CurrentLiabilities,
-    AccountsPayable,
-    AccruedAndOtherCurrentLiabilities,
-    ShortTermDebt,
-    TotalCurrentLiabilities,
-    LongTermDebt,
-    LongTermOperatingLeaseLiabilities,
-    OtherLongTermLiabilities,
-    TotalLiabilities,
-
-    Revenue,
-    CostOfRevenue,
-    GrossProfit,
-
-    OperatingExpenses,
-    ResearchAndDevelopment,
-    SalesGeneralAndAdministrative,
-    TotalOperatingExpenses,
-    OperatingIncome,
-
-    InterestIncome,
-    InterestExpense,
-    OtherIncomeNet,
-    TotalOtherIncomeNet,
-    IncomeBeforeIncomeTax,
-
-    IncomeTaxExpense,
-    NetIncome,
-}
-
-impl Item {
-    fn from(s: &str) -> Option<Self> {
-        match s.trim() {
-            "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
-            "Marketable securities" => Some(Item::MarketableSecurities),
-            "Accounts receivable, net" => Some(Item::AccountsReceivableNet),
-            "Inventories" => Some(Item::Inventories),
-            "Prepaid expenses and other current assets" => Some(Item::PrepaidExpensesAndOtherCurrentAssets),
-            "Total current assets" => Some(Item::TotalCurrentAssets),
-            "Property and equipment, net" => Some(Item::PropertyAndEquipmentNet),
-            "Operating lease assets" => Some(Item::OperatingLeaseAssets),
-            "Goodwill" => Some(Item::Goodwill),
-            "Intangible assets, net" => Some(Item::IntangibleAssetsNet),
-            "Deferred income tax assets" => Some(Item::DeferredIncomeTaxAssets),
-            "Non-marketable equity securities" => Some(Item::NonMarketableEquitySecurities),
-            "Other assets" => Some(Item::OtherAssets),
-            "Total assets" => Some(Item::TotalAssets),
-
-            "Accounts payable" => Some(Item::AccountsPayable),
-            "Accrued and other current liabilities" => Some(Item::AccruedAndOtherCurrentLiabilities),
-            "Short-term debt" => Some(Item::ShortTermDebt),
-            "Total current liabilities" => Some(Item::TotalCurrentLiabilities),
-            "Long-term debt" => Some(Item::LongTermDebt),
-            "Long-term operating lease liabilities" => Some(Item::LongTermOperatingLeaseLiabilities),
-            "Other long-term liabilities" => Some(Item::OtherLongTermLiabilities),
-            "Total liabilities" => Some(Item::TotalLiabilities),
-
-            "Revenue" => Some(Item::Revenue),
-            "Cost of revenue" => Some(Item::CostOfRevenue),
-            "Gross profit" => Some(Item::GrossProfit),
-            "Research and development" => Some(Item::ResearchAndDevelopment),
-            "Sales, general and administrative" => Some(Item::SalesGeneralAndAdministrative),
-            "Total operating expenses" => Some(Item::TotalOperatingExpenses),
-            "Operating income" => Some(Item::OperatingIncome),
-            "Interest income" => Some(Item::InterestIncome),
-            "Interest expense" => Some(Item::InterestExpense),
-            "Other income, net" => Some(Item::OtherIncomeNet),
-            "Total other income, net" => Some(Item::TotalOtherIncomeNet),
-            "Income before income tax" => Some(Item::IncomeBeforeIncomeTax),
-            "Income tax expense" => Some(Item::IncomeTaxExpense),
-            "Net income" => Some(Item::NetIncome),
-            &_ => None,
-        }
-    }
-
-    fn as_str(&self) -> &'static str {
-        match self {
-            Item::CurrentAssets => "CurrentAssets",
-            Item::CashAndCashEquivalents => "CashAndCashEquivalents",
-            Item::MarketableSecurities => "MarketableSecurities",
-            Item::AccountsReceivableNet => "AccountsReceivableNet",
-            Item::Inventories => "Inventories",
-            Item::PrepaidExpensesAndOtherCurrentAssets => "PrepaidExpensesAndOtherCurrentAssets",
-            Item::TotalCurrentAssets => "TotalCurrentAssets",
-            Item::PropertyAndEquipmentNet => "PropertyAndEquipmentNet",
-            Item::OperatingLeaseAssets => "OperatingLeaseAssets",
-            Item::Goodwill => "Goodwill",
-            Item::IntangibleAssetsNet => "IntangibleAssetsNet",
-            Item::DeferredIncomeTaxAssets => "DeferredIncomeTaxAssets",
-            Item::NonMarketableEquitySecurities => "NonMarketableEquitySecurities",
-            Item::OtherAssets => "OtherAssets",
-            Item::TotalAssets => "TotalAssets",
-            Item::CurrentLiabilities => "CurrentLiabilities",
-            Item::AccountsPayable => "AccountsPayable",
-            Item::AccruedAndOtherCurrentLiabilities => "AccruedAndOtherCurrentLiabilities",
-            Item::ShortTermDebt => "ShortTermDebt",
-            Item::TotalCurrentLiabilities => "TotalCurrentLiabilities",
-            Item::LongTermDebt => "LongTermDebt",
-            Item::LongTermOperatingLeaseLiabilities => "LongTermOperatingLeaseLiabilities",
-            Item::OtherLongTermLiabilities => "OtherLongTermLiabilities",
-            Item::TotalLiabilities => "TotalLiabilities",
-            Item::Revenue => "Revenue",
-            Item::CostOfRevenue => "CostOfRevenue",
-            Item::GrossProfit => "GrossProfit",
-            Item::OperatingExpenses => "OperatingExpenses",
-            Item::ResearchAndDevelopment => "ResearchAndDevelopment",
-            Item::SalesGeneralAndAdministrative => "SalesGeneralAndAdministrative",
-            Item::TotalOperatingExpenses => "TotalOperatingExpenses",
-            Item::OperatingIncome => "OperatingIncome",
-            Item::InterestIncome => "InterestIncome",
-            Item::InterestExpense => "InterestExpense",
-            Item::OtherIncomeNet => "OtherIncomeNet",
-            Item::TotalOtherIncomeNet => "TotalOtherIncomeNet",
-            Item::IncomeBeforeIncomeTax => "IncomeBeforeIncomeTax",
-            Item::IncomeTaxExpense => "IncomeTaxExpense",
-            Item::NetIncome => "NetIncome",
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum Period {
-    ThreeMonths,
-    SixMonths,
-    NineMonths,
-    TwelveMonths,
-    PointInTime,
-}
-
-impl Period {
-    fn as_str(&self) -> &'static str {
-        match self {
-            Period::ThreeMonths => "3m",
-            Period::SixMonths => "6m",
-            Period::NineMonths => "9m",
-            Period::TwelveMonths => "12m",
-            Period::PointInTime => "pit",
-        }
-    }
-}
-
-#[derive(Debug)]
-struct ReportedItem {
-    t: NaiveDate,
-    p: Period,
-    item: Item,
-    val: f64,
-}
+use lib::{Item, Period, ReportedItem};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut items = Vec::new();
@@ -253,7 +87,7 @@ fn process_balance_sheet(range: &Range<Data>, items: &mut Vec<ReportedItem>) {
             _ => continue,
         };
 
-        if let Some(item) = Item::from(label) {
+        if let Some(item) = Item::from_str(label) {
             for (col, date) in &dates {
                 if let Some(v) = row.get(*col) {
                     let val = match v {
@@ -262,7 +96,7 @@ fn process_balance_sheet(range: &Range<Data>, items: &mut Vec<ReportedItem>) {
                         _ => f64::NAN,
                     };
                     if !val.is_nan() {
-                        items.push(ReportedItem { t: *date, p: Period::PointInTime, item: item.clone(), val: val * multiplier });
+                        items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * multiplier });
                     }
                 }
             }
@@ -346,7 +180,7 @@ fn process_income_statement(range: &Range<Data>, items: &mut Vec<ReportedItem>) 
             _ => continue,
         };
 
-        if let Some(item) = Item::from(label) {
+        if let Some(item) = Item::from_str(label) {
             for (col, (date, period)) in &col_info {
                 if let Some(v) = row.get(*col) {
                     let val = match v {
@@ -355,7 +189,7 @@ fn process_income_statement(range: &Range<Data>, items: &mut Vec<ReportedItem>) 
                         _ => f64::NAN,
                     };
                     if !val.is_nan() {
-                        items.push(ReportedItem { t: *date, p: *period, item: item.clone(), val: val * multiplier });
+                        items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * multiplier });
                     }
                 }
             }
@@ -406,7 +240,8 @@ fn push_to_influx(items: &[ReportedItem]) -> Result<(), Box<dyn Error>> {
     for chunk in items.chunks(1000) {
         let mut payload = String::new();
         for item in chunk {
-            let ts = item.t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
+            let t = NaiveDate::parse_from_str(&item.t, "%Y-%m-%d").unwrap();
+            let ts = t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
                 "reported_item_v3,item={},period={} value={} {}\n",
                 item.item.as_str(),
