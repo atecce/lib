@@ -2,48 +2,49 @@ use crate::Name;
 
 //                   Contents
 //
-pub const BOOKS: [Name; 0] = [
-//    ALL’S WELL THAT ENDS WELL
-//    THE TRAGEDY OF ANTONY AND CLEOPATRA
-//    AS YOU LIKE IT
-//    THE COMEDY OF ERRORS
-//    THE TRAGEDY OF CORIOLANUS
-//    CYMBELINE
-//    THE TRAGEDY OF HAMLET, PRINCE OF DENMARK
-//    THE FIRST PART OF KING HENRY THE FOURTH
-//    THE SECOND PART OF KING HENRY THE FOURTH
-//    THE LIFE OF KING HENRY THE FIFTH
-//    THE FIRST PART OF HENRY THE SIXTH
-//    THE SECOND PART OF KING HENRY THE SIXTH
-//    THE THIRD PART OF KING HENRY THE SIXTH
-//    KING HENRY THE EIGHTH
-//    THE LIFE AND DEATH OF KING JOHN
-//    THE TRAGEDY OF JULIUS CAESAR
-//    THE TRAGEDY OF KING LEAR
-//    LOVE’S LABOUR’S LOST
-//    THE TRAGEDY OF MACBETH
-//    MEASURE FOR MEASURE
-//    THE MERCHANT OF VENICE
-//    THE MERRY WIVES OF WINDSOR
-//    A MIDSUMMER NIGHT’S DREAM
-//    MUCH ADO ABOUT NOTHING
-//    THE TRAGEDY OF OTHELLO, THE MOOR OF VENICE
-//    PERICLES, PRINCE OF TYRE
-//    KING RICHARD THE SECOND
-//    KING RICHARD THE THIRD
-//    THE TRAGEDY OF ROMEO AND JULIET
-//    THE TAMING OF THE SHREW
-//    THE TEMPEST
-//    THE LIFE OF TIMON OF ATHENS
-//    THE TRAGEDY OF TITUS ANDRONICUS
-//    TROILUS AND CRESSIDA
-//    TWELFTH NIGHT; OR, WHAT YOU WILL
-//    THE TWO GENTLEMEN OF VERONA
-//    THE TWO NOBLE KINSMEN
-//    THE WINTER’S TALE
-//    A LOVER’S COMPLAINT
-//    THE PASSIONATE PILGRIM
-//    THE PHOENIX AND THE TURTLE
-//    THE RAPE OF LUCRECE
-//    VENUS AND ADONIS
+pub const BOOKS: [Name; 44] = [
+    Name::TheSonnets,
+    Name::AllsWellThatEndsWell,
+    Name::TheTragedyOFAntonyAndCleopatra,
+    Name::AsYouLikeIt,
+    Name::TheComedyOfErrors,
+    Name::TheTragedyOfCoiolanus,
+    Name::Cymbeline,
+    Name::TheTragedyOfHamletPrinceOfDenmark,
+    Name::TheFirstPartOfKingHenryTheFourth,
+    Name::TheSecondPartOfKingHenryTheFourth,
+    Name::TheLifeOfKingHenryTheFifth,
+    Name::TheFirstPartOfHenryTheSixth,
+    Name::TheSecondPartOfKingHenryTheSixth,
+    Name::TheThirdPartOfKingHenryTheSixth,
+    Name::KingHenryTheEigth,
+    Name::TheLifeAndDeathOfKingJohn,
+    Name::TheTragedyOfJuliusCaesar,
+    Name::TheTragedyOfKingLear,
+    Name::LovesLaboursLost,
+    Name::TheTragedyOfMacbeth,
+    Name::MeasureForMeasure,
+    Name::TheMerchantOfVenice,
+    Name::TheMerryWivesOfWindsor,
+    Name::AMidsummerNightsDream,
+    Name::MuchAdoAboutNothing,
+    Name::TheTragedyOfOthelloTheMoorOfVenice,
+    Name::PericlesPrinceOfTyre,
+    Name::KingRichardTheSecond,
+    Name::KingRichardTheThird,
+    Name::TheTragedyOfRomeoAndJuliey,
+    Name::TheTamingOfTheShrew,
+    Name::Tempest,
+    Name::TheLifeOfTimonOfAthens,
+    Name::TheTragedyOfTitusAndronicus,
+    Name::TroilusAndCressida,
+    Name::TwelthNightOrWhatYouKill,
+    Name::TheTwoGentlemenOfVerona,
+    Name::TheTwoNobleKinsmen,
+    Name::TheWintersTale,
+    Name::ALoversComplaint,
+    Name::ThePassionatePilgrim,
+    Name::ThePhoenixAndTheTurtle,
+    Name::TheRapeOfLucrece,
+    Name::VenusAndAdonis,
 ];

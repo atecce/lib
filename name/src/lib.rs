@@ -1,6 +1,7 @@
 uniffi::setup_scaffolding!();
 
 pub mod bible;
+pub mod shakespeare;
 
 use std::fmt;
 use std::str::FromStr;
@@ -238,6 +239,52 @@ names! {
         Remus,
         Caesar,
         Cicero,
+
+        // shakespeare
+        TheSonnets,
+        AllsWellThatEndsWell,
+        TheTragedyOFAntonyAndCleopatra,
+        AsYouLikeIt,
+        TheComedyOfErrors,
+        TheTragedyOfCoiolanus,
+        Cymbeline,
+        TheTragedyOfHamletPrinceOfDenmark,
+        TheFirstPartOfKingHenryTheFourth,
+        TheSecondPartOfKingHenryTheFourth,
+        TheLifeOfKingHenryTheFifth,
+        TheFirstPartOfHenryTheSixth,
+        TheSecondPartOfKingHenryTheSixth,
+        TheThirdPartOfKingHenryTheSixth,
+        KingHenryTheEigth,
+        TheLifeAndDeathOfKingJohn,
+        TheTragedyOfJuliusCaesar,
+        TheTragedyOfKingLear,
+        LovesLaboursLost,
+        TheTragedyOfMacbeth,
+        MeasureForMeasure,
+        TheMerchantOfVenice,
+        TheMerryWivesOfWindsor,
+        AMidsummerNightsDream,
+        MuchAdoAboutNothing,
+        TheTragedyOfOthelloTheMoorOfVenice,
+        PericlesPrinceOfTyre,
+        KingRichardTheSecond,
+        KingRichardTheThird,
+        TheTragedyOfRomeoAndJuliey,
+        TheTamingOfTheShrew,
+        Tempest,
+        TheLifeOfTimonOfAthens,
+        TheTragedyOfTitusAndronicus,
+        TroilusAndCressida,
+        TwelthNightOrWhatYouKill,
+        TheTwoGentlemenOfVerona,
+        TheTwoNobleKinsmen,
+        TheWintersTale,
+        ALoversComplaint,
+        ThePassionatePilgrim,
+        ThePhoenixAndTheTurtle,
+        TheRapeOfLucrece,
+        VenusAndAdonis,
     }
 }
 
