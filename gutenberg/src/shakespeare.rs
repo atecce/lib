@@ -1,5 +1,7 @@
 use std::io::{BufRead, BufReader};
 
+use name::Name;
+
 pub struct Reader<R> {
     r: BufReader<R>,
 }
@@ -34,53 +36,6 @@ pub enum Dialogue {
     Speech { speaker: String, text: Vec<String> },
     StageDirection(String),
 }
-
-pub const TITLES: &[&str] = &[
-    "THE SONNETS",
-    "ALL’S WELL THAT ENDS WELL",
-    "THE TRAGEDY OF ANTONY AND CLEOPATRA",
-    "AS YOU LIKE IT",
-    "THE COMEDY OF ERRORS",
-    "THE TRAGEDY OF CORIOLANUS",
-    "CYMBELINE",
-    "THE TRAGEDY OF HAMLET, PRINCE OF DENMARK",
-    "THE FIRST PART OF KING HENRY THE FOURTH",
-    "THE SECOND PART OF KING HENRY THE FOURTH",
-    "THE LIFE OF KING HENRY THE FIFTH",
-    "THE FIRST PART OF HENRY THE SIXTH",
-    "THE SECOND PART OF KING HENRY THE SIXTH",
-    "THE THIRD PART OF KING HENRY THE SIXTH",
-    "KING HENRY THE EIGHTH",
-    "THE LIFE AND DEATH OF KING JOHN",
-    "THE TRAGEDY OF JULIUS CAESAR",
-    "THE TRAGEDY OF KING LEAR",
-    "LOVE’S LABOUR’S LOST",
-    "THE TRAGEDY OF MACBETH",
-    "MEASURE FOR MEASURE",
-    "THE MERCHANT OF VENICE",
-    "THE MERRY WIVES OF WINDSOR",
-    "A MIDSUMMER NIGHT’S DREAM",
-    "MUCH ADO ABOUT NOTHING",
-    "THE TRAGEDY OF OTHELLO, THE MOOR OF VENICE",
-    "PERICLES, PRINCE OF TYRE",
-    "KING RICHARD THE SECOND",
-    "KING RICHARD THE THIRD",
-    "THE TRAGEDY OF ROMEO AND JULIET",
-    "THE TAMING OF THE SHREW",
-    "THE TEMPEST",
-    "THE LIFE OF TIMON OF ATHENS",
-    "THE TRAGEDY OF TITUS ANDRONICUS",
-    "TROILUS AND CRESSIDA",
-    "TWELFTH NIGHT; OR, WHAT YOU WILL",
-    "THE TWO GENTLEMEN OF VERONA",
-    "THE TWO NOBLE KINSMEN",
-    "THE WINTER’S TALE",
-    "A LOVER’S COMPLAINT",
-    "THE PASSIONATE PILGRIM",
-    "THE PHOENIX AND THE TURTLE",
-    "THE RAPE OF LUCRECE",
-    "VENUS AND ADONIS",
-];
 
 impl<R: std::io::Read> Reader<R> {
     pub fn read_until_sonnets(self) -> Vec<Vec<String>> {
@@ -129,7 +84,7 @@ impl<R: std::io::Read> Reader<R> {
             }
 
             // Check for end of play (next play's title)
-            if TITLES.iter().any(|t| t == &trimmed && *t != title.to_uppercase()) {
+            if let Ok(book) = trimmed.parse::<Name>() && name::shakespeare::BOOKS.iter().any(|b| *b == book) {
                 break;
             }
 
