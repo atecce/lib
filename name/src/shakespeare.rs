@@ -1,7 +1,5 @@
 use crate::Name;
 
-//                   Contents
-//
 pub const BOOKS: [Name; 44] = [
     Name::TheSonnets,
     Name::AllsWellThatEndsWell,
