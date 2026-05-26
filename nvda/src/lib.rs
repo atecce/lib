@@ -219,7 +219,7 @@ fn parse_date_str(s: &str) -> Option<NaiveDate> {
     None
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, uniffi::Enum)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, uniffi::Enum)]
 pub enum Period {
     ThreeMonths,
     SixMonths,
@@ -240,7 +240,7 @@ impl Period {
     }
 }
 
-#[derive(Clone, Debug, uniffi::Enum)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, uniffi::Enum)]
 pub enum Item {
     CurrentAssets,
     CashAndCashEquivalents,

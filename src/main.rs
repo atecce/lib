@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
@@ -5,8 +6,14 @@ use nvda::{new_reader, ReportedItem};
 
 use chrono::NaiveDate;
 
+#[derive(Debug)]
+pub struct Observation {
+    pub t: String,
+    pub val: f64,
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut items = Vec::new();
+    let mut reported_items = Vec::new();
 
     let paths: Vec<_> = fs::read_dir("./nvda")?
         .filter_map(|f| f.ok())
@@ -22,11 +29,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         match new_reader(&path) {
             Ok(mut r) => {
                 match r.process_balance_sheet() {
-                    Ok(mut ret) => items.append(&mut ret),
+                    Ok(mut ret) => reported_items.append(&mut ret),
                     Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
                 }
                 match r.process_income_statement() {
-                    Ok(mut ret) => items.append(&mut ret),
+                    Ok(mut ret) => reported_items.append(&mut ret),
                     Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
                 }
             },
@@ -34,9 +41,21 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    if !items.is_empty() {
-        push_to_influx(&items)?;
-        println!("Successfully pushed {} items to InfluxDB", items.len());
+    if !reported_items.is_empty() {
+        push_to_influx(&reported_items)?;
+        println!("Successfully pushed {} items to InfluxDB", reported_items.len());
+
+        let mut series = HashMap::<nvda::Item, Vec<Observation>>::new();
+        for reported_item in reported_items {
+            series
+                .entry(reported_item.item)
+                .or_insert_with(Vec::new)
+                .push(Observation {
+                    t: reported_item.t,
+                    val: reported_item.val,
+                });
+        }
+        println!("{:#?}", series);
     }
 
     Ok(())
