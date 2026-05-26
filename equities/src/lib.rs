@@ -25,102 +25,77 @@ impl Period {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash, uniffi::Enum)]
-pub enum Item {
-    CurrentAssets,
-    CashAndCashEquivalents,
-    MarketableSecurities,
-    AccountsReceivableNet,
-    Inventories,
-    PrepaidExpensesAndOtherCurrentAssets,
-    TotalCurrentAssets,
-    PropertyAndEquipmentNet,
-    OperatingLeaseAssets,
-    Goodwill,
-    IntangibleAssetsNet,
-    DeferredIncomeTaxAssets,
-    NonMarketableEquitySecurities,
-    OtherAssets,
-    TotalAssets,
+macro_rules! items {
+    (
+        pub enum $item:ident {
+            $(
+                $variant:ident $(=> [$($alias:literal),+])?
+            ),* $(,)?
+        }
+    ) => {
+        #[derive(Clone, Debug, Eq, PartialEq, Hash, uniffi::Enum)]
+        pub enum $item {
+            $($variant),*
+        }
 
-    CurrentLiabilities,
-    AccountsPayable,
-    AccruedAndOtherCurrentLiabilities,
-    ShortTermDebt,
-    TotalCurrentLiabilities,
-    LongTermDebt,
-    LongTermOperatingLeaseLiabilities,
-    OtherLongTermLiabilities,
-    TotalLiabilities,
+        impl $item {
+            const ALL: [$item; 39] = [
+                $($item::$variant,)*
+            ];
+        }
+    }
+}
 
-    Revenue,
-    CostOfRevenue,
-    GrossProfit,
+items! {
+    pub enum Item {
+        CurrentAssets,
+        CashAndCashEquivalents,
+        MarketableSecurities,
+        AccountsReceivableNet,
+        Inventories,
+        PrepaidExpensesAndOtherCurrentAssets,
+        TotalCurrentAssets,
+        PropertyAndEquipmentNet,
+        OperatingLeaseAssets,
+        Goodwill,
+        IntangibleAssetsNet,
+        DeferredIncomeTaxAssets,
+        NonMarketableEquitySecurities,
+        OtherAssets,
+        TotalAssets,
 
-    OperatingExpenses,
-    ResearchAndDevelopment,
-    SalesGeneralAndAdministrative,
-    TotalOperatingExpenses,
-    OperatingIncome,
+        CurrentLiabilities,
+        AccountsPayable,
+        AccruedAndOtherCurrentLiabilities,
+        ShortTermDebt,
+        TotalCurrentLiabilities,
+        LongTermDebt,
+        LongTermOperatingLeaseLiabilities,
+        OtherLongTermLiabilities,
+        TotalLiabilities,
 
-    InterestIncome,
-    InterestExpense,
-    OtherIncomeNet,
-    TotalOtherIncomeNet,
-    IncomeBeforeIncomeTax,
+        Revenue,
+        CostOfRevenue,
+        GrossProfit,
 
-    IncomeTaxExpense,
-    NetIncome,
+        OperatingExpenses,
+        ResearchAndDevelopment,
+        SalesGeneralAndAdministrative,
+        TotalOperatingExpenses,
+        OperatingIncome,
+
+        InterestIncome,
+        InterestExpense,
+        OtherIncomeNet,
+        TotalOtherIncomeNet,
+        IncomeBeforeIncomeTax,
+
+        IncomeTaxExpense,
+        NetIncome,
+    }
 }
 
 impl Item {
-    const ALL: [Item; 39] = [
-        Item::CurrentAssets,
-        Item::CashAndCashEquivalents,
-        Item::MarketableSecurities,
-        Item::AccountsReceivableNet,
-        Item::Inventories,
-        Item::PrepaidExpensesAndOtherCurrentAssets,
-        Item::TotalCurrentAssets,
-        Item::PropertyAndEquipmentNet,
-        Item::OperatingLeaseAssets,
-        Item::Goodwill,
-        Item::IntangibleAssetsNet,
-        Item::DeferredIncomeTaxAssets,
-        Item::NonMarketableEquitySecurities,
-        Item::OtherAssets,
-        Item::TotalAssets,
-
-        Item::CurrentLiabilities,
-        Item::AccountsPayable,
-        Item::AccruedAndOtherCurrentLiabilities,
-        Item::ShortTermDebt,
-        Item::TotalCurrentLiabilities,
-        Item::LongTermDebt,
-        Item::LongTermOperatingLeaseLiabilities,
-        Item::OtherLongTermLiabilities,
-        Item::TotalLiabilities,
-
-        Item::Revenue,
-        Item::CostOfRevenue,
-        Item::GrossProfit,
-
-        Item::OperatingExpenses,
-        Item::ResearchAndDevelopment,
-        Item::SalesGeneralAndAdministrative,
-        Item::TotalOperatingExpenses,
-        Item::OperatingIncome,
-
-        Item::InterestIncome,
-        Item::InterestExpense,
-        Item::OtherIncomeNet,
-        Item::TotalOtherIncomeNet,
-        Item::IncomeBeforeIncomeTax,
-
-        Item::IncomeTaxExpense,
-        Item::NetIncome,
-    ];
-
     pub fn from_str(s: &str) -> Option<Self> {
         match s.trim() {
             "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
