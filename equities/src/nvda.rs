@@ -1,5 +1,3 @@
-uniffi::setup_scaffolding!();
-
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
-use nvda::{new_reader, ReportedItem};
+use equities::nvda::{new_reader, ReportedItem};
 
 use chrono::NaiveDate;
 
@@ -15,7 +15,7 @@ pub struct Observation {
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
 
-    let paths: Vec<_> = fs::read_dir("./nvda")?
+    let paths: Vec<_> = fs::read_dir("equities/nvda")?
         .filter_map(|f| f.ok())
         .filter(|f| {
              let path = f.path();
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         push_to_influx(&reported_items)?;
         println!("Successfully pushed {} items to InfluxDB", reported_items.len());
 
-        let mut series = HashMap::<nvda::Item, Vec<Observation>>::new();
+        let mut series = HashMap::<equities::nvda::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
             series
                 .entry(reported_item.item)

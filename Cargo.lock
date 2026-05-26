@@ -496,6 +496,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "equities"
+version = "0.1.0"
+dependencies = [
+ "calamine 0.35.0",
+ "chrono",
+ "uniffi",
+]
+
+[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1139,9 +1148,9 @@ dependencies = [
  "chrono",
  "csv",
  "daemon",
+ "equities",
  "greece",
  "name",
- "nvda",
  "reqwest",
  "serde",
  "serde_json",
@@ -1268,15 +1277,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "nvda"
-version = "0.1.0"
-dependencies = [
- "calamine 0.35.0",
- "chrono",
- "uniffi",
 ]
 
 [[package]]
