@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
-use equities::nvda::{new_reader, ReportedItem};
+use equities::nvda::new_reader;
 
 use chrono::NaiveDate;
 
@@ -45,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         push_to_influx(&reported_items)?;
         println!("Successfully pushed {} items to InfluxDB", reported_items.len());
 
-        let mut series = HashMap::<equities::nvda::Item, Vec<Observation>>::new();
+        let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
             series
                 .entry(reported_item.item)
@@ -61,7 +61,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn push_to_influx(items: &[ReportedItem]) -> Result<(), Box<dyn Error>> {
+fn push_to_influx(items: &[equities::ReportedItem]) -> Result<(), Box<dyn Error>> {
     let client = reqwest::blocking::Client::new();
     let auth_token = std::env::var("INFLUXDB3_AUTH_TOKEN")
         .map_err(|_| "INFLUXDB3_AUTH_TOKEN environment variable not set")?;
