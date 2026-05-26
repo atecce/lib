@@ -47,15 +47,13 @@ macro_rules! names {
 
 names! {
     pub enum Name {
-        //
-        God,
 
         // greece
         Κρόνος => ["Cronos", "Cronus", "Kronos"],
 
         Ζεύς => ["Zeus"],
 
-        Hera,
+        Ἥρα => ["Hera"],
 
         Λατώ => ["Leto"],
 
@@ -65,7 +63,7 @@ names! {
 
         Ἄρτεμις => ["Artemis"],
 
-        Achilles,
+        Ἀχιλλεύς => ["Achilles"],
 
         Σωκράτης => ["Socrates"],
         Πλάτων => ["Plato"],
@@ -239,6 +237,9 @@ names! {
         Remus,
         Caesar,
         Cicero,
+
+        //
+        God,
 
         // shakespeare
         TheSonnets => ["THE SONNETS"],

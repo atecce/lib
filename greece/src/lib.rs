@@ -3,8 +3,6 @@ uniffi::setup_scaffolding!();
 pub mod macedon;
 
 use daemon::Daemon;
-use name::Name::Achilles;
-use name::Name::Hera;
 
 #[derive(Debug)]
 pub struct Source;
@@ -38,8 +36,8 @@ pub const ΖΕΥΣ: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const HERA: &Daemon<Source> = &Daemon {
-    names: &[Hera],
+pub const ΗΡΑ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Ἥρα],
     words: &[],
     deeds: &[],
 
@@ -98,8 +96,8 @@ pub const ΑΡΤΕΜΙΣS: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-pub const ACHILLES: &Daemon<Source> = &Daemon {
-    names: &[Achilles],
+pub const ΑΧΙΛΛΕΥΣ: &Daemon<Source> = &Daemon {
+    names: &[name::Name::Ἀχιλλεύς],
     words: &[],
     deeds: &[],
 
