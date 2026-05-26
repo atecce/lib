@@ -74,6 +74,53 @@ pub enum Item {
 }
 
 impl Item {
+    const ALL: [Item; 39] = [
+        Item::CurrentAssets,
+        Item::CashAndCashEquivalents,
+        Item::MarketableSecurities,
+        Item::AccountsReceivableNet,
+        Item::Inventories,
+        Item::PrepaidExpensesAndOtherCurrentAssets,
+        Item::TotalCurrentAssets,
+        Item::PropertyAndEquipmentNet,
+        Item::OperatingLeaseAssets,
+        Item::Goodwill,
+        Item::IntangibleAssetsNet,
+        Item::DeferredIncomeTaxAssets,
+        Item::NonMarketableEquitySecurities,
+        Item::OtherAssets,
+        Item::TotalAssets,
+
+        Item::CurrentLiabilities,
+        Item::AccountsPayable,
+        Item::AccruedAndOtherCurrentLiabilities,
+        Item::ShortTermDebt,
+        Item::TotalCurrentLiabilities,
+        Item::LongTermDebt,
+        Item::LongTermOperatingLeaseLiabilities,
+        Item::OtherLongTermLiabilities,
+        Item::TotalLiabilities,
+
+        Item::Revenue,
+        Item::CostOfRevenue,
+        Item::GrossProfit,
+
+        Item::OperatingExpenses,
+        Item::ResearchAndDevelopment,
+        Item::SalesGeneralAndAdministrative,
+        Item::TotalOperatingExpenses,
+        Item::OperatingIncome,
+
+        Item::InterestIncome,
+        Item::InterestExpense,
+        Item::OtherIncomeNet,
+        Item::TotalOtherIncomeNet,
+        Item::IncomeBeforeIncomeTax,
+
+        Item::IncomeTaxExpense,
+        Item::NetIncome,
+    ];
+
     pub fn from_str(s: &str) -> Option<Self> {
         match s.trim() {
             "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),

@@ -1,16 +1,9 @@
-use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
 use equities::nvda::new_reader;
 
 use chrono::NaiveDate;
-
-#[derive(Debug)]
-pub struct Observation {
-    pub t: String,
-    pub val: f64,
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
@@ -44,18 +37,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     if !reported_items.is_empty() {
         push_to_influx(&reported_items)?;
         println!("Successfully pushed {} items to InfluxDB", reported_items.len());
-
-        let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
-        for reported_item in reported_items {
-            series
-                .entry(reported_item.item)
-                .or_insert_with(Vec::new)
-                .push(Observation {
-                    t: reported_item.t,
-                    val: reported_item.val,
-                });
-        }
-        println!("{:#?}", series);
     }
 
     Ok(())
