@@ -67,19 +67,22 @@ impl Reader {
                 _ => continue,
             };
     
-            if let Some(item) = Item::from_str(label) {
-                for (col, date) in &dates {
-                    if let Some(v) = row.get(*col) {
-                        let val = match v {
-                            Data::Float(f) => *f,
-                            Data::Int(i) => *i as f64,
-                            _ => f64::NAN,
-                        };
-                        if !val.is_nan() {
-                            items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * multiplier });
+            match label.parse::<Item>() {
+                Ok(item) => {
+                    for (col, date) in &dates {
+                        if let Some(v) = row.get(*col) {
+                            let val = match v {
+                                Data::Float(f) => *f,
+                                Data::Int(i) => *i as f64,
+                                _ => f64::NAN,
+                            };
+                            if !val.is_nan() {
+                                items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * multiplier });
+                            }
                         }
                     }
-                }
+                },
+                Err(e) => eprintln!("failed to parse label: {}", label),
             }
         }
         Ok(items)
@@ -166,19 +169,22 @@ impl Reader {
                 _ => continue,
             };
     
-            if let Some(item) = Item::from_str(label) {
-                for (col, (date, period)) in &col_info {
-                    if let Some(v) = row.get(*col) {
-                        let val = match v {
-                            Data::Float(f) => *f,
-                            Data::Int(i) => *i as f64,
-                            _ => f64::NAN,
-                        };
-                        if !val.is_nan() {
-                            items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * multiplier });
+            match label.parse::<Item>() {
+                Ok(item) => {
+                    for (col, (date, period)) in &col_info {
+                        if let Some(v) = row.get(*col) {
+                            let val = match v {
+                                Data::Float(f) => *f,
+                                Data::Int(i) => *i as f64,
+                                _ => f64::NAN,
+                            };
+                            if !val.is_nan() {
+                                items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * multiplier });
+                            }
                         }
                     }
-                }
+                },
+                Err(e) => eprintln!("failed to parse label {}", label),
             }
         }
 

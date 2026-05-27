@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let vector: &[f64] = &data;
         let matrix: &[&[f64]] = &[vector];
 
-        let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");;
+        let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");
         let processed = detector.preprocess(matrix).expect("input data is valid");
         let outliers = detector.detect(&processed);
         println!("{:#?}", outliers);

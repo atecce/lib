@@ -2,6 +2,8 @@ uniffi::setup_scaffolding!();
 
 pub mod nvda;
 
+use std::str::FromStr;
+
 // use chrono::NaiveDate;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, uniffi::Enum)]
@@ -43,103 +45,81 @@ macro_rules! items {
                 $($item::$variant,)*
             ];
         }
-    }
+
+        impl FromStr for $item {
+            type Err = ItemError;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                let trimmed = s.trim();
+                $(
+                    $(
+                        $(
+                            if trimmed.eq_ignore_ascii_case($alias) {
+                                return Ok($item::$variant);
+                            }
+                        )+
+                    )?
+
+                    if trimmed.eq_ignore_ascii_case(stringify!($variant)) {
+                        return Ok($item::$variant);
+                    }
+                )*
+                Err(ItemError::ItemNotFound)
+            }
+        }
+    };
 }
 
 items! {
     pub enum Item {
         CurrentAssets,
-        CashAndCashEquivalents,
-        MarketableSecurities,
-        AccountsReceivableNet,
-        Inventories,
-        PrepaidExpensesAndOtherCurrentAssets,
-        TotalCurrentAssets,
-        PropertyAndEquipmentNet,
-        OperatingLeaseAssets,
-        Goodwill,
-        IntangibleAssetsNet,
-        DeferredIncomeTaxAssets,
-        NonMarketableEquitySecurities,
-        OtherAssets,
-        TotalAssets,
+        CashAndCashEquivalents => ["Cash and cash equivalents"],
+        MarketableSecurities => ["Marketable securities"],
+        AccountsReceivableNet => ["Accounts receivable, net"],
+        Inventories => ["Inventories"],
+        PrepaidExpensesAndOtherCurrentAssets => ["Prepaid expenses and other current assets"],
+        TotalCurrentAssets => ["Total current assets"],
+        PropertyAndEquipmentNet => ["Property and equipment, net"],
+        OperatingLeaseAssets => ["Operating lease assets"],
+        Goodwill => ["Goodwill"],
+        IntangibleAssetsNet => ["Intangible assets, net"],
+        DeferredIncomeTaxAssets => ["Deferred income tax assets"],
+        NonMarketableEquitySecurities => ["Non-marketable equity securities"],
+        OtherAssets => ["Other assets"],
+        TotalAssets => ["Total assets"],
 
         CurrentLiabilities,
-        AccountsPayable,
-        AccruedAndOtherCurrentLiabilities,
-        ShortTermDebt,
-        TotalCurrentLiabilities,
-        LongTermDebt,
-        LongTermOperatingLeaseLiabilities,
-        OtherLongTermLiabilities,
-        TotalLiabilities,
+        AccountsPayable => ["Accounts payable"],
+        AccruedAndOtherCurrentLiabilities => ["Accrued and other current liabilities"],
+        ShortTermDebt => ["Short-term debt"],
+        TotalCurrentLiabilities => ["Total current liabilities"],
+        LongTermDebt => ["Long-term debt"],
+        LongTermOperatingLeaseLiabilities => ["Long-term operating lease liabilities"],
+        OtherLongTermLiabilities => ["Other long-term liabilities"],
+        TotalLiabilities => ["Total liabilities"],
 
-        Revenue,
-        CostOfRevenue,
-        GrossProfit,
+        Revenue => ["Revenue"],
+        CostOfRevenue => ["Cost of revenue"],
+        GrossProfit => ["Gross profit"],
 
         OperatingExpenses,
-        ResearchAndDevelopment,
-        SalesGeneralAndAdministrative,
-        TotalOperatingExpenses,
-        OperatingIncome,
+        ResearchAndDevelopment => ["Research and development"],
+        SalesGeneralAndAdministrative => ["Sales, general and administrative"],
+        TotalOperatingExpenses => ["Total operating expenses"],
+        OperatingIncome => ["Operating income"],
 
-        InterestIncome,
-        InterestExpense,
-        OtherIncomeNet,
-        TotalOtherIncomeNet,
-        IncomeBeforeIncomeTax,
+        InterestIncome => ["Interest income"],
+        InterestExpense => ["Interest expense"],
+        OtherIncomeNet => ["Other income, net"],
+        TotalOtherIncomeNet => ["Total other income, net"],
+        IncomeBeforeIncomeTax => ["Income before income tax"],
 
-        IncomeTaxExpense,
-        NetIncome,
+        IncomeTaxExpense => ["Income tax expense"],
+        NetIncome => ["Net income"],
     }
 }
 
 impl Item {
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s.trim() {
-            "Cash and cash equivalents" => Some(Item::CashAndCashEquivalents),
-            "Marketable securities" => Some(Item::MarketableSecurities),
-            "Accounts receivable, net" => Some(Item::AccountsReceivableNet),
-            "Inventories" => Some(Item::Inventories),
-            "Prepaid expenses and other current assets" => Some(Item::PrepaidExpensesAndOtherCurrentAssets),
-            "Total current assets" => Some(Item::TotalCurrentAssets),
-            "Property and equipment, net" => Some(Item::PropertyAndEquipmentNet),
-            "Operating lease assets" => Some(Item::OperatingLeaseAssets),
-            "Goodwill" => Some(Item::Goodwill),
-            "Intangible assets, net" => Some(Item::IntangibleAssetsNet),
-            "Deferred income tax assets" => Some(Item::DeferredIncomeTaxAssets),
-            "Non-marketable equity securities" => Some(Item::NonMarketableEquitySecurities),
-            "Other assets" => Some(Item::OtherAssets),
-            "Total assets" => Some(Item::TotalAssets),
-
-            "Accounts payable" => Some(Item::AccountsPayable),
-            "Accrued and other current liabilities" => Some(Item::AccruedAndOtherCurrentLiabilities),
-            "Short-term debt" => Some(Item::ShortTermDebt),
-            "Total current liabilities" => Some(Item::TotalCurrentLiabilities),
-            "Long-term debt" => Some(Item::LongTermDebt),
-            "Long-term operating lease liabilities" => Some(Item::LongTermOperatingLeaseLiabilities),
-            "Other long-term liabilities" => Some(Item::OtherLongTermLiabilities),
-            "Total liabilities" => Some(Item::TotalLiabilities),
-
-            "Revenue" => Some(Item::Revenue),
-            "Cost of revenue" => Some(Item::CostOfRevenue),
-            "Gross profit" => Some(Item::GrossProfit),
-            "Research and development" => Some(Item::ResearchAndDevelopment),
-            "Sales, general and administrative" => Some(Item::SalesGeneralAndAdministrative),
-            "Total operating expenses" => Some(Item::TotalOperatingExpenses),
-            "Operating income" => Some(Item::OperatingIncome),
-            "Interest income" => Some(Item::InterestIncome),
-            "Interest expense" => Some(Item::InterestExpense),
-            "Other income, net" => Some(Item::OtherIncomeNet),
-            "Total other income, net" => Some(Item::TotalOtherIncomeNet),
-            "Income before income tax" => Some(Item::IncomeBeforeIncomeTax),
-            "Income tax expense" => Some(Item::IncomeTaxExpense),
-            "Net income" => Some(Item::NetIncome),
-            &_ => None,
-        }
-    }
-
     pub fn as_str(&self) -> &'static str {
         match self {
             Item::CurrentAssets => "CurrentAssets",
@@ -183,6 +163,10 @@ impl Item {
             Item::NetIncome => "NetIncome",
         }
     }
+}
+
+pub enum ItemError {
+    ItemNotFound,
 }
 
 #[derive(Debug, uniffi::Record)]
