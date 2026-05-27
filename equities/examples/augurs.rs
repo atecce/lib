@@ -2,11 +2,13 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 
+use augurs::outlier::{MADDetector, OutlierDetector};
+
 use equities::nvda::new_reader;
 
 use chrono::NaiveDate;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Observation {
     pub t: String,
     pub val: f64,
@@ -42,6 +44,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if !reported_items.is_empty() {
+        reported_items.sort_by_cached_key(|item| {
+                NaiveDate::parse_from_str(&item.t, "&Y-&m-%d")
+                    .unwrap_or(NaiveDate::MIN)
+        });
+
         let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
             series
@@ -53,6 +60,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
         }
         println!("{:#?}", series);
+
+        let data = series[&equities::Item::MarketableSecurities].clone().into_iter().map(|o| o.val).collect::<Vec<f64>>();
+        let vector: &[f64] = &data;
+        let matrix: &[&[f64]] = &[vector];
+
+        let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");;
+        let processed = detector.preprocess(matrix).expect("input data is valid");
+        let outliers = detector.detect(&processed);
+        println!("{:#?}", outliers);
     }
 
     Ok(())
