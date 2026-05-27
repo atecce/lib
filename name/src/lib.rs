@@ -227,6 +227,9 @@ names! {
         Heli,
         Joseph,
 
+        // egypt
+        Cleopatra,
+
         // rome
         Jupiter,
         Juno,
@@ -235,6 +238,8 @@ names! {
         Diana,
         Romulus,
         Remus,
+        Brutus,
+        Cassius,
         Caesar,
         Cicero,
 
