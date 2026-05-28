@@ -45,8 +45,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     if !reported_items.is_empty() {
         reported_items.sort_by_cached_key(|item| {
-                NaiveDate::parse_from_str(&item.t, "&Y-&m-%d")
-                    .unwrap_or(NaiveDate::MIN)
+            match NaiveDate::parse_from_str(&item.t.trim(), "%Y-%m-%d") {
+                Ok(date) => date,
+                Err(e) => {
+                    eprintln!("failed to parse {} into date: {}", &item.t, e);
+                    NaiveDate::MIN
+                },
+            }
         });
 
         let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
@@ -59,7 +64,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     val: reported_item.val,
                 });
         }
-        println!("{:#?}", series);
 
         let data = series[&equities::Item::MarketableSecurities].clone().into_iter().map(|o| o.val).collect::<Vec<f64>>();
         let vector: &[f64] = &data;
@@ -67,8 +71,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");
         let processed = detector.preprocess(matrix).expect("input data is valid");
-        let outliers = detector.detect(&processed);
-        println!("{:#?}", outliers);
+        let outliers = detector.detect(&processed)?;
+
+        println!("outliers");
+        for interval in &outliers.series_results[0].outlier_intervals.intervals {
+            println!("{:#?}", series[&equities::Item::MarketableSecurities][interval.start]);
+        }
     }
 
     Ok(())
