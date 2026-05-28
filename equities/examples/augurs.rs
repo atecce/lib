@@ -65,17 +65,24 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
         }
 
-        let data = series[&equities::Item::MarketableSecurities].clone().into_iter().map(|o| o.val).collect::<Vec<f64>>();
-        let vector: &[f64] = &data;
-        let matrix: &[&[f64]] = &[vector];
+        for item in &equities::Item::ALL {
+            match series.get(item) {
+                Some(observations) => {
+                    let data = observations.clone().into_iter().map(|o| o.val).collect::<Vec<f64>>();
+                    let vector: &[f64] = &data;
+                    let matrix: &[&[f64]] = &[vector];
 
-        let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");
-        let processed = detector.preprocess(matrix).expect("input data is valid");
-        let outliers = detector.detect(&processed)?;
+                    let detector = MADDetector::with_sensitivity(0.5).expect("mad detector failed to construct");
+                    let processed = detector.preprocess(matrix).expect("input data is valid");
+                    let outliers = detector.detect(&processed)?;
 
-        println!("outliers");
-        for interval in &outliers.series_results[0].outlier_intervals.intervals {
-            println!("{:#?}", series[&equities::Item::MarketableSecurities][interval.start]);
+                    println!("outliers for {:?}", item);
+                    for interval in &outliers.series_results[0].outlier_intervals.intervals {
+                        println!("{:#?}", series[item][interval.start]);
+                    }
+                },
+                None => println!("{:?} not found", item),
+            }
         }
     }
 

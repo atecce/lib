@@ -41,7 +41,7 @@ macro_rules! items {
         }
 
         impl $item {
-            const ALL: [$item; 39] = [
+            pub const ALL: [$item; 39] = [
                 $($item::$variant,)*
             ];
         }
