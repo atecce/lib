@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 // use chrono::NaiveDate;
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, uniffi::Enum)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, serde::Serialize, uniffi::Enum)]
 pub enum Period {
     ThreeMonths,
     SixMonths,
@@ -35,7 +35,7 @@ macro_rules! items {
             ),* $(,)?
         }
     ) => {
-        #[derive(Clone, Debug, Eq, PartialEq, Hash, uniffi::Enum)]
+        #[derive(Clone, Debug, Eq, PartialEq, Hash, serde::Serialize, uniffi::Enum)]
         pub enum $item {
             $($variant),*
         }
@@ -169,7 +169,7 @@ pub enum ItemError {
     ItemNotFound,
 }
 
-#[derive(Debug, uniffi::Record)]
+#[derive(Debug, serde::Serialize, uniffi::Record)]
 pub struct ReportedItem {
     pub t: String,
     pub p: Period,

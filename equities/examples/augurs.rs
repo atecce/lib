@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
+use std::fs::File;
+use std::io::BufWriter;
 
 use augurs::outlier::{MADDetector, OutlierDetector};
 
@@ -53,6 +55,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 },
             }
         });
+
+        serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
 
         let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
