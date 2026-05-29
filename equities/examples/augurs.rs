@@ -48,10 +48,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     if !reported_items.is_empty() {
         reported_items.sort_by_cached_key(|item| {
             match NaiveDate::parse_from_str(&item.t.trim(), "%Y-%m-%d") {
-                Ok(date) => date,
+                Ok(date) => (date, item.p, item.item),
                 Err(e) => {
                     eprintln!("failed to parse {} into date: {}", &item.t, e);
-                    NaiveDate::MIN
+                    (NaiveDate::MIN, item.p, item.item)
                 },
             }
         });

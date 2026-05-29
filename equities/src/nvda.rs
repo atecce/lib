@@ -13,11 +13,14 @@ use chrono::NaiveDate;
 
 pub struct Reader {
     workbook: Sheets<BufReader<File>>,
+
+    multiplier: f64,
 }
 
 pub fn new_reader(path: &Path) -> Result<Reader, Box<dyn Error>> {
     Ok(Reader {
         workbook: open_workbook_auto(path)?,
+        multiplier: 1.0,
     })
 }
 
@@ -33,6 +36,7 @@ impl Reader {
     
         for (r, row) in rows.iter().enumerate() {
             for (c, cell) in row.iter().enumerate() {
+                self.find_multiplier(cell);
                 if let Some(date) = parse_date(cell) {
                     dates.entry(c).or_insert(date);
                 } else if let Some(month_day) = cell.get_string() {
@@ -59,8 +63,6 @@ impl Reader {
     
         if dates.is_empty() { return Err("dates are empty".into()); }
     
-        let multiplier = find_multiplier(&range);
-    
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             let label = match row.get(1) {
                 Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
@@ -77,7 +79,7 @@ impl Reader {
                                 _ => f64::NAN,
                             };
                             if !val.is_nan() {
-                                items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * multiplier });
+                                items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * self.multiplier });
                             }
                         }
                     }
@@ -98,6 +100,7 @@ impl Reader {
         let rows: Vec<_> = range.rows().take(25).collect();
         for row in rows.iter().take(10) {
             for cell in row.iter() {
+                self.find_multiplier(cell);
                 if let Some(s) = cell.get_string() {
                     if s.to_lowercase().contains("form type: 10-k") {
                         is_10k = true;
@@ -161,8 +164,6 @@ impl Reader {
     
         if col_info.is_empty() { return Err("col info is empty".into()); }
     
-        let multiplier = find_multiplier(&range);
-    
         for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
             let label = match row.get(1) {
                 Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
@@ -179,7 +180,7 @@ impl Reader {
                                 _ => f64::NAN,
                             };
                             if !val.is_nan() {
-                                items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * multiplier });
+                                items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * self.multiplier });
                             }
                         }
                     }
@@ -190,23 +191,18 @@ impl Reader {
 
         Ok(items)
     }
-}
 
-fn find_multiplier(range: &Range<Data>) -> f64 {
-    for row in range.rows().take(20) {
-        for cell in row.iter() {
-            if let Some(s) = cell.get_string() {
-                let s = s.to_lowercase();
-                if s.contains("in millions") {
-                    return 1_000_000.0;
-                }
-                if s.contains("in thousands") {
-                    return 1_000.0;
-                }
+    fn find_multiplier(&mut self, cell: &Data) {
+        if let Some(s) = cell.get_string() {
+            let s = s.to_lowercase();
+            if s.contains("in millions") {
+                self.multiplier = 1_000_000.0;
+            }
+            if s.contains("in thousands") {
+                self.multiplier =  1_000.0;
             }
         }
     }
-    1.0
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
