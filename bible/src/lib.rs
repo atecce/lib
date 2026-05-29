@@ -13,10 +13,10 @@ use serde::Serialize;
 #[derive(Clone, Debug, Serialize, uniffi::Record)]
 pub struct Source {
     pub book: Name,
-    pub chapter: i64,
+    pub chapter: u8,
     // TODO(atec): perhaps some enforcement of start <= end
-    pub start: i64,
-    pub end: Option<i64>,
+    pub start: u8,
+    pub end: Option<u8>,
 }
 
 impl fmt::Display for Source {
@@ -49,16 +49,16 @@ impl std::str::FromStr for Source {
         let (chapter_str, verses_str) = chapter_and_verse_str.split_once(':')
             .ok_or(SourceError::FailedToSplitOnColon)?;
 
-        let chapter = chapter_str.parse::<i64>()?;
+        let chapter = chapter_str.parse::<u8>()?;
 
-        let start: i64;
-        let end: Option<i64>;
+        let start: u8;
+        let end: Option<u8>;
 
         if let Some((start_raw, end_raw)) = verses_str.split_once('-') {
-            start = start_raw.parse::<i64>()?;
-            end = Some(end_raw.parse::<i64>()?);
+            start = start_raw.parse::<u8>()?;
+            end = Some(end_raw.parse::<u8>()?);
         } else {
-            start = verses_str.parse::<i64>()?;
+            start = verses_str.parse::<u8>()?;
             end = None;
         }
 

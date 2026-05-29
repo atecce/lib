@@ -419,15 +419,15 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-fileprivate struct FfiConverterInt64: FfiConverterPrimitive {
-    typealias FfiType = Int64
-    typealias SwiftType = Int64
+fileprivate struct FfiConverterUInt8: FfiConverterPrimitive {
+    typealias FfiType = UInt8
+    typealias SwiftType = UInt8
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Int64 {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UInt8 {
         return try lift(readInt(&buf))
     }
 
-    public static func write(_ value: Int64, into buf: inout [UInt8]) {
+    public static func write(_ value: UInt8, into buf: inout [UInt8]) {
         writeInt(&buf, lower(value))
     }
 }
@@ -476,13 +476,13 @@ fileprivate struct FfiConverterString: FfiConverter {
 
 public struct Source: Equatable, Hashable {
     public var book: Name
-    public var chapter: Int64
-    public var start: Int64
-    public var end: Int64?
+    public var chapter: UInt8
+    public var start: UInt8
+    public var end: UInt8?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(book: Name, chapter: Int64, start: Int64, end: Int64?) {
+    public init(book: Name, chapter: UInt8, start: UInt8, end: UInt8?) {
         self.book = book
         self.chapter = chapter
         self.start = start
@@ -506,17 +506,17 @@ public struct FfiConverterTypeSource: FfiConverterRustBuffer {
         return
             try Source(
                 book: FfiConverterTypeName.read(from: &buf), 
-                chapter: FfiConverterInt64.read(from: &buf), 
-                start: FfiConverterInt64.read(from: &buf), 
-                end: FfiConverterOptionInt64.read(from: &buf)
+                chapter: FfiConverterUInt8.read(from: &buf), 
+                start: FfiConverterUInt8.read(from: &buf), 
+                end: FfiConverterOptionUInt8.read(from: &buf)
         )
     }
 
     public static func write(_ value: Source, into buf: inout [UInt8]) {
         FfiConverterTypeName.write(value.book, into: &buf)
-        FfiConverterInt64.write(value.chapter, into: &buf)
-        FfiConverterInt64.write(value.start, into: &buf)
-        FfiConverterOptionInt64.write(value.end, into: &buf)
+        FfiConverterUInt8.write(value.chapter, into: &buf)
+        FfiConverterUInt8.write(value.start, into: &buf)
+        FfiConverterOptionUInt8.write(value.end, into: &buf)
     }
 }
 
@@ -630,8 +630,8 @@ public func FfiConverterTypeSourceError_lower(_ value: SourceError) -> RustBuffe
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-fileprivate struct FfiConverterOptionInt64: FfiConverterRustBuffer {
-    typealias SwiftType = Int64?
+fileprivate struct FfiConverterOptionUInt8: FfiConverterRustBuffer {
+    typealias SwiftType = UInt8?
 
     public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
         guard let value = value else {
@@ -639,13 +639,13 @@ fileprivate struct FfiConverterOptionInt64: FfiConverterRustBuffer {
             return
         }
         writeInt(&buf, Int8(1))
-        FfiConverterInt64.write(value, into: &buf)
+        FfiConverterUInt8.write(value, into: &buf)
     }
 
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
         switch try readInt(&buf) as Int8 {
         case 0: return nil
-        case 1: return try FfiConverterInt64.read(from: &buf)
+        case 1: return try FfiConverterUInt8.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
