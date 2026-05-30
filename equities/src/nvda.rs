@@ -8,201 +8,167 @@ use crate::Period;
 use crate::Item;
 use crate::ReportedItem;
 
-use calamine::{open_workbook_auto, Data, DataType, Range, Reader as CalamineReader, Sheets};
+use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
 use chrono::NaiveDate;
 
 pub struct Reader {
     workbook: Sheets<BufReader<File>>,
-
-    multiplier: f64,
 }
 
 pub fn new_reader(path: &Path) -> Result<Reader, Box<dyn Error>> {
     Ok(Reader {
         workbook: open_workbook_auto(path)?,
-        multiplier: 1.0,
     })
 }
 
 impl Reader {
     pub fn process_balance_sheet(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
-
         let range = self.workbook.worksheet_range("BALANCE_SHEET")?;
+        let header_rows: Vec<_> = range.rows().take(30).collect();
 
-        let mut items = Vec::new();
+        let multiplier = header_rows.iter().take(20)
+            .find_map(|r| r.iter().find_map(|c| {
+                let s = c.get_string()?.to_lowercase();
+                if s.contains("in millions") { Some(1_000_000.0) }
+                else if s.contains("in thousands") { Some(1_000.0) }
+                else { None }
+            }))
+            .unwrap_or(1.0);
 
-        let mut dates = HashMap::new();
-        let rows: Vec<_> = range.rows().take(25).collect();
-    
-        for (r, row) in rows.iter().enumerate() {
-            for (c, cell) in row.iter().enumerate() {
-                self.find_multiplier(cell);
-                if let Some(date) = parse_date(cell) {
-                    dates.entry(c).or_insert(date);
-                } else if let Some(month_day) = cell.get_string() {
-                    if month_day.trim().ends_with(',') || month_day.trim().split_whitespace().count() >= 2 {
-                         if let Some(next_row) = rows.get(r + 1) {
-                             if let Some(year_cell) = next_row.get(c) {
-                                 let year = match year_cell {
-                                     Data::Float(f) => *f as i32,
-                                     Data::Int(i) => *i as i32,
-                                     _ => 0,
-                                 };
-                                 if year > 1900 && year < 2100 {
-                                     let date_str = format!("{} {}", month_day, year);
-                                     if let Some(date) = parse_date_str(&date_str) {
-                                         dates.entry(c).or_insert(date);
-                                     }
-                                 }
-                             }
-                         }
+        let col_info: HashMap<usize, NaiveDate> = header_rows.iter().enumerate()
+            .flat_map(|(r, row)| {
+                let rows = &header_rows; // Borrow for split-row check
+                row.iter().enumerate().filter_map(move |(c, cell)| {
+                    if let Some(date) = parse_date(cell) {
+                        return Some((c, date));
                     }
-                }
-            }
-        }
-    
-        if dates.is_empty() { return Err("dates are empty".into()); }
-    
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
-                _ => continue,
-            };
-    
-            match label.parse::<Item>() {
-                Ok(item) => {
-                    for (col, date) in &dates {
-                        if let Some(v) = row.get(*col) {
-                            let val = match v {
-                                Data::Float(f) => *f,
-                                Data::Int(i) => *i as f64,
-                                _ => f64::NAN,
-                            };
-                            if !val.is_nan() {
-                                items.push(ReportedItem { t: date.to_string(), p: Period::PointInTime, item: item.clone(), val: val * self.multiplier });
+                    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+                        if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
+                            Data::Float(f) => Some(*f as i32),
+                            Data::Int(i) => Some(*i as i32),
+                            _ => None,
+                        }).filter(|&y| y > 1900 && y < 2100) {
+                            if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
+                                return Some((c, date));
                             }
                         }
                     }
-                },
-                Err(e) => eprintln!("failed to parse label: {}", label),
-            }
-        }
+                    None
+                })
+            })
+            .collect();
+
+        if col_info.is_empty() { return Err("no dates found".into()); }
+
+        let items = range.rows()
+            .filter(|row| !row.iter().all(|c| c.is_empty()))
+            .filter_map(|row| {
+                let label = row.get(1)?.get_string()?;
+                let item = label.parse::<Item>().ok()?;
+                Some((item, row))
+            })
+            .flat_map(|(item, row)| {
+                col_info.iter().filter_map(move |(&col, &date)| {
+                    let val = match row.get(col)? {
+                        Data::Float(f) => *f,
+                        Data::Int(i) => *i as f64,
+                        _ => return None,
+                    };
+                    if val.is_nan() { return None; }
+                    Some(ReportedItem { t: date.to_string(), p: Period::PointInTime, item, val: val * multiplier })
+                })
+            })
+            .collect();
+
         Ok(items)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
-
         let range = self.workbook.worksheet_range("INCOME_STATEMENT")?;
+        let header_rows: Vec<_> = range.rows().take(30).collect();
 
-        let mut items = Vec::new();
+        let is_10k = header_rows.iter().take(10)
+            .any(|r| r.iter().any(|c| c.get_string().map(|s| s.to_lowercase().contains("form type: 10-k")).unwrap_or(false)));
 
-        let mut is_10k = false;
-        let rows: Vec<_> = range.rows().take(25).collect();
-        for row in rows.iter().take(10) {
-            for cell in row.iter() {
-                self.find_multiplier(cell);
-                if let Some(s) = cell.get_string() {
-                    if s.to_lowercase().contains("form type: 10-k") {
-                        is_10k = true;
-                    }
+        let multiplier = header_rows.iter().take(20)
+            .find_map(|r| r.iter().find_map(|c| {
+                let s = c.get_string()?.to_lowercase();
+                if s.contains("in millions") { Some(1_000_000.0) }
+                else if s.contains("in thousands") { Some(1_000.0) }
+                else { None }
+            }))
+            .unwrap_or(1.0);
+
+        let mut col_periods = HashMap::new();
+        header_rows.iter().enumerate().for_each(|(_, row)| {
+            row.iter().enumerate().for_each(|(c, cell)| {
+                if let Some(p) = cell.get_string().and_then(parse_period_str) {
+                    col_periods.insert(c, p);
+                    col_periods.insert(c + 1, p);
+                    col_periods.insert(c + 2, p);
                 }
-            }
-        }
-    
-        let mut col_periods: HashMap<usize, Period> = HashMap::new();
-        for row in &rows {
-            for (c, cell) in row.iter().enumerate() {
-                if let Some(s) = cell.get_string() {
-                    let s = s.to_lowercase();
-                    let p = if s.contains("three months") { Some(Period::ThreeMonths) }
-                        else if s.contains("six months") { Some(Period::SixMonths) }
-                        else if s.contains("nine months") { Some(Period::NineMonths) }
-                        else if s.contains("year ended") || s.contains("annual") || s.contains("twelve months") { Some(Period::TwelveMonths) }
-                        else { None };
-                    
-                    if let Some(period) = p {
-                        col_periods.insert(c, period);
-                        col_periods.insert(c + 1, period);
-                        col_periods.insert(c + 2, period);
+            });
+        });
+
+        let col_info: HashMap<usize, (NaiveDate, Period)> = header_rows.iter().enumerate()
+            .flat_map(|(r, row)| {
+                let rows = &header_rows;
+                let periods = &col_periods;
+                row.iter().enumerate().filter_map(move |(c, cell)| {
+                    if let Some(date) = parse_date(cell) {
+                        let p = periods.get(&c).cloned().unwrap_or(if is_10k { Period::TwelveMonths } else { Period::ThreeMonths });
+                        return Some((c, (date, p)));
                     }
-                }
-            }
-        }
-    
-        let mut col_info = HashMap::new();
-        for (r, row) in rows.iter().enumerate() {
-            for (c, cell) in row.iter().enumerate() {
-                if let Some(date) = parse_date(cell) {
-                    let p = col_periods.get(&c).cloned().unwrap_or_else(|| {
-                        if is_10k { Period::TwelveMonths } else { Period::ThreeMonths }
-                    });
-                    col_info.entry(c).or_insert((date, p));
-                } else if let Some(month_day) = cell.get_string() {
-                    if month_day.trim().ends_with(',') || month_day.trim().split_whitespace().count() >= 2 {
-                         if let Some(next_row) = rows.get(r + 1) {
-                             if let Some(year_cell) = next_row.get(c) {
-                                 let year = match year_cell {
-                                     Data::Float(f) => *f as i32,
-                                     Data::Int(i) => *i as i32,
-                                     _ => 0,
-                                 };
-                                 if year > 1900 && year < 2100 {
-                                     let date_str = format!("{} {}", month_day, year);
-                                     if let Some(date) = parse_date_str(&date_str) {
-                                         let p = col_periods.get(&c).cloned().unwrap_or_else(|| {
-                                             if is_10k { Period::TwelveMonths } else { Period::ThreeMonths }
-                                         });
-                                         col_info.entry(c).or_insert((date, p));
-                                     }
-                                 }
-                             }
-                         }
-                    }
-                }
-            }
-        }
-    
-        if col_info.is_empty() { return Err("col info is empty".into()); }
-    
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
-            let label = match row.get(1) {
-                Some(l) if !l.is_empty() => l.get_string().unwrap_or(""),
-                _ => continue,
-            };
-    
-            match label.parse::<Item>() {
-                Ok(item) => {
-                    for (col, (date, period)) in &col_info {
-                        if let Some(v) = row.get(*col) {
-                            let val = match v {
-                                Data::Float(f) => *f,
-                                Data::Int(i) => *i as f64,
-                                _ => f64::NAN,
-                            };
-                            if !val.is_nan() {
-                                items.push(ReportedItem { t: date.to_string(), p: *period, item: item.clone(), val: val * self.multiplier });
+                    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+                        if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
+                            Data::Float(f) => Some(*f as i32),
+                            Data::Int(i) => Some(*i as i32),
+                            _ => None,
+                        }).filter(|&y| y > 1900 && y < 2100) {
+                            if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
+                                let p = periods.get(&c).cloned().unwrap_or(if is_10k { Period::TwelveMonths } else { Period::ThreeMonths });
+                                return Some((c, (date, p)));
                             }
                         }
                     }
-                },
-                Err(e) => eprintln!("failed to parse label {}", label),
-            }
-        }
+                    None
+                })
+            })
+            .collect();
+
+        if col_info.is_empty() { return Err("no dates found".into()); }
+
+        let items = range.rows()
+            .filter(|row| !row.iter().all(|c| c.is_empty()))
+            .filter_map(|row| {
+                let label = row.get(1)?.get_string()?;
+                let item = label.parse::<Item>().ok()?;
+                Some((item, row))
+            })
+            .flat_map(|(item, row)| {
+                col_info.iter().filter_map(move |(&col, (date, period))| {
+                    let val = match row.get(col)? {
+                        Data::Float(f) => *f,
+                        Data::Int(i) => *i as f64,
+                        _ => return None,
+                    };
+                    if val.is_nan() { return None; }
+                    Some(ReportedItem { t: date.to_string(), p: *period, item, val: val * multiplier })
+                })
+            })
+            .collect();
 
         Ok(items)
     }
+}
 
-    fn find_multiplier(&mut self, cell: &Data) {
-        if let Some(s) = cell.get_string() {
-            let s = s.to_lowercase();
-            if s.contains("in millions") {
-                self.multiplier = 1_000_000.0;
-            }
-            if s.contains("in thousands") {
-                self.multiplier =  1_000.0;
-            }
-        }
-    }
+fn parse_period_str(s: &str) -> Option<Period> {
+    let s = s.to_lowercase();
+    if s.contains("three months") { Some(Period::ThreeMonths) }
+    else if s.contains("six months") { Some(Period::SixMonths) }
+    else if s.contains("nine months") { Some(Period::NineMonths) }
+    else if s.contains("year ended") || s.contains("annual") || s.contains("twelve months") { Some(Period::TwelveMonths) }
+    else { None }
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
@@ -215,10 +181,5 @@ fn parse_date(cell: &Data) -> Option<NaiveDate> {
 fn parse_date_str(s: &str) -> Option<NaiveDate> {
     let s = s.trim().replace(",", "");
     let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d"];
-    for fmt in formats {
-        if let Ok(date) = NaiveDate::parse_from_str(&s, fmt) {
-            return Some(date);
-        }
-    }
-    None
+    formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())
 }
