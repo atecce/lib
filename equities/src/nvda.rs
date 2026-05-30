@@ -88,10 +88,15 @@ impl Reader {
         let mut col_periods = HashMap::new();
         header_rows.iter().enumerate().for_each(|(_, row)| {
             row.iter().enumerate().for_each(|(c, cell)| {
-                if let Some(p) = cell.get_string().and_then(parse_period_str) {
-                    col_periods.insert(c, p);
-                    col_periods.insert(c + 1, p);
-                    col_periods.insert(c + 2, p);
+                if let Some(s) = cell.get_string() {
+                    match s.parse::<Period>() {
+                        Ok(p) => {
+                            col_periods.insert(c, p);
+                            col_periods.insert(c + 1, p);
+                            col_periods.insert(c + 2, p);
+                        },
+                        Err(e) => eprintln!("failed to parse {} into period: {:?}", s, e),
+                    }
                 }
             });
         });
@@ -156,15 +161,6 @@ fn get_multiplier(rows: Vec<&[Data]>) -> Option<f64> {
             else if s.contains("in thousands") { Some(1_000.0) }
             else { None }
         }))
-}
-
-fn parse_period_str(s: &str) -> Option<Period> {
-    let s = s.to_lowercase();
-    if s.contains("three months") { Some(Period::ThreeMonths) }
-    else if s.contains("six months") { Some(Period::SixMonths) }
-    else if s.contains("nine months") { Some(Period::NineMonths) }
-    else if s.contains("year ended") || s.contains("annual") || s.contains("twelve months") { Some(Period::TwelveMonths) }
-    else { None }
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {

@@ -15,6 +15,21 @@ pub enum Period {
     PointInTime,
 }
 
+impl FromStr for Period {
+    type Err = PeriodError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let trimmed = s.trim();
+
+        let lower = trimmed.to_lowercase();
+        if lower.contains("three months") { Ok(Period::ThreeMonths) }
+        else if lower.contains("six months") { Ok(Period::SixMonths) }
+        else if lower.contains("nine months") { Ok(Period::NineMonths) }
+        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
+        else { Err(PeriodError::InvalidPeriod) }
+    }
+}
+
 impl Period {
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -25,6 +40,11 @@ impl Period {
             Period::PointInTime => "pit",
         }
     }
+}
+
+#[derive(Debug)]
+pub enum PeriodError {
+    InvalidPeriod,
 }
 
 macro_rules! items {
