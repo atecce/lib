@@ -26,14 +26,7 @@ impl Reader {
         let range = self.workbook.worksheet_range("BALANCE_SHEET")?;
         let header_rows: Vec<_> = range.rows().take(30).collect();
 
-        let multiplier = header_rows.iter().take(20)
-            .find_map(|r| r.iter().find_map(|c| {
-                let s = c.get_string()?.to_lowercase();
-                if s.contains("in millions") { Some(1_000_000.0) }
-                else if s.contains("in thousands") { Some(1_000.0) }
-                else { None }
-            }))
-            .unwrap_or(1.0);
+        let multiplier = get_multiplier(header_rows.clone()).ok_or("failed to get multiplier")?;
 
         let col_info: HashMap<usize, NaiveDate> = header_rows.iter().enumerate()
             .flat_map(|(r, row)| {
@@ -90,14 +83,7 @@ impl Reader {
         let is_10k = header_rows.iter().take(10)
             .any(|r| r.iter().any(|c| c.get_string().map(|s| s.to_lowercase().contains("form type: 10-k")).unwrap_or(false)));
 
-        let multiplier = header_rows.iter().take(20)
-            .find_map(|r| r.iter().find_map(|c| {
-                let s = c.get_string()?.to_lowercase();
-                if s.contains("in millions") { Some(1_000_000.0) }
-                else if s.contains("in thousands") { Some(1_000.0) }
-                else { None }
-            }))
-            .unwrap_or(1.0);
+        let multiplier = get_multiplier(header_rows.clone()).ok_or("failed to get multiplier")?;
 
         let mut col_periods = HashMap::new();
         header_rows.iter().enumerate().for_each(|(_, row)| {
@@ -160,6 +146,16 @@ impl Reader {
 
         Ok(items)
     }
+}
+
+fn get_multiplier(rows: Vec<&[Data]>) -> Option<f64> {
+    rows.iter().take(20)
+        .find_map(|r| r.iter().find_map(|c| {
+            let s = c.get_string()?.to_lowercase();
+            if s.contains("in millions") { Some(1_000_000.0) }
+            else if s.contains("in thousands") { Some(1_000.0) }
+            else { None }
+        }))
 }
 
 fn parse_period_str(s: &str) -> Option<Period> {
