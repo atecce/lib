@@ -24471,19 +24471,13 @@
     "t": "2020-07-26",
     "p": "ThreeMonths",
     "item": "Revenue",
-    "val": 3866000000.0
-  },
-  {
-    "t": "2020-07-26",
-    "p": "ThreeMonths",
-    "item": "Revenue",
     "val": 6946000000.0
   },
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "CostOfRevenue",
-    "val": 1591000000.0
+    "item": "Revenue",
+    "val": 3866000000.0
   },
   {
     "t": "2020-07-26",
@@ -24500,8 +24494,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "GrossProfit",
-    "val": 2275000000.0
+    "item": "CostOfRevenue",
+    "val": 1591000000.0
   },
   {
     "t": "2020-07-26",
@@ -24518,8 +24512,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "ResearchAndDevelopment",
-    "val": 997000000.0
+    "item": "GrossProfit",
+    "val": 2275000000.0
   },
   {
     "t": "2020-07-26",
@@ -24536,8 +24530,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "SalesGeneralAndAdministrative",
-    "val": 627000000.0
+    "item": "ResearchAndDevelopment",
+    "val": 997000000.0
   },
   {
     "t": "2020-07-26",
@@ -24554,8 +24548,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "TotalOperatingExpenses",
-    "val": 1624000000.0
+    "item": "SalesGeneralAndAdministrative",
+    "val": 627000000.0
   },
   {
     "t": "2020-07-26",
@@ -24572,8 +24566,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "InterestIncome",
-    "val": 13000000.0
+    "item": "TotalOperatingExpenses",
+    "val": 1624000000.0
   },
   {
     "t": "2020-07-26",
@@ -24590,8 +24584,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "InterestExpense",
-    "val": -54000000.0
+    "item": "InterestIncome",
+    "val": 13000000.0
   },
   {
     "t": "2020-07-26",
@@ -24608,8 +24602,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "IncomeBeforeIncomeTax",
-    "val": 609000000.0
+    "item": "InterestExpense",
+    "val": -54000000.0
   },
   {
     "t": "2020-07-26",
@@ -24626,8 +24620,8 @@
   {
     "t": "2020-07-26",
     "p": "ThreeMonths",
-    "item": "NetIncome",
-    "val": 622000000.0
+    "item": "IncomeBeforeIncomeTax",
+    "val": 609000000.0
   },
   {
     "t": "2020-07-26",
@@ -24640,6 +24634,12 @@
     "p": "ThreeMonths",
     "item": "NetIncome",
     "val": 1539000000.0
+  },
+  {
+    "t": "2020-07-26",
+    "p": "ThreeMonths",
+    "item": "NetIncome",
+    "val": 622000000.0
   },
   {
     "t": "2020-07-26",
@@ -28101,12 +28101,6 @@
     "t": "2022-07-31",
     "p": "ThreeMonths",
     "item": "Revenue",
-    "val": 6704000000.0
-  },
-  {
-    "t": "2022-07-31",
-    "p": "ThreeMonths",
-    "item": "Revenue",
     "val": 14992000000.0
   },
   {
@@ -28118,8 +28112,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "CostOfRevenue",
-    "val": 3789000000.0
+    "item": "Revenue",
+    "val": 6704000000.0
   },
   {
     "t": "2022-07-31",
@@ -28136,8 +28130,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "GrossProfit",
-    "val": 2915000000.0
+    "item": "CostOfRevenue",
+    "val": 3789000000.0
   },
   {
     "t": "2022-07-31",
@@ -28154,8 +28148,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "ResearchAndDevelopment",
-    "val": 1824000000.0
+    "item": "GrossProfit",
+    "val": 2915000000.0
   },
   {
     "t": "2022-07-31",
@@ -28172,8 +28166,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "SalesGeneralAndAdministrative",
-    "val": 592000000.0
+    "item": "ResearchAndDevelopment",
+    "val": 1824000000.0
   },
   {
     "t": "2022-07-31",
@@ -28190,14 +28184,20 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "TotalOperatingExpenses",
-    "val": 2416000000.0
+    "item": "SalesGeneralAndAdministrative",
+    "val": 592000000.0
   },
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
     "item": "TotalOperatingExpenses",
     "val": 5979000000.0
+  },
+  {
+    "t": "2022-07-31",
+    "p": "ThreeMonths",
+    "item": "TotalOperatingExpenses",
+    "val": 2416000000.0
   },
   {
     "t": "2022-07-31",
@@ -28215,12 +28215,6 @@
     "t": "2022-07-31",
     "p": "ThreeMonths",
     "item": "InterestIncome",
-    "val": 46000000.0
-  },
-  {
-    "t": "2022-07-31",
-    "p": "ThreeMonths",
-    "item": "InterestIncome",
     "val": 64000000.0
   },
   {
@@ -28232,8 +28226,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "InterestExpense",
-    "val": -65000000.0
+    "item": "InterestIncome",
+    "val": 46000000.0
   },
   {
     "t": "2022-07-31",
@@ -28250,8 +28244,8 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "IncomeBeforeIncomeTax",
-    "val": 475000000.0
+    "item": "InterestExpense",
+    "val": -65000000.0
   },
   {
     "t": "2022-07-31",
@@ -28268,14 +28262,20 @@
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "NetIncome",
-    "val": 656000000.0
+    "item": "IncomeBeforeIncomeTax",
+    "val": 475000000.0
   },
   {
     "t": "2022-07-31",
     "p": "ThreeMonths",
     "item": "NetIncome",
     "val": 2274000000.0
+  },
+  {
+    "t": "2022-07-31",
+    "p": "ThreeMonths",
+    "item": "NetIncome",
+    "val": 656000000.0
   },
   {
     "t": "2022-07-31",

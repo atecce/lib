@@ -8,25 +8,29 @@ use crate::Period;
 use crate::Item;
 use crate::ReportedItem;
 
-use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
+use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Range, Sheets};
 use chrono::NaiveDate;
 
 pub struct Reader {
-    workbook: Sheets<BufReader<File>>,
+    balance_sheet: Range<Data>,
+    income_statement: Range<Data>,
 }
 
 pub fn new_reader(path: &Path) -> Result<Reader, Box<dyn Error>> {
+
+    let mut workbook = open_workbook_auto(path)?;
+
     Ok(Reader {
-        workbook: open_workbook_auto(path)?,
+        balance_sheet: workbook.worksheet_range("BALANCE_SHEET")?,
+        income_statement: workbook.worksheet_range("INCOME_STATEMENT")?,
     })
 }
 
 impl Reader {
     pub fn process_balance_sheet(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
-        let range = self.workbook.worksheet_range("BALANCE_SHEET")?;
-        let header_rows: Vec<_> = range.rows().take(30).collect();
+        let header_rows: &Vec<&[Data]> = &self.balance_sheet.rows().take(30).collect();
 
-        let multiplier = get_multiplier(header_rows.clone()).ok_or("failed to get multiplier")?;
+        let multiplier = get_multiplier(header_rows).ok_or("failed to get multiplier")?;
 
         let col_info: HashMap<usize, NaiveDate> = header_rows.iter().enumerate()
             .flat_map(|(r, row)| {
@@ -53,7 +57,7 @@ impl Reader {
 
         if col_info.is_empty() { return Err("no dates found".into()); }
 
-        let items = range.rows()
+        let items = self.balance_sheet.rows()
             .filter(|row| !row.iter().all(|c| c.is_empty()))
             .filter_map(|row| {
                 let label = row.get(1)?.get_string()?;
@@ -77,13 +81,12 @@ impl Reader {
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
-        let range = self.workbook.worksheet_range("INCOME_STATEMENT")?;
-        let header_rows: Vec<_> = range.rows().take(30).collect();
+        let header_rows: &Vec<&[Data]> = &self.income_statement.rows().take(30).collect();
 
         let is_10k = header_rows.iter().take(10)
             .any(|r| r.iter().any(|c| c.get_string().map(|s| s.to_lowercase().contains("form type: 10-k")).unwrap_or(false)));
 
-        let multiplier = get_multiplier(header_rows.clone()).ok_or("failed to get multiplier")?;
+        let multiplier = get_multiplier(header_rows).ok_or("failed to get multiplier")?;
 
         let mut col_periods = HashMap::new();
         header_rows.iter().enumerate().for_each(|(_, row)| {
@@ -129,7 +132,7 @@ impl Reader {
 
         if col_info.is_empty() { return Err("no dates found".into()); }
 
-        let items = range.rows()
+        let items = self.income_statement.rows()
             .filter(|row| !row.iter().all(|c| c.is_empty()))
             .filter_map(|row| {
                 let label = row.get(1)?.get_string()?;
@@ -153,7 +156,7 @@ impl Reader {
     }
 }
 
-fn get_multiplier(rows: Vec<&[Data]>) -> Option<f64> {
+fn get_multiplier(rows: &Vec<&[Data]>) -> Option<f64> {
     rows.iter().take(20)
         .find_map(|r| r.iter().find_map(|c| {
             let s = c.get_string()?.to_lowercase();
