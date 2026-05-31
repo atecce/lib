@@ -30,18 +30,6 @@ impl FromStr for Period {
     }
 }
 
-impl Period {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Period::ThreeMonths => "3m",
-            Period::SixMonths => "6m",
-            Period::NineMonths => "9m",
-            Period::TwelveMonths => "12m",
-            Period::PointInTime => "pit",
-        }
-    }
-}
-
 #[derive(Debug)]
 pub enum PeriodError {
     InvalidPeriod,
@@ -136,52 +124,6 @@ items! {
 
         IncomeTaxExpense => ["Income tax expense"],
         NetIncome => ["Net income"],
-    }
-}
-
-impl Item {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Item::CurrentAssets => "CurrentAssets",
-            Item::CashAndCashEquivalents => "CashAndCashEquivalents",
-            Item::MarketableSecurities => "MarketableSecurities",
-            Item::AccountsReceivableNet => "AccountsReceivableNet",
-            Item::Inventories => "Inventories",
-            Item::PrepaidExpensesAndOtherCurrentAssets => "PrepaidExpensesAndOtherCurrentAssets",
-            Item::TotalCurrentAssets => "TotalCurrentAssets",
-            Item::PropertyAndEquipmentNet => "PropertyAndEquipmentNet",
-            Item::OperatingLeaseAssets => "OperatingLeaseAssets",
-            Item::Goodwill => "Goodwill",
-            Item::IntangibleAssetsNet => "IntangibleAssetsNet",
-            Item::DeferredIncomeTaxAssets => "DeferredIncomeTaxAssets",
-            Item::NonMarketableEquitySecurities => "NonMarketableEquitySecurities",
-            Item::OtherAssets => "OtherAssets",
-            Item::TotalAssets => "TotalAssets",
-            Item::CurrentLiabilities => "CurrentLiabilities",
-            Item::AccountsPayable => "AccountsPayable",
-            Item::AccruedAndOtherCurrentLiabilities => "AccruedAndOtherCurrentLiabilities",
-            Item::ShortTermDebt => "ShortTermDebt",
-            Item::TotalCurrentLiabilities => "TotalCurrentLiabilities",
-            Item::LongTermDebt => "LongTermDebt",
-            Item::LongTermOperatingLeaseLiabilities => "LongTermOperatingLeaseLiabilities",
-            Item::OtherLongTermLiabilities => "OtherLongTermLiabilities",
-            Item::TotalLiabilities => "TotalLiabilities",
-            Item::Revenue => "Revenue",
-            Item::CostOfRevenue => "CostOfRevenue",
-            Item::GrossProfit => "GrossProfit",
-            Item::OperatingExpenses => "OperatingExpenses",
-            Item::ResearchAndDevelopment => "ResearchAndDevelopment",
-            Item::SalesGeneralAndAdministrative => "SalesGeneralAndAdministrative",
-            Item::TotalOperatingExpenses => "TotalOperatingExpenses",
-            Item::OperatingIncome => "OperatingIncome",
-            Item::InterestIncome => "InterestIncome",
-            Item::InterestExpense => "InterestExpense",
-            Item::OtherIncomeNet => "OtherIncomeNet",
-            Item::TotalOtherIncomeNet => "TotalOtherIncomeNet",
-            Item::IncomeBeforeIncomeTax => "IncomeBeforeIncomeTax",
-            Item::IncomeTaxExpense => "IncomeTaxExpense",
-            Item::NetIncome => "NetIncome",
-        }
     }
 }
 
