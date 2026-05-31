@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 use std::error::Error;
-use std::fs::File;
-use std::io::BufReader;
 use std::path::Path;
 
 use crate::Period;
@@ -57,7 +55,7 @@ impl Reader {
 
         if col_info.is_empty() { return Err("no dates found".into()); }
 
-        let items = self.balance_sheet.rows()
+        let reported_items = self.balance_sheet.rows()
             .filter(|row| !row.iter().all(|c| c.is_empty()))
             .filter_map(|row| {
                 let label = row.get(1)?.get_string()?;
@@ -77,7 +75,7 @@ impl Reader {
             })
             .collect();
 
-        Ok(items)
+        Ok(reported_items)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
@@ -132,7 +130,7 @@ impl Reader {
 
         if col_info.is_empty() { return Err("no dates found".into()); }
 
-        let items = self.income_statement.rows()
+        let reported_items = self.income_statement.rows()
             .filter(|row| !row.iter().all(|c| c.is_empty()))
             .filter_map(|row| {
                 let label = row.get(1)?.get_string()?;
@@ -152,7 +150,7 @@ impl Reader {
             })
             .collect();
 
-        Ok(items)
+        Ok(reported_items)
     }
 }
 
