@@ -6,7 +6,7 @@ use crate::Period;
 use crate::Item;
 use crate::ReportedItem;
 
-use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Range, Sheets};
+use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Range};
 use chrono::NaiveDate;
 
 pub struct Reader {
@@ -28,7 +28,7 @@ impl Reader {
     pub fn process_balance_sheet(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
         let header_rows: &Vec<&[Data]> = &self.balance_sheet.rows().take(30).collect();
 
-        let multiplier = get_multiplier(header_rows).ok_or("failed to get multiplier")?;
+        let multiplier = multiplier(header_rows).ok_or("failed to get multiplier")?;
 
         let col_info: HashMap<usize, NaiveDate> = header_rows.iter().enumerate()
             .flat_map(|(r, row)| {
@@ -81,10 +81,8 @@ impl Reader {
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
         let header_rows: &Vec<&[Data]> = &self.income_statement.rows().take(30).collect();
 
-        let is_10k = header_rows.iter().take(10)
-            .any(|r| r.iter().any(|c| c.get_string().map(|s| s.to_lowercase().contains("form type: 10-k")).unwrap_or(false)));
-
-        let multiplier = get_multiplier(header_rows).ok_or("failed to get multiplier")?;
+        let is_10k = is_10k(header_rows);
+        let multiplier = multiplier(header_rows).ok_or("failed to get multiplier")?;
 
         let mut col_periods = HashMap::new();
         header_rows.iter().enumerate().for_each(|(_, row)| {
@@ -154,14 +152,19 @@ impl Reader {
     }
 }
 
-fn get_multiplier(rows: &Vec<&[Data]>) -> Option<f64> {
-    rows.iter().take(20)
-        .find_map(|r| r.iter().find_map(|c| {
-            let s = c.get_string()?.to_lowercase();
-            if s.contains("in millions") { Some(1_000_000.0) }
-            else if s.contains("in thousands") { Some(1_000.0) }
-            else { None }
-        }))
+fn is_10k(rows: &Vec<&[Data]>) -> bool {
+    rows.iter().any(|r| r.iter()
+        .any(|c| c.get_string()
+            .map(|s| s.to_lowercase().contains("form type: 10-k")).unwrap_or(false)))
+}
+
+fn multiplier(rows: &Vec<&[Data]>) -> Option<f64> {
+    rows.iter().find_map(|r| r.iter().find_map(|c| {
+        let s = c.get_string()?.to_lowercase();
+        if s.contains("in millions") { Some(1_000_000.0) }
+        else if s.contains("in thousands") { Some(1_000.0) }
+        else { None }
+    }))
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
