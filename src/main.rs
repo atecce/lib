@@ -1,36 +1,41 @@
 use std::error::Error;
 use std::fs;
 
-use equities::nvda::new_reader;
+use equities::reader::new_reader;
 
 use chrono::NaiveDate;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
 
-    let paths: Vec<_> = fs::read_dir("equities/nvda")?
-        .filter_map(|f| f.ok())
-        .filter(|f| {
-             let path = f.path();
-             let ext = path.extension().and_then(|ext| ext.to_str());
-             ext == Some("xlsx")
-        })
-        .map(|f| f.path())
-        .collect();
+    let equities = vec!["nvda", "tsla"];
 
-    for path in paths {
-        match new_reader(&path) {
-            Ok(mut r) => {
-                match r.process_balance_sheet() {
-                    Ok(mut ret) => reported_items.append(&mut ret),
-                    Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
-                }
-                match r.process_income_statement() {
-                    Ok(mut ret) => reported_items.append(&mut ret),
-                    Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
-                }
-            },
-            Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
+    for equity in equities {
+        let dir = format!("equities/{}", equity);
+        let paths: Vec<_> = fs::read_dir(&dir)?
+            .filter_map(|f| f.ok())
+            .filter(|f| {
+                 let path = f.path();
+                 let ext = path.extension().and_then(|ext| ext.to_str());
+                 ext == Some("xlsx")
+            })
+            .map(|f| f.path())
+            .collect();
+
+        for path in paths {
+            match new_reader(&path, equity.to_string()) {
+                Ok(mut r) => {
+                    match r.process_balance_sheet() {
+                        Ok(mut ret) => reported_items.append(&mut ret),
+                        Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
+                    }
+                    match r.process_income_statement() {
+                        Ok(mut ret) => reported_items.append(&mut ret),
+                        Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
+                    }
+                },
+                Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
+            }
         }
     }
 
@@ -53,12 +58,14 @@ fn push_to_influx(items: &[equities::ReportedItem]) -> Result<(), Box<dyn Error>
             let t = NaiveDate::parse_from_str(&item.t, "%Y-%m-%d").unwrap();
             let ts = t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
-                "reported_item_v3,item={},period={} value={} {}\n",
+                "reported_item_v11,ticker={},item={},period={} value={} {}\n",
+                item.ticker,
                 item.item.as_str(),
                 item.p.as_str(),
                 item.val,
                 ts
             ));
+
         }
 
         let res = client.post("http://localhost:8181/write?db=financials")
