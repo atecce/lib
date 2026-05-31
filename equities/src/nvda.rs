@@ -29,7 +29,6 @@ impl Reader {
         let header_rows: &Vec<&[Data]> = &self.balance_sheet.rows().take(30).collect();
 
         let multiplier = multiplier(header_rows).ok_or("failed to get multiplier")?;
-
         let col_info = col_info_balance_sheet(header_rows)?;
 
         let reported_items = self.balance_sheet.rows()
@@ -61,21 +60,7 @@ impl Reader {
         let is_10k = is_10k(header_rows);
         let multiplier = multiplier(header_rows).ok_or("failed to get multiplier")?;
 
-        let mut col_periods = HashMap::new();
-        header_rows.iter().enumerate().for_each(|(_, row)| {
-            row.iter().enumerate().for_each(|(c, cell)| {
-                if let Some(s) = cell.get_string() {
-                    match s.parse::<Period>() {
-                        Ok(p) => {
-                            col_periods.insert(c, p);
-                            col_periods.insert(c + 1, p);
-                            col_periods.insert(c + 2, p);
-                        },
-                        Err(e) => eprintln!("failed to parse {} into period: {:?}", s, e),
-                    }
-                }
-            });
-        });
+        let col_periods = col_periods(header_rows);
 
         let col_info: HashMap<usize, (NaiveDate, Period)> = header_rows.iter().enumerate()
             .flat_map(|(r, row)| {
@@ -142,6 +127,26 @@ fn multiplier(rows: &Vec<&[Data]>) -> Option<f64> {
         else if s.contains("in thousands") { Some(1_000.0) }
         else { None }
     }))
+}
+
+fn col_periods(rows: &Vec<&[Data]>) -> HashMap<usize, Period> {
+    let mut col_periods = HashMap::new();
+    rows.iter().enumerate().for_each(|(_, row)| {
+        row.iter().enumerate().for_each(|(c, cell)| {
+            if let Some(s) = cell.get_string() {
+                match s.parse::<Period>() {
+                    Ok(p) => {
+                        col_periods.insert(c, p);
+                        col_periods.insert(c + 1, p);
+                        col_periods.insert(c + 2, p);
+                    },
+                    Err(e) => eprintln!("failed to parse {} into period: {:?}", s, e),
+                }
+            }
+        });
+    });
+
+    col_periods
 }
 
 fn col_info_balance_sheet(rows: &Vec<&[Data]>) -> Result<HashMap<usize, NaiveDate>, Box<dyn Error>> {
