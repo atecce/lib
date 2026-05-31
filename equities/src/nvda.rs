@@ -30,30 +30,7 @@ impl Reader {
 
         let multiplier = multiplier(header_rows).ok_or("failed to get multiplier")?;
 
-        let col_info: HashMap<usize, NaiveDate> = header_rows.iter().enumerate()
-            .flat_map(|(r, row)| {
-                let rows = &header_rows; // Borrow for split-row check
-                row.iter().enumerate().filter_map(move |(c, cell)| {
-                    if let Some(date) = parse_date(cell) {
-                        return Some((c, date));
-                    }
-                    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
-                        if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
-                            Data::Float(f) => Some(*f as i32),
-                            Data::Int(i) => Some(*i as i32),
-                            _ => None,
-                        }).filter(|&y| y > 1900 && y < 2100) {
-                            if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
-                                return Some((c, date));
-                            }
-                        }
-                    }
-                    None
-                })
-            })
-            .collect();
-
-        if col_info.is_empty() { return Err("no dates found".into()); }
+        let col_info = col_info_balance_sheet(header_rows)?;
 
         let reported_items = self.balance_sheet.rows()
             .filter(|row| !row.iter().all(|c| c.is_empty()))
@@ -165,6 +142,34 @@ fn multiplier(rows: &Vec<&[Data]>) -> Option<f64> {
         else if s.contains("in thousands") { Some(1_000.0) }
         else { None }
     }))
+}
+
+fn col_info_balance_sheet(rows: &Vec<&[Data]>) -> Result<HashMap<usize, NaiveDate>, Box<dyn Error>> {
+    let col_info: HashMap<usize, NaiveDate> = rows.iter().enumerate().flat_map(|(r, row)| {
+        let rows = &rows; // Borrow for split-row check
+        row.iter().enumerate().filter_map(move |(c, cell)| {
+            if let Some(date) = parse_date(cell) {
+                return Some((c, date));
+            }
+            if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+                if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
+                    Data::Float(f) => Some(*f as i32),
+                    Data::Int(i) => Some(*i as i32),
+                    _ => None,
+                }).filter(|&y| y > 1900 && y < 2100) {
+                    if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
+                        return Some((c, date));
+                    }
+                }
+            }
+            None
+        })
+    })
+    .collect();
+
+    if col_info.is_empty() { return Err("no dates found".into()); }
+
+    Ok(col_info)
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
