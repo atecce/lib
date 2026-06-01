@@ -23,6 +23,12 @@ fn main() {
             chapter: 23,
             start: 9,
             end: None,
+        },
+        bible::Source {
+            book: name::Name::Deuteronomy,
+            chapter: 8,
+            start: 3,
+            end: None,
         }
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
