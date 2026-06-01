@@ -71,7 +71,7 @@ use name::Name::Peleg;
 use name::Name::Perez;
 use name::Name::Ram;
 use name::Name::Reu;
-use name::Name::Reuben;
+// use name::Name::Reuben;
 use name::Name::Rhesa;
 use name::Name::Salmon;
 use name::Name::Semein;
@@ -145,7 +145,7 @@ const EVE: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const CAIN: &Daemon<Source> = &Daemon {
+pub const CAIN: &Daemon<Source> = &Daemon {
     names: &[Cain],
     words: &[],
     deeds: &[],
@@ -157,7 +157,7 @@ const CAIN: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const ABEL: &Daemon<Source> = &Daemon {
+pub const ABEL: &Daemon<Source> = &Daemon {
     names: &[Abel],
     words: &[],
     deeds: &[],
@@ -433,17 +433,17 @@ const JACOB: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const REUBEN: &Daemon<Source> = &Daemon {
-    names: &[Reuben],
-    words: &[],
-    deeds: &[],
-
-    father: Some(JACOB),
-    mother: None,
-    teacher: None,
-
-    predecessor: None,
-};
+// const REUBEN: &Daemon<Source> = &Daemon {
+//     names: &[Reuben],
+//     words: &[],
+//     deeds: &[],
+//
+//     father: Some(JACOB),
+//     mother: None,
+//     teacher: None,
+//
+//     predecessor: None,
+// };
 
 const AMRAM: &Daemon<Source> = &Daemon {
     names: &[Amram],
@@ -481,7 +481,7 @@ const מֹשֶׁה: &Daemon<Source> = &Daemon {
     predecessor: None,
 };
 
-const AARON: &Daemon<Source> = &Daemon {
+pub const AARON: &Daemon<Source> = &Daemon {
     names: &[Aaron],
     words: &[],
     deeds: &[],
