@@ -11,6 +11,12 @@ fn main() {
             chapter: 18,
             start: 14,
             end: Some(27),
+        },
+        bible::Source {
+            book: name::Name::Leviticus,
+            chapter: 20,
+            start: 26,
+            end: None,
         }
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
