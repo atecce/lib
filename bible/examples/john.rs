@@ -5,6 +5,12 @@ fn main() {
             chapter: 28,
             start: 10,
             end: Some(22),
+        },
+        bible::Source {
+            book: name::Name::Exodus,
+            chapter: 18,
+            start: 14,
+            end: Some(27),
         }
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
