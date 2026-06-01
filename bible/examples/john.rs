@@ -17,6 +17,12 @@ fn main() {
             chapter: 20,
             start: 26,
             end: None,
+        },
+        bible::Source {
+            book: name::Name::Numbers,
+            chapter: 23,
+            start: 9,
+            end: None,
         }
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
