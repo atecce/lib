@@ -58,7 +58,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
 
-        let mut series = HashMap::<equities::Item, Vec<Observation>>::new();
+        let mut series = HashMap::<equities::item::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
             series
                 .entry(reported_item.item)
@@ -69,7 +69,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
         }
 
-        for item in &equities::Item::ALL {
+        for item in &equities::item::Item::ALL {
             match series.get(item) {
                 Some(observations) => {
                     let data = observations.clone().into_iter().map(|o| o.val).collect::<Vec<f64>>();

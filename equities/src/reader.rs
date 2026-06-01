@@ -7,7 +7,7 @@ use std::path::Path;
 
 use crate::Ticker;
 use crate::Period;
-use crate::Item;
+use crate::item::Item;
 use crate::ReportedItem;
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets, Range};

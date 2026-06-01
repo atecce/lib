@@ -35417,13 +35417,6 @@
     "t": "2022-07-31",
     "p": "ThreeMonths",
     "item": "Revenue",
-    "val": 6704000000.0
-  },
-  {
-    "ticker": "NVDA",
-    "t": "2022-07-31",
-    "p": "ThreeMonths",
-    "item": "Revenue",
     "val": 14992000000.0
   },
   {
@@ -35437,8 +35430,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "CostOfRevenue",
-    "val": 3789000000.0
+    "item": "Revenue",
+    "val": 6704000000.0
   },
   {
     "ticker": "NVDA",
@@ -35458,8 +35451,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "GrossProfit",
-    "val": 2915000000.0
+    "item": "CostOfRevenue",
+    "val": 3789000000.0
   },
   {
     "ticker": "NVDA",
@@ -35479,8 +35472,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "ResearchAndDevelopment",
-    "val": 1824000000.0
+    "item": "GrossProfit",
+    "val": 2915000000.0
   },
   {
     "ticker": "NVDA",
@@ -35500,8 +35493,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "SalesGeneralAndAdministrative",
-    "val": 592000000.0
+    "item": "ResearchAndDevelopment",
+    "val": 1824000000.0
   },
   {
     "ticker": "NVDA",
@@ -35521,8 +35514,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "TotalOperatingExpenses",
-    "val": 2416000000.0
+    "item": "SalesGeneralAndAdministrative",
+    "val": 592000000.0
   },
   {
     "ticker": "NVDA",
@@ -35542,8 +35535,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "OperatingIncome",
-    "val": 499000000.0
+    "item": "TotalOperatingExpenses",
+    "val": 2416000000.0
   },
   {
     "ticker": "NVDA",
@@ -35563,8 +35556,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "InterestIncome",
-    "val": 46000000.0
+    "item": "OperatingIncome",
+    "val": 499000000.0
   },
   {
     "ticker": "NVDA",
@@ -35584,8 +35577,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "InterestExpense",
-    "val": -65000000.0
+    "item": "InterestIncome",
+    "val": 46000000.0
   },
   {
     "ticker": "NVDA",
@@ -35605,8 +35598,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "OtherIncomeNet",
-    "val": -24000000.0
+    "item": "InterestExpense",
+    "val": -65000000.0
   },
   {
     "ticker": "NVDA",
@@ -35626,8 +35619,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "IncomeBeforeIncomeTax",
-    "val": 475000000.0
+    "item": "OtherIncomeNet",
+    "val": -24000000.0
   },
   {
     "ticker": "NVDA",
@@ -35647,8 +35640,8 @@
     "ticker": "NVDA",
     "t": "2022-07-31",
     "p": "ThreeMonths",
-    "item": "NetIncome",
-    "val": 656000000.0
+    "item": "IncomeBeforeIncomeTax",
+    "val": 475000000.0
   },
   {
     "ticker": "NVDA",
@@ -35656,6 +35649,13 @@
     "p": "ThreeMonths",
     "item": "NetIncome",
     "val": 2274000000.0
+  },
+  {
+    "ticker": "NVDA",
+    "t": "2022-07-31",
+    "p": "ThreeMonths",
+    "item": "NetIncome",
+    "val": 656000000.0
   },
   {
     "ticker": "NVDA",
