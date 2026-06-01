@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .collect();
 
     for path in paths {
-        match new_reader(&path, "nvda".to_string()) {
+        match new_reader(&path, equities::Ticker::NVDA) {
             Ok(mut r) => {
                 match r.process_balance_sheet() {
                     Ok(mut ret) => reported_items.append(&mut ret),

@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
+use crate::Ticker;
 use crate::Period;
 use crate::Item;
 use crate::ReportedItem;
@@ -14,10 +15,10 @@ use chrono::NaiveDate;
 
 pub struct Reader {
     workbook: Sheets<BufReader<File>>,
-    ticker: String,
+    ticker: Ticker,
 }
 
-pub fn new_reader(path: &Path, ticker: String) -> Result<Reader, Box<dyn Error>> {
+pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
     Ok(Reader {
         workbook: open_workbook_auto(path)?,
         ticker,
@@ -58,7 +59,7 @@ impl Reader {
                         if !val.is_nan() {
                             found_items.get_mut(&col).unwrap().insert(item);
                             reported_items.push(ReportedItem {
-                                ticker: ticker.clone(),
+                                ticker: ticker.to_string(),
                                 t: date.to_string(),
                                 p: Period::PointInTime,
                                 item,
@@ -106,7 +107,7 @@ impl Reader {
                         if !val.is_nan() {
                             found_items.get_mut(&col).unwrap().insert((item, *period));
                             reported_items.push(ReportedItem {
-                                ticker: ticker.clone(),
+                                ticker: ticker.to_string(),
                                 t: date.to_string(),
                                 p: *period,
                                 item,

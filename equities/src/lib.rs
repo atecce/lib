@@ -160,3 +160,32 @@ pub struct ReportedItem {
     pub item: Item,
     pub val: f64,
 }
+
+#[derive(Clone, Debug)]
+pub enum Ticker {
+    NVDA,
+    TSLA,
+}
+
+impl std::fmt::Display for Ticker {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl FromStr for Ticker {
+    type Err = TickerError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let trimmed = s.trim();
+
+        let lower = trimmed.to_lowercase();
+        if lower.contains("nvda") { Ok(Ticker::NVDA) }
+        else if lower.contains("tsla") { Ok(Ticker::TSLA) }
+        else { Err(TickerError::TickerNotFound) }
+    }
+}
+
+pub enum TickerError {
+    TickerNotFound,
+}

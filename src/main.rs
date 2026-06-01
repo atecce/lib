@@ -8,7 +8,7 @@ use chrono::NaiveDate;
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
 
-    let equities = vec!["nvda", "tsla"];
+    let equities = vec![equities::Ticker::NVDA, equities::Ticker::TSLA];
 
     for equity in equities {
         let dir = format!("equities/{}", equity);
@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             .collect();
 
         for path in paths {
-            match new_reader(&path, equity.to_string()) {
+            match new_reader(&path, equity.clone()) {
                 Ok(mut r) => {
                     match r.process_balance_sheet() {
                         Ok(mut ret) => reported_items.append(&mut ret),
