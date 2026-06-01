@@ -170,20 +170,12 @@ fn col_periods(rows: &[&[Data]]) -> HashMap<usize, Period> {
     for row in rows {
         for (c, cell) in row.iter().enumerate() {
             if let Some(s) = cell.get_string() {
-                let lower = s.to_lowercase();
-                let p = if lower.contains("three months") { Some(Period::ThreeMonths) }
-                    else if lower.contains("six months") { Some(Period::SixMonths) }
-                    else if lower.contains("nine months") { Some(Period::NineMonths) }
-                    else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Some(Period::TwelveMonths) }
-                    else { None };
-
-                if let Some(period) = p {
-                    col_periods.insert(c, period);
+                if let Ok(p) = s.to_lowercase().parse::<Period>() {
+                    col_periods.insert(c, p);
                 }
             }
         }
     }
-
     col_periods
 }
 
