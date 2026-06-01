@@ -6,7 +6,7 @@ use std::io::BufWriter;
 
 use augurs::outlier::{MADDetector, OutlierDetector};
 
-use equities::nvda::new_reader;
+use equities::reader::new_reader;
 
 use chrono::NaiveDate;
 
@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .collect();
 
     for path in paths {
-        match new_reader(&path) {
+        match new_reader(&path, "nvda".to_string()) {
             Ok(mut r) => {
                 match r.process_balance_sheet() {
                     Ok(mut ret) => reported_items.append(&mut ret),

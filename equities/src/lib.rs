@@ -15,15 +15,16 @@ pub enum Period {
     PointInTime,
 }
 
-impl Period {
-    pub fn as_str(&self) -> &'static str {
-        match self {
+impl std::fmt::Display for Period {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
             Period::ThreeMonths => "3m",
             Period::SixMonths => "6m",
             Period::NineMonths => "9m",
             Period::TwelveMonths => "12m",
             Period::PointInTime => "pit",
-        }
+        };
+        write!(f, "{}", s)
     }
 }
 
@@ -60,16 +61,18 @@ macro_rules! items {
             $($variant),*
         }
 
+        impl std::fmt::Display for $item {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    $($item::$variant => write!(f, "{}", stringify!($variant)),)*
+                }
+            }
+        }
+
         impl $item {
             pub const ALL: [$item; 39] = [
                 $($item::$variant,)*
             ];
-
-            pub fn as_str(&self) -> &'static str {
-                match self {
-                    $($item::$variant => stringify!($variant),)*
-                }
-            }
         }
 
         impl FromStr for $item {

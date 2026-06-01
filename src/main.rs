@@ -60,8 +60,8 @@ fn push_to_influx(items: &[equities::ReportedItem]) -> Result<(), Box<dyn Error>
             payload.push_str(&format!(
                 "reported_item_v11,ticker={},item={},period={} value={} {}\n",
                 item.ticker,
-                item.item.as_str(),
-                item.p.as_str(),
+                item.item,
+                item.p,
                 item.val,
                 ts
             ));
