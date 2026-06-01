@@ -1,7 +1,5 @@
 use std::str::FromStr;
 
-// use chrono::NaiveDate;
-
 macro_rules! items {
     (
         pub enum $item:ident {
@@ -13,14 +11,6 @@ macro_rules! items {
         #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, serde::Serialize, uniffi::Enum)]
         pub enum $item {
             $($variant),*
-        }
-
-        impl std::fmt::Display for $item {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                match self {
-                    $($item::$variant => write!(f, "{}", stringify!($variant)),)*
-                }
-            }
         }
 
         impl $item {
@@ -51,6 +41,12 @@ macro_rules! items {
             }
         }
     };
+}
+
+impl std::fmt::Display for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 items! {
