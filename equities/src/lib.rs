@@ -105,7 +105,7 @@ pub enum PeriodError {
     InvalidPeriod,
 }
 
-#[derive(Debug, serde::Serialize, uniffi::Record)]
+#[derive(Debug, PartialEq, serde::Serialize, uniffi::Record)]
 pub struct ReportedItem {
     pub ticker: String,
     pub t: String,
