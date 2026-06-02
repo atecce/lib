@@ -10,7 +10,7 @@ use crate::Period;
 use crate::item::Item;
 use crate::ReportedItem;
 
-use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets, Range};
+use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
 use chrono::NaiveDate;
 
 pub struct Reader {
@@ -37,7 +37,7 @@ impl Reader {
         let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
         let col_info = col_info_balance_sheet(&rows)?;
 
-        let label_col = self.detect_label_column(&range);
+        let label_col = detect_label_column(&rows);
         let ticker = self.ticker.clone();
 
         let mut reported_items = Vec::new();
@@ -86,7 +86,7 @@ impl Reader {
         let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
         let col_info = col_info_income_statement(&rows)?;
 
-        let label_col = self.detect_label_column(&range);
+        let label_col = detect_label_column(&rows);
         let ticker = self.ticker.clone();
 
         let mut reported_items = Vec::new();
@@ -134,21 +134,6 @@ impl Reader {
             }
         }
         None
-    }
-
-    fn detect_label_column(&self, range: &Range<Data>) -> usize {
-        let mut col0_count = 0;
-        let mut col1_count = 0;
-        for row in range.rows().take(50) {
-            let row: &[Data] = row;
-            if let Some(s) = row.get(0).and_then(|c| c.get_string()) {
-                if s.parse::<Item>().is_ok() { col0_count += 1; }
-            }
-            if let Some(s) = row.get(1).and_then(|c| c.get_string()) {
-                if s.parse::<Item>().is_ok() { col1_count += 1; }
-            }
-        }
-        if col0_count >= col1_count { 0 } else { 1 }
     }
 }
 
@@ -250,6 +235,21 @@ fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDa
     if col_info.is_empty() { return Err("no dates found".into()); }
 
     Ok(col_info)
+}
+
+fn detect_label_column(rows: &[&[Data]]) -> usize {
+    let mut col0_count = 0;
+    let mut col1_count = 0;
+    for row in rows {
+        let row: &[Data] = row;
+        if let Some(s) = row.get(0).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col0_count += 1; }
+        }
+        if let Some(s) = row.get(1).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col1_count += 1; }
+        }
+    }
+    if col0_count >= col1_count { 0 } else { 1 }
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
