@@ -39,10 +39,10 @@ impl std::str::FromStr for Source {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let s = s.trim();
 
-        let last_space_idx = s.rfind(' ').ok_or(SourceError::FailedToSplitOnSpace)?;
+        let i = s.rfind(' ').ok_or(SourceError::FailedToSplitOnSpace)?;
 
-        let book_str = &s[..last_space_idx];
-        let chapter_and_verse_str = &s[last_space_idx + 1..];
+        let book_str = &s[..i];
+        let chapter_and_verse_str = &s[i + 1..];
 
         let book = book_str.parse::<Name>().map_err(|err| SourceError::FailedToParseName(err))?;
 
