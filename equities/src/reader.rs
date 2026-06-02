@@ -29,12 +29,13 @@ impl Reader {
     pub fn process_balance_sheet(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance Sheets", "Condensed Consolidated Balance S"])
             .ok_or("Balance sheet not found")?;
-        
-        let range = self.workbook.worksheet_range(&sheet_name)?;
-        let header_rows: Vec<&[Data]> = range.rows().take(30).collect();
 
-        let multiplier = multiplier(&header_rows).ok_or("failed to get multiplier")?;
-        let col_info = col_info_balance_sheet(&header_rows)?;
+        let range = self.workbook.worksheet_range(&sheet_name)?;
+
+        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+
+        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
+        let col_info = col_info_balance_sheet(&rows)?;
 
         let label_col = self.detect_label_column(&range);
         let ticker = self.ticker.clone();
@@ -42,7 +43,7 @@ impl Reader {
         let mut reported_items = Vec::new();
         let mut found_items: HashMap<usize, HashSet<Item>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
 
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+        for row in rows {
             if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
                     for (&col, &date) in &col_info {
@@ -79,10 +80,11 @@ impl Reader {
             .ok_or("Income statement not found")?;
 
         let range = self.workbook.worksheet_range(&sheet_name)?;
-        let header_rows: Vec<&[Data]> = range.rows().take(30).collect();
 
-        let multiplier = multiplier(&header_rows).ok_or("failed to get multiplier")?;
-        let col_info = col_info_income_statement(&header_rows)?;
+        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+
+        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
+        let col_info = col_info_income_statement(&rows)?;
 
         let label_col = self.detect_label_column(&range);
         let ticker = self.ticker.clone();
@@ -90,7 +92,7 @@ impl Reader {
         let mut reported_items = Vec::new();
         let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
 
-        for row in range.rows().filter(|row| !row.iter().all(|c| c.is_empty())) {
+        for row in rows {
             if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
                     for (&col, (date, period)) in &col_info {
