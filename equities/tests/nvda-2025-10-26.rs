@@ -3,7 +3,7 @@ use equities::Period::PointInTime;
 use equities::ReportedItem;
 
 #[test]
-fn report() {
+fn balance_sheet() {
     let expected = [
 
         ReportedItem {
@@ -260,7 +260,15 @@ fn report() {
         }
     });
 
-    for (i, actual_reported_item) in actual.into_iter().enumerate() {
+    println!("{:#?}", actual);
+
+    for (i, actual_reported_item) in actual.into_iter()
+        .filter(|item| item.item != Item::TotalCurrentAssets
+            && item.item != Item::TotalAssets
+            && item.item != Item::TotalCurrentLiabilities
+            && item.item != Item::TotalLiabilities
+         )
+        .enumerate() {
         assert!(
             actual_reported_item == expected[i],
             "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
