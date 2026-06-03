@@ -49,6 +49,15 @@ impl std::fmt::Display for Item {
     }
 }
 
+impl Item {
+    pub fn is_aggregate(self) -> bool {
+        self == Item::TotalCurrentAssets
+            || self == Item::TotalAssets
+            || self == Item::TotalCurrentLiabilities
+            || self == Item::TotalLiabilities
+    }
+}
+
 items! {
     pub enum Item {
         CurrentAssets,

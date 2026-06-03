@@ -263,11 +263,7 @@ fn balance_sheet() {
     println!("{:#?}", actual);
 
     for (i, actual_reported_item) in actual.into_iter()
-        .filter(|item| item.item != Item::TotalCurrentAssets
-            && item.item != Item::TotalAssets
-            && item.item != Item::TotalCurrentLiabilities
-            && item.item != Item::TotalLiabilities
-         )
+        .filter(|item| !item.item.is_aggregate())
         .enumerate() {
         assert!(
             actual_reported_item == expected[i],
