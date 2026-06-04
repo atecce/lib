@@ -11,26 +11,30 @@ use crate::item::Item;
 
 pub struct BalanceSheet {
 
-    cash_and_cash_equivalents: f64,
-    marketable_securities: f64,
-    accounts_receivable_net: f64,
-    inventories: f64,
-    prepaid_expenses_and_other_current_assets: f64,
+    pub ticker: String,
 
-    property_and_equipment_net: f64,
-    operating_lease_assets: f64,
-    goodwill: f64,
-    intangible_assets_net: f64,
-    deferred_income_tax_assets: f64,
-    other_assets: f64,
+    pub t: String,
 
-    accounts_payable: f64,
-    accrued_and_other_current_liabilities: f64,
-    short_term_debt: f64,
+    pub cash_and_cash_equivalents: f64,
+    pub marketable_securities: f64,
+    pub accounts_receivable_net: f64,
+    pub inventories: f64,
+    pub prepaid_expenses_and_other_current_assets: f64,
 
-    long_term_debt: f64,
-    long_term_operating_lease_liabilities: f64,
-    other_long_term_liabilities: f64,
+    pub property_and_equipment_net: f64,
+    pub operating_lease_assets: f64,
+    pub goodwill: f64,
+    pub intangible_assets_net: f64,
+    pub deferred_income_tax_assets: f64,
+    pub other_assets: f64,
+
+    pub accounts_payable: f64,
+    pub accrued_and_other_current_liabilities: f64,
+    pub short_term_debt: f64,
+
+    pub long_term_debt: f64,
+    pub long_term_operating_lease_liabilities: f64,
+    pub other_long_term_liabilities: f64,
 }
 
 impl BalanceSheet {
@@ -60,6 +64,130 @@ impl BalanceSheet {
             + self.long_term_debt
             + self.long_term_operating_lease_liabilities
             + self.other_long_term_liabilities
+    }
+
+    pub fn reported_items(&self) -> [ReportedItem; 17] {
+        [
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::CashAndCashEquivalents,
+                val: self.cash_and_cash_equivalents,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::MarketableSecurities,
+                val: self.marketable_securities,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::AccountsReceivableNet,
+                val: self.accounts_receivable_net,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::Inventories,
+                val: self.inventories,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::PrepaidExpensesAndOtherCurrentAssets,
+                val: self.prepaid_expenses_and_other_current_assets,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::PropertyAndEquipmentNet,
+                val: self.property_and_equipment_net,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::OperatingLeaseAssets,
+                val: self.operating_lease_assets,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::Goodwill,
+                val: self.goodwill,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::IntangibleAssetsNet,
+                val: self.intangible_assets_net,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::DeferredIncomeTaxAssets,
+                val: self.deferred_income_tax_assets,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::OtherAssets,
+                val: self.other_assets,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::AccountsPayable,
+                val: self.accounts_payable,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::AccruedAndOtherCurrentLiabilities,
+                val: self.accrued_and_other_current_liabilities,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::ShortTermDebt,
+                val: self.short_term_debt,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::LongTermDebt,
+                val: self.long_term_debt,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::LongTermOperatingLeaseLiabilities,
+                val: self.long_term_operating_lease_liabilities,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::OtherLongTermLiabilities,
+                val: self.other_long_term_liabilities,
+            },
+        ]
     }
 }
 
@@ -105,7 +233,7 @@ pub enum PeriodError {
     InvalidPeriod,
 }
 
-#[derive(Debug, PartialEq, serde::Serialize, uniffi::Record)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, uniffi::Record)]
 pub struct ReportedItem {
     pub ticker: String,
     pub t: String,
