@@ -1,4 +1,5 @@
 use equities::BalanceSheet;
+use equities::IncomeStatement;
 
 #[test]
 fn balance_sheet() {
@@ -6,7 +7,7 @@ fn balance_sheet() {
     let balance_sheets = vec![
         BalanceSheet {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).expect("2025-01-26 chrono naive date failed"),
+            t: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).unwrap(),
 
             cash_and_cash_equivalents: 8_589_000_000.0,
             marketable_securities: 34_621_000_000.0,
@@ -31,7 +32,7 @@ fn balance_sheet() {
         },
         BalanceSheet {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).expect("2025-10-26 chrono naive date failed"),
+            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
 
             cash_and_cash_equivalents: 11_486_000_000.0,
             marketable_securities: 49_122_000_000.0,
@@ -58,15 +59,102 @@ fn balance_sheet() {
 
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
     let mut actual = r.process_balance_sheet().unwrap();
-
     actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
 
-    println!("{:#?}", actual);
+    let expected: Vec<equities::ReportedItem> = balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect();
 
-    let expected = [balance_sheets[0].reported_items(), balance_sheets[1].reported_items()].concat();
+    for (i, actual_reported_item) in actual.into_iter().enumerate() {
+        assert!(
+            actual_reported_item == expected[i],
+            "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
+            actual_reported_item,
+            expected[i],
+        )
+    }
+}
 
-    for (i, actual_reported_item) in actual.into_iter()
-        .enumerate() {
+#[test]
+fn income_statement() {
+
+    let income_statements = vec![
+        IncomeStatement {
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
+            p: equities::Period::ThreeMonths,
+
+            revenue: 35_082_000_000.0,
+            cost_of_revenue: 8_926_000_000.0,
+
+            research_and_development: 3_390_000_000.0,
+            sales_general_and_administrative: 897_000_000.0,
+
+            interest_income: 472_000_000.0,
+            interest_expense: -61_000_000.0,
+            other_income_net: 36_000_000.0,
+
+            income_tax_expense: 3_007_000_000.0,
+        },
+        IncomeStatement {
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
+            p: equities::Period::NineMonths,
+
+            revenue: 91_166_000_000.0,
+            cost_of_revenue: 22_031_000_000.0,
+
+            research_and_development: 9_200_000_000.0,
+            sales_general_and_administrative: 2_516_000_000.0,
+
+            interest_income: 1_275_000_000.0,
+            interest_expense: -186_000_000.0,
+            other_income_net: 301_000_000.0,
+
+            income_tax_expense: 8_020_000_000.0,
+        },
+
+        IncomeStatement {
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            p: equities::Period::ThreeMonths,
+
+            revenue: 57_006_000_000.0,
+            cost_of_revenue: 15_157_000_000.0,
+
+            research_and_development: 4_705_000_000.0,
+            sales_general_and_administrative: 1_134_000_000.0,
+
+            interest_income: 624_000_000.0,
+            interest_expense: -61_000_000.0,
+            other_income_net: 1_363_000_000.0,
+
+            income_tax_expense: 6_026_000_000.0,
+        },
+        IncomeStatement {
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            p: equities::Period::NineMonths,
+
+            revenue: 147_811_000_000.0,
+            cost_of_revenue: 45_441_000_000.0,
+
+            research_and_development: 12_985_000_000.0,
+            sales_general_and_administrative: 3_297_000_000.0,
+
+            interest_income: 1_732_000_000.0,
+            interest_expense: -186_000_000.0,
+            other_income_net: 3_418_000_000.0,
+
+            income_tax_expense: 13_945_000_000.0,
+        },
+    ];
+
+    let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
+    let mut actual = r.process_income_statement().unwrap();
+    actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
+
+    let expected: Vec<equities::ReportedItem> = income_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect();
+
+    for (i, actual_reported_item) in actual.into_iter().enumerate() {
         assert!(
             actual_reported_item == expected[i],
             "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",

@@ -68,148 +68,148 @@ impl BalanceSheet {
     pub fn reported_items(&self) -> [ReportedItem; 21] {
         [
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::CashAndCashEquivalents,
                 val: self.cash_and_cash_equivalents,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::MarketableSecurities,
                 val: self.marketable_securities,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::AccountsReceivableNet,
                 val: self.accounts_receivable_net,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::Inventories,
                 val: self.inventories,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::PrepaidExpensesAndOtherCurrentAssets,
                 val: self.prepaid_expenses_and_other_current_assets,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::TotalCurrentAssets,
                 val: self.total_current_assets(),
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::PropertyAndEquipmentNet,
                 val: self.property_and_equipment_net,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::OperatingLeaseAssets,
                 val: self.operating_lease_assets,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::Goodwill,
                 val: self.goodwill,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::IntangibleAssetsNet,
                 val: self.intangible_assets_net,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::DeferredIncomeTaxAssets,
                 val: self.deferred_income_tax_assets,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::OtherAssets,
                 val: self.other_assets,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::TotalAssets,
                 val: self.total_assets(),
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::AccountsPayable,
                 val: self.accounts_payable,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::AccruedAndOtherCurrentLiabilities,
                 val: self.accrued_and_other_current_liabilities,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::ShortTermDebt,
                 val: self.short_term_debt,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::TotalCurrentLiabilities,
                 val: self.total_current_liabilities(),
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::LongTermDebt,
                 val: self.long_term_debt,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::LongTermOperatingLeaseLiabilities,
                 val: self.long_term_operating_lease_liabilities,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::OtherLongTermLiabilities,
                 val: self.other_long_term_liabilities,
             },
             ReportedItem {
-                ticker: self.ticker.clone(),
-                t: self.t.clone(),
+                ticker: self.ticker,
+                t: self.t,
                 p: Period::PointInTime,
                 item: Item::TotalLiabilities,
                 val: self.total_liabilities(),
@@ -220,21 +220,145 @@ impl BalanceSheet {
 
 pub struct IncomeStatement {
 
-    ticker: String,
+    pub ticker: Ticker,
+    pub t: NaiveDate,
+    pub p: Period,
 
-    t: String,
+    pub revenue: f64,
+    pub cost_of_revenue: f64,
 
-    revenue: f64,
-    cost_of_revenue: f64,
+    pub research_and_development: f64,
+    pub sales_general_and_administrative: f64,
 
-    research_and_development: f64,
-    sales_general_and_administrative: f64,
+    pub interest_income: f64,
+    pub interest_expense: f64,
+    pub other_income_net: f64,
 
-    interest_income: f64,
-    interest_expense: f64,
-    other_income_net: f64,
+    pub income_tax_expense: f64,
+}
 
-    income_tax_expense: f64,
+impl IncomeStatement {
+    fn gross_profit(&self) -> f64 {
+        self.revenue - self.cost_of_revenue
+    }
+    fn total_operating_expenses(&self) -> f64 {
+        self.research_and_development + self.sales_general_and_administrative
+    }
+    fn operating_income(&self) -> f64 {
+        self.gross_profit() - self.total_operating_expenses()
+    }
+    fn total_other_income_net(&self) -> f64 {
+        self.interest_income + self.interest_expense + self.other_income_net
+    }
+    fn income_before_income_tax(&self) -> f64 {
+        self.operating_income() + self.total_other_income_net()
+    }
+    fn net_income(&self) -> f64 {
+        self.income_before_income_tax() - self.income_tax_expense
+    }
+
+    pub fn reported_items(&self) -> [ReportedItem; 14] {
+        [
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::Revenue,
+                val: self.revenue,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::CostOfRevenue,
+                val: self.cost_of_revenue,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::GrossProfit,
+                val: self.gross_profit(),
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::ResearchAndDevelopment,
+                val: self.research_and_development,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::SalesGeneralAndAdministrative,
+                val: self.sales_general_and_administrative,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::TotalOperatingExpenses,
+                val: self.total_operating_expenses(),
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::OperatingIncome,
+                val: self.operating_income(),
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::InterestIncome,
+                val: self.interest_income,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::InterestExpense,
+                val: self.interest_expense,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::OtherIncomeNet,
+                val: self.other_income_net,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::TotalOtherIncomeNet,
+                val: self.total_other_income_net(),
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::IncomeBeforeIncomeTax,
+                val: self.income_before_income_tax(),
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::IncomeTaxExpense,
+                val: self.income_tax_expense,
+            },
+            ReportedItem {
+                ticker: self.ticker,
+                t: self.t,
+                p: self.p,
+                item: Item::NetIncome,
+                val: self.net_income(),
+            },
+        ]
+    }
 }
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, uniffi::Enum)]
