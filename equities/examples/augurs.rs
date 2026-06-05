@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
+use std::fs::File;
+use std::io::BufWriter;
 
 use augurs::outlier::{MADDetector, OutlierDetector};
 
@@ -46,7 +48,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     if !reported_items.is_empty() {
         reported_items.sort_by_cached_key(|item| (item.t, item.p, item.item));
 
-//        serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
+        serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
 
         let mut series = HashMap::<equities::item::Item, Vec<Observation>>::new();
         for reported_item in reported_items {

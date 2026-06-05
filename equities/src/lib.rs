@@ -279,7 +279,7 @@ pub enum PeriodError {
     InvalidPeriod,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
 pub struct ReportedItem {
     pub ticker: Ticker,
     pub t: NaiveDate,
@@ -288,7 +288,7 @@ pub struct ReportedItem {
     pub val: f64,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
 pub enum Ticker {
     NVDA,
     TSLA,
