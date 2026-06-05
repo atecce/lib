@@ -1,8 +1,7 @@
-use equities::BalanceSheet;
-use equities::IncomeStatement;
+use equities::{BalanceSheet, IncomeStatement, ReportedItem};
 
 #[test]
-fn balance_sheet() {
+fn report() {
 
     let balance_sheets = vec![
         BalanceSheet {
@@ -56,25 +55,6 @@ fn balance_sheet() {
             other_long_term_liabilities: 6_694_000_000.0,
         },
     ];
-
-    let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
-    let mut actual = r.process_balance_sheet().unwrap();
-    actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
-
-    let expected: Vec<equities::ReportedItem> = balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect();
-
-    for (i, actual_reported_item) in actual.into_iter().enumerate() {
-        assert!(
-            actual_reported_item == expected[i],
-            "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
-            actual_reported_item,
-            expected[i],
-        )
-    }
-}
-
-#[test]
-fn income_statement() {
 
     let income_statements = vec![
         IncomeStatement {
@@ -149,17 +129,21 @@ fn income_statement() {
     ];
 
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
-    let mut actual = r.process_income_statement().unwrap();
+
+    assert_reported_items(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect());
+    assert_reported_items(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect());
+}
+
+fn assert_reported_items(mut actual: Vec<ReportedItem>, expected: Vec<ReportedItem>) {
     actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
 
-    let expected: Vec<equities::ReportedItem> = income_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect();
-
-    for (i, actual_reported_item) in actual.into_iter().enumerate() {
+    for (actual_reported_item, expected_reported_item) in actual.into_iter().zip(expected) {
+        println!("{:#?}", actual_reported_item);
+        println!("{:#?}", expected_reported_item);
         assert!(
-            actual_reported_item == expected[i],
+            actual_reported_item == expected_reported_item,
             "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
-            actual_reported_item,
-            expected[i],
+            actual_reported_item, expected_reported_item,
         )
     }
 }
