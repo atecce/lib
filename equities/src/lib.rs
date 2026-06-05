@@ -9,8 +9,53 @@ use crate::item::Item;
 
 use chrono::NaiveDate;
 
-pub struct BalanceSheet {
+macro_rules! count_items {
+    () => { 0 };
+    ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
+}
 
+macro_rules! impl_reported_items {
+    ($name:ident, @pit, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
+        impl $name {
+            pub fn reported_items(&self) -> [ReportedItem; count_items!($($variant)*)] {
+                [
+                    $(
+                        ReportedItem {
+                            ticker: self.ticker,
+                            t: self.t,
+                            p: Period::PointInTime,
+                            item: Item::$variant,
+                            val: impl_reported_items!(@val self, $kind $source),
+                        },
+                    )*
+                ]
+            }
+        }
+    };
+
+    ($name:ident, @field $period_field:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
+        impl $name {
+            pub fn reported_items(&self) -> [ReportedItem; count_items!($($variant)*)] {
+                [
+                    $(
+                        ReportedItem {
+                            ticker: self.ticker,
+                            t: self.t,
+                            p: self.$period_field,
+                            item: Item::$variant,
+                            val: impl_reported_items!(@val self, $kind $source),
+                        },
+                    )*
+                ]
+            }
+        }
+    };
+
+    (@val $self:ident, field $source:ident) => { $self.$source };
+    (@val $self:ident, method $source:ident) => { $self.$source() };
+}
+
+pub struct BalanceSheet {
     pub ticker: Ticker,
     pub t: NaiveDate,
 
@@ -34,6 +79,34 @@ pub struct BalanceSheet {
     pub long_term_debt: f64,
     pub long_term_operating_lease_liabilities: f64,
     pub other_long_term_liabilities: f64,
+}
+
+impl_reported_items! {
+    BalanceSheet,
+    @pit,
+    [
+        CashAndCashEquivalents => field cash_and_cash_equivalents,
+        MarketableSecurities => field marketable_securities,
+        AccountsReceivableNet => field accounts_receivable_net,
+        Inventories => field inventories,
+        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
+        TotalCurrentAssets => method total_current_assets,
+        PropertyAndEquipmentNet => field property_and_equipment_net,
+        OperatingLeaseAssets => field operating_lease_assets,
+        Goodwill => field goodwill,
+        IntangibleAssetsNet => field intangible_assets_net,
+        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
+        OtherAssets => field other_assets,
+        TotalAssets => method total_assets,
+        AccountsPayable => field accounts_payable,
+        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        ShortTermDebt => field short_term_debt,
+        TotalCurrentLiabilities => method total_current_liabilities,
+        LongTermDebt => field long_term_debt,
+        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
+        OtherLongTermLiabilities => field other_long_term_liabilities,
+        TotalLiabilities => method total_liabilities,
+    ]
 }
 
 impl BalanceSheet {
@@ -64,162 +137,9 @@ impl BalanceSheet {
             + self.long_term_operating_lease_liabilities
             + self.other_long_term_liabilities
     }
-
-    pub fn reported_items(&self) -> [ReportedItem; 21] {
-        [
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::CashAndCashEquivalents,
-                val: self.cash_and_cash_equivalents,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::MarketableSecurities,
-                val: self.marketable_securities,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::AccountsReceivableNet,
-                val: self.accounts_receivable_net,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::Inventories,
-                val: self.inventories,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::PrepaidExpensesAndOtherCurrentAssets,
-                val: self.prepaid_expenses_and_other_current_assets,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::TotalCurrentAssets,
-                val: self.total_current_assets(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::PropertyAndEquipmentNet,
-                val: self.property_and_equipment_net,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::OperatingLeaseAssets,
-                val: self.operating_lease_assets,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::Goodwill,
-                val: self.goodwill,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::IntangibleAssetsNet,
-                val: self.intangible_assets_net,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::DeferredIncomeTaxAssets,
-                val: self.deferred_income_tax_assets,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::OtherAssets,
-                val: self.other_assets,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::TotalAssets,
-                val: self.total_assets(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::AccountsPayable,
-                val: self.accounts_payable,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::AccruedAndOtherCurrentLiabilities,
-                val: self.accrued_and_other_current_liabilities,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::ShortTermDebt,
-                val: self.short_term_debt,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::TotalCurrentLiabilities,
-                val: self.total_current_liabilities(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::LongTermDebt,
-                val: self.long_term_debt,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::LongTermOperatingLeaseLiabilities,
-                val: self.long_term_operating_lease_liabilities,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::OtherLongTermLiabilities,
-                val: self.other_long_term_liabilities,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: Period::PointInTime,
-                item: Item::TotalLiabilities,
-                val: self.total_liabilities(),
-            },
-        ]
-    }
 }
 
 pub struct IncomeStatement {
-
     pub ticker: Ticker,
     pub t: NaiveDate,
     pub p: Period,
@@ -235,6 +155,27 @@ pub struct IncomeStatement {
     pub other_income_net: f64,
 
     pub income_tax_expense: f64,
+}
+
+impl_reported_items! {
+    IncomeStatement,
+    @field p,
+    [
+        Revenue => field revenue,
+        CostOfRevenue => field cost_of_revenue,
+        GrossProfit => method gross_profit,
+        ResearchAndDevelopment => field research_and_development,
+        SalesGeneralAndAdministrative => field sales_general_and_administrative,
+        TotalOperatingExpenses => method total_operating_expenses,
+        OperatingIncome => method operating_income,
+        InterestIncome => field interest_income,
+        InterestExpense => field interest_expense,
+        OtherIncomeNet => field other_income_net,
+        TotalOtherIncomeNet => method total_other_income_net,
+        IncomeBeforeIncomeTax => method income_before_income_tax,
+        IncomeTaxExpense => field income_tax_expense,
+        NetIncome => method net_income,
+    ]
 }
 
 impl IncomeStatement {
@@ -255,109 +196,6 @@ impl IncomeStatement {
     }
     fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.income_tax_expense
-    }
-
-    pub fn reported_items(&self) -> [ReportedItem; 14] {
-        [
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::Revenue,
-                val: self.revenue,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::CostOfRevenue,
-                val: self.cost_of_revenue,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::GrossProfit,
-                val: self.gross_profit(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::ResearchAndDevelopment,
-                val: self.research_and_development,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::SalesGeneralAndAdministrative,
-                val: self.sales_general_and_administrative,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::TotalOperatingExpenses,
-                val: self.total_operating_expenses(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::OperatingIncome,
-                val: self.operating_income(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::InterestIncome,
-                val: self.interest_income,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::InterestExpense,
-                val: self.interest_expense,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::OtherIncomeNet,
-                val: self.other_income_net,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::TotalOtherIncomeNet,
-                val: self.total_other_income_net(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::IncomeBeforeIncomeTax,
-                val: self.income_before_income_tax(),
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::IncomeTaxExpense,
-                val: self.income_tax_expense,
-            },
-            ReportedItem {
-                ticker: self.ticker,
-                t: self.t,
-                p: self.p,
-                item: Item::NetIncome,
-                val: self.net_income(),
-            },
-        ]
     }
 }
 
@@ -398,7 +236,7 @@ impl FromStr for Period {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, uniffi::Error)]
 pub enum PeriodError {
     InvalidPeriod,
 }
@@ -418,25 +256,27 @@ pub enum Ticker {
     TSLA,
 }
 
-impl std::fmt::Display for Ticker {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 impl FromStr for Ticker {
     type Err = TickerError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let trimmed = s.trim();
-
-        let lower = trimmed.to_lowercase();
-        if lower.contains("nvda") { Ok(Ticker::NVDA) }
-        else if lower.contains("tsla") { Ok(Ticker::TSLA) }
-        else { Err(TickerError::TickerNotFound) }
+        match s {
+            "NVDA" => Ok(Ticker::NVDA),
+            "TSLA" => Ok(Ticker::TSLA),
+            _ => Err(TickerError::TickerNotFound),
+        }
     }
 }
 
 pub enum TickerError {
     TickerNotFound,
+}
+
+impl std::fmt::Display for Ticker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Ticker::NVDA => write!(f, "NVDA"),
+            Ticker::TSLA => write!(f, "TSLA"),
+        }
+    }
 }
