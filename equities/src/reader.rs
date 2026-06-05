@@ -38,7 +38,6 @@ impl Reader {
         let col_info = col_info_balance_sheet(&rows)?;
 
         let label_col = detect_label_column(&rows);
-        let ticker = self.ticker.clone();
 
         let mut reported_items = Vec::new();
         let mut found_items: HashMap<usize, HashSet<Item>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
@@ -60,8 +59,8 @@ impl Reader {
                         if !val.is_nan() {
                             found_items.get_mut(&col).unwrap().insert(item);
                             reported_items.push(ReportedItem {
-                                ticker: ticker.to_string(),
-                                t: date.to_string(),
+                                ticker: self.ticker,
+                                t: date,
                                 p: Period::PointInTime,
                                 item,
                                 val: val * multiplier,
@@ -87,7 +86,6 @@ impl Reader {
         let col_info = col_info_income_statement(&rows)?;
 
         let label_col = detect_label_column(&rows);
-        let ticker = self.ticker.clone();
 
         let mut reported_items = Vec::new();
         let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
@@ -109,8 +107,8 @@ impl Reader {
                         if !val.is_nan() {
                             found_items.get_mut(&col).unwrap().insert((item, *period));
                             reported_items.push(ReportedItem {
-                                ticker: ticker.to_string(),
-                                t: date.to_string(),
+                                ticker: self.ticker,
+                                t: *date,
                                 p: *period,
                                 item,
                                 val: val * multiplier,

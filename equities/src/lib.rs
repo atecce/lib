@@ -7,13 +7,12 @@ use std::str::FromStr;
 
 use crate::item::Item;
 
-// use chrono::NaiveDate;
+use chrono::NaiveDate;
 
 pub struct BalanceSheet {
 
-    pub ticker: String,
-
-    pub t: String,
+    pub ticker: Ticker,
+    pub t: NaiveDate,
 
     pub cash_and_cash_equivalents: f64,
     pub marketable_securities: f64,
@@ -280,16 +279,16 @@ pub enum PeriodError {
     InvalidPeriod,
 }
 
-#[derive(Clone, Debug, PartialEq, serde::Serialize, uniffi::Record)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ReportedItem {
-    pub ticker: String,
-    pub t: String,
+    pub ticker: Ticker,
+    pub t: NaiveDate,
     pub p: Period,
     pub item: Item,
     pub val: f64,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Ticker {
     NVDA,
     TSLA,

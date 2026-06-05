@@ -1,14 +1,12 @@
 use equities::BalanceSheet;
-use equities::item::Item;
 
 #[test]
 fn balance_sheet() {
 
     let balance_sheets = vec![
         BalanceSheet {
-            ticker: "NVDA".to_string(),
-
-            t: "2025-01-26".to_string(),
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).expect("2025-01-26 chrono naive date failed"),
 
             cash_and_cash_equivalents: 8_589_000_000.0,
             marketable_securities: 34_621_000_000.0,
@@ -32,9 +30,8 @@ fn balance_sheet() {
             other_long_term_liabilities: 4_245_000_000.0,
         },
         BalanceSheet {
-            ticker: "NVDA".to_string(),
-
-            t: "2025-10-26".to_string(),
+            ticker: equities::Ticker::NVDA,
+            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).expect("2025-10-26 chrono naive date failed"),
 
             cash_and_cash_equivalents: 11_486_000_000.0,
             marketable_securities: 49_122_000_000.0,
@@ -62,15 +59,7 @@ fn balance_sheet() {
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
     let mut actual = r.process_balance_sheet().unwrap();
 
-    actual.sort_by_cached_key(|item| {
-        match chrono::NaiveDate::parse_from_str(&item.t.trim(), "%Y-%m-%d") {
-            Ok(date) => (date, item.p, item.item),
-            Err(e) => {
-                eprintln!("failed to parse {} into date: {}", &item.t, e);
-                (chrono::NaiveDate::MIN, item.p, item.item)
-            },
-        }
-    });
+    actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
 
     println!("{:#?}", actual);
 

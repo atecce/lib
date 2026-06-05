@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
-use std::fs::File;
-use std::io::BufWriter;
 
 use augurs::outlier::{MADDetector, OutlierDetector};
 
@@ -12,7 +10,7 @@ use chrono::NaiveDate;
 
 #[derive(Clone, Debug)]
 pub struct Observation {
-    pub t: String,
+    pub t: NaiveDate,
     pub val: f64,
 }
 
@@ -46,17 +44,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if !reported_items.is_empty() {
-        reported_items.sort_by_cached_key(|item| {
-            match NaiveDate::parse_from_str(&item.t.trim(), "%Y-%m-%d") {
-                Ok(date) => (date, item.p, item.item),
-                Err(e) => {
-                    eprintln!("failed to parse {} into date: {}", &item.t, e);
-                    (NaiveDate::MIN, item.p, item.item)
-                },
-            }
-        });
+        reported_items.sort_by_cached_key(|item| (item.t, item.p, item.item));
 
-        serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
+//        serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
 
         let mut series = HashMap::<equities::item::Item, Vec<Observation>>::new();
         for reported_item in reported_items {
