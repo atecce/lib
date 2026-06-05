@@ -29,7 +29,55 @@ fn main() {
             chapter: 8,
             start: 3,
             end: None,
-        }
+        },
+        bible::Source {
+            book: name::Name::Joshua,
+            chapter: 7,
+            start: 11,
+            end: Some(26),
+        },
+        bible::Source {
+            book: name::Name::Judges,
+            chapter: 21,
+            start: 25,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::SamuelI,
+            chapter: 8,
+            start: 19,
+            end: Some(20),
+        },
+        bible::Source {
+            book: name::Name::SamuelII,
+            chapter: 2,
+            start: 10,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::SamuelII,
+            chapter: 22,
+            start: 26,
+            end: Some(28),
+        },
+        bible::Source {
+            book: name::Name::SamuelII,
+            chapter: 22,
+            start: 50,
+            end: Some(51),
+        },
+        bible::Source {
+            book: name::Name::SamuelII,
+            chapter: 23,
+            start: 1,
+            end: Some(4),
+        },
+        bible::Source {
+            book: name::Name::SamuelII,
+            chapter: 23,
+            start: 13,
+            end: Some(17),
+        },
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
         println!("{}", src);
