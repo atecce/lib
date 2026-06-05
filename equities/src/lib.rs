@@ -15,7 +15,7 @@ macro_rules! count_items {
 }
 
 macro_rules! impl_reported_items {
-    ($name:ident, @pit, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
+    ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
         impl $name {
             pub fn reported_items(&self) -> [ReportedItem; count_items!($($variant)*)] {
                 [
@@ -23,25 +23,7 @@ macro_rules! impl_reported_items {
                         ReportedItem {
                             ticker: self.ticker,
                             t: self.t,
-                            p: Period::PointInTime,
-                            item: Item::$variant,
-                            val: impl_reported_items!(@val self, $kind $source),
-                        },
-                    )*
-                ]
-            }
-        }
-    };
-
-    ($name:ident, @field $period_field:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
-        impl $name {
-            pub fn reported_items(&self) -> [ReportedItem; count_items!($($variant)*)] {
-                [
-                    $(
-                        ReportedItem {
-                            ticker: self.ticker,
-                            t: self.t,
-                            p: self.$period_field,
+                            p: self.period(),
                             item: Item::$variant,
                             val: impl_reported_items!(@val self, $kind $source),
                         },
@@ -53,6 +35,10 @@ macro_rules! impl_reported_items {
 
     (@val $self:ident, field $source:ident) => { $self.$source };
     (@val $self:ident, method $source:ident) => { $self.$source() };
+}
+
+pub trait Statement {
+    fn period(&self) -> Period;
 }
 
 pub struct BalanceSheet {
@@ -81,9 +67,14 @@ pub struct BalanceSheet {
     pub other_long_term_liabilities: f64,
 }
 
+impl Statement for BalanceSheet {
+    fn period(&self) -> Period {
+        Period::PointInTime
+    }
+}
+
 impl_reported_items! {
     BalanceSheet,
-    @pit,
     [
         CashAndCashEquivalents => field cash_and_cash_equivalents,
         MarketableSecurities => field marketable_securities,
@@ -157,9 +148,14 @@ pub struct IncomeStatement {
     pub income_tax_expense: f64,
 }
 
+impl Statement for IncomeStatement {
+    fn period(&self) -> Period {
+        self.p
+    }
+}
+
 impl_reported_items! {
     IncomeStatement,
-    @field p,
     [
         Revenue => field revenue,
         CostOfRevenue => field cost_of_revenue,
