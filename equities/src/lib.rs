@@ -45,7 +45,7 @@ impl BalanceSheet {
             + self.inventories
             + self.prepaid_expenses_and_other_current_assets
     }
-    fn total_assets(self) -> f64 {
+    fn total_assets(&self) -> f64 {
         self.total_current_assets()
             + self.property_and_equipment_net
             + self.operating_lease_assets
@@ -59,14 +59,14 @@ impl BalanceSheet {
             + self.accrued_and_other_current_liabilities
             + self.short_term_debt
     }
-    fn total_liabilities(self) -> f64 {
+    fn total_liabilities(&self) -> f64 {
         self.total_current_liabilities()
             + self.long_term_debt
             + self.long_term_operating_lease_liabilities
             + self.other_long_term_liabilities
     }
 
-    pub fn reported_items(&self) -> [ReportedItem; 17] {
+    pub fn reported_items(&self) -> [ReportedItem; 21] {
         [
             ReportedItem {
                 ticker: self.ticker.clone(),
@@ -102,6 +102,13 @@ impl BalanceSheet {
                 p: Period::PointInTime,
                 item: Item::PrepaidExpensesAndOtherCurrentAssets,
                 val: self.prepaid_expenses_and_other_current_assets,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::TotalCurrentAssets,
+                val: self.total_current_assets(),
             },
             ReportedItem {
                 ticker: self.ticker.clone(),
@@ -149,6 +156,13 @@ impl BalanceSheet {
                 ticker: self.ticker.clone(),
                 t: self.t.clone(),
                 p: Period::PointInTime,
+                item: Item::TotalAssets,
+                val: self.total_assets(),
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
                 item: Item::AccountsPayable,
                 val: self.accounts_payable,
             },
@@ -165,6 +179,13 @@ impl BalanceSheet {
                 p: Period::PointInTime,
                 item: Item::ShortTermDebt,
                 val: self.short_term_debt,
+            },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::TotalCurrentLiabilities,
+                val: self.total_current_liabilities(),
             },
             ReportedItem {
                 ticker: self.ticker.clone(),
@@ -187,8 +208,34 @@ impl BalanceSheet {
                 item: Item::OtherLongTermLiabilities,
                 val: self.other_long_term_liabilities,
             },
+            ReportedItem {
+                ticker: self.ticker.clone(),
+                t: self.t.clone(),
+                p: Period::PointInTime,
+                item: Item::TotalLiabilities,
+                val: self.total_liabilities(),
+            },
         ]
     }
+}
+
+pub struct IncomeStatement {
+
+    ticker: String,
+
+    t: String,
+
+    revenue: f64,
+    cost_of_revenue: f64,
+
+    research_and_development: f64,
+    sales_general_and_administrative: f64,
+
+    interest_income: f64,
+    interest_expense: f64,
+    other_income_net: f64,
+
+    income_tax_expense: f64,
 }
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, uniffi::Enum)]

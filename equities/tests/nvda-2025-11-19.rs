@@ -1,7 +1,5 @@
 use equities::BalanceSheet;
 use equities::item::Item;
-use equities::Period::PointInTime;
-use equities::ReportedItem;
 
 #[test]
 fn balance_sheet() {
@@ -61,8 +59,6 @@ fn balance_sheet() {
         },
     ];
 
-    let expected = [balance_sheets[0].reported_items(), balance_sheets[1].reported_items()].concat();
-
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
     let mut actual = r.process_balance_sheet().unwrap();
 
@@ -78,8 +74,9 @@ fn balance_sheet() {
 
     println!("{:#?}", actual);
 
+    let expected = [balance_sheets[0].reported_items(), balance_sheets[1].reported_items()].concat();
+
     for (i, actual_reported_item) in actual.into_iter()
-        .filter(|item| !item.item.is_aggregate())
         .enumerate() {
         assert!(
             actual_reported_item == expected[i],
