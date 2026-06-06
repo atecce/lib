@@ -58,6 +58,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 });
         }
 
+        let mut dates = std::collections::HashSet::new();
         for item in &equities::item::Item::ALL {
             match series.get(item) {
                 Some(observations) => {
@@ -72,11 +73,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("outliers for {:?}", item);
                     for interval in &outliers.series_results[0].outlier_intervals.intervals {
                         println!("{:#?}", series[item][interval.start]);
+                        dates.insert(series[item][interval.start].t);
                     }
                 },
                 None => println!("{:?} not found", item),
             }
         }
+        let mut collected_dates: Vec<NaiveDate> = dates.into_iter().collect();
+        collected_dates.sort();
+        println!("{:#?}", collected_dates);
     }
 
     Ok(())
