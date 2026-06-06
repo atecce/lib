@@ -22,7 +22,7 @@ macro_rules! impl_reported_items {
                     $(
                         ReportedItem {
                             ticker: self.ticker,
-                            t: self.t,
+                            date: self.date,
                             p: self.period(),
                             item: Item::$variant,
                             val: impl_reported_items!(@val self, $kind $source),
@@ -43,7 +43,7 @@ pub trait Statement {
 
 pub struct BalanceSheet {
     pub ticker: Ticker,
-    pub t: NaiveDate,
+    pub date: NaiveDate,
 
     pub cash_and_cash_equivalents: f64,
     pub marketable_securities: f64,
@@ -132,7 +132,7 @@ impl BalanceSheet {
 
 pub struct IncomeStatement {
     pub ticker: Ticker,
-    pub t: NaiveDate,
+    pub date: NaiveDate,
     pub p: Period,
 
     pub revenue: f64,
@@ -240,7 +240,7 @@ pub enum PeriodError {
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
 pub struct ReportedItem {
     pub ticker: Ticker,
-    pub t: NaiveDate,
+    pub date: NaiveDate,
     pub p: Period,
     pub item: Item,
     pub val: f64,

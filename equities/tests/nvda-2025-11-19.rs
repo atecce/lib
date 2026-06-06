@@ -6,7 +6,7 @@ fn report() {
     let balance_sheets = vec![
         BalanceSheet {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).unwrap(),
 
             cash_and_cash_equivalents: 8_589_000_000.0,
             marketable_securities: 34_621_000_000.0,
@@ -31,7 +31,7 @@ fn report() {
         },
         BalanceSheet {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
 
             cash_and_cash_equivalents: 11_486_000_000.0,
             marketable_securities: 49_122_000_000.0,
@@ -59,7 +59,7 @@ fn report() {
     let income_statements = vec![
         IncomeStatement {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
             p: equities::Period::ThreeMonths,
 
             revenue: 35_082_000_000.0,
@@ -76,7 +76,7 @@ fn report() {
         },
         IncomeStatement {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
             p: equities::Period::NineMonths,
 
             revenue: 91_166_000_000.0,
@@ -94,7 +94,7 @@ fn report() {
 
         IncomeStatement {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
             p: equities::Period::ThreeMonths,
 
             revenue: 57_006_000_000.0,
@@ -111,7 +111,7 @@ fn report() {
         },
         IncomeStatement {
             ticker: equities::Ticker::NVDA,
-            t: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
             p: equities::Period::NineMonths,
 
             revenue: 147_811_000_000.0,
@@ -135,7 +135,7 @@ fn report() {
 }
 
 fn assert_reported_items(mut actual: Vec<ReportedItem>, expected: Vec<ReportedItem>) {
-    actual.sort_by_cached_key(|item| (item.t, item.p, item.item));
+    actual.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
     for (actual_reported_item, expected_reported_item) in actual.into_iter().zip(expected) {
         println!("{:#?}", actual_reported_item);

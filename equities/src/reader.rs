@@ -60,7 +60,7 @@ impl Reader {
                             found_items.get_mut(&col).unwrap().insert(item);
                             reported_items.push(ReportedItem {
                                 ticker: self.ticker,
-                                t: date,
+                                date: date,
                                 p: Period::PointInTime,
                                 item,
                                 val: val * multiplier,
@@ -108,7 +108,7 @@ impl Reader {
                             found_items.get_mut(&col).unwrap().insert((item, *period));
                             reported_items.push(ReportedItem {
                                 ticker: self.ticker,
-                                t: *date,
+                                date: *date,
                                 p: *period,
                                 item,
                                 val: val * multiplier,

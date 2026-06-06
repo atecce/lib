@@ -46,7 +46,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if !reported_items.is_empty() {
-        reported_items.sort_by_cached_key(|item| (item.t, item.p, item.item));
+        reported_items.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
         serde_json::to_writer_pretty(BufWriter::new(File::create("reported_items.json")?), &reported_items)?;
 
@@ -56,7 +56,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .entry(reported_item.item)
                 .or_insert_with(Vec::new)
                 .push(Observation {
-                    t: reported_item.t,
+                    t: reported_item.date,
                     val: reported_item.val,
                 });
         }

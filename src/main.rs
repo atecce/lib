@@ -55,8 +55,7 @@ fn push_to_influx(items: &[equities::ReportedItem]) -> Result<(), Box<dyn Error>
     for chunk in items.chunks(1000) {
         let mut payload = String::new();
         for item in chunk {
-            let t = NaiveDate::parse_from_str(&item.t, "%Y-%m-%d").unwrap();
-            let ts = t.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
+            let ts = item.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
                 "reported_item_v11,ticker={},item={},period={} value={} {}\n",
                 item.ticker,
