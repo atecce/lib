@@ -19,17 +19,14 @@ pub struct Observation {
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
 
-    let paths: Vec<_> = fs::read_dir("nvda")?
+    for path in fs::read_dir("nvda")?
         .filter_map(|f| f.ok())
         .filter(|f| {
              let path = f.path();
              let ext = path.extension().and_then(|ext| ext.to_str());
              ext == Some("xlsx")
         })
-        .map(|f| f.path())
-        .collect();
-
-    for path in paths {
+        .map(|f| f.path()) {
         match new_reader(&path, equities::Ticker::NVDA) {
             Ok(mut r) => {
                 match r.process_balance_sheet() {
