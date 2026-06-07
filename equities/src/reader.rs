@@ -34,7 +34,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, col_info_balance_sheet(&rows)?)
+        self.reported_items(&rows, col_info(&rows, find_period_balance_sheet)?)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
@@ -45,7 +45,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, col_info_income_statement(&rows)?)
+        self.reported_items(&rows, col_info(&rows, find_period_income_statement)?)
     }
 
     fn find_sheet(&self, matches: &[&str]) -> Option<String> {
@@ -100,34 +100,19 @@ impl Reader {
     }
 }
 
-fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
-    let mut col_info = HashMap::new();
-    for (r, row) in rows.iter().enumerate() {
-        for (c, cell) in row.iter().enumerate() {
-            if let Some(date) = parse_date(cell) {
-                col_info.entry(c).or_insert((date, Period::PointInTime));
-            } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
-                col_info.entry(c).or_insert((date, Period::PointInTime));
-            }
-        }
-    }
+fn col_info(rows: &[&[Data]],
+    find_period: impl Fn(usize, &HashMap<usize, Period>, bool) -> Period) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
 
-    if col_info.is_empty() { return Err("no dates found".into()); }
-
-    Ok(col_info)
-}
-
-fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
     let is_10k = is_10k(rows);
     let col_periods = col_periods(rows);
-    let mut col_info = HashMap::new();
 
+    let mut col_info = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
         for (c, cell) in row.iter().enumerate() {
             if let Some(date) = parse_date(cell) {
-                col_info.entry(c).or_insert((date, find_the_nearest_period_label_to_the_left_or_at_the_current_column(c, &col_periods, is_10k)));
+                col_info.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
             } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
-                col_info.entry(c).or_insert((date, find_the_nearest_period_label_to_the_left_or_at_the_current_column(c, &col_periods, is_10k)));
+                col_info.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
             }
         }
     }
@@ -137,7 +122,11 @@ fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDa
     Ok(col_info)
 }
 
-fn find_the_nearest_period_label_to_the_left_or_at_the_current_column(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
+fn find_period_balance_sheet(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
+    Period::PointInTime
+}
+
+fn find_period_income_statement(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
     let mut p = None;
     for offset in (0..=c).rev().take(4) {
         if let Some(detected_p) = col_periods.get(&offset) {
