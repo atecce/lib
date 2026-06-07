@@ -34,44 +34,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
-        let col_info = col_info_balance_sheet(&rows)?;
-
-        let label_col = detect_label_column(&rows);
-
-        let mut reported_items = Vec::new();
-        let mut found_items: HashMap<usize, HashSet<Item>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
-
-        for row in rows {
-            if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
-                if let Ok(item) = label.parse::<Item>() {
-                    for (&col, (date, period)) in &col_info {
-                        if found_items.get(&col).map(|s| s.contains(&item)).unwrap_or(true) {
-                            continue;
-                        }
-
-                        let val = match row.get(col) {
-                            Some(Data::Float(f)) => *f,
-                            Some(Data::Int(i)) => *i as f64,
-                            _ => f64::NAN,
-                        };
-
-                        if !val.is_nan() {
-                            found_items.get_mut(&col).unwrap().insert(item);
-                            reported_items.push(ReportedItem {
-                                ticker: self.ticker,
-                                date: *date,
-                                p: Period::PointInTime,
-                                item,
-                                val: val * multiplier,
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        Ok(reported_items)
+        self.reported_items(&rows, col_info_balance_sheet(&rows)?)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
@@ -82,13 +45,28 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
-        let col_info = col_info_income_statement(&rows)?;
+        self.reported_items(&rows, col_info_income_statement(&rows)?)
+    }
 
-        let label_col = detect_label_column(&rows);
+    fn find_sheet(&self, matches: &[&str]) -> Option<String> {
+        let names = self.workbook.sheet_names();
+        for m in matches {
+            for name in &names {
+                if name.to_lowercase().contains(&m.to_lowercase()) {
+                    return Some(name.clone());
+                }
+            }
+        }
+        None
+    }
+
+    fn reported_items(&self, rows: &[&[Data]], col_info: HashMap<usize, (NaiveDate, Period)>) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
-        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.keys().map(|&c| (c, HashSet::new())).collect();
+        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.keys().map(|&col| (col, HashSet::new())).collect();
+
+        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
+        let label_col = detect_label_column(&rows);
 
         for row in rows {
             if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
@@ -118,50 +96,8 @@ impl Reader {
                 }
             }
         }
-
         Ok(reported_items)
     }
-
-    fn find_sheet(&self, matches: &[&str]) -> Option<String> {
-        let names = self.workbook.sheet_names();
-        for m in matches {
-            for name in &names {
-                if name.to_lowercase().contains(&m.to_lowercase()) {
-                    return Some(name.clone());
-                }
-            }
-        }
-        None
-    }
-}
-
-fn is_10k(rows: &[&[Data]]) -> bool {
-    rows.iter().any(|r| r.iter()
-        .any(|c| c.get_string()
-            .map(|s| s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended")).unwrap_or(false)))
-}
-
-fn multiplier(rows: &[&[Data]]) -> Option<f64> {
-    rows.iter().find_map(|r| r.iter().find_map(|c| {
-        let s = c.get_string()?.to_lowercase();
-        if s.contains("in millions") { Some(1_000_000.0) }
-        else if s.contains("in thousands") { Some(1_000.0) }
-        else { None }
-    }))
-}
-
-fn col_periods(rows: &[&[Data]]) -> HashMap<usize, Period> {
-    let mut col_periods = HashMap::new();
-    for row in rows {
-        for (c, cell) in row.iter().enumerate() {
-            if let Some(s) = cell.get_string() {
-                if let Ok(p) = s.to_lowercase().parse::<Period>() {
-                    col_periods.insert(c, p);
-                }
-            }
-        }
-    }
-    col_periods
 }
 
 fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
@@ -187,17 +123,6 @@ fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate,
     if col_info.is_empty() { return Err("no dates found".into()); }
 
     Ok(col_info)
-}
-
-fn find_the_nearest_period_label_to_the_left_or_at_the_current_column(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
-    let mut p = None;
-    for offset in (0..=c).rev().take(4) {
-        if let Some(detected_p) = col_periods.get(&offset) {
-            p = Some(*detected_p);
-            break;
-        }
-    }
-    return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
 }
 
 fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
@@ -228,6 +153,40 @@ fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDa
     Ok(col_info)
 }
 
+fn find_the_nearest_period_label_to_the_left_or_at_the_current_column(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
+    let mut p = None;
+    for offset in (0..=c).rev().take(4) {
+        if let Some(detected_p) = col_periods.get(&offset) {
+            p = Some(*detected_p);
+            break;
+        }
+    }
+    return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
+}
+
+fn col_periods(rows: &[&[Data]]) -> HashMap<usize, Period> {
+    let mut col_periods = HashMap::new();
+    for row in rows {
+        for (c, cell) in row.iter().enumerate() {
+            if let Some(s) = cell.get_string() {
+                if let Ok(p) = s.to_lowercase().parse::<Period>() {
+                    col_periods.insert(c, p);
+                }
+            }
+        }
+    }
+    col_periods
+}
+
+fn multiplier(rows: &[&[Data]]) -> Option<f64> {
+    rows.iter().find_map(|r| r.iter().find_map(|c| {
+        let s = c.get_string()?.to_lowercase();
+        if s.contains("in millions") { Some(1_000_000.0) }
+        else if s.contains("in thousands") { Some(1_000.0) }
+        else { None }
+    }))
+}
+
 fn detect_label_column(rows: &[&[Data]]) -> usize {
     let mut col0_count = 0;
     let mut col1_count = 0;
@@ -241,6 +200,12 @@ fn detect_label_column(rows: &[&[Data]]) -> usize {
         }
     }
     if col0_count >= col1_count { 0 } else { 1 }
+}
+
+fn is_10k(rows: &[&[Data]]) -> bool {
+    rows.iter().any(|r| r.iter()
+        .any(|c| c.get_string()
+            .map(|s| s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended")).unwrap_or(false)))
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
