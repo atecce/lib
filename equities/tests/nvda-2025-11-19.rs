@@ -1,4 +1,4 @@
-use equities::{BalanceSheet, IncomeStatement, ReportedItem};
+use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, ReportedItem};
 
 #[test]
 fn report() {
@@ -127,6 +127,88 @@ fn report() {
             income_tax_expense: 13_945_000_000.0,
         },
     ];
+
+    let cash_flow_statements = vec![
+        CashFlowStatement {
+            ticker: equities::Ticker::NVDA,
+            date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
+            p: equities::Period::NineMonths,
+
+            net_income: income_statements[1].net_income(),
+
+            stock_based_compensation_expense: 3_416_000_000.0,
+            depreciation_and_amoritization: 1_321_000_000.0,
+            deferred_income_taxes: -3_879_000_000.0,
+            gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net: -302_000_000.0,
+            other: -365_000_000.0,
+
+            accounts_receivable: -7_694_000_000.0,
+            inventories: -2_357_000_000.0,
+            prepaid_expenses_and_other_assets: -726_000_000.0,
+            accounts_payable: 2_490_000_000.0,
+            accrued_and_other_current_liabilities: 3_918_000_000.0,
+            other_long_term_liabilities: 849_000_000.0,
+
+            proceeds_from_maturities_of_marketable_securities: 9_485_000_000.0,
+            proceeds_from_sales_of_marketable_securities: 318_000_000.0,
+            proceeds_from_sales_of_non_marketable_equity_securities: 171_000_000.0,
+            purchases_of_marketable_securities: -19_565_000_000.0,
+            purchases_related_to_property_and_equipment_and_intangible_assets: -2_159_000_000.0,
+            purchases_of_non_marketable_equity_securities: -1_008_000_000.0,
+            acquisitions_net_of_cash_acquired: -465_000_000.0,
+
+            proceeds_related_to_employee_stock_plans: 489_000_000.0,
+            payments_related_to_repurchases_of_common_stock: -25_895_000_000.0,
+            payments_related_to_employee_stock_plan_taxes: -5_068_000_000.0,
+            dividends_paid: -589_000_000.0,
+            principal_payments_on_property_and_equipment_and_intangible_assets: -97_000_000.0,
+            repayment_of_debt: -1_250_000_000.0,
+
+            cash_and_cash_equivalents_at_beginning_of_period: 7_280_000_000.0,
+
+            cash_paid_for_income_taxes_net: 10_989_000_000.0,
+        },
+        CashFlowStatement {
+            ticker: equities::Ticker::NVDA,
+            date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
+            p: equities::Period::NineMonths,
+
+            net_income: income_statements[3].net_income(),
+
+            stock_based_compensation_expense: 4_753_000_000.0,
+            depreciation_and_amoritization: 2_031_000_000.0,
+            deferred_income_taxes: -2_035_000_000.0,
+            gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net: -3_426_000_000.0,
+            other: -276_000_000.0,
+
+            accounts_receivable: -10_325_000_000.0,
+            inventories: -9_703_000_000.0,
+            prepaid_expenses_and_other_assets: 857_000_000.0,
+            accounts_payable: 2_032_000_000.0,
+            accrued_and_other_current_liabilities: 4_204_000_000.0,
+            other_long_term_liabilities: 1_311_000_000.0,
+
+            proceeds_from_maturities_of_marketable_securities: 8_980_000_000.0,
+            proceeds_from_sales_of_marketable_securities: 487_000_000.0,
+            proceeds_from_sales_of_non_marketable_equity_securities: 72_000_000.0,
+            purchases_of_marketable_securities: -20_076_000_000.0,
+            purchases_related_to_property_and_equipment_and_intangible_assets: -4_758_000_000.0,
+            purchases_of_non_marketable_equity_securities: -4_702_000_000.0,
+            acquisitions_net_of_cash_acquired: -1_370_000_000.0,
+
+            proceeds_related_to_employee_stock_plans: 643_000_000.0,
+            payments_related_to_repurchases_of_common_stock: -36_271_000_000.0,
+            payments_related_to_employee_stock_plan_taxes: -5_809_000_000.0,
+            dividends_paid: -732_000_000.0,
+            principal_payments_on_property_and_equipment_and_intangible_assets: -97_000_000.0,
+            repayment_of_debt: 0.0,
+
+            cash_and_cash_equivalents_at_beginning_of_period: balance_sheets[0].cash_and_cash_equivalents,
+
+            cash_paid_for_income_taxes_net: 13_309_000_000.0,
+        },
+    ];
+
 
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
 

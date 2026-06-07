@@ -190,8 +190,98 @@ impl IncomeStatement {
     fn income_before_income_tax(&self) -> f64 {
         self.operating_income() + self.total_other_income_net()
     }
-    fn net_income(&self) -> f64 {
+    pub fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.income_tax_expense
+    }
+}
+
+pub struct CashFlowStatement {
+    pub ticker: Ticker,
+    pub date: NaiveDate,
+    pub p: Period,
+
+    pub net_income: f64,
+
+    pub stock_based_compensation_expense: f64,
+    pub depreciation_and_amoritization: f64,
+    pub deferred_income_taxes: f64,
+    pub gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net: f64,
+    pub other: f64,
+
+    pub accounts_receivable: f64,
+    pub inventories: f64,
+    pub prepaid_expenses_and_other_assets:f64,
+    pub accounts_payable: f64,
+    pub accrued_and_other_current_liabilities: f64,
+    pub other_long_term_liabilities: f64,
+
+    pub proceeds_from_maturities_of_marketable_securities: f64,
+    pub proceeds_from_sales_of_marketable_securities: f64,
+    pub proceeds_from_sales_of_non_marketable_equity_securities: f64,
+    pub purchases_of_marketable_securities: f64,
+    pub purchases_related_to_property_and_equipment_and_intangible_assets: f64,
+    pub purchases_of_non_marketable_equity_securities: f64,
+    pub acquisitions_net_of_cash_acquired: f64,
+
+    pub proceeds_related_to_employee_stock_plans: f64,
+    pub payments_related_to_repurchases_of_common_stock: f64,
+    pub payments_related_to_employee_stock_plan_taxes: f64,
+    pub dividends_paid: f64,
+    pub principal_payments_on_property_and_equipment_and_intangible_assets: f64,
+    pub repayment_of_debt: f64,
+
+    pub cash_and_cash_equivalents_at_beginning_of_period: f64,
+
+    pub cash_paid_for_income_taxes_net: f64,
+}
+
+impl Statement for CashFlowStatement {
+    fn period(&self) -> Period {
+        self.p
+    }
+}
+
+impl CashFlowStatement {
+    fn net_cash_provided_by_operating_activities(&self) -> f64 {
+        self.net_income
+            - (self.stock_based_compensation_expense
+            + self.depreciation_and_amoritization
+            + self.deferred_income_taxes
+            + self.gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net
+            + self.other
+
+            + self.accounts_receivable
+            + self.inventories
+            + self.prepaid_expenses_and_other_assets
+            + self.accounts_payable
+            + self.accrued_and_other_current_liabilities
+            + self.other_long_term_liabilities)
+    }
+    fn net_cash_used_in_investing_activities(&self) -> f64 {
+        self.proceeds_from_maturities_of_marketable_securities
+            + self.proceeds_from_sales_of_marketable_securities
+            + self.proceeds_from_sales_of_non_marketable_equity_securities
+            + self.purchases_of_marketable_securities
+            + self.purchases_related_to_property_and_equipment_and_intangible_assets
+            + self.purchases_of_non_marketable_equity_securities
+            + self.acquisitions_net_of_cash_acquired
+    }
+    fn net_cash_used_in_financing_activities(&self) -> f64 {
+        self.proceeds_related_to_employee_stock_plans
+            + self.payments_related_to_repurchases_of_common_stock
+            + self.payments_related_to_employee_stock_plan_taxes
+            + self.dividends_paid
+            + self.principal_payments_on_property_and_equipment_and_intangible_assets
+            + self.repayment_of_debt
+    }
+    fn change_in_cash_and_cash_equivalents(&self) -> f64 {
+        self.net_cash_provided_by_operating_activities()
+            + self.net_cash_used_in_investing_activities()
+            + self.net_cash_used_in_financing_activities()
+    }
+
+    fn cash_and_cash_equivalents_at_end_of_period(&self) -> f64 {
+        self.change_in_cash_and_cash_equivalents() + self.cash_and_cash_equivalents_at_beginning_of_period
     }
 }
 
