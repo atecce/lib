@@ -106,16 +106,8 @@ fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate,
         for (c, cell) in row.iter().enumerate() {
             if let Some(date) = parse_date(cell) {
                 col_info.entry(c).or_insert((date, Period::PointInTime));
-            } else if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
-                if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
-                    Data::Float(f) => Some(*f as i32),
-                    Data::Int(i) => Some(*i as i32),
-                    _ => None,
-                }).filter(|&y| y > 1900 && y < 2100) {
-                    if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
-                        col_info.entry(c).or_insert((date, Period::PointInTime));
-                    }
-                }
+            } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1), c) {
+                col_info.entry(c).or_insert((date, Period::PointInTime));
             }
         }
     }
@@ -134,16 +126,8 @@ fn col_info_income_statement(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDa
         for (c, cell) in row.iter().enumerate() {
             if let Some(date) = parse_date(cell) {
                 col_info.entry(c).or_insert((date, find_the_nearest_period_label_to_the_left_or_at_the_current_column(c, &col_periods, is_10k)));
-            } else if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
-                if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
-                    Data::Float(f) => Some(*f as i32),
-                    Data::Int(i) => Some(*i as i32),
-                    _ => None,
-                }).filter(|&y| y > 1900 && y < 2100) {
-                    if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
-                        col_info.entry(c).or_insert((date, find_the_nearest_period_label_to_the_left_or_at_the_current_column(c, &col_periods, is_10k)));
-                    }
-                }
+            } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1), c) {
+                col_info.entry(c).or_insert((date, find_the_nearest_period_label_to_the_left_or_at_the_current_column(c, &col_periods, is_10k)));
             }
         }
     }
@@ -206,6 +190,19 @@ fn is_10k(rows: &[&[Data]]) -> bool {
     rows.iter().any(|r| r.iter()
         .any(|c| c.get_string()
             .map(|s| s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended")).unwrap_or(false)))
+}
+
+fn parse_date_month_day(cell: &Data, next_row: Option<&&[Data]>, c: usize) -> Option<NaiveDate> {
+    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+        if let Some(year) = next_row.and_then(|next| next.get(c)).and_then(|c| match c {
+            Data::Float(f) => Some(*f as i32),
+            Data::Int(i) => Some(*i as i32),
+            _ => None,
+        }).filter(|&y| y > 1900 && y < 2100) {
+            return parse_date_str(&format!("{} {}", month_day, year))
+        }
+    }
+    None
 }
 
 fn parse_date(cell: &Data) -> Option<NaiveDate> {
