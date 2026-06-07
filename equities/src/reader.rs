@@ -45,7 +45,7 @@ impl Reader {
         for row in rows {
             if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
-                    for (&col, &date) in &col_info {
+                    for (&col, (date, period)) in &col_info {
                         if found_items.get(&col).map(|s| s.contains(&item)).unwrap_or(true) {
                             continue;
                         }
@@ -60,7 +60,7 @@ impl Reader {
                             found_items.get_mut(&col).unwrap().insert(item);
                             reported_items.push(ReportedItem {
                                 ticker: self.ticker,
-                                date: date,
+                                date: *date,
                                 p: Period::PointInTime,
                                 item,
                                 val: val * multiplier,
@@ -164,12 +164,12 @@ fn col_periods(rows: &[&[Data]]) -> HashMap<usize, Period> {
     col_periods
 }
 
-fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, NaiveDate>, Box<dyn Error>> {
+fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
     let mut col_info = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
         for (c, cell) in row.iter().enumerate() {
             if let Some(date) = parse_date(cell) {
-                col_info.entry(c).or_insert(date);
+                col_info.entry(c).or_insert((date, Period::PointInTime));
             } else if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
                 if let Some(year) = rows.get(r + 1).and_then(|next| next.get(c)).and_then(|c| match c {
                     Data::Float(f) => Some(*f as i32),
@@ -177,7 +177,7 @@ fn col_info_balance_sheet(rows: &[&[Data]]) -> Result<HashMap<usize, NaiveDate>,
                     _ => None,
                 }).filter(|&y| y > 1900 && y < 2100) {
                     if let Some(date) = parse_date_str(&format!("{} {}", month_day, year)) {
-                        col_info.entry(c).or_insert(date);
+                        col_info.entry(c).or_insert((date, Period::PointInTime));
                     }
                 }
             }
