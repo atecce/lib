@@ -35,25 +35,28 @@ pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetI
         }
 
         for (c, cell) in row.iter().enumerate() {
-            if let Some(s) = cell.get_string() {
-                if let Ok(p) = s.to_lowercase().parse::<Period>() {
-                    periods.insert(c, p);
-                }
+            match cell {
+                Data::String(s) => {
+                    if let Ok(p) = s.to_lowercase().parse::<Period>() {
+                        periods.insert(c, p);
+                    }
 
-                if s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended") {
-                    is_10k = true;
-                }
+                    if s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended") {
+                        is_10k = true;
+                    }
 
-                if s.to_lowercase().contains("in millions") { multiplier = 1_000_000.0; }
-                if s.to_lowercase().contains("in thousands") { multiplier = 1_000.0; }
-            }
+                    if s.to_lowercase().contains("in millions") { multiplier = 1_000_000.0; }
+                    if s.to_lowercase().contains("in thousands") { multiplier = 1_000.0; }
 
-            if let Some(date) = parse_date(cell).or_else(|| parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c)))) {
-                if is_balance_sheet {
-                    dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
-                } else {
-                    dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
-                }
+                    if let Some(date) = parse_date_str(s).or_else(|| parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c)))) {
+                        if is_balance_sheet {
+                            dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
+                        } else {
+                            dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
+                        }
+                    }
+                },
+                _ => continue,
             }
         }
     }
@@ -97,13 +100,6 @@ fn parse_date_month_day(cell: &Data, next_cell: Option<&Data>) -> Option<NaiveDa
         }
     }
     None
-}
-
-fn parse_date(cell: &Data) -> Option<NaiveDate> {
-    match cell {
-        Data::String(s) => parse_date_str(s),
-        _ => None,
-    }
 }
 
 fn parse_date_str(s: &str) -> Option<NaiveDate> {
