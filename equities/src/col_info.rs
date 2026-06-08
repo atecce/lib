@@ -14,7 +14,7 @@ pub struct ColInfo {
 
 pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo, Box<dyn Error>> {
 
-    let is_10k = is_10k(rows);
+    let mut is_10k = false;
 
     let mut col0_count = 0;
     let mut col1_count = 0;
@@ -36,6 +36,10 @@ pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo,
             if let Some(s) = cell.get_string() {
                 if let Ok(p) = s.to_lowercase().parse::<Period>() {
                     periods.insert(c, p);
+                }
+
+                if s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended") {
+                    is_10k = true;
                 }
             }
 
@@ -73,13 +77,6 @@ fn find_period(c: usize, periods: &HashMap<usize, Period>, is10k: bool) -> Perio
         }
     }
     return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
-}
-
-fn is_10k(rows: &[&[Data]]) -> bool {
-    rows.iter().any(|r| r.iter()
-        .any(|c| c.get_string()
-            .map(|s| s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended"))
-                 .unwrap_or(false)))
 }
 
 fn parse_date_month_day(cell: &Data, next_cell: Option<&Data>) -> Option<NaiveDate> {
