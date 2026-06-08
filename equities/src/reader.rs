@@ -60,18 +60,19 @@ impl Reader {
         None
     }
 
-    fn reported_items(&self, rows: &[&[Data]], col_info: HashMap<usize, (NaiveDate, Period)>) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    fn reported_items(&self, rows: &[&[Data]], col_info: (HashMap<usize, (NaiveDate, Period)>, usize)) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+
+        let (col_dates_and_periods, label_col) = col_info;
 
         let mut reported_items = Vec::new();
-        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.keys().map(|&col| (col, HashSet::new())).collect();
+        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_dates_and_periods.keys().map(|&col| (col, HashSet::new())).collect();
 
         let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
-        let label_col = detect_label_column(&rows);
 
         for row in rows {
             if let Some(label) = row.get(label_col).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
-                    for (&col, (date, period)) in &col_info {
+                    for (&col, (date, period)) in &col_dates_and_periods {
                         if found_items.get(&col).map(|s| s.contains(&(item, *period))).unwrap_or(true) {
                             continue;
                         }
@@ -101,13 +102,26 @@ impl Reader {
 }
 
 fn col_info(rows: &[&[Data]],
-    find_period: impl Fn(usize, &HashMap<usize, Period>, bool) -> Period) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
+    find_period: impl Fn(usize, &HashMap<usize, Period>, bool) -> Period) -> Result<(HashMap<usize, (NaiveDate, Period)>, usize), Box<dyn Error>> {
 
     let is_10k = is_10k(rows);
+
+    let mut col0_count = 0;
+    let mut col1_count = 0;
+
     let mut col_periods = HashMap::new();
 
-    let mut col_info = HashMap::new();
+    let mut col_dates_and_periods = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
+
+        let row: &[Data] = row;
+        if let Some(s) = row.get(0).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col0_count += 1; }
+        }
+        if let Some(s) = row.get(1).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col1_count += 1; }
+        }
+
         for (c, cell) in row.iter().enumerate() {
             if let Some(s) = cell.get_string() {
                 if let Ok(p) = s.to_lowercase().parse::<Period>() {
@@ -115,16 +129,20 @@ fn col_info(rows: &[&[Data]],
                 }
             }
             if let Some(date) = parse_date(cell) {
-                col_info.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
+                col_dates_and_periods.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
             } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
-                col_info.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
+                col_dates_and_periods.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
             }
         }
     }
 
-    if col_info.is_empty() { return Err("no dates found".into()); }
+    if col_dates_and_periods.is_empty() { return Err("no dates found".into()); }
 
-    Ok(col_info)
+    if col0_count >= col1_count {
+        Ok((col_dates_and_periods, 0))
+    } else {
+        Ok((col_dates_and_periods, 1))
+    }
 }
 
 fn find_period_balance_sheet(c: usize, col_periods: &HashMap<usize, Period>, is10k: bool) -> Period {
@@ -149,21 +167,6 @@ fn multiplier(rows: &[&[Data]]) -> Option<f64> {
         else if s.contains("in thousands") { Some(1_000.0) }
         else { None }
     }))
-}
-
-fn detect_label_column(rows: &[&[Data]]) -> usize {
-    let mut col0_count = 0;
-    let mut col1_count = 0;
-    for row in rows {
-        let row: &[Data] = row;
-        if let Some(s) = row.get(0).and_then(|c| c.get_string()) {
-            if s.parse::<Item>().is_ok() { col0_count += 1; }
-        }
-        if let Some(s) = row.get(1).and_then(|c| c.get_string()) {
-            if s.parse::<Item>().is_ok() { col1_count += 1; }
-        }
-    }
-    if col0_count >= col1_count { 0 } else { 1 }
 }
 
 fn is_10k(rows: &[&[Data]]) -> bool {
