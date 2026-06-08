@@ -63,15 +63,11 @@ impl Reader {
     fn reported_items(&self, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
-        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = sheet_info.dates_and_periods.keys().map(|&col| (col, HashSet::new())).collect();
 
         for row in rows {
             if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
                     for (&col, (date, period)) in &sheet_info.dates_and_periods {
-                        if found_items.get(&col).map(|s| s.contains(&(item, *period))).unwrap_or(true) {
-                            continue;
-                        }
 
                         let val = match row.get(col) {
                             Some(Data::Float(f)) => *f,
@@ -80,7 +76,6 @@ impl Reader {
                         };
 
                         if !val.is_nan() {
-                            found_items.get_mut(&col).unwrap().insert((item, *period));
                             reported_items.push(ReportedItem {
                                 ticker: self.ticker,
                                 date: *date,
