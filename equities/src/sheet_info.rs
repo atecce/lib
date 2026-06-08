@@ -48,7 +48,7 @@ pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetI
                     if s.to_lowercase().contains("in millions") { multiplier = 1_000_000.0; }
                     if s.to_lowercase().contains("in thousands") { multiplier = 1_000.0; }
 
-                    if let Some(date) = parse_date_str(s).or_else(|| parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c)))) {
+                    if let Some(date) = parse_date_str(s).or_else(|| parse_date_across_cells(s, rows.get(r+1).and_then(|next| next.get(c)))) {
                         if is_balance_sheet {
                             dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
                         } else {
@@ -85,14 +85,14 @@ pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetI
     }
 }
 
-fn parse_date_month_day(cell: &Data, next_cell: Option<&Data>) -> Option<NaiveDate> {
-    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+fn parse_date_across_cells(s: &str, next_cell: Option<&Data>) -> Option<NaiveDate> {
+    if s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2 {
         if let Some(year) = next_cell.and_then(|c| match c {
             Data::Float(f) => Some(*f as i32),
             Data::Int(i) => Some(*i as i32),
             _ => None,
         }).filter(|&y| y > 1900 && y < 2100) {
-            return parse_date_str(&format!("{} {}", month_day, year))
+            return parse_date_str(&format!("{} {}", s, year))
         }
     }
     None
