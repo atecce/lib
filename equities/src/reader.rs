@@ -104,11 +104,16 @@ fn col_info(rows: &[&[Data]],
     find_period: impl Fn(usize, &HashMap<usize, Period>, bool) -> Period) -> Result<HashMap<usize, (NaiveDate, Period)>, Box<dyn Error>> {
 
     let is_10k = is_10k(rows);
-    let col_periods = col_periods(rows);
+    let mut col_periods = HashMap::new();
 
     let mut col_info = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
         for (c, cell) in row.iter().enumerate() {
+            if let Some(s) = cell.get_string() {
+                if let Ok(p) = s.to_lowercase().parse::<Period>() {
+                    col_periods.insert(c, p);
+                }
+            }
             if let Some(date) = parse_date(cell) {
                 col_info.entry(c).or_insert((date, find_period(c, &col_periods, is_10k)));
             } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
@@ -135,20 +140,6 @@ fn find_period_income_statement(c: usize, col_periods: &HashMap<usize, Period>, 
         }
     }
     return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
-}
-
-fn col_periods(rows: &[&[Data]]) -> HashMap<usize, Period> {
-    let mut col_periods = HashMap::new();
-    for row in rows {
-        for (c, cell) in row.iter().enumerate() {
-            if let Some(s) = cell.get_string() {
-                if let Ok(p) = s.to_lowercase().parse::<Period>() {
-                    col_periods.insert(c, p);
-                }
-            }
-        }
-    }
-    col_periods
 }
 
 fn multiplier(rows: &[&[Data]]) -> Option<f64> {
