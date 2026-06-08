@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
@@ -7,7 +5,6 @@ use std::path::Path;
 
 use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::Ticker;
-use crate::Period;
 use crate::item::Item;
 use crate::ReportedItem;
 
