@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-use crate::col_info::{new_col_info, ColInfo};
+use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::Ticker;
 use crate::Period;
 use crate::item::Item;
@@ -34,7 +34,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, new_col_info(&rows, true)?)
+        self.reported_items(&rows, new_sheet_info(&rows, true)?)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
@@ -45,7 +45,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, new_col_info(&rows, false)?)
+        self.reported_items(&rows, new_sheet_info(&rows, false)?)
     }
 
     fn find_sheet(&self, matches: &[&str]) -> Option<String> {
@@ -60,17 +60,15 @@ impl Reader {
         None
     }
 
-    fn reported_items(&self, rows: &[&[Data]], col_info: ColInfo) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    fn reported_items(&self, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
-        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = col_info.dates_and_periods.keys().map(|&col| (col, HashSet::new())).collect();
-
-        let multiplier = multiplier(&rows).ok_or("failed to get multiplier")?;
+        let mut found_items: HashMap<usize, HashSet<(Item, Period)>> = sheet_info.dates_and_periods.keys().map(|&col| (col, HashSet::new())).collect();
 
         for row in rows {
-            if let Some(label) = row.get(col_info.labels).and_then(|c| c.get_string()) {
+            if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
                 if let Ok(item) = label.parse::<Item>() {
-                    for (&col, (date, period)) in &col_info.dates_and_periods {
+                    for (&col, (date, period)) in &sheet_info.dates_and_periods {
                         if found_items.get(&col).map(|s| s.contains(&(item, *period))).unwrap_or(true) {
                             continue;
                         }
@@ -88,7 +86,7 @@ impl Reader {
                                 date: *date,
                                 p: *period,
                                 item,
-                                val: val * multiplier,
+                                val: val * sheet_info.multiplier,
                             });
                         }
                     }
@@ -97,13 +95,4 @@ impl Reader {
         }
         Ok(reported_items)
     }
-}
-
-fn multiplier(rows: &[&[Data]]) -> Option<f64> {
-    rows.iter().find_map(|r| r.iter().find_map(|c| {
-        let s = c.get_string()?.to_lowercase();
-        if s.contains("in millions") { Some(1_000_000.0) }
-        else if s.contains("in thousands") { Some(1_000.0) }
-        else { None }
-    }))
 }

@@ -7,14 +7,16 @@ use crate::item::Item;
 use calamine::{Data, DataType};
 use chrono::NaiveDate;
 
-pub struct ColInfo {
+pub struct SheetInfo {
     pub dates_and_periods: HashMap<usize, (NaiveDate, Period)>,
     pub labels: usize,
+    pub multiplier: f64,
 }
 
-pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo, Box<dyn Error>> {
+pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetInfo, Box<dyn Error>> {
 
     let mut is_10k = false;
+    let mut multiplier = 0.0;
 
     let mut col0_count = 0;
     let mut col1_count = 0;
@@ -41,6 +43,9 @@ pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo,
                 if s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended") {
                     is_10k = true;
                 }
+
+                if s.to_lowercase().contains("in millions") { multiplier = 1_000_000.0; }
+                if s.to_lowercase().contains("in thousands") { multiplier = 1_000.0; }
             }
 
             if let Some(date) = parse_date(cell).or_else(|| parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c)))) {
@@ -56,14 +61,16 @@ pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo,
     if dates_and_periods.is_empty() { return Err("no dates found".into()); }
 
     if col0_count >= col1_count {
-        Ok(ColInfo {
+        Ok(SheetInfo {
             dates_and_periods: dates_and_periods,
             labels: 0,
+            multiplier: multiplier,
         })
     } else {
-        Ok(ColInfo {
+        Ok(SheetInfo {
             dates_and_periods: dates_and_periods,
             labels: 1,
+            multiplier: multiplier,
         })
     }
 }
