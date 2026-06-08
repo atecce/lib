@@ -4,6 +4,7 @@ use std::io::BufReader;
 use std::path::Path;
 
 use crate::sheet_info::{new_sheet_info, SheetInfo};
+use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 use crate::Ticker;
 use crate::item::Item;
 use crate::ReportedItem;
@@ -31,7 +32,7 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, new_sheet_info(&rows, true)?)
+        self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
     }
 
     pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
@@ -42,7 +43,14 @@ impl Reader {
 
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
-        self.reported_items(&rows, new_sheet_info(&rows, false)?)
+        self.reported_items(&rows, new_sheet_info(&rows, IncomeStatement)?)
+    }
+
+    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+        let range = self.workbook.worksheet_range("CASH_FLOW")?;
+        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+
+        self.reported_items(&rows, new_sheet_info(&rows, CashFlowStatement)?)
     }
 
     fn find_sheet(&self, matches: &[&str]) -> Option<String> {
@@ -63,7 +71,7 @@ impl Reader {
 
         for row in rows {
             if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
-                if let Ok(item) = label.parse::<Item>() {
+                if let Ok(mut item) = label.parse::<Item>() {
                     for (&col, (date, period)) in &sheet_info.dates_and_periods {
 
                         let val = match row.get(col) {
@@ -71,6 +79,27 @@ impl Reader {
                             Some(Data::Int(i)) => *i as f64,
                             _ => f64::NAN,
                         };
+
+                        match sheet_info.sheet_type {
+                            crate::sheet_info::SheetType::CashFlowStatement => {
+                                match item {
+                                    crate::Item::Inventories => {
+                                        item = crate::Item::ChangeInInventories;
+                                    },
+                                    crate::Item::AccountsPayable => {
+                                        item = crate::Item::ChangeInAccountsPayable;
+                                    },
+                                    crate::Item::AccruedAndOtherCurrentLiabilities => {
+                                        item = crate::Item::ChangeInAccruedAndOtherCurrentLiabilities;
+                                    },
+                                    crate::Item::OtherLongTermLiabilities => {
+                                        item = crate::Item::ChangeInOtherLongTermLiabilities;
+                                    },
+                                    _ => (),
+                                }
+                            },
+                            _ => (),
+                        }
 
                         if !val.is_nan() {
                             reported_items.push(ReportedItem {

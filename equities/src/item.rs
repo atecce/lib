@@ -14,7 +14,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 39] = [
+            pub const ALL: [$item; 66] = [
                 $($item::$variant,)*
             ];
         }
@@ -104,6 +104,34 @@ items! {
 
         IncomeTaxExpense => ["Income tax expense", "Provision for (benefit from) income taxes", "Income Tax Expense"],
         NetIncome => ["Net income", "Net income attributable to common stockholders"],
+
+        StockBasedCompensationExpense => ["Stock-based compensation expense"],
+        DepreciationAndAmoritization => ["Depreciation and amortization"],
+        DeferredIncomeTaxes => ["Deferred income taxes"],
+        GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => ["securities, net"],
+        Other,
+        AccountsReceivable => ["Accounts receivable"],
+        ChangeInInventories,
+        PrepaidExpensesAndOtherAssets => ["Prepaid expenses and other assets"],
+        ChangeInAccountsPayable,
+        ChangeInAccruedAndOtherCurrentLiabilities,
+        ChangeInOtherLongTermLiabilities,
+        NetCashProvidedByOperatingActivities => ["Net cash provided by operating activities"],
+        ProceedsFromMaturitiesOfMarketableSecurities,
+        ProceedsFromSalesOfMarketableSecurities,
+        ProceedsFromSalesOfNonMarketableEquitySecurities,
+        PurchasesOfMarketableSecurities,
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets,
+        PurchasesOfNonMarketableEquitySecurities,
+        AcquisitionsNetOfCashAcquired,
+        NetCashUsedInInvestingActivities,
+        ProceedsRelatedToEmployeeStockPlans,
+        PaymentsRelatedToRepurchasesOfCommonStock,
+        PaymentsRelatedToEmployeeStockPlanTaxes,
+        DividendsPaid,
+        PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets,
+        RepaymentOfDebt,
+        ChangeInCashAndCashEquivalents,
     }
 }
 

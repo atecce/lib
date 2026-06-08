@@ -242,6 +242,40 @@ impl Statement for CashFlowStatement {
     }
 }
 
+impl_reported_items! {
+    CashFlowStatement,
+    [
+        NetIncome => field net_income,
+        StockBasedCompensationExpense => field stock_based_compensation_expense,
+        DepreciationAndAmoritization => field depreciation_and_amoritization,
+        DeferredIncomeTaxes => field deferred_income_taxes,
+        GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => field gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net,
+        Other => field other,
+        AccountsReceivable => field accounts_receivable,
+        ChangeInInventories => field inventories,
+        PrepaidExpensesAndOtherAssets => field prepaid_expenses_and_other_assets,
+        ChangeInAccountsPayable => field accounts_payable,
+        ChangeInAccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        ChangeInOtherLongTermLiabilities => field other_long_term_liabilities,
+        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
+        ProceedsFromMaturitiesOfMarketableSecurities => field proceeds_from_maturities_of_marketable_securities,
+        ProceedsFromSalesOfMarketableSecurities => field proceeds_from_sales_of_marketable_securities,
+        ProceedsFromSalesOfNonMarketableEquitySecurities => field proceeds_from_sales_of_non_marketable_equity_securities,
+        PurchasesOfMarketableSecurities => field purchases_of_marketable_securities,
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_related_to_property_and_equipment_and_intangible_assets,
+        PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
+        AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
+        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
+        PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
+        PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
+        DividendsPaid => field dividends_paid,
+        PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => field principal_payments_on_property_and_equipment_and_intangible_assets,
+        RepaymentOfDebt => field repayment_of_debt,
+        ChangeInCashAndCashEquivalents => method change_in_cash_and_cash_equivalents,
+    ]
+}
+
 impl CashFlowStatement {
     fn net_cash_provided_by_operating_activities(&self) -> f64 {
         self.net_income

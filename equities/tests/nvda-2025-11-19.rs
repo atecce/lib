@@ -214,14 +214,16 @@ fn report() {
 
     assert_reported_items(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect());
     assert_reported_items(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect());
+    assert_reported_items(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect());
 }
 
 fn assert_reported_items(mut actual: Vec<ReportedItem>, expected: Vec<ReportedItem>) {
     actual.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
-    for (actual_reported_item, expected_reported_item) in actual.into_iter().zip(expected) {
-        println!("{:#?}", actual_reported_item);
-        println!("{:#?}", expected_reported_item);
+    let zipped = actual.into_iter().zip(expected);
+    println!("{:#?}", zipped);
+
+    for (actual_reported_item, expected_reported_item) in zipped {
         assert!(
             actual_reported_item == expected_reported_item,
             "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
