@@ -1,0 +1,114 @@
+use std::collections::HashMap;
+use std::error::Error;
+
+use crate::Period;
+use crate::item::Item;
+
+use calamine::{Data, DataType};
+use chrono::NaiveDate;
+
+pub struct ColInfo {
+    pub dates_and_periods: HashMap<usize, (NaiveDate, Period)>,
+    pub labels: usize,
+}
+
+pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo, Box<dyn Error>> {
+
+    let is_10k = is_10k(rows);
+
+    let mut col0_count = 0;
+    let mut col1_count = 0;
+
+    let mut periods = HashMap::new();
+
+    let mut dates_and_periods = HashMap::new();
+    for (r, row) in rows.iter().enumerate() {
+
+        let row: &[Data] = row;
+        if let Some(s) = row.get(0).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col0_count += 1; }
+        }
+        if let Some(s) = row.get(1).and_then(|c| c.get_string()) {
+            if s.parse::<Item>().is_ok() { col1_count += 1; }
+        }
+
+        for (c, cell) in row.iter().enumerate() {
+            if let Some(s) = cell.get_string() {
+                if let Ok(p) = s.to_lowercase().parse::<Period>() {
+                    periods.insert(c, p);
+                }
+            }
+            if let Some(date) = parse_date(cell) {
+                if is_balance_sheet {
+                    dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
+                } else {
+                    dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
+                }
+            } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
+                if is_balance_sheet {
+                    dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
+                } else {
+                    dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
+                }
+            }
+        }
+    }
+
+    if dates_and_periods.is_empty() { return Err("no dates found".into()); }
+
+    if col0_count >= col1_count {
+        Ok(ColInfo {
+            dates_and_periods: dates_and_periods,
+            labels: 0,
+        })
+    } else {
+        Ok(ColInfo {
+            dates_and_periods: dates_and_periods,
+            labels: 1,
+        })
+    }
+}
+
+fn find_period(c: usize, periods: &HashMap<usize, Period>, is10k: bool) -> Period {
+    let mut p = None;
+    for offset in (0..=c).rev().take(4) {
+        if let Some(detected_p) = periods.get(&offset) {
+            p = Some(*detected_p);
+            break;
+        }
+    }
+    return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
+}
+
+fn is_10k(rows: &[&[Data]]) -> bool {
+    rows.iter().any(|r| r.iter()
+        .any(|c| c.get_string()
+            .map(|s| s.to_lowercase().contains("form type: 10-k") || s.to_lowercase().contains("12 months ended"))
+                 .unwrap_or(false)))
+}
+
+fn parse_date_month_day(cell: &Data, next_cell: Option<&Data>) -> Option<NaiveDate> {
+    if let Some(month_day) = cell.get_string().filter(|s| s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2) {
+        if let Some(year) = next_cell.and_then(|c| match c {
+            Data::Float(f) => Some(*f as i32),
+            Data::Int(i) => Some(*i as i32),
+            _ => None,
+        }).filter(|&y| y > 1900 && y < 2100) {
+            return parse_date_str(&format!("{} {}", month_day, year))
+        }
+    }
+    None
+}
+
+fn parse_date(cell: &Data) -> Option<NaiveDate> {
+    match cell {
+        Data::String(s) => parse_date_str(s),
+        _ => None,
+    }
+}
+
+fn parse_date_str(s: &str) -> Option<NaiveDate> {
+    let s = s.trim().replace(",", "");
+    let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
+    formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())
+}

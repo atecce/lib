@@ -2,6 +2,7 @@ uniffi::setup_scaffolding!();
 
 pub mod item;
 pub mod reader;
+mod col_info;
 
 use std::str::FromStr;
 
