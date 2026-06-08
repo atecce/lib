@@ -38,13 +38,8 @@ pub fn new_col_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<ColInfo,
                     periods.insert(c, p);
                 }
             }
-            if let Some(date) = parse_date(cell) {
-                if is_balance_sheet {
-                    dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
-                } else {
-                    dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
-                }
-            } else if let Some(date) = parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c))) {
+
+            if let Some(date) = parse_date(cell).or_else(|| parse_date_month_day(cell, rows.get(r+1).and_then(|next| next.get(c)))) {
                 if is_balance_sheet {
                     dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
                 } else {
