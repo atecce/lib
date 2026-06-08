@@ -52,7 +52,14 @@ pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetI
                         if is_balance_sheet {
                             dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
                         } else {
-                            dates_and_periods.entry(c).or_insert((date, find_period(c, &periods, is_10k)));
+                            let mut p = None;
+                            for offset in (0..=c).rev().take(4) {
+                                if let Some(detected_p) = periods.get(&offset) {
+                                    p = Some(*detected_p);
+                                    break;
+                                }
+                            }
+                            dates_and_periods.entry(c).or_insert((date, p.unwrap_or(if is_10k { Period::TwelveMonths } else { Period::ThreeMonths })));
                         }
                     }
                 },
@@ -76,17 +83,6 @@ pub fn new_sheet_info(rows: &[&[Data]], is_balance_sheet: bool) -> Result<SheetI
             multiplier: multiplier,
         })
     }
-}
-
-fn find_period(c: usize, periods: &HashMap<usize, Period>, is10k: bool) -> Period {
-    let mut p = None;
-    for offset in (0..=c).rev().take(4) {
-        if let Some(detected_p) = periods.get(&offset) {
-            p = Some(*detected_p);
-            break;
-        }
-    }
-    return p.unwrap_or(if is10k { Period::TwelveMonths } else { Period::ThreeMonths });
 }
 
 fn parse_date_month_day(cell: &Data, next_cell: Option<&Data>) -> Option<NaiveDate> {
