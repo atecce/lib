@@ -279,7 +279,7 @@ impl_reported_items! {
 impl CashFlowStatement {
     fn net_cash_provided_by_operating_activities(&self) -> f64 {
         self.net_income
-            - (self.stock_based_compensation_expense
+            + self.stock_based_compensation_expense
             + self.depreciation_and_amoritization
             + self.deferred_income_taxes
             + self.gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net
@@ -290,7 +290,7 @@ impl CashFlowStatement {
             + self.prepaid_expenses_and_other_assets
             + self.accounts_payable
             + self.accrued_and_other_current_liabilities
-            + self.other_long_term_liabilities)
+            + self.other_long_term_liabilities
     }
     fn net_cash_used_in_investing_activities(&self) -> f64 {
         self.proceeds_from_maturities_of_marketable_securities
