@@ -53,6 +53,14 @@ impl Reader {
         self.reported_items(&rows, new_sheet_info(&rows, CashFlowStatement)?)
     }
 
+    pub fn rows(&mut self, sheet_name: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
+        let range = self.workbook.worksheet_range(sheet_name)?;
+        Ok(range.rows()
+            .filter(|row| !row.iter().all(|c| c.is_empty()))
+            .map(|row| row.to_vec())
+            .collect())
+    }
+
     fn find_sheet(&self, matches: &[&str]) -> Option<String> {
         let names = self.workbook.sheet_names();
         for m in matches {
