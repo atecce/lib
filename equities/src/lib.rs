@@ -4,6 +4,7 @@ pub mod item;
 pub mod nvda;
 pub mod reader;
 pub mod sheet_info;
+pub mod tsla;
 
 use std::str::FromStr;
 
@@ -121,6 +122,10 @@ macro_rules! impl_reported {
 
 pub trait BalanceSheet {
     fn ticker(&self) -> Ticker;
+    fn total_current_assets(&self) -> f64;
+    fn total_assets(&self) -> f64;
+    fn total_current_liabilities(&self) -> f64;
+    fn total_liabilities(&self) -> f64;
 }
 
 impl<T: BalanceSheet> Statement for T {
