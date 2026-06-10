@@ -31,7 +31,7 @@ macro_rules! impl_reported_items {
                 [
                     $(
                         ReportedItem {
-                            ticker: self.ticker(),
+                            ticker: Statement::ticker(self),
                             date: self.date,
                             p: self.period(),
                             item: Item::$variant,
@@ -48,6 +48,7 @@ macro_rules! impl_reported_items {
 }
 
 pub trait Statement {
+    fn ticker(&self) -> Ticker;
     fn period(&self) -> Period;
 }
 
@@ -56,6 +57,9 @@ pub trait BalanceSheet {
 }
 
 impl<T: BalanceSheet> Statement for T {
+    fn ticker(&self) -> Ticker {
+        self.ticker()
+    }
     fn period(&self) -> Period {
         Period::PointInTime
     }
@@ -168,16 +172,15 @@ pub struct IncomeStatement {
 }
 
 impl Statement for IncomeStatement {
+    fn ticker(&self) -> Ticker {
+        self.ticker
+    }
     fn period(&self) -> Period {
         self.p
     }
 }
 
 impl IncomeStatement {
-    fn ticker(&self) -> Ticker {
-        self.ticker
-    }
-
     fn gross_profit(&self) -> f64 {
         self.revenue - self.cost_of_revenue
     }
@@ -259,16 +262,15 @@ pub struct CashFlowStatement {
 }
 
 impl Statement for CashFlowStatement {
+    fn ticker(&self) -> Ticker {
+        self.ticker
+    }
     fn period(&self) -> Period {
         self.p
     }
 }
 
 impl CashFlowStatement {
-    fn ticker(&self) -> Ticker {
-        self.ticker
-    }
-
     fn net_cash_provided_by_operating_activities(&self) -> f64 {
         self.net_income
             + self.stock_based_compensation_expense
