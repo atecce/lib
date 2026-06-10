@@ -83,21 +83,14 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
     if dates_and_periods.is_empty() { return Err("no dates found".into()); }
 
-    if col0_count >= col1_count {
-        Ok(SheetInfo {
-            dates_and_periods: dates_and_periods,
-            labels: 0,
-            multiplier: multiplier,
-            sheet_type: sheet_type,
-        })
-    } else {
-        Ok(SheetInfo {
-            dates_and_periods: dates_and_periods,
-            labels: 1,
-            multiplier: multiplier,
-            sheet_type: sheet_type,
-        })
-    }
+    let labels = if col0_count >= col1_count { 0 } else { 1 };
+
+    Ok(SheetInfo {
+        dates_and_periods: dates_and_periods,
+        labels: labels,
+        multiplier: multiplier,
+        sheet_type: sheet_type,
+    })
 }
 
 fn parse_date_across_cells(s: &str, next_cell: Option<&Data>) -> Option<NaiveDate> {
