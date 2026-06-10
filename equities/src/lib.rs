@@ -10,6 +10,15 @@ use crate::item::Item;
 
 use chrono::NaiveDate;
 
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
+pub struct ReportedItem {
+    pub ticker: Ticker,
+    pub date: NaiveDate,
+    pub p: Period,
+    pub item: Item,
+    pub val: f64,
+}
+
 macro_rules! count_items {
     () => { 0 };
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
@@ -360,15 +369,6 @@ impl FromStr for Period {
 #[derive(Debug, uniffi::Error)]
 pub enum PeriodError {
     InvalidPeriod,
-}
-
-#[derive(Clone, Debug, PartialEq, serde::Serialize)]
-pub struct ReportedItem {
-    pub ticker: Ticker,
-    pub date: NaiveDate,
-    pub p: Period,
-    pub item: Item,
-    pub val: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
