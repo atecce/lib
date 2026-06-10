@@ -39,7 +39,7 @@ fn main() -> Result<(), Box<dyn Error>>{
                                 println!("{:#?}", path);
                                 println!("{:#?}", items);
                             },
-                            Err(e) => eprintln!("failed to construct sheet info"),
+                            Err(e) => eprintln!("failed to construct sheet info for path: {:?}; {}", path, e),
                         }
                     },
                     Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),

@@ -288,9 +288,9 @@ impl CashFlowStatement {
             + self.net_cash_used_in_financing_activities()
     }
 
-    fn cash_and_cash_equivalents_at_end_of_period(&self) -> f64 {
-        self.change_in_cash_and_cash_equivalents() + self.cash_and_cash_equivalents_at_beginning_of_period
-    }
+//    fn cash_and_cash_equivalents_at_end_of_period(&self) -> f64 {
+//        self.change_in_cash_and_cash_equivalents() + self.cash_and_cash_equivalents_at_beginning_of_period
+//    }
 }
 
 impl_reported! {
