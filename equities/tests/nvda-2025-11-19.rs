@@ -1,11 +1,10 @@
-use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, ReportedItem};
+use equities::{NVDABalanceSheet, CashFlowStatement, IncomeStatement, ReportedItem};
 
 #[test]
 fn report() {
 
     let balance_sheets = vec![
-        BalanceSheet {
-            ticker: equities::Ticker::NVDA,
+        NVDABalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2025, 1, 26).unwrap(),
 
             cash_and_cash_equivalents: 8_589_000_000.0,
@@ -29,8 +28,7 @@ fn report() {
             long_term_operating_lease_liabilities: 1_519_000_000.0,
             other_long_term_liabilities: 4_245_000_000.0,
         },
-        BalanceSheet {
-            ticker: equities::Ticker::NVDA,
+        NVDABalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
 
             cash_and_cash_equivalents: 11_486_000_000.0,

@@ -31,7 +31,7 @@ macro_rules! impl_reported_items {
                 [
                     $(
                         ReportedItem {
-                            ticker: self.ticker,
+                            ticker: self.ticker(),
                             date: self.date,
                             p: self.period(),
                             item: Item::$variant,
@@ -51,8 +51,17 @@ pub trait Statement {
     fn period(&self) -> Period;
 }
 
-pub struct BalanceSheet {
-    pub ticker: Ticker,
+pub trait BalanceSheet {
+    fn ticker(&self) -> Ticker;
+}
+
+impl<T: BalanceSheet> Statement for T {
+    fn period(&self) -> Period {
+        Period::PointInTime
+    }
+}
+
+pub struct NVDABalanceSheet {
     pub date: NaiveDate,
 
     pub cash_and_cash_equivalents: f64,
@@ -77,40 +86,13 @@ pub struct BalanceSheet {
     pub other_long_term_liabilities: f64,
 }
 
-impl Statement for BalanceSheet {
-    fn period(&self) -> Period {
-        Period::PointInTime
+impl BalanceSheet for NVDABalanceSheet {
+    fn ticker(&self) -> Ticker {
+        Ticker::NVDA
     }
 }
 
-impl_reported_items! {
-    BalanceSheet,
-    [
-        CashAndCashEquivalents => field cash_and_cash_equivalents,
-        MarketableSecurities => field marketable_securities,
-        AccountsReceivableNet => field accounts_receivable_net,
-        Inventories => field inventories,
-        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
-        TotalCurrentAssets => method total_current_assets,
-        PropertyAndEquipmentNet => field property_and_equipment_net,
-        OperatingLeaseAssets => field operating_lease_assets,
-        Goodwill => field goodwill,
-        IntangibleAssetsNet => field intangible_assets_net,
-        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
-        OtherAssets => field other_assets,
-        TotalAssets => method total_assets,
-        AccountsPayable => field accounts_payable,
-        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        ShortTermDebt => field short_term_debt,
-        TotalCurrentLiabilities => method total_current_liabilities,
-        LongTermDebt => field long_term_debt,
-        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
-        OtherLongTermLiabilities => field other_long_term_liabilities,
-        TotalLiabilities => method total_liabilities,
-    ]
-}
-
-impl BalanceSheet {
+impl NVDABalanceSheet {
     fn total_current_assets(&self) -> f64 {
         self.cash_and_cash_equivalents
             + self.marketable_securities
@@ -140,6 +122,33 @@ impl BalanceSheet {
     }
 }
 
+impl_reported_items! {
+    NVDABalanceSheet,
+    [
+        CashAndCashEquivalents => field cash_and_cash_equivalents,
+        MarketableSecurities => field marketable_securities,
+        AccountsReceivableNet => field accounts_receivable_net,
+        Inventories => field inventories,
+        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
+        TotalCurrentAssets => method total_current_assets,
+        PropertyAndEquipmentNet => field property_and_equipment_net,
+        OperatingLeaseAssets => field operating_lease_assets,
+        Goodwill => field goodwill,
+        IntangibleAssetsNet => field intangible_assets_net,
+        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
+        OtherAssets => field other_assets,
+        TotalAssets => method total_assets,
+        AccountsPayable => field accounts_payable,
+        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        ShortTermDebt => field short_term_debt,
+        TotalCurrentLiabilities => method total_current_liabilities,
+        LongTermDebt => field long_term_debt,
+        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
+        OtherLongTermLiabilities => field other_long_term_liabilities,
+        TotalLiabilities => method total_liabilities,
+    ]
+}
+
 pub struct IncomeStatement {
     pub ticker: Ticker,
     pub date: NaiveDate,
@@ -164,27 +173,11 @@ impl Statement for IncomeStatement {
     }
 }
 
-impl_reported_items! {
-    IncomeStatement,
-    [
-        Revenue => field revenue,
-        CostOfRevenue => field cost_of_revenue,
-        GrossProfit => method gross_profit,
-        ResearchAndDevelopment => field research_and_development,
-        SalesGeneralAndAdministrative => field sales_general_and_administrative,
-        TotalOperatingExpenses => method total_operating_expenses,
-        OperatingIncome => method operating_income,
-        InterestIncome => field interest_income,
-        InterestExpense => field interest_expense,
-        OtherIncomeNet => field other_income_net,
-        TotalOtherIncomeNet => method total_other_income_net,
-        IncomeBeforeIncomeTax => method income_before_income_tax,
-        IncomeTaxExpense => field income_tax_expense,
-        NetIncome => method net_income,
-    ]
-}
-
 impl IncomeStatement {
+    fn ticker(&self) -> Ticker {
+        self.ticker
+    }
+
     fn gross_profit(&self) -> f64 {
         self.revenue - self.cost_of_revenue
     }
@@ -203,6 +196,26 @@ impl IncomeStatement {
     pub fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.income_tax_expense
     }
+}
+
+impl_reported_items! {
+    IncomeStatement,
+    [
+        Revenue => field revenue,
+        CostOfRevenue => field cost_of_revenue,
+        GrossProfit => method gross_profit,
+        ResearchAndDevelopment => field research_and_development,
+        SalesGeneralAndAdministrative => field sales_general_and_administrative,
+        TotalOperatingExpenses => method total_operating_expenses,
+        OperatingIncome => method operating_income,
+        InterestIncome => field interest_income,
+        InterestExpense => field interest_expense,
+        OtherIncomeNet => field other_income_net,
+        TotalOtherIncomeNet => method total_other_income_net,
+        IncomeBeforeIncomeTax => method income_before_income_tax,
+        IncomeTaxExpense => field income_tax_expense,
+        NetIncome => method net_income,
+    ]
 }
 
 pub struct CashFlowStatement {
@@ -251,41 +264,11 @@ impl Statement for CashFlowStatement {
     }
 }
 
-impl_reported_items! {
-    CashFlowStatement,
-    [
-        NetIncome => field net_income,
-        StockBasedCompensationExpense => field stock_based_compensation_expense,
-        DepreciationAndAmoritization => field depreciation_and_amoritization,
-        DeferredIncomeTaxes => field deferred_income_taxes,
-        GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => field gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net,
-        Other => field other,
-        AccountsReceivable => field accounts_receivable,
-        ChangeInInventories => field inventories,
-        PrepaidExpensesAndOtherAssets => field prepaid_expenses_and_other_assets,
-        ChangeInAccountsPayable => field accounts_payable,
-        ChangeInAccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        ChangeInOtherLongTermLiabilities => field other_long_term_liabilities,
-        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
-        ProceedsFromMaturitiesOfMarketableSecurities => field proceeds_from_maturities_of_marketable_securities,
-        ProceedsFromSalesOfMarketableSecurities => field proceeds_from_sales_of_marketable_securities,
-        ProceedsFromSalesOfNonMarketableEquitySecurities => field proceeds_from_sales_of_non_marketable_equity_securities,
-        PurchasesOfMarketableSecurities => field purchases_of_marketable_securities,
-        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_related_to_property_and_equipment_and_intangible_assets,
-        PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
-        AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
-        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
-        ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
-        PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
-        PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
-        DividendsPaid => field dividends_paid,
-        PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => field principal_payments_on_property_and_equipment_and_intangible_assets,
-        RepaymentOfDebt => field repayment_of_debt,
-        ChangeInCashAndCashEquivalents => method change_in_cash_and_cash_equivalents,
-    ]
-}
-
 impl CashFlowStatement {
+    fn ticker(&self) -> Ticker {
+        self.ticker
+    }
+
     fn net_cash_provided_by_operating_activities(&self) -> f64 {
         self.net_income
             + self.stock_based_compensation_expense
@@ -327,6 +310,40 @@ impl CashFlowStatement {
     fn cash_and_cash_equivalents_at_end_of_period(&self) -> f64 {
         self.change_in_cash_and_cash_equivalents() + self.cash_and_cash_equivalents_at_beginning_of_period
     }
+}
+
+impl_reported_items! {
+    CashFlowStatement,
+    [
+        NetIncome => field net_income,
+        StockBasedCompensationExpense => field stock_based_compensation_expense,
+        DepreciationAndAmoritization => field depreciation_and_amoritization,
+        DeferredIncomeTaxes => field deferred_income_taxes,
+        GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => field gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net,
+        Other => field other,
+        AccountsReceivable => field accounts_receivable,
+        ChangeInInventories => field inventories,
+        PrepaidExpensesAndOtherAssets => field prepaid_expenses_and_other_assets,
+        ChangeInAccountsPayable => field accounts_payable,
+        ChangeInAccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        ChangeInOtherLongTermLiabilities => field other_long_term_liabilities,
+        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
+        ProceedsFromMaturitiesOfMarketableSecurities => field proceeds_from_maturities_of_marketable_securities,
+        ProceedsFromSalesOfMarketableSecurities => field proceeds_from_sales_of_marketable_securities,
+        ProceedsFromSalesOfNonMarketableEquitySecurities => field proceeds_from_sales_of_non_marketable_equity_securities,
+        PurchasesOfMarketableSecurities => field purchases_of_marketable_securities,
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_related_to_property_and_equipment_and_intangible_assets,
+        PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
+        AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
+        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
+        PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
+        PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
+        DividendsPaid => field dividends_paid,
+        PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => field principal_payments_on_property_and_equipment_and_intangible_assets,
+        RepaymentOfDebt => field repayment_of_debt,
+        ChangeInCashAndCashEquivalents => method change_in_cash_and_cash_equivalents,
+    ]
 }
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, uniffi::Enum)]
