@@ -7,9 +7,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("Usage: inspect_sheets <file>");
         return Ok(());
     }
-    let mut workbook = open_workbook_auto(&args[1])?;
+
     println!("Sheets in {}:", args[1]);
-    for sheet in workbook.sheet_names() {
+    for sheet in open_workbook_auto(&args[1])?.sheet_names() {
         println!("  {}", sheet);
     }
     Ok(())
