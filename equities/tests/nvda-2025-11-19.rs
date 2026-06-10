@@ -211,22 +211,22 @@ fn report() {
 
     let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
 
-    assert_reported_items(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect());
-    assert_reported_items(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect());
-    assert_reported_items(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported_items()).flatten().collect());
+    assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
+    assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
+    assert_reported(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }
 
-fn assert_reported_items(mut actual: Vec<Reported>, expected: Vec<Reported>) {
+fn assert_reported(mut actual: Vec<Reported>, expected: Vec<Reported>) {
     actual.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
     let zipped = actual.into_iter().zip(expected);
     println!("{:#?}", zipped);
 
-    for (actual_reported_item, expected_reported_item) in zipped {
+    for (actual_reported, expected_reported) in zipped {
         assert!(
-            actual_reported_item == expected_reported_item,
+            actual_reported == expected_reported,
             "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n",
-            actual_reported_item, expected_reported_item,
+            actual_reported, expected_reported,
         )
     }
 }

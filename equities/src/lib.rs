@@ -18,15 +18,88 @@ macro_rules! count_items {
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
+pub enum Ticker {
+    NVDA,
+    TSLA,
+}
+
+impl FromStr for Ticker {
+    type Err = TickerError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "NVDA" => Ok(Ticker::NVDA),
+            "TSLA" => Ok(Ticker::TSLA),
+            _ => Err(TickerError::TickerNotFound),
+        }
+    }
+}
+
+pub enum TickerError {
+    TickerNotFound,
+}
+
+impl std::fmt::Display for Ticker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Ticker::NVDA => write!(f, "NVDA"),
+            Ticker::TSLA => write!(f, "TSLA"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, uniffi::Enum)]
+pub enum Period {
+    ThreeMonths,
+    SixMonths,
+    NineMonths,
+    TwelveMonths,
+    PointInTime,
+}
+
+impl std::fmt::Display for Period {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Period::ThreeMonths => "3m",
+            Period::SixMonths => "6m",
+            Period::NineMonths => "9m",
+            Period::TwelveMonths => "12m",
+            Period::PointInTime => "pit",
+        };
+        write!(f, "{}", s)
+    }
+}
+
+impl FromStr for Period {
+    type Err = PeriodError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let trimmed = s.trim();
+
+        let lower = trimmed.to_lowercase();
+        if lower.contains("three months") { Ok(Period::ThreeMonths) }
+        else if lower.contains("six months") { Ok(Period::SixMonths) }
+        else if lower.contains("nine months") { Ok(Period::NineMonths) }
+        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
+        else { Err(PeriodError::InvalidPeriod) }
+    }
+}
+
+#[derive(Debug, uniffi::Error)]
+pub enum PeriodError {
+    InvalidPeriod,
+}
+
 pub trait Statement {
     fn ticker(&self) -> Ticker;
     fn period(&self) -> Period;
 }
 
-macro_rules! impl_reported_items {
+macro_rules! impl_reported {
     ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
         impl $name {
-            pub fn reported_items(&self) -> [Reported; count_items!($($variant)*)] {
+            pub fn reported(&self) -> [Reported; count_items!($($variant)*)] {
                 [
                     $(
                         Reported {
@@ -34,7 +107,7 @@ macro_rules! impl_reported_items {
                             date: self.date,
                             p: self.period(),
                             item: Item::$variant,
-                            val: impl_reported_items!(@val self, $kind $source),
+                            val: impl_reported!(@val self, $kind $source),
                         },
                     )*
                 ]
@@ -107,7 +180,7 @@ impl IncomeStatement {
     }
 }
 
-impl_reported_items! {
+impl_reported! {
     IncomeStatement,
     [
         Revenue => field revenue,
@@ -220,7 +293,7 @@ impl CashFlowStatement {
     }
 }
 
-impl_reported_items! {
+impl_reported! {
     CashFlowStatement,
     [
         NetIncome => field net_income,
@@ -254,80 +327,7 @@ impl_reported_items! {
     ]
 }
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, uniffi::Enum)]
-pub enum Period {
-    ThreeMonths,
-    SixMonths,
-    NineMonths,
-    TwelveMonths,
-    PointInTime,
-}
-
-impl std::fmt::Display for Period {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = match self {
-            Period::ThreeMonths => "3m",
-            Period::SixMonths => "6m",
-            Period::NineMonths => "9m",
-            Period::TwelveMonths => "12m",
-            Period::PointInTime => "pit",
-        };
-        write!(f, "{}", s)
-    }
-}
-
-impl FromStr for Period {
-    type Err = PeriodError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let trimmed = s.trim();
-
-        let lower = trimmed.to_lowercase();
-        if lower.contains("three months") { Ok(Period::ThreeMonths) }
-        else if lower.contains("six months") { Ok(Period::SixMonths) }
-        else if lower.contains("nine months") { Ok(Period::NineMonths) }
-        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
-        else { Err(PeriodError::InvalidPeriod) }
-    }
-}
-
-#[derive(Debug, uniffi::Error)]
-pub enum PeriodError {
-    InvalidPeriod,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
-pub enum Ticker {
-    NVDA,
-    TSLA,
-}
-
-impl FromStr for Ticker {
-    type Err = TickerError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "NVDA" => Ok(Ticker::NVDA),
-            "TSLA" => Ok(Ticker::TSLA),
-            _ => Err(TickerError::TickerNotFound),
-        }
-    }
-}
-
-pub enum TickerError {
-    TickerNotFound,
-}
-
-impl std::fmt::Display for Ticker {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Ticker::NVDA => write!(f, "NVDA"),
-            Ticker::TSLA => write!(f, "TSLA"),
-        }
-    }
-}
-
-impl_reported_items! {
+impl_reported! {
     NVDABalanceSheet,
     [
         CashAndCashEquivalents => field cash_and_cash_equivalents,
