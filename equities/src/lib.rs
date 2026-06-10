@@ -7,7 +7,7 @@ pub mod sheet_info;
 use std::str::FromStr;
 
 use crate::item::Item;
-use crate::item::ReportedItem;
+use crate::item::Reported;
 
 use chrono::NaiveDate;
 
@@ -19,10 +19,10 @@ macro_rules! count_items {
 macro_rules! impl_reported_items {
     ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
         impl $name {
-            pub fn reported_items(&self) -> [ReportedItem; count_items!($($variant)*)] {
+            pub fn reported_items(&self) -> [Reported; count_items!($($variant)*)] {
                 [
                     $(
-                        ReportedItem {
+                        Reported {
                             ticker: Statement::ticker(self),
                             date: self.date,
                             p: self.period(),

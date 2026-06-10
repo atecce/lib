@@ -6,8 +6,7 @@ use std::path::Path;
 use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 use crate::Ticker;
-use crate::item::Item;
-use crate::item::ReportedItem;
+use crate::item::{Item, Reported};
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
 
@@ -24,7 +23,7 @@ pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>>
 }
 
 impl Reader {
-    pub fn process_balance_sheet(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    pub fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance Sheets", "Condensed Consolidated Balance S"])
             .ok_or("Balance sheet not found")?;
 
@@ -35,7 +34,7 @@ impl Reader {
         self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
     }
 
-    pub fn process_income_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    pub fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["INCOME_STATEMENT", "Consolidated Statements of Oper", "Consolidated Statements of Inco", "Condensed Consolidated Statemen"])
             .ok_or("Income statement not found")?;
 
@@ -46,7 +45,7 @@ impl Reader {
         self.reported_items(&rows, new_sheet_info(&rows, IncomeStatement)?)
     }
 
-    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let range = self.workbook.worksheet_range("CASH_FLOW")?;
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
 
@@ -73,7 +72,7 @@ impl Reader {
         None
     }
 
-    fn reported_items(&self, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<ReportedItem>, Box<dyn Error>> {
+    fn reported_items(&self, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
 
@@ -110,7 +109,7 @@ impl Reader {
                         }
 
                         if !val.is_nan() {
-                            reported_items.push(ReportedItem {
+                            reported_items.push(Reported {
                                 ticker: self.ticker,
                                 date: *date,
                                 p: *period,

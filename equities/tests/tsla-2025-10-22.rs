@@ -1,4 +1,4 @@
-use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, item::ReportedItem};
+use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, item::Reported};
 
 #[test]
 fn report() {
@@ -41,7 +41,7 @@ fn report() {
 //    assert_reported_items(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported_items()).flatten().collect());
 }
 
-fn assert_reported_items(mut actual: Vec<ReportedItem>, expected: Vec<ReportedItem>) {
+fn assert_reported_items(mut actual: Vec<Reported>, expected: Vec<Reported>) {
     actual.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
     let zipped = actual.into_iter().zip(expected);

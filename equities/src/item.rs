@@ -140,7 +140,7 @@ pub enum ItemError {
 }
 
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]
-pub struct ReportedItem {
+pub struct Reported {
     pub ticker: crate::Ticker,
     pub date: chrono::NaiveDate,
     pub p: crate::Period,
