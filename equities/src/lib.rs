@@ -1,6 +1,7 @@
 uniffi::setup_scaffolding!();
 
 pub mod item;
+pub mod nvda;
 pub mod reader;
 pub mod sheet_info;
 
@@ -8,12 +9,18 @@ use std::str::FromStr;
 
 use crate::item::Item;
 use crate::item::Reported;
+use crate::nvda::NVDABalanceSheet;
 
 use chrono::NaiveDate;
 
 macro_rules! count_items {
     () => { 0 };
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
+}
+
+pub trait Statement {
+    fn ticker(&self) -> Ticker;
+    fn period(&self) -> Period;
 }
 
 macro_rules! impl_reported_items {
@@ -39,11 +46,6 @@ macro_rules! impl_reported_items {
     (@val $self:ident, method $source:ident) => { $self.$source() };
 }
 
-pub trait Statement {
-    fn ticker(&self) -> Ticker;
-    fn period(&self) -> Period;
-}
-
 pub trait BalanceSheet {
     fn ticker(&self) -> Ticker;
 }
@@ -55,94 +57,6 @@ impl<T: BalanceSheet> Statement for T {
     fn period(&self) -> Period {
         Period::PointInTime
     }
-}
-
-pub struct NVDABalanceSheet {
-    pub date: NaiveDate,
-
-    pub cash_and_cash_equivalents: f64,
-    pub marketable_securities: f64,
-    pub accounts_receivable_net: f64,
-    pub inventories: f64,
-    pub prepaid_expenses_and_other_current_assets: f64,
-
-    pub property_and_equipment_net: f64,
-    pub operating_lease_assets: f64,
-    pub goodwill: f64,
-    pub intangible_assets_net: f64,
-    pub deferred_income_tax_assets: f64,
-    pub other_assets: f64,
-
-    pub accounts_payable: f64,
-    pub accrued_and_other_current_liabilities: f64,
-    pub short_term_debt: f64,
-
-    pub long_term_debt: f64,
-    pub long_term_operating_lease_liabilities: f64,
-    pub other_long_term_liabilities: f64,
-}
-
-impl BalanceSheet for NVDABalanceSheet {
-    fn ticker(&self) -> Ticker {
-        Ticker::NVDA
-    }
-}
-
-impl NVDABalanceSheet {
-    fn total_current_assets(&self) -> f64 {
-        self.cash_and_cash_equivalents
-            + self.marketable_securities
-            + self.accounts_receivable_net
-            + self.inventories
-            + self.prepaid_expenses_and_other_current_assets
-    }
-    fn total_assets(&self) -> f64 {
-        self.total_current_assets()
-            + self.property_and_equipment_net
-            + self.operating_lease_assets
-            + self.goodwill
-            + self.intangible_assets_net
-            + self.deferred_income_tax_assets
-            + self.other_assets
-    }
-    fn total_current_liabilities(&self) -> f64 {
-        self.accounts_payable
-            + self.accrued_and_other_current_liabilities
-            + self.short_term_debt
-    }
-    fn total_liabilities(&self) -> f64 {
-        self.total_current_liabilities()
-            + self.long_term_debt
-            + self.long_term_operating_lease_liabilities
-            + self.other_long_term_liabilities
-    }
-}
-
-impl_reported_items! {
-    NVDABalanceSheet,
-    [
-        CashAndCashEquivalents => field cash_and_cash_equivalents,
-        MarketableSecurities => field marketable_securities,
-        AccountsReceivableNet => field accounts_receivable_net,
-        Inventories => field inventories,
-        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
-        TotalCurrentAssets => method total_current_assets,
-        PropertyAndEquipmentNet => field property_and_equipment_net,
-        OperatingLeaseAssets => field operating_lease_assets,
-        Goodwill => field goodwill,
-        IntangibleAssetsNet => field intangible_assets_net,
-        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
-        OtherAssets => field other_assets,
-        TotalAssets => method total_assets,
-        AccountsPayable => field accounts_payable,
-        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        ShortTermDebt => field short_term_debt,
-        TotalCurrentLiabilities => method total_current_liabilities,
-        LongTermDebt => field long_term_debt,
-        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
-        OtherLongTermLiabilities => field other_long_term_liabilities,
-        TotalLiabilities => method total_liabilities,
-    ]
 }
 
 pub struct IncomeStatement {
@@ -411,4 +325,31 @@ impl std::fmt::Display for Ticker {
             Ticker::TSLA => write!(f, "TSLA"),
         }
     }
+}
+
+impl_reported_items! {
+    NVDABalanceSheet,
+    [
+        CashAndCashEquivalents => field cash_and_cash_equivalents,
+        MarketableSecurities => field marketable_securities,
+        AccountsReceivableNet => field accounts_receivable_net,
+        Inventories => field inventories,
+        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
+        TotalCurrentAssets => method total_current_assets,
+        PropertyAndEquipmentNet => field property_and_equipment_net,
+        OperatingLeaseAssets => field operating_lease_assets,
+        Goodwill => field goodwill,
+        IntangibleAssetsNet => field intangible_assets_net,
+        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
+        OtherAssets => field other_assets,
+        TotalAssets => method total_assets,
+        AccountsPayable => field accounts_payable,
+        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        ShortTermDebt => field short_term_debt,
+        TotalCurrentLiabilities => method total_current_liabilities,
+        LongTermDebt => field long_term_debt,
+        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
+        OtherLongTermLiabilities => field other_long_term_liabilities,
+        TotalLiabilities => method total_liabilities,
+    ]
 }
