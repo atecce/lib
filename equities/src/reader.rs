@@ -7,7 +7,7 @@ use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 use crate::Ticker;
 use crate::item::Item;
-use crate::ReportedItem;
+use crate::item::ReportedItem;
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
 

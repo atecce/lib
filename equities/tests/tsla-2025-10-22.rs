@@ -1,4 +1,4 @@
-use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, ReportedItem};
+use equities::{BalanceSheet, CashFlowStatement, IncomeStatement, item::ReportedItem};
 
 #[test]
 fn report() {

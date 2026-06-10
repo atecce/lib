@@ -138,3 +138,12 @@ items! {
 pub enum ItemError {
     ItemNotFound,
 }
+
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
+pub struct ReportedItem {
+    pub ticker: crate::Ticker,
+    pub date: chrono::NaiveDate,
+    pub p: crate::Period,
+    pub item: Item,
+    pub val: f64,
+}

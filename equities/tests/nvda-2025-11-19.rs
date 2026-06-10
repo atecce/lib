@@ -1,4 +1,4 @@
-use equities::{NVDABalanceSheet, CashFlowStatement, IncomeStatement, ReportedItem};
+use equities::{NVDABalanceSheet, CashFlowStatement, IncomeStatement, item::ReportedItem};
 
 #[test]
 fn report() {

@@ -7,17 +7,9 @@ pub mod sheet_info;
 use std::str::FromStr;
 
 use crate::item::Item;
+use crate::item::ReportedItem;
 
 use chrono::NaiveDate;
-
-#[derive(Clone, Debug, PartialEq, serde::Serialize)]
-pub struct ReportedItem {
-    pub ticker: Ticker,
-    pub date: NaiveDate,
-    pub p: Period,
-    pub item: Item,
-    pub val: f64,
-}
 
 macro_rules! count_items {
     () => { 0 };
