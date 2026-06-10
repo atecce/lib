@@ -9,7 +9,7 @@ use std::str::FromStr;
 
 use crate::item::Item;
 use crate::item::Reported;
-use crate::nvda::NVDABalanceSheet;
+use crate::nvda::BalanceSheet as NVDABalanceSheet;
 
 use chrono::NaiveDate;
 
