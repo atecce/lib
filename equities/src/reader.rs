@@ -9,6 +9,7 @@ use crate::Ticker;
 use crate::item::{Item, Reported};
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
+use pdfsink_rs::{PdfDocument, TableSettings};
 
 pub struct Reader {
     workbook: Sheets<BufReader<File>>,
@@ -122,5 +123,28 @@ impl Reader {
             }
         }
         Ok(reported_items)
+    }
+}
+
+pub struct PDFReader {
+    doc: PdfDocument,
+}
+
+pub fn new_pdf_reader() -> Result<PDFReader, Box<dyn Error>> {
+    Ok(PDFReader {
+        doc: PdfDocument::open("tsla/tsla-20250930-gen.pdf")?,
+    })
+}
+
+impl PDFReader {
+    pub fn process_balance_sheet(&self) -> Result<(), Box<dyn Error>> {
+        let page = self.doc.page(4)?;
+
+        if let Some(table) = page.extract_table(TableSettings::default())? {
+            for row in &table {
+                println!("{:?}", row);
+            }
+        }
+        Ok(())
     }
 }
