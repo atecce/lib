@@ -128,11 +128,13 @@ impl Reader {
 
 pub struct PDFReader {
     doc: PdfDocument,
+    ticker: Ticker,
 }
 
-pub fn new_pdf_reader() -> Result<PDFReader, Box<dyn Error>> {
+pub fn new_pdf_reader(path: &Path, ticker: Ticker) -> Result<PDFReader, Box<dyn Error>> {
     Ok(PDFReader {
-        doc: PdfDocument::open("tsla/tsla-20250930-gen.pdf")?,
+        doc: PdfDocument::open(path)?,
+        ticker: ticker,
     })
 }
 
@@ -143,6 +145,13 @@ impl PDFReader {
         if let Some(table) = page.extract_table(TableSettings::default())? {
             for row in &table {
                 println!("{:?}", row);
+                if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                    println!("{}", item);
+                    if let Some(val) = &row[1] {
+                        println!("{}", val);
+                    }
+                }
+                println!("");
             }
         }
         Ok(())

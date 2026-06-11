@@ -14,7 +14,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 66] = [
+            pub const ALL: [$item; 68] = [
                 $($item::$variant,)*
             ];
         }
@@ -51,25 +51,28 @@ impl std::fmt::Display for Item {
 
 items! {
     pub enum Item {
-        CurrentAssets,
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"],
         MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"],
         Inventories => ["Inventories", "Inventory"],
         PrepaidExpensesAndOtherCurrentAssets => ["Prepaid expenses and other current assets", "Prepaid Expenses and Other Current Assets"],
         TotalCurrentAssets => ["Total current assets", "Total Current Assets"],
+
         PropertyAndEquipmentNet => ["Property and equipment, net", "Property, plant and equipment, net", "Property and Equipment, Net"],
         OperatingLeaseAssets => ["Operating lease assets", "Operating lease right-of-use assets", "Operating Lease Assets"],
+        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net"],
+        SolarEnergySystemsNet => ["Solar energy systems, net"],
         Goodwill => ["Goodwill"],
+        DigitalAssets => ["Digital assets"],
         IntangibleAssetsNet => ["Intangible assets, net", "Intangible Assets, Net"],
         DeferredIncomeTaxAssets => ["Deferred income tax assets", "Deferred tax assets", "Deferred Income Tax Assets"],
         NonMarketableEquitySecurities => ["Non-marketable equity securities", "Digital assets, net", "Non-Marketable Equity Securities"],
         OtherAssets => ["Other assets", "Other non-current assets", "Other Assets"],
         TotalAssets => ["Total assets", "Total Assets"],
 
-        CurrentLiabilities,
         AccountsPayable => ["Accounts payable", "Accounts Payable"],
         AccruedAndOtherCurrentLiabilities => ["Accrued and other current liabilities", "Accrued liabilities and other", "Accrued and Other Current Liabilities"],
+        DeferredRevenue => ["Deferred revenue"],
         ShortTermDebt => ["Short-term debt", "Current portion of debt and finance leases", "Short-Term Debt"],
         TotalCurrentLiabilities => ["Total current liabilities", "Total Current Liabilities"],
         LongTermDebt => ["Long-term debt", "Debt and finance leases, net of current portion", "Long-Term Debt"],
