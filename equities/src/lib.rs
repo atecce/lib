@@ -1,10 +1,11 @@
 uniffi::setup_scaffolding!();
 
 pub mod item;
+pub mod xlsx;
+pub mod pdf;
 pub mod nvda;
-pub mod reader;
-pub mod sheet_info;
 pub mod tsla;
+pub mod sheet_info;
 
 use std::str::FromStr;
 

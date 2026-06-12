@@ -4,7 +4,7 @@ use std::fs;
 use calamine::DataType;
 
 use equities::item::Item;
-use equities::reader::new_reader;
+use equities::xlsx::new_reader;
 use equities::sheet_info::new_sheet_info;
 use equities::sheet_info::SheetType::BalanceSheet;
 

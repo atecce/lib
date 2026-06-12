@@ -1,6 +1,5 @@
 mod reported;
 
-use equities::{CashFlowStatement, IncomeStatement};
 use equities::Reader;
 use equities::tsla::BalanceSheet;
 
@@ -39,6 +38,6 @@ fn report() {
         },
     ];
 
-    let mut r = equities::reader::new_pdf_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
+    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
 }
