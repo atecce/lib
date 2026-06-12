@@ -14,7 +14,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 68] = [
+            pub const ALL: [$item; 70] = [
                 $($item::$variant,)*
             ];
         }
@@ -52,6 +52,7 @@ impl std::fmt::Display for Item {
 items! {
     pub enum Item {
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"],
+        // TODO(atec): Short-term investments
         MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"],
         Inventories => ["Inventories", "Inventory"],
@@ -66,6 +67,7 @@ items! {
         DigitalAssets => ["Digital assets"],
         IntangibleAssetsNet => ["Intangible assets, net", "Intangible Assets, Net"],
         DeferredIncomeTaxAssets => ["Deferred income tax assets", "Deferred tax assets", "Deferred Income Tax Assets"],
+        // TODO(atec): Digital assets, net
         NonMarketableEquitySecurities => ["Non-marketable equity securities", "Digital assets, net", "Non-Marketable Equity Securities"],
         OtherAssets => ["Other assets", "Other non-current assets", "Other Assets"],
         TotalAssets => ["Total assets", "Total Assets"],
@@ -73,10 +75,13 @@ items! {
         AccountsPayable => ["Accounts payable", "Accounts Payable"],
         AccruedAndOtherCurrentLiabilities => ["Accrued and other current liabilities", "Accrued liabilities and other", "Accrued and Other Current Liabilities"],
         DeferredRevenue => ["Deferred revenue"],
+        // TODO(atec): Current portion of debt and finance leases
         ShortTermDebt => ["Short-term debt", "Current portion of debt and finance leases", "Short-Term Debt"],
         TotalCurrentLiabilities => ["Total current liabilities", "Total Current Liabilities"],
-        LongTermDebt => ["Long-term debt", "Debt and finance leases, net of current portion", "Long-Term Debt"],
-        LongTermOperatingLeaseLiabilities => ["Long-term operating lease liabilities", "Deferred revenue, net of current portion", "Long-Term Operating Lease Liabilities"],
+        LongTermDebt => ["Long-term debt", "Long-Term Debt"],
+        DebtAndFinanceLeasesNetOfCurrentPortion => ["Debt and finance leases, net of current portion"],
+        DeferredRevenueNetOfCurrentPortion => ["Deferred revenue, net of current portion"],
+        LongTermOperatingLeaseLiabilities => ["Long-term operating lease liabilities", "Long-Term Operating Lease Liabilities"],
         OtherLongTermLiabilities => ["Other long-term liabilities", "Other Long-Term Liabilities"],
         TotalLiabilities => ["Total liabilities", "Total Liabilities"],
 

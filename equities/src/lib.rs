@@ -384,6 +384,8 @@ impl_reported! {
         DeferredRevenue => field deferred_revenue,
         ShortTermDebt => field current_portion_of_debt_and_finance_leases,
         TotalCurrentLiabilities => method total_current_liabilities,
+        DebtAndFinanceLeasesNetOfCurrentPortion => field debt_and_finance_leases_net_of_current_portion,
+        DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
         OtherLongTermLiabilities => field other_long_term_liabilities,
         TotalLiabilities => method total_liabilities,
     ]
