@@ -11,6 +11,7 @@ use std::str::FromStr;
 use crate::item::Item;
 use crate::item::Reported;
 use crate::nvda::BalanceSheet as NVDABalanceSheet;
+use crate::tsla::BalanceSheet as TSLABalanceSheet;
 
 use chrono::NaiveDate;
 
@@ -354,6 +355,35 @@ impl_reported! {
         TotalCurrentLiabilities => method total_current_liabilities,
         LongTermDebt => field long_term_debt,
         LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
+        OtherLongTermLiabilities => field other_long_term_liabilities,
+        TotalLiabilities => method total_liabilities,
+    ]
+}
+
+impl_reported! {
+    TSLABalanceSheet,
+    [
+        CashAndCashEquivalents => field cash_and_cash_equivalents,
+        MarketableSecurities => field marketable_securities,
+        AccountsReceivableNet => field accounts_receivable_net,
+        Inventories => field inventories,
+        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
+        TotalCurrentAssets => method total_current_assets,
+        OperatingLeaseVehiclesNet => field operating_lease_vehicles_net,
+        SolarEnergySystemsNet => field solar_energy_systems_net,
+        PropertyAndEquipmentNet => field property_and_equipment_net,
+        OperatingLeaseAssets => field operating_lease_assets,
+        Goodwill => field goodwill,
+        DigitalAssets => field digital_assets,
+        IntangibleAssetsNet => field intangible_assets_net,
+        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
+        OtherAssets => field other_assets,
+        TotalAssets => method total_assets,
+        AccountsPayable => field accounts_payable,
+        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        DeferredRevenue => field deferred_revenue,
+        ShortTermDebt => field current_portion_of_debt_and_finance_leases,
+        TotalCurrentLiabilities => method total_current_liabilities,
         OtherLongTermLiabilities => field other_long_term_liabilities,
         TotalLiabilities => method total_liabilities,
     ]

@@ -1,4 +1,4 @@
-// mod reported;
+mod reported;
 use equities::{CashFlowStatement, IncomeStatement};
 use equities::tsla::BalanceSheet;
 
@@ -10,7 +10,7 @@ fn report() {
             date: chrono::NaiveDate::from_ymd_opt(2024, 12, 31).unwrap(),
 
             cash_and_cash_equivalents: 16_139_000_000.0,
-            short_term_investments: 20_424_000_000.0,
+            marketable_securities: 20_424_000_000.0,
             accounts_receivable_net: 4_418_000_000.0,
             inventories: 12_017_000_000.0,
             prepaid_expenses_and_other_current_assets: 5_362_000_000.0,
@@ -18,16 +18,16 @@ fn report() {
             operating_lease_vehicles_net: 5_581_000_000.0,
             solar_energy_systems_net: 4_924_000_000.0,
 
-            property_plant_and_equipment_net: 35_836_000_000.0,
-            operating_lease_right_of_use_assets: 5_160_000_000.0,
+            property_and_equipment_net: 35_836_000_000.0,
+            operating_lease_assets: 5_160_000_000.0,
             digital_assets: 1_076_000_000.0,
             intangible_assets_net: 150_000_000.0,
             goodwill: 244_000_000.0,
-            deferred_tax_assets: 6_524_000_000.0,
-            other_non_current_assets: 4_215_000_000.0,
+            deferred_income_tax_assets: 6_524_000_000.0,
+            other_assets: 4_215_000_000.0,
 
             accounts_payable: 12_474_000_000.0,
-            accrued_liabilities_and_other: 10_723_000_000.0,
+            accrued_and_other_current_liabilities: 10_723_000_000.0,
             deferred_revenue: 3_168_000_000.0,
             current_portion_of_debt_and_finance_leases: 2_456_000_000.0,
 
@@ -37,7 +37,6 @@ fn report() {
         },
     ];
 
-//    let mut r = equities::reader::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
-
-//    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
+    let mut r = equities::reader::new_pdf_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
+    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
 }

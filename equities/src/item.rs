@@ -58,10 +58,10 @@ items! {
         PrepaidExpensesAndOtherCurrentAssets => ["Prepaid expenses and other current assets", "Prepaid Expenses and Other Current Assets"],
         TotalCurrentAssets => ["Total current assets", "Total Current Assets"],
 
-        PropertyAndEquipmentNet => ["Property and equipment, net", "Property, plant and equipment, net", "Property and Equipment, Net"],
-        OperatingLeaseAssets => ["Operating lease assets", "Operating lease right-of-use assets", "Operating Lease Assets"],
         OperatingLeaseVehiclesNet => ["Operating lease vehicles, net"],
         SolarEnergySystemsNet => ["Solar energy systems, net"],
+        PropertyAndEquipmentNet => ["Property and equipment, net", "Property, plant and equipment, net", "Property and Equipment, Net"],
+        OperatingLeaseAssets => ["Operating lease assets", "Operating lease right-of-use assets", "Operating Lease Assets"],
         Goodwill => ["Goodwill"],
         DigitalAssets => ["Digital assets"],
         IntangibleAssetsNet => ["Intangible assets, net", "Intangible Assets, Net"],

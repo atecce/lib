@@ -3,10 +3,11 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
+use crate::Ticker;
+use crate::Period;
+use crate::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
-use crate::Ticker;
-use crate::item::{Item, Reported};
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
 use pdfsink_rs::{PdfDocument, TableSettings};
@@ -139,37 +140,61 @@ pub fn new_pdf_reader(path: &Path, ticker: Ticker) -> Result<PDFReader, Box<dyn 
 }
 
 impl PDFReader {
-    pub fn process_balance_sheet(&self) -> Result<(), Box<dyn Error>> {
+    pub fn process_balance_sheet(&self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let page = self.doc.page(4)?;
+
+        let mut reported = Vec::new();
 
         if let Some(table) = page.extract_table(TableSettings::default())? {
             for row in &table {
-                println!("{:?}", row);
                 if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                    let q3_2025 = chrono::NaiveDate::from_ymd_opt(2025, 9, 30).ok_or("q3 2025 not valid naive date")?;
+                    let q4_2024 = chrono::NaiveDate::from_ymd_opt(2024, 12, 31).ok_or("q4 2024 not valid naive date")?;
                     match item {
                         Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
-                            println!("{}", item);
                             if let Some(val) = &row[2] {
-                                println!("{}", val);
+                                reported.push(Reported {
+                                    ticker: self.ticker,
+                                    date: q3_2025,
+                                    p: Period::PointInTime,
+                                    item,
+                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                });
                             }
                             if let Some(val) = &row[5] {
-                                println!("{}", val);
+                                reported.push(Reported {
+                                    ticker: self.ticker,
+                                    date: q4_2024,
+                                    p: Period::PointInTime,
+                                    item,
+                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                });
                             }
                         },
                         _ => {
-                            println!("{}", item);
                             if let Some(val) = &row[1] {
-                                println!("{}", val);
+                                reported.push(Reported {
+                                    ticker: self.ticker,
+                                    date: q3_2025,
+                                    p: Period::PointInTime,
+                                    item,
+                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                });
                             }
                             if let Some(val) = &row[4] {
-                                println!("{}", val);
+                                reported.push(Reported {
+                                    ticker: self.ticker,
+                                    date: q4_2024,
+                                    p: Period::PointInTime,
+                                    item,
+                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                });
                             }
                         }
                     }
                 }
-                println!("");
             }
         }
-        Ok(())
+        Ok(reported)
     }
 }
