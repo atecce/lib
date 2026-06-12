@@ -98,6 +98,10 @@ pub trait Statement {
     fn period(&self) -> Period;
 }
 
+pub trait Reader {
+    fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn std::error::Error>>;
+}
+
 macro_rules! impl_reported {
     ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
         impl $name {

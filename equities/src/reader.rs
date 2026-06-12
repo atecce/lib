@@ -5,6 +5,7 @@ use std::path::Path;
 
 use crate::Ticker;
 use crate::Period;
+use crate::Reader as R;
 use crate::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetInfo};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
@@ -24,8 +25,8 @@ pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>>
     })
 }
 
-impl Reader {
-    pub fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
+impl R for Reader {
+    fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance Sheets", "Condensed Consolidated Balance S"])
             .ok_or("Balance sheet not found")?;
 
@@ -35,7 +36,9 @@ impl Reader {
 
         self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
     }
+}
 
+impl Reader {
     pub fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["INCOME_STATEMENT", "Consolidated Statements of Oper", "Consolidated Statements of Inco", "Condensed Consolidated Statemen"])
             .ok_or("Income statement not found")?;
@@ -139,8 +142,8 @@ pub fn new_pdf_reader(path: &Path, ticker: Ticker) -> Result<PDFReader, Box<dyn 
     })
 }
 
-impl PDFReader {
-    pub fn process_balance_sheet(&self) -> Result<Vec<Reported>, Box<dyn Error>> {
+impl R for PDFReader {
+    fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let page = self.doc.page(4)?;
 
         let mut reported = Vec::new();

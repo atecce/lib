@@ -1,5 +1,7 @@
 mod reported;
+
 use equities::{CashFlowStatement, IncomeStatement};
+use equities::Reader;
 use equities::tsla::BalanceSheet;
 
 #[test]
