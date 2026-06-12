@@ -26,17 +26,24 @@ impl R for Reader {
 
         let mut reported = Vec::new();
 
+        let text = page.extract_text();
+        let lines = text.lines().collect::<Vec<_>>();
+
+        let month_days = lines[7].split(",").filter(|l| *l != "").map(|l| l.trim()).collect::<Vec<_>>();
+        let years = lines[8].split(" ").collect::<Vec<_>>();
+
+        let present = parse_date_across_lines(month_days[0], years[0])?;
+        let past = parse_date_across_lines(month_days[1], years[1])?;
+
         if let Some(table) = page.extract_table(TableSettings::default())? {
             for row in &table {
                 if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                    let q3_2025 = chrono::NaiveDate::from_ymd_opt(2025, 9, 30).ok_or("q3 2025 not valid naive date")?;
-                    let q4_2024 = chrono::NaiveDate::from_ymd_opt(2024, 12, 31).ok_or("q4 2024 not valid naive date")?;
                     match item {
                         Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
                             if let Some(val) = &row[2] {
                                 reported.push(Reported {
                                     ticker: self.ticker,
-                                    date: q3_2025,
+                                    date: present,
                                     p: Period::PointInTime,
                                     item,
                                     val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
@@ -45,7 +52,7 @@ impl R for Reader {
                             if let Some(val) = &row[5] {
                                 reported.push(Reported {
                                     ticker: self.ticker,
-                                    date: q4_2024,
+                                    date: past,
                                     p: Period::PointInTime,
                                     item,
                                     val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
@@ -56,7 +63,7 @@ impl R for Reader {
                             if let Some(val) = &row[1] {
                                 reported.push(Reported {
                                     ticker: self.ticker,
-                                    date: q3_2025,
+                                    date: present,
                                     p: Period::PointInTime,
                                     item,
                                     val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
@@ -65,7 +72,7 @@ impl R for Reader {
                             if let Some(val) = &row[4] {
                                 reported.push(Reported {
                                     ticker: self.ticker,
-                                    date: q4_2024,
+                                    date: past,
                                     p: Period::PointInTime,
                                     item,
                                     val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
@@ -78,4 +85,18 @@ impl R for Reader {
         }
         Ok(reported)
     }
+}
+
+fn parse_date_across_lines(s: &str, next_s: &str) -> Result<chrono::NaiveDate, Box<dyn Error>> {
+    if s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2 {
+        let year = next_s.parse::<u16>()?;
+        return parse_date_str(&format!("{} {}", s, year)).ok_or("failed to parse date str".into())
+    }
+    None.ok_or("failed to find trailing comma or split on whitespace greater than 2".into())
+}
+
+fn parse_date_str(s: &str) -> Option<chrono::NaiveDate> {
+    let s = s.trim().replace(",", "");
+    let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
+    formats.iter().find_map(|fmt| chrono::NaiveDate::parse_from_str(&s, fmt).ok())
 }
