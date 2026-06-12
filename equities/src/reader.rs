@@ -146,9 +146,25 @@ impl PDFReader {
             for row in &table {
                 println!("{:?}", row);
                 if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                    println!("{}", item);
-                    if let Some(val) = &row[1] {
-                        println!("{}", val);
+                    match item {
+                        Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
+                            println!("{}", item);
+                            if let Some(val) = &row[2] {
+                                println!("{}", val);
+                            }
+                            if let Some(val) = &row[5] {
+                                println!("{}", val);
+                            }
+                        },
+                        _ => {
+                            println!("{}", item);
+                            if let Some(val) = &row[1] {
+                                println!("{}", val);
+                            }
+                            if let Some(val) = &row[4] {
+                                println!("{}", val);
+                            }
+                        }
                     }
                 }
                 println!("");
