@@ -14,7 +14,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 70] = [
+            pub const ALL: [$item; 75] = [
                 $($item::$variant,)*
             ];
         }
@@ -61,6 +61,7 @@ items! {
 
         OperatingLeaseVehiclesNet => ["Operating lease vehicles, net"],
         SolarEnergySystemsNet => ["Solar energy systems, net"],
+
         PropertyAndEquipmentNet => ["Property and equipment, net", "Property, plant and equipment, net", "Property and Equipment, Net"],
         OperatingLeaseAssets => ["Operating lease assets", "Operating lease right-of-use assets", "Operating Lease Assets"],
         Goodwill => ["Goodwill"],
@@ -87,11 +88,18 @@ items! {
 
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues"],
+
+        AutomotiveSales => ["Automotive sales"],
+        AutomotiveRegulatoryCredits => ["Automotive regulatory credits"],
+        AutomotiveLeasing => ["Automotive leasing"],
+        EnergyGenerationAndStorage => ["Energy generation and storage"],
+        ServicesAndOther => ["Services and other"],
+
         GrossProfit => ["Gross profit", "Gross Profit", "Total gross profit", "Total Gross Profit"],
 
-        OperatingExpenses,
         ResearchAndDevelopment => ["Research and development", "Research and Development"],
         SalesGeneralAndAdministrative => ["Sales, general and administrative", "Selling, general and administrative", "Sales, General and Administrative"],
+        RestructuringAndOther => ["Restructuring and other"],
         TotalOperatingExpenses => ["Total operating expenses", "Total Operating Expenses"],
         OperatingIncome => ["Operating income", "Income from operations", "Operating Income"],
 
@@ -101,7 +109,7 @@ items! {
         TotalOtherIncomeNet => ["Total other income, net", "Total Other Income, Net"],
         IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax"],
 
-        IncomeTaxExpense => ["Income tax expense", "Provision for (benefit from) income taxes", "Income Tax Expense"],
+        IncomeTaxExpense => ["Income tax expense", "Provision for income taxes", "Provision for (benefit from) income taxes", "Income Tax Expense"],
         NetIncome => ["Net income", "Net income attributable to common stockholders"],
 
         StockBasedCompensationExpense => ["Stock-based compensation expense"],
