@@ -69,3 +69,75 @@ impl BS for BalanceSheet {
             + self.other_long_term_liabilities
     }
 }
+
+pub struct IncomeStatement {
+    pub date: NaiveDate,
+
+    pub automotive_sales_revenue: f64,
+    pub automotive_regulatory_credits_revenue: f64,
+    pub automotive_leasing_revenue: f64,
+
+    pub energy_generation_and_storage_revenue: f64,
+    pub services_and_other_revenue: f64,
+
+    pub automotive_sales_cost_of_revenue: f64,
+    pub automotive_leasing_cost_of_revenue: f64,
+
+    pub energy_generation_and_storage_cost_of_revenue: f64,
+    pub services_and_other_cost_of_revenue: f64,
+
+    pub research_and_development: f64,
+    pub selling_general_and_administrative: f64,
+    pub restructuring_and_other: f64,
+
+    pub interest_income: f64,
+    pub interest_expense: f64,
+    pub other_expense_income_net: f64,
+
+    pub provision_for_income_taxes: f64,
+}
+
+impl IncomeStatement {
+    fn ticker(&self) -> Ticker {
+        Ticker::TSLA
+    }
+    pub fn total_automotive_revenues(&self) -> f64 {
+        self.automotive_sales_revenue
+            + self.automotive_regulatory_credits_revenue
+            + self.automotive_leasing_revenue
+    }
+    pub fn total_revenues(&self) -> f64 {
+        self.total_automotive_revenues()
+            + self.energy_generation_and_storage_revenue
+            + self.services_and_other_revenue
+    }
+    pub fn total_automotive_cost_of_revenues(&self) -> f64 {
+        self.automotive_sales_cost_of_revenue
+            + self.automotive_leasing_cost_of_revenue
+    }
+    pub fn total_cost_of_revenues(&self) -> f64 {
+        self.total_automotive_cost_of_revenues()
+            + self.energy_generation_and_storage_cost_of_revenue
+            + self.services_and_other_cost_of_revenue
+    }
+    pub fn gross_profit(&self) -> f64 {
+        self.total_revenues() - self.total_cost_of_revenues()
+    }
+    pub fn total_operating_expenses(&self) -> f64 {
+        self.research_and_development
+            + self.selling_general_and_administrative
+            + self.restructuring_and_other
+    }
+    pub fn income_from_operations(&self) -> f64 {
+        self.gross_profit() - self.total_operating_expenses()
+    }
+    pub fn income_before_income_tax(&self) -> f64 {
+        self.income_from_operations()
+            + self.interest_income
+            + self.interest_expense
+            + self.other_expense_income_net
+    }
+    pub fn net_income(&self) -> f64 {
+        self.income_before_income_tax() - self.provision_for_income_taxes
+    }
+}
