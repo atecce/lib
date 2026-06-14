@@ -88,10 +88,8 @@ impl R for Reader {
         }
         Ok(reported)
     }
-}
 
-impl Reader {
-    pub fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
+    fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let page = self.doc.page(5)?;
 
         let mut reported = Vec::new();

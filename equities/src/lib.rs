@@ -101,6 +101,7 @@ pub trait Statement {
 
 pub trait Reader {
     fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn std::error::Error>>;
+    fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn std::error::Error>>;
 }
 
 macro_rules! impl_reported {

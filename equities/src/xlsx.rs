@@ -34,10 +34,8 @@ impl R for Reader {
 
         self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
     }
-}
 
-impl Reader {
-    pub fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
+    fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["INCOME_STATEMENT", "Consolidated Statements of Oper", "Consolidated Statements of Inco", "Condensed Consolidated Statemen"])
             .ok_or("Income statement not found")?;
 
@@ -47,7 +45,9 @@ impl Reader {
 
         self.reported_items(&rows, new_sheet_info(&rows, IncomeStatement)?)
     }
+}
 
+impl Reader {
     pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let range = self.workbook.worksheet_range("CASH_FLOW")?;
         let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
