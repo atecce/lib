@@ -719,6 +719,7 @@ dependencies = [
  "calamine 0.35.0",
  "chrono",
  "pdfsink-rs",
+ "regex",
  "reqwest",
  "serde",
  "serde_json",

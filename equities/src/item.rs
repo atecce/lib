@@ -110,7 +110,7 @@ items! {
         IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax"],
 
         IncomeTaxExpense => ["Income tax expense", "Provision for income taxes", "Provision for (benefit from) income taxes", "Income Tax Expense"],
-        NetIncome => ["Net income", "Net income attributable to common stockholders"],
+        NetIncome => ["Net income"],
 
         StockBasedCompensationExpense => ["Stock-based compensation expense"],
         DepreciationAndAmoritization => ["Depreciation and amortization"],
