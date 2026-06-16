@@ -364,3 +364,22 @@ fn parse_date_str(s: &str) -> Option<NaiveDate> {
     let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
     formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())
 }
+
+fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &str) -> Result<Reported, Box<dyn Error>> {
+    let ret: f64;
+    if val.starts_with('(') && val.ends_with(')') {
+        // Slice off the outer characters '(' and ')'
+        let val = &val[1..val.len() - 1];
+        // Parse the inner number and make it negative
+        ret = val.parse::<f64>().map(|num| -num)?
+    } else {
+        ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
+    }
+    return Ok(Reported {
+        ticker: ticker,
+        date: date,
+        p: period,
+        item: item,
+        val: ret,
+    })
+}

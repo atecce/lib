@@ -13,6 +13,7 @@ use crate::item::Item;
 use crate::item::Reported;
 use crate::nvda::BalanceSheet as NVDABalanceSheet;
 use crate::tsla::BalanceSheet as TSLABalanceSheet;
+use crate::tsla::IncomeStatement as TSLAIncomeStatement;
 
 use chrono::NaiveDate;
 
@@ -396,3 +397,28 @@ impl_reported! {
         TotalLiabilities => method total_liabilities,
     ]
 }
+
+// impl_reported! {
+//     TSLAIncomeStatement,
+//     [
+//         AutomotiveSalesRevenue => field automotive_sales_revenue,
+//         AutomotiveRegulatoryCredits => field automotive_regulatory_credits,
+//         AutomotiveLeasingRevenue => field automotive_leasing_revenue,
+//         EnergyGenerationAndStorageRevenue => field energy_generation_and_storage_revenue,
+//         ServicesAndOtherRevenue => field services_and_other_revenue,
+//         Revenue => method total_revenues,
+//         AutomotiveSalesCost => field automotive_sales_cost_of_revenue,
+//         AutomotiveLeasingCost => field automotive_leasing_cost_of_revenue,
+//         EnergyGenerationAndStorageCost => field energy_generation_and_storage_cost_of_revenue,
+//         ServicesAndOtherCost => field services_and_other_cost_of_revenue,
+//         CostOfRevenue => method total_cost_of_revenues,
+//         ResearchAndDevelopment => field research_and_development,
+//         SalesGeneralAndAdministrative => field selling_general_and_administrative,
+//         RestructuringAndOther => field restructuring_and_other,
+//         OperatingIncome => method income_from_operations,
+//         InterestIncome => field interest_income,
+//         InterestExpense => field interest_expense,
+//         OtherIncomeNet => field other_expense_income_net,
+//         NetIncome => method net_income,
+//     ]
+// }

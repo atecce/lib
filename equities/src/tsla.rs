@@ -1,4 +1,5 @@
 use crate::Ticker;
+use crate::Period;
 use crate::BalanceSheet as BS;
 
 use chrono::NaiveDate;
@@ -72,9 +73,10 @@ impl BS for BalanceSheet {
 
 pub struct IncomeStatement {
     pub date: NaiveDate,
+    pub period: Period,
 
     pub automotive_sales_revenue: f64,
-    pub automotive_regulatory_credits_revenue: f64,
+    pub automotive_regulatory_credits: f64,
     pub automotive_leasing_revenue: f64,
 
     pub energy_generation_and_storage_revenue: f64,
@@ -103,7 +105,7 @@ impl IncomeStatement {
     }
     pub fn total_automotive_revenues(&self) -> f64 {
         self.automotive_sales_revenue
-            + self.automotive_regulatory_credits_revenue
+            + self.automotive_regulatory_credits
             + self.automotive_leasing_revenue
     }
     pub fn total_revenues(&self) -> f64 {
