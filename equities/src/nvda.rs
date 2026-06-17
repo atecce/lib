@@ -2,6 +2,7 @@ use crate::Ticker;
 use crate::Period;
 use crate::Statement;
 use crate::BalanceSheet as BS;
+use crate::IncomeStatement as IS;
 
 use chrono::NaiveDate;
 
@@ -96,23 +97,26 @@ impl Statement for IncomeStatement {
     }
 }
 
-impl IncomeStatement {
-    pub fn gross_profit(&self) -> f64 {
+impl IS for IncomeStatement {
+    fn gross_profit(&self) -> f64 {
         self.revenue - self.cost_of_revenue
     }
-    pub fn total_operating_expenses(&self) -> f64 {
+    fn total_operating_expenses(&self) -> f64 {
         self.research_and_development + self.sales_general_and_administrative
     }
-    pub fn operating_income(&self) -> f64 {
+    fn operating_income(&self) -> f64 {
         self.gross_profit() - self.total_operating_expenses()
     }
-    pub fn total_other_income_net(&self) -> f64 {
-        self.interest_income + self.interest_expense + self.other_income_net
-    }
-    pub fn income_before_income_tax(&self) -> f64 {
+    fn income_before_income_tax(&self) -> f64 {
         self.operating_income() + self.total_other_income_net()
     }
-    pub fn net_income(&self) -> f64 {
+    fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.income_tax_expense
+    }
+}
+
+impl IncomeStatement {
+    pub fn total_other_income_net(&self) -> f64 {
+        self.interest_income + self.interest_expense + self.other_income_net
     }
 }

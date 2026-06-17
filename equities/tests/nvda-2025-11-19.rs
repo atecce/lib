@@ -2,6 +2,7 @@ mod reported;
 
 use equities::{CashFlowStatement};
 use equities::Reader;
+use equities::IncomeStatement as IS;
 use equities::nvda::{BalanceSheet, IncomeStatement};
 
 #[test]

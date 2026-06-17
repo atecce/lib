@@ -2,6 +2,7 @@ use crate::Ticker;
 use crate::Period;
 use crate::Statement;
 use crate::BalanceSheet as BS;
+use crate::IncomeStatement as IS;
 
 use chrono::NaiveDate;
 
@@ -115,6 +116,29 @@ impl Statement for IncomeStatement {
     }
 }
 
+impl IS for IncomeStatement {
+    fn gross_profit(&self) -> f64 {
+        self.total_revenues() - self.total_cost_of_revenues()
+    }
+    fn total_operating_expenses(&self) -> f64 {
+        self.research_and_development
+            + self.selling_general_and_administrative
+            + self.restructuring_and_other
+    }
+    fn operating_income(&self) -> f64 {
+        self.gross_profit() - self.total_operating_expenses()
+    }
+    fn income_before_income_tax(&self) -> f64 {
+        self.operating_income()
+            + self.interest_income
+            + self.interest_expense
+            + self.other_expense_income_net
+    }
+    fn net_income(&self) -> f64 {
+        self.income_before_income_tax() - self.provision_for_income_taxes
+    }
+}
+
 impl IncomeStatement {
     pub fn total_automotive_revenues(&self) -> f64 {
         self.automotive_sales_revenue
@@ -134,25 +158,5 @@ impl IncomeStatement {
         self.total_automotive_cost_of_revenues()
             + self.energy_generation_and_storage_cost_of_revenue
             + self.services_and_other_cost_of_revenue
-    }
-    pub fn gross_profit(&self) -> f64 {
-        self.total_revenues() - self.total_cost_of_revenues()
-    }
-    pub fn total_operating_expenses(&self) -> f64 {
-        self.research_and_development
-            + self.selling_general_and_administrative
-            + self.restructuring_and_other
-    }
-    pub fn income_from_operations(&self) -> f64 {
-        self.gross_profit() - self.total_operating_expenses()
-    }
-    pub fn income_before_income_tax(&self) -> f64 {
-        self.income_from_operations()
-            + self.interest_income
-            + self.interest_expense
-            + self.other_expense_income_net
-    }
-    pub fn net_income(&self) -> f64 {
-        self.income_before_income_tax() - self.provision_for_income_taxes
     }
 }

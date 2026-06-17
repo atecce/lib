@@ -136,6 +136,14 @@ pub trait BalanceSheet {
     fn total_liabilities(&self) -> f64;
 }
 
+pub trait IncomeStatement {
+    fn gross_profit(&self) -> f64;
+    fn total_operating_expenses(&self) -> f64;
+    fn operating_income(&self) -> f64;
+    fn income_before_income_tax(&self) -> f64;
+    fn net_income(&self) -> f64;
+}
+
 pub struct CashFlowStatement {
     pub ticker: Ticker,
     pub date: NaiveDate,
@@ -360,7 +368,7 @@ impl_reported! {
         SalesGeneralAndAdministrative => field selling_general_and_administrative,
         RestructuringAndOther => field restructuring_and_other,
         TotalOperatingExpenses => method total_operating_expenses,
-        OperatingIncome => method income_from_operations,
+        OperatingIncome => method operating_income,
         InterestIncome => field interest_income,
         InterestExpense => field interest_expense,
         OtherIncomeNet => field other_expense_income_net,
