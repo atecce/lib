@@ -139,7 +139,9 @@ pub trait BalanceSheet {
 pub trait IncomeStatement {
     fn gross_profit(&self) -> f64;
     fn total_operating_expenses(&self) -> f64;
-    fn operating_income(&self) -> f64;
+    fn operating_income(&self) -> f64 {
+        self.gross_profit() - self.total_operating_expenses()
+    }
     fn income_before_income_tax(&self) -> f64;
     fn net_income(&self) -> f64;
 }

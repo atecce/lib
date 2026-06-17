@@ -104,9 +104,6 @@ impl IS for IncomeStatement {
     fn total_operating_expenses(&self) -> f64 {
         self.research_and_development + self.sales_general_and_administrative
     }
-    fn operating_income(&self) -> f64 {
-        self.gross_profit() - self.total_operating_expenses()
-    }
     fn income_before_income_tax(&self) -> f64 {
         self.operating_income() + self.total_other_income_net()
     }
