@@ -68,3 +68,51 @@ impl BS for BalanceSheet {
             + self.other_long_term_liabilities
     }
 }
+
+pub struct IncomeStatement {
+    pub ticker: Ticker,
+    pub date: NaiveDate,
+    pub p: Period,
+
+    pub revenue: f64,
+    pub cost_of_revenue: f64,
+
+    pub research_and_development: f64,
+    pub sales_general_and_administrative: f64,
+
+    pub interest_income: f64,
+    pub interest_expense: f64,
+    pub other_income_net: f64,
+
+    pub income_tax_expense: f64,
+}
+
+impl Statement for IncomeStatement {
+    fn ticker(&self) -> Ticker {
+        self.ticker
+    }
+    fn period(&self) -> Period {
+        self.p
+    }
+}
+
+impl IncomeStatement {
+    pub fn gross_profit(&self) -> f64 {
+        self.revenue - self.cost_of_revenue
+    }
+    pub fn total_operating_expenses(&self) -> f64 {
+        self.research_and_development + self.sales_general_and_administrative
+    }
+    pub fn operating_income(&self) -> f64 {
+        self.gross_profit() - self.total_operating_expenses()
+    }
+    pub fn total_other_income_net(&self) -> f64 {
+        self.interest_income + self.interest_expense + self.other_income_net
+    }
+    pub fn income_before_income_tax(&self) -> f64 {
+        self.operating_income() + self.total_other_income_net()
+    }
+    pub fn net_income(&self) -> f64 {
+        self.income_before_income_tax() - self.income_tax_expense
+    }
+}

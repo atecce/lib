@@ -1,8 +1,8 @@
 mod reported;
 
-use equities::{CashFlowStatement, IncomeStatement};
+use equities::{CashFlowStatement};
 use equities::Reader;
-use equities::nvda::BalanceSheet;
+use equities::nvda::{BalanceSheet, IncomeStatement};
 
 #[test]
 fn report() {

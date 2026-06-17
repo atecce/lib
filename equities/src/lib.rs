@@ -13,6 +13,7 @@ use crate::item::Item;
 use crate::item::Reported;
 use crate::nvda::BalanceSheet as NVDABalanceSheet;
 use crate::tsla::BalanceSheet as TSLABalanceSheet;
+use crate::nvda::IncomeStatement as NVDAIncomeStatement;
 use crate::tsla::IncomeStatement as TSLAIncomeStatement;
 
 use chrono::NaiveDate;
@@ -133,74 +134,6 @@ pub trait BalanceSheet {
     fn total_assets(&self) -> f64;
     fn total_current_liabilities(&self) -> f64;
     fn total_liabilities(&self) -> f64;
-}
-
-pub struct IncomeStatement {
-    pub ticker: Ticker,
-    pub date: NaiveDate,
-    pub p: Period,
-
-    pub revenue: f64,
-    pub cost_of_revenue: f64,
-
-    pub research_and_development: f64,
-    pub sales_general_and_administrative: f64,
-
-    pub interest_income: f64,
-    pub interest_expense: f64,
-    pub other_income_net: f64,
-
-    pub income_tax_expense: f64,
-}
-
-impl Statement for IncomeStatement {
-    fn ticker(&self) -> Ticker {
-        self.ticker
-    }
-    fn period(&self) -> Period {
-        self.p
-    }
-}
-
-impl IncomeStatement {
-    fn gross_profit(&self) -> f64 {
-        self.revenue - self.cost_of_revenue
-    }
-    fn total_operating_expenses(&self) -> f64 {
-        self.research_and_development + self.sales_general_and_administrative
-    }
-    fn operating_income(&self) -> f64 {
-        self.gross_profit() - self.total_operating_expenses()
-    }
-    fn total_other_income_net(&self) -> f64 {
-        self.interest_income + self.interest_expense + self.other_income_net
-    }
-    fn income_before_income_tax(&self) -> f64 {
-        self.operating_income() + self.total_other_income_net()
-    }
-    pub fn net_income(&self) -> f64 {
-        self.income_before_income_tax() - self.income_tax_expense
-    }
-}
-
-impl_reported! {
-    IncomeStatement,
-    [
-        Revenue => field revenue,
-        CostOfRevenue => field cost_of_revenue,
-        GrossProfit => method gross_profit,
-        ResearchAndDevelopment => field research_and_development,
-        SalesGeneralAndAdministrative => field sales_general_and_administrative,
-        TotalOperatingExpenses => method total_operating_expenses,
-        OperatingIncome => method operating_income,
-        InterestIncome => field interest_income,
-        InterestExpense => field interest_expense,
-        OtherIncomeNet => field other_income_net,
-        TotalOtherIncomeNet => method total_other_income_net,
-        IncomeBeforeIncomeTax => method income_before_income_tax,
-        IncomeTaxExpense => field income_tax_expense,
-        NetIncome => method net_income,
-    ]
 }
 
 pub struct CashFlowStatement {
@@ -385,6 +318,26 @@ impl_reported! {
         DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
         OtherLongTermLiabilities => field other_long_term_liabilities,
         TotalLiabilities => method total_liabilities,
+    ]
+}
+
+impl_reported! {
+    NVDAIncomeStatement,
+    [
+        Revenue => field revenue,
+        CostOfRevenue => field cost_of_revenue,
+        GrossProfit => method gross_profit,
+        ResearchAndDevelopment => field research_and_development,
+        SalesGeneralAndAdministrative => field sales_general_and_administrative,
+        TotalOperatingExpenses => method total_operating_expenses,
+        OperatingIncome => method operating_income,
+        InterestIncome => field interest_income,
+        InterestExpense => field interest_expense,
+        OtherIncomeNet => field other_income_net,
+        TotalOtherIncomeNet => method total_other_income_net,
+        IncomeBeforeIncomeTax => method income_before_income_tax,
+        IncomeTaxExpense => field income_tax_expense,
+        NetIncome => method net_income,
     ]
 }
 
