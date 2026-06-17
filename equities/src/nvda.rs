@@ -1,4 +1,6 @@
 use crate::Ticker;
+use crate::Period;
+use crate::Statement;
 use crate::BalanceSheet as BS;
 
 use chrono::NaiveDate;
@@ -28,10 +30,16 @@ pub struct BalanceSheet {
     pub other_long_term_liabilities: f64,
 }
 
-impl BS for BalanceSheet {
+impl Statement for BalanceSheet {
     fn ticker(&self) -> Ticker {
         Ticker::NVDA
     }
+    fn period(&self) -> Period {
+        Period::PointInTime
+    }
+}
+
+impl BS for BalanceSheet {
     fn total_current_assets(&self) -> f64 {
         self.cash_and_cash_equivalents
             + self.marketable_securities

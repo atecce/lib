@@ -14,7 +14,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 75] = [
+            pub const ALL: [$item; 70] = [
                 $($item::$variant,)*
             ];
         }
@@ -89,11 +89,16 @@ items! {
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues"],
 
-        AutomotiveSales => ["Automotive sales"],
-        AutomotiveRegulatoryCredits => ["Automotive regulatory credits"],
-        AutomotiveLeasing => ["Automotive leasing"],
-        EnergyGenerationAndStorage => ["Energy generation and storage"],
-        ServicesAndOther => ["Services and other"],
+//        AutomotiveSalesRevenue => ["Automotive sales"],
+//        AutomotiveRegulatoryCredits => ["Automotive regulatory credits"],
+//        AutomotiveLeasingRevenue => ["Automotive leasing"],
+//        EnergyGenerationAndStorageRevenue => ["Energy generation and storage"],
+//        ServicesAndOtherRevenue => ["Services and other"],
+//
+//        AutomotiveSalesCost => ["Automotive sales"],
+//        AutomotiveLeasingCost => ["Automotive leasing"],
+//        EnergyGenerationAndStorageCost => ["Energy generation and storage"],
+//        ServicesAndOtherCost => ["Services and other"],
 
         GrossProfit => ["Gross profit", "Gross Profit", "Total gross profit", "Total Gross Profit"],
 
@@ -105,7 +110,7 @@ items! {
 
         InterestIncome => ["Interest income", "Interest Income"],
         InterestExpense => ["Interest expense", "Interest Expense"],
-        OtherIncomeNet => ["Other income, net", "Other income (expense), net", "Other Income, Net"],
+        OtherIncomeNet => ["Other income, net", "Other income (expense), net", "Other (expense) income, net", "Other Income, Net"],
         TotalOtherIncomeNet => ["Total other income, net", "Total Other Income, Net"],
         IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax"],
 

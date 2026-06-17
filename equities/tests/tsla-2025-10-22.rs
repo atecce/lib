@@ -100,7 +100,7 @@ fn report() {
             date: chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap(),
             period: equities::Period::NineMonths,
 
-            automotive_sales_revenue: 52_821_000_000.0,
+            automotive_sales_revenue: 53_821_000_000.0,
             automotive_regulatory_credits: 2_071_000_000.0,
             automotive_leasing_revenue: 1_380_000_000.0,
 

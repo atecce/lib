@@ -106,168 +106,80 @@ impl R for Reader {
                 }
                 if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
                     match item {
-                        Item::AutomotiveSales => {
-                            if let Some(val) = &row[2] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[0].end_date,
-                                    p: financial_headers[0].period,
-                                    item,
-                                    val: ret,
-                                });
-                            }
-                            if let Some(val) = &row[5] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[1].end_date,
-                                    p: financial_headers[1].period,
-                                    item,
-                                    val: ret,
-                                });
-                            }
-                            if let Some(val) = &row[8] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[2].end_date,
-                                    p: financial_headers[2].period,
-                                    item,
-                                    val: ret,
-                                });
-                            }
-                            if let Some(val) = &row[11] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[3].end_date,
-                                    p: financial_headers[3].period,
-                                    item,
-                                    val: ret,
-                                });
-                            }
-                        },
+//                        Item::AutomotiveSalesRevenue => {
+//                            if let Some(val) = &row[2] {
+//                                reported.push(parse_val(
+//                                    self.ticker,
+//                                    financial_headers[0].end_date,
+//                                    financial_headers[0].period,
+//                                    item,
+//                                    val,
+//                                )?);
+//                            }
+//                            if let Some(val) = &row[5] {
+//                                reported.push(parse_val(
+//                                    self.ticker,
+//                                    financial_headers[1].end_date,
+//                                    financial_headers[1].period,
+//                                    item,
+//                                    val,
+//                                )?);
+//                            }
+//                            if let Some(val) = &row[8] {
+//                                reported.push(parse_val(
+//                                    self.ticker,
+//                                    financial_headers[2].end_date,
+//                                    financial_headers[2].period,
+//                                    item,
+//                                    val,
+//                                )?);
+//                            }
+//                            if let Some(val) = &row[11] {
+//                                reported.push(parse_val(
+//                                    self.ticker,
+//                                    financial_headers[3].end_date,
+//                                    financial_headers[3].period,
+//                                    item,
+//                                    val,
+//                                )?);
+//                            }
+//                        },
                         _ => {
                             if let Some(val) = &row[1] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[0].end_date,
-                                    p: financial_headers[0].period,
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[0].end_date,
+                                    financial_headers[0].period,
                                     item,
-                                    val: ret,
-                                });
+                                    val,
+                                )?);
                             }
                             if let Some(val) = &row[4] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[1].end_date,
-                                    p: financial_headers[1].period,
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[1].end_date,
+                                    financial_headers[1].period,
                                     item,
-                                    val: ret,
-                                });
+                                    val,
+                                )?);
                             }
                             if let Some(val) = &row[7] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[2].end_date,
-                                    p: financial_headers[2].period,
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[2].end_date,
+                                    financial_headers[2].period,
                                     item,
-                                    val: ret,
-                                });
+                                    val,
+                                )?);
                             }
                             if let Some(val) = &row[10] {
-
-                                let ret: f64;
-                                if val.starts_with('(') && val.ends_with(')') {
-                                    // Slice off the outer characters '(' and ')'
-                                    let val = &val[1..val.len() - 1];
-                                    // Parse the inner number and make it negative
-                                    ret = val.parse::<f64>().map(|num| -num)?
-                                } else {
-                                    ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
-                                }
-
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: financial_headers[3].end_date,
-                                    p: financial_headers[3].period,
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[3].end_date,
+                                    financial_headers[3].period,
                                     item,
-                                    val: ret,
-                                });
+                                    val,
+                                )?);
                             }
                         }
                     }
@@ -371,7 +283,7 @@ fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &
         // Slice off the outer characters '(' and ')'
         let val = &val[1..val.len() - 1];
         // Parse the inner number and make it negative
-        ret = val.parse::<f64>().map(|num| -num)?
+        ret = val.parse::<f64>().map(|num| -num)? * 1_000_000.0;
     } else {
         ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
     }
