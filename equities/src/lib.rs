@@ -1,5 +1,6 @@
 uniffi::setup_scaffolding!();
 
+pub mod date;
 pub mod item;
 pub mod xlsx;
 pub mod pdf;
