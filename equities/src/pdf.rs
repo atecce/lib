@@ -204,7 +204,7 @@ fn parse_financial_headers(lines: &[&str]) -> Vec<ReportInterval> {
         ("January", 1), ("February", 2), ("March", 3), ("April", 4),
         ("May", 5), ("June", 6), ("July", 7), ("August", 8),
         ("September", 9), ("October", 10), ("November", 11), ("December", 12)
-    ].iter().cloned().collect();
+    ].into_iter().collect();
 
     // Step 2: Use regex to extract the chunks from the first line
     // Capture group 1: Period string, Capture group 2: Month name, Capture group 3: Day number
