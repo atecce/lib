@@ -48,7 +48,7 @@ impl R for Reader {
                                     date: present,
                                     p: Period::PointInTime,
                                     item,
-                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
                                 });
                             }
                             if let Some(val) = &row[5] {
@@ -57,7 +57,7 @@ impl R for Reader {
                                     date: past,
                                     p: Period::PointInTime,
                                     item,
-                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
                                 });
                             }
                         },
@@ -68,7 +68,7 @@ impl R for Reader {
                                     date: present,
                                     p: Period::PointInTime,
                                     item,
-                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
                                 });
                             }
                             if let Some(val) = &row[4] {
@@ -77,7 +77,7 @@ impl R for Reader {
                                     date: past,
                                     p: Period::PointInTime,
                                     item,
-                                    val: val.replace(',', "").parse::<f64>()? * 1_000_000.0,
+                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
                                 });
                             }
                         }
@@ -198,9 +198,9 @@ fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &
         // Slice off the outer characters '(' and ')'
         let val = &val[1..val.len() - 1];
         // Parse the inner number and make it negative
-        ret = val.parse::<f64>().map(|num| -num)? * 1_000_000.0;
+        ret = val.parse::<f64>().map(|num| -num).map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0;
     } else {
-        ret = val.replace(',', "").parse::<f64>()? * 1_000_000.0;
+        ret = val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0;
     }
     return Ok(Reported {
         ticker: ticker,

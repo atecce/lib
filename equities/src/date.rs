@@ -16,7 +16,7 @@ pub fn parse_date_str(s: &str) -> Option<NaiveDate> {
 
 pub fn parse_date_across_lines(s: &str, next_s: &str) -> Result<NaiveDate, Box<dyn Error>> {
     if s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2 {
-        let year = next_s.parse::<u16>()?;
+        let year = next_s.parse::<u16>().map_err(|e| format!("failed to parse '{}' as a int: {}", next_s, e))?;
         return parse_date_str(&format!("{} {}", s, year)).ok_or("failed to parse date str".into())
     }
     None.ok_or("failed to find trailing comma or split on whitespace greater than 2".into())
