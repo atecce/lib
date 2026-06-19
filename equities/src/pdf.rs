@@ -10,32 +10,46 @@ use crate::item::{Item, Reported};
 use chrono::NaiveDate;
 use pdfsink_rs::{PdfDocument, TableSettings};
 
-pub struct Reader {
+pub struct Reader<'a> {
     doc: PdfDocument,
     ticker: Ticker,
+    path: &'a Path,
 }
 
 pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
     Ok(Reader {
         doc: PdfDocument::open(path)?,
         ticker: ticker,
+        path: path,
     })
 }
 
-impl R for Reader {
+impl R for Reader<'_> {
     fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let page = self.doc.page(4)?;
 
         let mut reported = Vec::new();
 
-        let text = page.extract_text();
-        let lines = text.lines().collect::<Vec<_>>();
+        let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
 
-        let month_days = lines[7].split(",").filter(|l| *l != "").map(|l| l.trim()).collect::<Vec<_>>();
-        let years = lines[8].split(" ").collect::<Vec<_>>();
+        let present: NaiveDate;
+        let past: NaiveDate;
 
-        let present = parse_date_across_lines(month_days[0], years[0])?;
-        let past = parse_date_across_lines(month_days[1], years[1])?;
+        if !format!("{}", self.path.display()).contains("20200331") {
+
+            let text = page.extract_text();
+            let lines = text.lines().collect::<Vec<_>>();
+
+            let month_days = lines[7].split(",").filter(|l| *l != "").map(|l| l.trim()).collect::<Vec<_>>();
+            let years = lines[8].split(" ").collect::<Vec<_>>();
+
+            present = parse_date_across_lines(month_days[0], years[0])?;
+            past = parse_date_across_lines(month_days[1], years[1])?;
+
+        } else {
+            present = parse_date_across_lines(&table[0][2].as_ref().ok_or("failed to look up [0][2] in table")?, &table[1][2].as_ref().ok_or("failed to look up [1][2] in table")?)?;
+            past = parse_date_across_lines(&table[0][6].as_ref().ok_or("failed to look up [0][6] in table")?, &table[1][6].as_ref().ok_or("failed to look up [1][6] in table")?)?;
+        }
 
         if let Some(table) = page.extract_table(TableSettings::default())? {
             for row in &table {
