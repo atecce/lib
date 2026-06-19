@@ -1,9 +1,7 @@
 use std::error::Error;
 use std::fs;
 
-use equities::reader::new_reader;
-
-use chrono::NaiveDate;
+use equities::Reader;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut reported_items = Vec::new();
@@ -11,30 +9,62 @@ fn main() -> Result<(), Box<dyn Error>> {
     let equities = vec![equities::Ticker::NVDA, equities::Ticker::TSLA];
 
     for equity in equities {
-        let dir = format!("equities/{}", equity);
-        let paths: Vec<_> = fs::read_dir(&dir)?
-            .filter_map(|f| f.ok())
-            .filter(|f| {
-                 let path = f.path();
-                 let ext = path.extension().and_then(|ext| ext.to_str());
-                 ext == Some("xlsx")
-            })
-            .map(|f| f.path())
-            .collect();
+        match equity {
+            equities::Ticker::NVDA => {
+                let dir = format!("equities/{}", equity);
+                let paths: Vec<_> = fs::read_dir(&dir)?
+                    .filter_map(|f| f.ok())
+                    .filter(|f| {
+                         let path = f.path();
+                         let ext = path.extension().and_then(|ext| ext.to_str());
+                         ext == Some("xlsx")
+                    })
+                    .map(|f| f.path())
+                    .collect();
 
-        for path in paths {
-            match new_reader(&path, equity.clone()) {
-                Ok(mut r) => {
-                    match r.process_balance_sheet() {
-                        Ok(mut ret) => reported_items.append(&mut ret),
-                        Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
+                for path in paths {
+                    match equities::xlsx::new_reader(&path, equity.clone()) {
+                        Ok(mut r) => {
+                            match r.process_balance_sheet() {
+                                Ok(mut ret) => reported_items.append(&mut ret),
+                                Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
+                            }
+                            match r.process_income_statement() {
+                                Ok(mut ret) => reported_items.append(&mut ret),
+                                Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
+                            }
+                        },
+                        Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
                     }
-                    match r.process_income_statement() {
-                        Ok(mut ret) => reported_items.append(&mut ret),
-                        Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
+                }
+            }
+            equities::Ticker::TSLA => {
+                let dir = format!("equities/{}", equity);
+                let paths: Vec<_> = fs::read_dir(&dir)?
+                    .filter_map(|f| f.ok())
+                    .filter(|f| {
+                         let path = f.path();
+                         let ext = path.extension().and_then(|ext| ext.to_str());
+                         ext == Some("pdf")
+                    })
+                    .map(|f| f.path())
+                    .collect();
+
+                for path in paths {
+                    match equities::pdf::new_reader(&path, equity.clone()) {
+                        Ok(mut r) => {
+                            match r.process_balance_sheet() {
+                                Ok(mut ret) => reported_items.append(&mut ret),
+                                Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
+                            }
+                            match r.process_income_statement() {
+                                Ok(mut ret) => reported_items.append(&mut ret),
+                                Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
+                            }
+                        },
+                        Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
                     }
-                },
-                Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
+                }
             }
         }
     }
@@ -47,7 +77,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn push_to_influx(items: &[equities::ReportedItem]) -> Result<(), Box<dyn Error>> {
+fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Error>> {
     let client = reqwest::blocking::Client::new();
     let auth_token = std::env::var("INFLUXDB3_AUTH_TOKEN")
         .map_err(|_| "INFLUXDB3_AUTH_TOKEN environment variable not set")?;

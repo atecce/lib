@@ -1,9 +1,9 @@
 fn main() {
-    let word = gutenberg::read_all();
+    let word = gutenberg::bible::read_all();
     println!("pub const fn word(book: Name) -> &'static [&'static [&'static str]] {{");
     println!("    match book {{");
 
-    for book in name::BIBLE {
+    for book in name::bible::BOOKS {
         let chapters = &word[&book];
 
         println!("        name::Name::{} => &[", book);

@@ -42,13 +42,23 @@ pub struct ReportInterval {
 }
 
 // Step 1: Set up mapping for month strings to numeric values
-static MONTH_MAP: LazyLock<HashMap<&str, u32>> = LazyLock::new(|| {
-    HashMap::from([
-        ("January", 1), ("February", 2), ("March", 3), ("April", 4),
-        ("May", 5), ("June", 6), ("July", 7), ("August", 8),
-        ("September", 9), ("October", 10), ("November", 11), ("December", 12)
-    ])
-});
+fn month_to_int(month: &str) -> Option<u32> {
+    match month {
+        "January" => Some(1),
+        "February" => Some(2),
+        "March" => Some(3),
+        "April" => Some(4),
+        "May" => Some(5),
+        "June" => Some(6),
+        "July" => Some(7),
+        "August" => Some(8),
+        "September" => Some(9),
+        "October" => Some(10),
+        "November" => Some(11),
+        "December" => Some(12),
+        _ => None,
+    }
+}
 
 // Step 2: Use regex to extract the chunks from the first line
 // Capture group 1: Period string, Capture group 2: Month name, Capture group 3: Day number
@@ -75,7 +85,7 @@ pub fn parse_financial_headers(lines: &[&str]) -> Vec<ReportInterval> {
             _ => Period::PointInTime, // Fallback safety
         };
 
-        let month = *MONTH_MAP.get(month_str).unwrap_or(&9); // Defaults to September if parsing fails
+        let month = month_to_int(month_str).unwrap_or(9); // Defaults to September if parsing fails
 
         // Save the parsed structure metadata (each period applies to 2 consecutive years)
         structural_periods.push((period, month, day));

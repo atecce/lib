@@ -29,6 +29,7 @@ pub struct BalanceSheet {
     pub accounts_payable: f64,
     pub accrued_and_other_current_liabilities: f64,
     pub deferred_revenue: f64,
+    pub customer_deposits: f64,
     pub current_portion_of_debt_and_finance_leases: f64,
 
     pub debt_and_finance_leases_net_of_current_portion: f64,

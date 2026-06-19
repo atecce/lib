@@ -97,6 +97,9 @@ impl R for Reader {
         let lines = text.lines().collect::<Vec<_>>();
 
         let financial_headers = parse_financial_headers(&lines[5..=6]);
+        if financial_headers.len() < 4 {
+            return Err("less than 4 financial headers in income statement".into());
+        }
 
         if let Some(table) = page.extract_table(TableSettings::default())? {
             for row in &table {

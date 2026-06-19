@@ -31,6 +31,7 @@ fn report() {
             accounts_payable: 12_474_000_000.0,
             accrued_and_other_current_liabilities: 10_723_000_000.0,
             deferred_revenue: 3_168_000_000.0,
+            customer_deposits: 0.0,
             current_portion_of_debt_and_finance_leases: 2_456_000_000.0,
 
             debt_and_finance_leases_net_of_current_portion: 5_757_000_000.0,
@@ -60,6 +61,7 @@ fn report() {
             accounts_payable: 12_819_000_000.0,
             accrued_and_other_current_liabilities: 12_791_000_000.0,
             deferred_revenue: 3_756_000_000.0,
+            customer_deposits: 0.0,
             current_portion_of_debt_and_finance_leases: 1_924_000_000.0,
 
             debt_and_finance_leases_net_of_current_portion: 5_778_000_000.0,
