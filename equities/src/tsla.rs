@@ -70,6 +70,7 @@ impl BS for BalanceSheet {
         self.accounts_payable
             + self.accrued_and_other_current_liabilities
             + self.deferred_revenue
+            + self.customer_deposits
             + self.current_portion_of_debt_and_finance_leases
     }
     fn total_liabilities(&self) -> f64 {

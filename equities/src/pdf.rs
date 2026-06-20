@@ -2,6 +2,7 @@ use std::error::Error;
 use std::path::Path;
 
 use crate::date::{parse_date_across_lines, parse_financial_headers};
+use crate::sheet_info::{new_sheet_info_from_pdf, SheetType};
 use crate::Ticker;
 use crate::Period;
 use crate::Reader as R;
@@ -31,10 +32,12 @@ impl R for Reader<'_> {
         let mut reported = Vec::new();
 
         let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        let sheet_info = new_sheet_info_from_pdf(&table, SheetType::BalanceSheet);
 
         let present: NaiveDate;
         let past: NaiveDate;
 
+        let cols: [usize; 4];
         if !format!("{}", self.path.display()).contains("20200331") {
 
             let text = page.extract_text();
@@ -46,54 +49,55 @@ impl R for Reader<'_> {
             present = parse_date_across_lines(month_days[0], years[0])?;
             past = parse_date_across_lines(month_days[1], years[1])?;
 
+            cols = [2, 5, 1, 4];
         } else {
             present = parse_date_across_lines(&table[0][2].as_ref().ok_or("failed to look up [0][2] in table")?, &table[1][2].as_ref().ok_or("failed to look up [1][2] in table")?)?;
             past = parse_date_across_lines(&table[0][6].as_ref().ok_or("failed to look up [0][6] in table")?, &table[1][6].as_ref().ok_or("failed to look up [1][6] in table")?)?;
+
+            cols = [3, 7, 3, 7];
         }
 
-        if let Some(table) = page.extract_table(TableSettings::default())? {
-            for row in &table {
-                if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                    match item {
-                        Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
-                            if let Some(val) = &row[2] {
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: present,
-                                    p: Period::PointInTime,
-                                    item,
-                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
-                                });
-                            }
-                            if let Some(val) = &row[5] {
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: past,
-                                    p: Period::PointInTime,
-                                    item,
-                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
-                                });
-                            }
-                        },
-                        _ => {
-                            if let Some(val) = &row[1] {
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: present,
-                                    p: Period::PointInTime,
-                                    item,
-                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
-                                });
-                            }
-                            if let Some(val) = &row[4] {
-                                reported.push(Reported {
-                                    ticker: self.ticker,
-                                    date: past,
-                                    p: Period::PointInTime,
-                                    item,
-                                    val: val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0,
-                                });
-                            }
+        for row in &table {
+            if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                match item {
+                    Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
+                        if let Some(val) = &row[cols[0]] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                present,
+                                Period::PointInTime,
+                                item,
+                                val,
+                            )?);
+                        }
+                        if let Some(val) = &row[cols[1]] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                past,
+                                Period::PointInTime,
+                                item,
+                                val,
+                            )?);
+                        }
+                    },
+                    _ => {
+                        if let Some(val) = &row[cols[2]] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                present,
+                                Period::PointInTime,
+                                item,
+                                val,
+                            )?);
+                        }
+                        if let Some(val) = &row[cols[3]] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                past,
+                                Period::PointInTime,
+                                item,
+                                val,
+                            )?);
                         }
                     }
                 }
@@ -107,6 +111,9 @@ impl R for Reader<'_> {
 
         let mut reported = Vec::new();
 
+        let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        let sheet_info = new_sheet_info_from_pdf(&table, SheetType::IncomeStatement);
+
         let text = page.extract_text();
         let lines = text.lines().collect::<Vec<_>>();
 
@@ -115,88 +122,86 @@ impl R for Reader<'_> {
             return Err("less than 4 financial headers in income statement".into());
         }
 
-        if let Some(table) = page.extract_table(TableSettings::default())? {
-            for row in &table {
-                if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
-                    continue;
-                }
-                if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                    match item {
-//                        Item::AutomotiveSalesRevenue => {
-//                            if let Some(val) = &row[2] {
-//                                reported.push(parse_val(
-//                                    self.ticker,
-//                                    financial_headers[0].end_date,
-//                                    financial_headers[0].period,
-//                                    item,
-//                                    val,
-//                                )?);
-//                            }
-//                            if let Some(val) = &row[5] {
-//                                reported.push(parse_val(
-//                                    self.ticker,
-//                                    financial_headers[1].end_date,
-//                                    financial_headers[1].period,
-//                                    item,
-//                                    val,
-//                                )?);
-//                            }
-//                            if let Some(val) = &row[8] {
-//                                reported.push(parse_val(
-//                                    self.ticker,
-//                                    financial_headers[2].end_date,
-//                                    financial_headers[2].period,
-//                                    item,
-//                                    val,
-//                                )?);
-//                            }
-//                            if let Some(val) = &row[11] {
-//                                reported.push(parse_val(
-//                                    self.ticker,
-//                                    financial_headers[3].end_date,
-//                                    financial_headers[3].period,
-//                                    item,
-//                                    val,
-//                                )?);
-//                            }
-//                        },
-                        _ => {
-                            if let Some(val) = &row[1] {
-                                reported.push(parse_val(
-                                    self.ticker,
-                                    financial_headers[0].end_date,
-                                    financial_headers[0].period,
-                                    item,
-                                    val,
-                                )?);
-                            }
-                            if let Some(val) = &row[4] {
-                                reported.push(parse_val(
-                                    self.ticker,
-                                    financial_headers[1].end_date,
-                                    financial_headers[1].period,
-                                    item,
-                                    val,
-                                )?);
-                            }
-                            if let Some(val) = &row[7] {
-                                reported.push(parse_val(
-                                    self.ticker,
-                                    financial_headers[2].end_date,
-                                    financial_headers[2].period,
-                                    item,
-                                    val,
-                                )?);
-                            }
-                            if let Some(val) = &row[10] {
-                                reported.push(parse_val(
-                                    self.ticker,
-                                    financial_headers[3].end_date,
-                                    financial_headers[3].period,
-                                    item,
-                                    val,
-                                )?);
-                            }
+        for row in &table {
+            if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
+                continue;
+            }
+            if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                match item {
+//                    Item::AutomotiveSalesRevenue => {
+//                        if let Some(val) = &row[2] {
+//                            reported.push(parse_val(
+//                                self.ticker,
+//                                financial_headers[0].end_date,
+//                                financial_headers[0].period,
+//                                item,
+//                                val,
+//                            )?);
+//                        }
+//                        if let Some(val) = &row[5] {
+//                            reported.push(parse_val(
+//                                self.ticker,
+//                                financial_headers[1].end_date,
+//                                financial_headers[1].period,
+//                                item,
+//                                val,
+//                            )?);
+//                        }
+//                        if let Some(val) = &row[8] {
+//                            reported.push(parse_val(
+//                                self.ticker,
+//                                financial_headers[2].end_date,
+//                                financial_headers[2].period,
+//                                item,
+//                                val,
+//                            )?);
+//                        }
+//                        if let Some(val) = &row[11] {
+//                            reported.push(parse_val(
+//                                self.ticker,
+//                                financial_headers[3].end_date,
+//                                financial_headers[3].period,
+//                                item,
+//                                val,
+//                            )?);
+//                        }
+//                    },
+                    _ => {
+                        if let Some(val) = &row[1] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                financial_headers[0].end_date,
+                                financial_headers[0].period,
+                                item,
+                                val,
+                            )?);
+                        }
+                        if let Some(val) = &row[4] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                financial_headers[1].end_date,
+                                financial_headers[1].period,
+                                item,
+                                val,
+                            )?);
+                        }
+                        if let Some(val) = &row[7] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                financial_headers[2].end_date,
+                                financial_headers[2].period,
+                                item,
+                                val,
+                            )?);
+                        }
+                        if let Some(val) = &row[10] {
+                            reported.push(parse_val(
+                                self.ticker,
+                                financial_headers[3].end_date,
+                                financial_headers[3].period,
+                                item,
+                                val,
+                            )?);
                         }
                     }
                 }
@@ -212,9 +217,9 @@ fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &
         // Slice off the outer characters '(' and ')'
         let val = &val[1..val.len() - 1];
         // Parse the inner number and make it negative
-        ret = val.parse::<f64>().map(|num| -num).map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0;
+        ret = val.parse::<f64>().map(|num| -num).map_err(|e| format!("failed to parse '{}' as a float for item '{}': {}", val, item, e))? * 1_000_000.0;
     } else {
-        ret = val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float: {}", val, e))? * 1_000_000.0;
+        ret = val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float for item '{}': {}", val, item, e))? * 1_000_000.0;
     }
     return Ok(Reported {
         ticker: ticker,
