@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::path::Path;
+use std::sync::LazyLock;
 
 use crate::date::{parse_date_across_lines, parse_financial_headers};
 use crate::sheet_info::{new_sheet_info_from_pdf, SheetType};
@@ -9,18 +10,36 @@ use crate::Reader as R;
 use crate::item::{Item, Reported};
 
 use chrono::NaiveDate;
+use regex::Regex;
 use pdfsink_rs::{PdfDocument, TableSettings};
 
+// Regex to match "For the quarterly period ended " followed by "Month DD, YYYY"
+static QUARTERLY_PERIOD_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"For the quarterly period ended\s+([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})").unwrap()
+});
+
 pub struct Reader<'a> {
-    doc: PdfDocument,
     ticker: Ticker,
+    date: NaiveDate,
+    doc: PdfDocument,
     path: &'a Path,
 }
 
 pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
+
+    let doc = PdfDocument::open(path)?;
+    let text = doc.page(1)?.extract_text();
+
+    let caps = QUARTERLY_PERIOD_REGEX.captures(&text).ok_or("failed to capture quarterly_period")?;
+
+    // Construct the full date string from the capture groups
+    let date_str = format!("{} {}, {}", &caps[1], &caps[2], &caps[3]);
+
     Ok(Reader {
-        doc: PdfDocument::open(path)?,
         ticker: ticker,
+        // Parse "March 31, 2020" using the %B %e, %Y format specifier
+        date: NaiveDate::parse_from_str(&date_str, "%B %e, %Y")?,
+        doc: doc,
         path: path,
     })
 }
