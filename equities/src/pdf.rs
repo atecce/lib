@@ -18,11 +18,10 @@ static QUARTERLY_PERIOD_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"For the quarterly period ended\s+([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})").unwrap()
 });
 
-pub struct Reader<'a> {
+pub struct Reader {
     ticker: Ticker,
     date: NaiveDate,
     doc: PdfDocument,
-    path: &'a Path,
 }
 
 pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
@@ -40,11 +39,10 @@ pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>>
         // Parse "March 31, 2020" using the %B %e, %Y format specifier
         date: NaiveDate::parse_from_str(&date_str, "%B %e, %Y")?,
         doc: doc,
-        path: path,
     })
 }
 
-impl R for Reader<'_> {
+impl R for Reader {
     fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let page = self.doc.page(4)?;
 
@@ -57,7 +55,7 @@ impl R for Reader<'_> {
         let past: NaiveDate;
 
         let cols: [usize; 4];
-        if !format!("{}", self.path.display()).contains("20200331") {
+        if !(NaiveDate::from_ymd_opt(2020, 3, 31).unwrap() == self.date) {
 
             let text = page.extract_text();
             let lines = text.lines().collect::<Vec<_>>();
