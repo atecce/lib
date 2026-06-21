@@ -6,7 +6,7 @@ use std::path::Path;
 use crate::Ticker;
 use crate::Reader as R;
 use crate::item::{Item, Reported};
-use crate::sheet_info::{new_sheet_info, SheetInfo};
+use crate::sheet_info::{new_sheet_info, SheetInfo, SheetType};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 
 use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
@@ -54,13 +54,29 @@ impl Reader {
 
         self.reported_items(&rows, new_sheet_info(&rows, CashFlowStatement)?)
     }
+    pub fn items(&mut self, sheet_type: SheetType) -> Result<Vec<Item>, Box<dyn Error>> {
+        match sheet_type {
+            BalanceSheet => {
+                let range = self.workbook.worksheet_range("BALANCE_SHEET")?;
+                let rows: Vec<&[Data]> = range.rows()
+                    .filter(|row| !row.iter().all(|c| c.is_empty()))
+                    .collect();
 
-    pub fn rows(&mut self, sheet_name: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
-        let range = self.workbook.worksheet_range(sheet_name)?;
-        Ok(range.rows()
-            .filter(|row| !row.iter().all(|c| c.is_empty()))
-            .map(|row| row.to_vec())
-            .collect())
+                let sheet_info = new_sheet_info(&rows, sheet_type)?;
+
+                let mut items = Vec::new();
+                for row in rows {
+                    if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
+                        if let Ok(item) = label.parse::<Item>() {
+                            items.push(item);
+                        }
+                    }
+                }
+
+                Ok(items)
+            },
+            _ => Err("sheet type not supported".into()),
+        }
     }
 
     fn find_sheet(&self, matches: &[&str]) -> Option<String> {
