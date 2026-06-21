@@ -48,13 +48,22 @@ impl R for Reader {
 
         let mut reported = Vec::new();
 
-        let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        let mut table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        table.iter_mut().for_each(|row| {
+            row.retain(|cell| {
+                match cell.as_deref() {
+                    None => false,
+                    Some("") => false,
+                    Some("$") => false,
+                    _ => true,
+                }
+            });
+        });
+
         let sheet_info = new_sheet_info_from_pdf(&table, SheetType::BalanceSheet);
 
         let present: NaiveDate;
         let past: NaiveDate;
-
-        let cols: [usize; 4];
         if !(NaiveDate::from_ymd_opt(2020, 3, 31).unwrap() == self.date) {
 
             let text = page.extract_text();
@@ -65,58 +74,30 @@ impl R for Reader {
 
             present = parse_date_across_lines(month_days[0], years[0])?;
             past = parse_date_across_lines(month_days[1], years[1])?;
-
-            cols = [2, 5, 1, 4];
         } else {
-            present = parse_date_across_lines(&table[0][2].as_ref().ok_or("failed to look up [0][2] in table")?, &table[1][2].as_ref().ok_or("failed to look up [1][2] in table")?)?;
-            past = parse_date_across_lines(&table[0][6].as_ref().ok_or("failed to look up [0][6] in table")?, &table[1][6].as_ref().ok_or("failed to look up [1][6] in table")?)?;
-
-            cols = [3, 7, 3, 7];
+            present = parse_date_across_lines(&table[0][0].as_ref().ok_or("failed to look up [0][0] in table")?, &table[1][0].as_ref().ok_or("failed to look up [1][0] in table")?)?;
+            past = parse_date_across_lines(&table[0][1].as_ref().ok_or("failed to look up [0][1] in table")?, &table[1][1].as_ref().ok_or("failed to look up [1][1] in table")?)?;
         }
 
         for row in &table {
             if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                match item {
-                    Item::CashAndCashEquivalents | Item::AccountsPayable | Item::TotalAssets => {
-                        if let Some(val) = &row[cols[0]] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                present,
-                                Period::PointInTime,
-                                item,
-                                val,
-                            )?);
-                        }
-                        if let Some(val) = &row[cols[1]] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                past,
-                                Period::PointInTime,
-                                item,
-                                val,
-                            )?);
-                        }
-                    },
-                    _ => {
-                        if let Some(val) = &row[cols[2]] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                present,
-                                Period::PointInTime,
-                                item,
-                                val,
-                            )?);
-                        }
-                        if let Some(val) = &row[cols[3]] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                past,
-                                Period::PointInTime,
-                                item,
-                                val,
-                            )?);
-                        }
-                    }
+                if let Some(val) = &row[1] {
+                    reported.push(parse_val(
+                        self.ticker,
+                        present,
+                        Period::PointInTime,
+                        item,
+                        val,
+                    )?);
+                }
+                if let Some(val) = &row[2] {
+                    reported.push(parse_val(
+                        self.ticker,
+                        past,
+                        Period::PointInTime,
+                        item,
+                        val,
+                    )?);
                 }
             }
         }
