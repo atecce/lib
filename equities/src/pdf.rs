@@ -80,6 +80,9 @@ impl R for Reader {
         }
 
         for row in &table {
+            if row.len() == 0 {
+                return Err("no rows in table".into());
+            }
             if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
                 if let Some(val) = &row[1] {
                     reported.push(parse_val(
