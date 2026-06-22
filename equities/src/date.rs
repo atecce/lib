@@ -59,78 +59,77 @@ fn month_to_int(month: &str) -> Option<u32> {
     }
 }
 
-// Step 2: Use regex to extract the chunks from the first line
-// Capture group 1: Period string, Capture group 2: Month name, Capture group 3: Day number
-static HEADER_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"((?:Three|Six|Nine|Twelve)\s+Months?\s+Ended)\s+([A-Za-z]+)\s+(\d+),?").unwrap()
+static REPORT_INTERVAL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?x)
+        # Match the first duration and date text block
+        ^([A-Za-z]+)\s+Months?\s+Ended\s+([A-Za-z]+\s+\d{1,2}),\s*
+
+        # Optionally match a second duration and date block on the same line
+        (?:
+            \s*([A-Za-z]+)\s+Months?\s+Ended\s+([A-Za-z]+\s+\d{1,2}),\s*
+        )?
+
+        # Match the line break and spacing leading to the year columns
+        [\r\n]+
+        ^\s*
+
+        # Match the first two required year columns
+        (\d{4})\s+(\d{4})
+
+        # Optionally match the third and fourth year columns
+        (?:
+            \s+(\d{4})\s+(\d{4})
+        )?
+    ").unwrap()
 });
 
-// Step 3: Extract all the numeric years from the second line
-static YEAR_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\b\d{4}\b").unwrap()
-});
+pub fn parse_financial_headers(text: &str) -> Result<Vec<ReportInterval>, Box<dyn Error>> {
 
-pub fn parse_financial_headers(lines: &[&str]) -> Vec<ReportInterval> {
+    let mut ret = Vec::new();
 
-    let mut structural_periods = Vec::new();
-    for cap in HEADER_REGEX.captures_iter(lines[0]) {
-        let period_str = &cap[1];
-        let month_str = &cap[2];
-        let day: u32 = cap[3].parse().unwrap();
+    if let Some(caps) = REPORT_INTERVAL_REGEX.captures(text) {
+        let p1_name = caps.get(1).map_or("", |m| m.as_str());
+        let p1_date = caps.get(2).map_or("", |m| m.as_str());
+        let year_col1 = caps.get(5).map_or("", |m| m.as_str());
+        let year_col2 = caps.get(6).map_or("", |m| m.as_str());
 
-        let period = match period_str {
-            "Three Months Ended" => Period::ThreeMonths,
-            "Nine Months Ended" => Period::NineMonths,
+        let p1 = match p1_name {
+            "Three" => Period::ThreeMonths,
+            "Nine" => Period::NineMonths,
             _ => Period::PointInTime, // Fallback safety
         };
+        let date1 = NaiveDate::parse_from_str(&format!("{}, {}", p1_date, year_col1), "%B %d, %Y")?;
+        let date2 = NaiveDate::parse_from_str(&format!("{}, {}", p1_date, year_col2), "%B %d, %Y")?;
 
-        let month = month_to_int(month_str).unwrap_or(9); // Defaults to September if parsing fails
+        ret.push(ReportInterval {
+            period: p1,
+            end_date: date1,
+        });
+        ret.push(ReportInterval {
+            period: p1,
+            end_date: date2,
+        });
 
-        // Save the parsed structure metadata (each period applies to 2 consecutive years)
-        structural_periods.push((period, month, day));
+        if let (Some(p2_name), Some(p2_date), Some(year_col3), Some(year_col4)) =
+            (caps.get(3), caps.get(4), caps.get(7), caps.get(8))
+        {
+            let p2 = match p2_name.as_str() {
+                "Three" => Period::ThreeMonths,
+                "Nine" => Period::NineMonths,
+                _ => Period::PointInTime, // Fallback safety
+            };
+            let date3 = NaiveDate::parse_from_str(&format!("{}, {}", p2_date.as_str(), year_col3.as_str()), "%B %d, %Y")?;
+            let date4 = NaiveDate::parse_from_str(&format!("{}, {}", p2_date.as_str(), year_col4.as_str()), "%B %d, %Y")?;
+
+            ret.push(ReportInterval {
+                period: p2,
+                end_date: date3,
+            });
+            ret.push(ReportInterval {
+                period: p2,
+                end_date: date4,
+            });
+        }
     }
-
-    let years: Vec<i32> = YEAR_REGEX
-        .find_iter(lines[1])
-        .map(|m| m.as_str().parse::<i32>().unwrap())
-        .collect();
-
-    let mut results = Vec::new();
-
-    // Step 4: Zip structural descriptors together with the layout years
-    // The string format implies: [Period 1 (2025), Period 1 (2024), Period 2 (2025), Period 2 (2024)]
-    if structural_periods.len() == 2 && years.len() == 4 {
-        // First period applies to the first two years
-        results.push(ReportInterval {
-            period: structural_periods[0].0,
-            end_date: NaiveDate::from_ymd_opt(years[0], structural_periods[0].1, structural_periods[0].2).unwrap(),
-        });
-        results.push(ReportInterval {
-            period: structural_periods[0].0,
-            end_date: NaiveDate::from_ymd_opt(years[1], structural_periods[0].1, structural_periods[0].2).unwrap(),
-        });
-
-        // Second period applies to the last two years
-        results.push(ReportInterval {
-            period: structural_periods[1].0,
-            end_date: NaiveDate::from_ymd_opt(years[2], structural_periods[1].1, structural_periods[1].2).unwrap(),
-        });
-        results.push(ReportInterval {
-            period: structural_periods[1].0,
-            end_date: NaiveDate::from_ymd_opt(years[3], structural_periods[1].1, structural_periods[1].2).unwrap(),
-        });
-    }
-
-    if structural_periods.len() == 1 && years.len() == 2 {
-        results.push(ReportInterval {
-            period: structural_periods[0].0,
-            end_date: NaiveDate::from_ymd_opt(years[0], structural_periods[0].1, structural_periods[0].2).unwrap(),
-        });
-        results.push(ReportInterval {
-            period: structural_periods[0].0,
-            end_date: NaiveDate::from_ymd_opt(years[1], structural_periods[0].1, structural_periods[0].2).unwrap(),
-        });
-    }
-
-    results
+    Ok(ret)
 }

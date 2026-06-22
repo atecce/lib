@@ -122,11 +122,10 @@ impl R for Reader {
         });
 
         let text = page.extract_text();
-        let lines = text.lines().collect::<Vec<_>>();
 
-        let financial_headers = parse_financial_headers(&lines[5..=6]);
+        let financial_headers = parse_financial_headers(&text)?;
         if financial_headers.len() != 2 && financial_headers.len() != 4 {
-            return Err(format!("there should be 2 or 4 financial headers on income statement. found {}", financial_headers.len()).into());
+            return Err(format!("there should be 2 or 4 financial headers on income statement. found {:#?}", financial_headers).into());
         }
 
         for row in &table {
