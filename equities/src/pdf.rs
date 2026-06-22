@@ -78,7 +78,7 @@ impl R for Reader {
 
         for row in &table {
             if row.len() == 0 {
-                return Err("no rows in table".into());
+                continue;
             }
             if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
                 if let Some(val) = &row[1] {
@@ -109,7 +109,17 @@ impl R for Reader {
 
         let mut reported = Vec::new();
 
-        let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        let mut table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
+        table.iter_mut().for_each(|row| {
+            row.retain(|cell| {
+                match cell.as_deref() {
+                    None => false,
+                    Some("") => false,
+                    Some("$") => false,
+                    _ => true,
+                }
+            });
+        });
 
         let text = page.extract_text();
         let lines = text.lines().collect::<Vec<_>>();
@@ -120,6 +130,9 @@ impl R for Reader {
         }
 
         for row in &table {
+            if row.len() == 0 {
+                continue;
+            }
             if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
                 continue;
             }
@@ -173,7 +186,7 @@ impl R for Reader {
                                 val,
                             )?);
                         }
-                        if let Some(val) = &row[4] {
+                        if let Some(val) = &row[2] {
                             reported.push(parse_val(
                                 self.ticker,
                                 financial_headers[1].end_date,
@@ -182,7 +195,7 @@ impl R for Reader {
                                 val,
                             )?);
                         }
-                        if let Some(val) = &row[7] {
+                        if let Some(val) = &row[3] {
                             reported.push(parse_val(
                                 self.ticker,
                                 financial_headers[2].end_date,
@@ -191,7 +204,7 @@ impl R for Reader {
                                 val,
                             )?);
                         }
-                        if let Some(val) = &row[10] {
+                        if let Some(val) = &row[4] {
                             reported.push(parse_val(
                                 self.ticker,
                                 financial_headers[3].end_date,
