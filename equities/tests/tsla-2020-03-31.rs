@@ -133,8 +133,8 @@ fn report() {
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());
-//    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
-//        .map(|stmt| stmt.reported()).flatten()
-//        .filter(|report| report.val != 0.0)
-//        .collect());
+    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+        .map(|stmt| stmt.reported()).flatten()
+        .filter(|report| report.val != 0.0)
+        .collect());
 }

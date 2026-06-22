@@ -60,25 +60,25 @@ fn month_to_int(month: &str) -> Option<u32> {
 }
 
 static REPORT_INTERVAL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    // Corrected verbose regex that allows flexible layout matching
     Regex::new(r"(?x)
-        # Match the first duration and date text block
-        ^([A-Za-z]+)\s+Months?\s+Ended\s+([A-Za-z]+\s+\d{1,2}),\s*
+        # Find the first period marker anywhere in the text
+        ([A-Za-z]+)\s+Months?\s+Ended\s+([A-Za-z]+\s+\d{1,2}),\s*
 
-        # Optionally match a second duration and date block on the same line
+        # Capture an optional second period marker on the same line
         (?:
             \s*([A-Za-z]+)\s+Months?\s+Ended\s+([A-Za-z]+\s+\d{1,2}),\s*
         )?
 
-        # Match the line break and spacing leading to the year columns
-        [\r\n]+
-        ^\s*
+        # Handle trailing characters and potential clean lines before the years
+        [^\d]*
 
-        # Match the first two required year columns
-        (\d{4})\s+(\d{4})
+        # Match the first two year columns
+        \b(\d{4})\b\s+\b(\d{4})\b
 
         # Optionally match the third and fourth year columns
         (?:
-            \s+(\d{4})\s+(\d{4})
+            \s+\b(\d{4})\b\s+\b(\d{4})\b
         )?
     ").unwrap()
 });

@@ -124,105 +124,103 @@ impl R for Reader {
         let text = page.extract_text();
 
         let financial_headers = parse_financial_headers(&text)?;
-        if financial_headers.len() != 2 && financial_headers.len() != 4 {
-            return Err(format!("there should be 2 or 4 financial headers on income statement. found {:#?}", financial_headers).into());
-        }
-
-        for row in &table {
-            if row.len() == 0 {
-                continue;
-            }
-            if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
-                continue;
-            }
-            if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
-                match item {
-//                    Item::AutomotiveSalesRevenue => {
-//                        if let Some(val) = &row[2] {
-//                            reported.push(parse_val(
-//                                self.ticker,
-//                                financial_headers[0].end_date,
-//                                financial_headers[0].period,
-//                                item,
-//                                val,
-//                            )?);
-//                        }
-//                        if let Some(val) = &row[5] {
-//                            reported.push(parse_val(
-//                                self.ticker,
-//                                financial_headers[1].end_date,
-//                                financial_headers[1].period,
-//                                item,
-//                                val,
-//                            )?);
-//                        }
-//                        if let Some(val) = &row[8] {
-//                            reported.push(parse_val(
-//                                self.ticker,
-//                                financial_headers[2].end_date,
-//                                financial_headers[2].period,
-//                                item,
-//                                val,
-//                            )?);
-//                        }
-//                        if let Some(val) = &row[11] {
-//                            reported.push(parse_val(
-//                                self.ticker,
-//                                financial_headers[3].end_date,
-//                                financial_headers[3].period,
-//                                item,
-//                                val,
-//                            )?);
-//                        }
-//                    },
-                    _ => {
-                        if let Some(val) = &row[1] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                financial_headers[0].end_date,
-                                financial_headers[0].period,
-                                item,
-                                val,
-                            )?);
-                        }
-                        if let Some(val) = &row[2] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                financial_headers[1].end_date,
-                                financial_headers[1].period,
-                                item,
-                                val,
-                            )?);
-                        }
-                        if let Some(val) = &row[3] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                financial_headers[2].end_date,
-                                financial_headers[2].period,
-                                item,
-                                val,
-                            )?);
-                        }
-                        if let Some(val) = &row[4] {
-                            reported.push(parse_val(
-                                self.ticker,
-                                financial_headers[3].end_date,
-                                financial_headers[3].period,
-                                item,
-                                val,
-                            )?);
+        if financial_headers.len() == 2 {
+            for row in &table {
+                if row.len() == 0 {
+                    continue;
+                }
+                if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
+                    continue;
+                }
+                if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                    match item {
+                        _ => {
+                            if let Some(val) = &row[1] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[0].end_date,
+                                    financial_headers[0].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
+                            if let Some(val) = &row[2] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[1].end_date,
+                                    financial_headers[1].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
                         }
                     }
                 }
             }
+        } else if financial_headers.len() == 4 {
+            for row in &table {
+                if row.len() == 0 {
+                    continue;
+                }
+                if row[0].as_deref().unwrap_or_default() == "Revenues" || row[0].as_deref().unwrap_or_default() == "Cost of revenues" {
+                    continue;
+                }
+                if let Ok(item) = row[0].as_ref().ok_or("failed to get first row item")?.parse::<Item>() {
+                    match item {
+                        _ => {
+                            if let Some(val) = &row[1] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[0].end_date,
+                                    financial_headers[0].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
+                            if let Some(val) = &row[2] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[1].end_date,
+                                    financial_headers[1].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
+                            if let Some(val) = &row[3] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[2].end_date,
+                                    financial_headers[2].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
+                            if let Some(val) = &row[4] {
+                                reported.push(parse_val(
+                                    self.ticker,
+                                    financial_headers[3].end_date,
+                                    financial_headers[3].period,
+                                    item,
+                                    val,
+                                )?);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            return Err(format!("there should be 2 or 4 financial headers on income statement. found {:#?}", financial_headers).into());
         }
+
         Ok(reported)
     }
 }
 
 fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &str) -> Result<Reported, Box<dyn Error>> {
     let ret: f64;
-    if val.starts_with('(') && val.ends_with(')') {
+    if val.starts_with('-') {
+        ret = 0.0;
+    } else if val.starts_with('(') && val.ends_with(')') {
         // Slice off the outer characters '(' and ')'
         let val = &val[1..val.len() - 1];
         // Parse the inner number and make it negative
