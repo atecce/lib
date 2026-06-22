@@ -1,11 +1,7 @@
 use std::error::Error;
 use std::fs;
 
-use calamine::DataType;
-
-use equities::item::Item;
 use equities::xlsx::new_reader;
-use equities::sheet_info::new_sheet_info;
 use equities::sheet_info::SheetType::BalanceSheet;
 
 fn main() -> Result<(), Box<dyn Error>>{

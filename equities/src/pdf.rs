@@ -3,7 +3,6 @@ use std::path::Path;
 use std::sync::LazyLock;
 
 use crate::date::{parse_date_across_lines, parse_financial_headers};
-use crate::sheet_info::{new_sheet_info_from_pdf, SheetType};
 use crate::Ticker;
 use crate::Period;
 use crate::Reader as R;
@@ -60,8 +59,6 @@ impl R for Reader {
             });
         });
 
-        let sheet_info = new_sheet_info_from_pdf(&table, SheetType::BalanceSheet);
-
         let present: NaiveDate;
         let past: NaiveDate;
         if !(NaiveDate::from_ymd_opt(2020, 3, 31).unwrap() == self.date) {
@@ -113,14 +110,13 @@ impl R for Reader {
         let mut reported = Vec::new();
 
         let table = page.extract_table(TableSettings::default())?.ok_or("failed to extract table")?;
-        let sheet_info = new_sheet_info_from_pdf(&table, SheetType::IncomeStatement);
 
         let text = page.extract_text();
         let lines = text.lines().collect::<Vec<_>>();
 
         let financial_headers = parse_financial_headers(&lines[5..=6]);
-        if financial_headers.len() < 4 {
-            return Err("less than 4 financial headers in income statement".into());
+        if financial_headers.len() != 2 && financial_headers.len() != 4 {
+            return Err(format!("there should be 2 or 4 financial headers on income statement. found {}", financial_headers.len()).into());
         }
 
         for row in &table {

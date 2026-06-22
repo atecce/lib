@@ -121,5 +121,16 @@ pub fn parse_financial_headers(lines: &[&str]) -> Vec<ReportInterval> {
         });
     }
 
+    if structural_periods.len() == 1 && years.len() == 2 {
+        results.push(ReportInterval {
+            period: structural_periods[0].0,
+            end_date: NaiveDate::from_ymd_opt(years[0], structural_periods[0].1, structural_periods[0].2).unwrap(),
+        });
+        results.push(ReportInterval {
+            period: structural_periods[0].0,
+            end_date: NaiveDate::from_ymd_opt(years[1], structural_periods[0].1, structural_periods[0].2).unwrap(),
+        });
+    }
+
     results
 }

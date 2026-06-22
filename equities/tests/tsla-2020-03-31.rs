@@ -1,202 +1,3 @@
-//   [
-//     "Assets",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Current assets",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Total assets",
-//     "",
-//     "$",
-//     "37,250",
-//     "",
-//     "",
-//     "$",
-//     "34,309",
-//     ""
-//   ],
-//   [
-//     "Liabilities",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Current liabilities",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Commitments and contingencies (Note 12)",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Redeemable noncontrolling interests in subsidiaries",
-//     "",
-//     "",
-//     "632",
-//     "",
-//     "",
-//     "",
-//     "643",
-//     ""
-//   ],
-//   [
-//     "Convertible senior notes (Note 10)",
-//     "",
-//     "",
-//     "60",
-//     "",
-//     "",
-//     "",
-//     "—",
-//     ""
-//   ],
-//   [
-//     "Equity",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Stockholders' equity",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     "",
-//     ""
-//   ],
-//   [
-//     "Preferred stock; $0.001 par value; 100 shares authorized;\nno shares issued and outstanding",
-//     "",
-//     "",
-//     "—",
-//     "",
-//     "",
-//     "",
-//     "—",
-//     ""
-//   ],
-//   [
-//     "Common stock; $0.001 par value; 2,000 shares authorized; 185 and\n181 shares issued and outstanding as of March 31, 2020 and December 31,\n2019, respectively",
-//     "",
-//     "",
-//     "0",
-//     "",
-//     "",
-//     "",
-//     "0",
-//     ""
-//   ],
-//   [
-//     "Additional paid-in capital",
-//     "",
-//     "",
-//     "15,390",
-//     "",
-//     "",
-//     "",
-//     "12,737",
-//     ""
-//   ],
-//   [
-//     "Accumulated other comprehensive loss",
-//     "",
-//     "",
-//     "(113",
-//     ")",
-//     "",
-//     "",
-//     "(36",
-//     ")"
-//   ],
-//   [
-//     "Accumulated deficit",
-//     "",
-//     "",
-//     "(6,104",
-//     ")",
-//     "",
-//     "",
-//     "(6,083",
-//     ")"
-//   ],
-//   [
-//     "Total stockholders' equity",
-//     "",
-//     "",
-//     "9,173",
-//     "",
-//     "",
-//     "",
-//     "6,618",
-//     ""
-//   ],
-//   [
-//     "Noncontrolling interests in subsidiaries",
-//     "",
-//     "",
-//     "867",
-//     "",
-//     "",
-//     "",
-//     "849",
-//     ""
-//   ],
-//   [
-//     "Total liabilities and equity",
-//     "",
-//     "$",
-//     "37,250",
-//     "",
-//     "",
-//     "$",
-//     "34,309",
-//     ""
-//   ]
-// ]
 mod reported;
 
 use equities::Reader;
@@ -207,29 +8,6 @@ use equities::tsla::IncomeStatement;
 fn report() {
 
     let balance_sheets = vec![
-// [
-//   [
-//     "",
-//     "",
-//     "March 31,",
-//     null,
-//     "",
-//     "",
-//     "December 31,",
-//     null,
-//     ""
-//   ],
-//   [
-//     "",
-//     "",
-//     "2020",
-//     null,
-//     "",
-//     "",
-//     "2019",
-//     null,
-//     ""
-//   ],
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2019, 12, 31).unwrap(),
 
@@ -292,12 +70,71 @@ fn report() {
         },
     ];
 
+    let income_statements = vec![
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2019, 3, 31).unwrap(),
+            period: equities::Period::ThreeMonths,
+
+            automotive_sales_revenue: 3_509_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 215_000_000.0,
+
+            energy_generation_and_storage_revenue: 324_000_000.0,
+            services_and_other_revenue: 493_000_000.0,
+
+            automotive_sales_cost_of_revenue: 2_856_000_000.0,
+            automotive_leasing_cost_of_revenue: 117_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 316_000_000.0,
+            services_and_other_cost_of_revenue: 686_000_000.0,
+
+            research_and_development: 340_000_000.0,
+            selling_general_and_administrative: 704_000_000.0,
+            restructuring_and_other: 44_000_000.0,
+
+            interest_income: 9_000_000.0,
+            interest_expense: -158_000_000.0,
+            other_expense_income_net: 26_000_000.0,
+
+            provision_for_income_taxes: 23_000_000.0,
+        },
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+            period: equities::Period::ThreeMonths,
+
+            automotive_sales_revenue: 4_893_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 239_000_000.0,
+
+            energy_generation_and_storage_revenue: 293_000_000.0,
+            services_and_other_revenue: 560_000_000.0,
+
+            automotive_sales_cost_of_revenue: 3_699_000_000.0,
+            automotive_leasing_cost_of_revenue: 122_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 282_000_000.0,
+            services_and_other_cost_of_revenue: 648_000_000.0,
+
+            research_and_development: 324_000_000.0,
+            selling_general_and_administrative: 627_000_000.0,
+            restructuring_and_other: 0.0,
+
+            interest_income: 10_000_000.0,
+            interest_expense: -169_000_000.0,
+            other_expense_income_net: 54_000_000.0,
+
+            provision_for_income_taxes: 2_000_000.0,
+        },
+    ];
+
     let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200331-gen_0.pdf"), equities::Ticker::TSLA).unwrap();
 
-    let expected_reports = balance_sheets.into_iter()
+    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
-        .collect();
-
-    reported::assert(r.process_balance_sheet().unwrap(), expected_reports);
+        .collect());
+//    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+//        .map(|stmt| stmt.reported()).flatten()
+//        .filter(|report| report.val != 0.0)
+//        .collect());
 }
