@@ -40,25 +40,6 @@ pub struct ReportInterval {
     pub end_date: NaiveDate,
 }
 
-// Step 1: Set up mapping for month strings to numeric values
-fn month_to_int(month: &str) -> Option<u32> {
-    match month {
-        "January" => Some(1),
-        "February" => Some(2),
-        "March" => Some(3),
-        "April" => Some(4),
-        "May" => Some(5),
-        "June" => Some(6),
-        "July" => Some(7),
-        "August" => Some(8),
-        "September" => Some(9),
-        "October" => Some(10),
-        "November" => Some(11),
-        "December" => Some(12),
-        _ => None,
-    }
-}
-
 static REPORT_INTERVAL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     // Corrected verbose regex that allows flexible layout matching
     Regex::new(r"(?x)
