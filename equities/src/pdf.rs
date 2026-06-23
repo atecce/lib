@@ -116,6 +116,7 @@ impl R for Reader {
                     None => false,
                     Some("") => false,
                     Some("$") => false,
+                    Some(")") => false,
                     _ => true,
                 }
             });
@@ -218,12 +219,15 @@ impl R for Reader {
 
 fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &str) -> Result<Reported, Box<dyn Error>> {
     let ret: f64;
-    if val.starts_with('-') {
+    if val == "—" {
         ret = 0.0;
     } else if val.starts_with('(') && val.ends_with(')') {
         // Slice off the outer characters '(' and ')'
         let val = &val[1..val.len() - 1];
         // Parse the inner number and make it negative
+        ret = val.parse::<f64>().map(|num| -num).map_err(|e| format!("failed to parse '{}' as a float for item '{}': {}", val, item, e))? * 1_000_000.0;
+    } else if val.starts_with('(') {
+        let val = &val[1..val.len()];
         ret = val.parse::<f64>().map(|num| -num).map_err(|e| format!("failed to parse '{}' as a float for item '{}': {}", val, item, e))? * 1_000_000.0;
     } else {
         ret = val.replace(',', "").parse::<f64>().map_err(|e| format!("failed to parse '{}' as a float for item '{}': {}", val, item, e))? * 1_000_000.0;

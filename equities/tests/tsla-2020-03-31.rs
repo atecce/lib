@@ -4,6 +4,8 @@ use equities::Reader;
 use equities::tsla::BalanceSheet;
 use equities::tsla::IncomeStatement;
 
+use equities::item::Item::RestructuringAndOther;
+
 #[test]
 fn report() {
 
@@ -121,7 +123,7 @@ fn report() {
 
             interest_income: 10_000_000.0,
             interest_expense: -169_000_000.0,
-            other_expense_income_net: 54_000_000.0,
+            other_expense_income_net: -54_000_000.0,
 
             provision_for_income_taxes: 2_000_000.0,
         },
@@ -135,6 +137,6 @@ fn report() {
         .collect());
     reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
         .map(|stmt| stmt.reported()).flatten()
-        .filter(|report| report.val != 0.0)
+        .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
         .collect());
 }

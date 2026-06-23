@@ -106,16 +106,16 @@ items! {
         SalesGeneralAndAdministrative => ["Sales, general and administrative", "Selling, general and administrative", "Sales, General and Administrative"],
         RestructuringAndOther => ["Restructuring and other"],
         TotalOperatingExpenses => ["Total operating expenses", "Total Operating Expenses"],
-        OperatingIncome => ["Operating income", "Income from operations", "Operating Income"],
+        OperatingIncome => ["Operating income", "Income from operations", "Operating Income", "Income (loss) from operations"],
 
         InterestIncome => ["Interest income", "Interest Income"],
         InterestExpense => ["Interest expense", "Interest Expense"],
         OtherIncomeNet => ["Other income, net", "Other income (expense), net", "Other (expense) income, net", "Other Income, Net"],
         TotalOtherIncomeNet => ["Total other income, net", "Total Other Income, Net"],
-        IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax"],
+        IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax", "Income (loss) before income taxes"],
 
         IncomeTaxExpense => ["Income tax expense", "Provision for income taxes", "Provision for (benefit from) income taxes", "Income Tax Expense"],
-        NetIncome => ["Net income"],
+        NetIncome => ["Net income", "Net income (loss)"],
 
         StockBasedCompensationExpense => ["Stock-based compensation expense"],
         DepreciationAndAmoritization => ["Depreciation and amortization"],
