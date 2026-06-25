@@ -10,36 +10,7 @@ use equities::item::Item::RestructuringAndOther;
 fn report() {
 
     let balance_sheets = vec![
-        BalanceSheet {
-            date: chrono::NaiveDate::from_ymd_opt(2019, 12, 31).unwrap(),
-
-            cash_and_cash_equivalents: 6_268_000_000.0,
-            marketable_securities: 0.0,
-            accounts_receivable_net: 1_324_000_000.0,
-            inventories: 3_552_000_000.0,
-            prepaid_expenses_and_other_current_assets: 959_000_000.0,
-
-            operating_lease_vehicles_net: 2_447_000_000.0,
-            solar_energy_systems_net: 6_138_000_000.0,
-
-            property_and_equipment_net: 10_396_000_000.0,
-            operating_lease_assets: 1_218_000_000.0,
-            digital_assets: 0.0,
-            intangible_assets_net: 339_000_000.0,
-            goodwill: 198_000_000.0,
-            deferred_income_tax_assets: 0.0,
-            other_assets: 1_470_000_000.0,
-
-            accounts_payable: 3_771_000_000.0,
-            accrued_and_other_current_liabilities: 3_222_000_000.0,
-            deferred_revenue: 1_163_000_000.0,
-            customer_deposits: 726_000_000.0,
-            current_portion_of_debt_and_finance_leases: 1_785_000_000.0,
-
-            debt_and_finance_leases_net_of_current_portion: 11_634_000_000.0,
-            deferred_revenue_net_of_current_portion: 1_207_000_000.0,
-            other_long_term_liabilities: 2_691_000_000.0,
-        },
+        equities::tsla::Q4_2019_BALANCE_SHEET,
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2020, 06, 30).unwrap(),
 
