@@ -110,7 +110,7 @@ items! {
 
         InterestIncome => ["Interest income", "Interest Income"],
         InterestExpense => ["Interest expense", "Interest Expense"],
-        OtherIncomeNet => ["Other income, net", "Other income (expense), net", "Other (expense) income, net", "Other Income, Net"],
+        OtherIncomeNet => ["Other income, net", "Other income (expense), net", "Other (expense) income, net", "Other Income, Net", "Other expense, net"],
         TotalOtherIncomeNet => ["Total other income, net", "Total Other Income, Net"],
         IncomeBeforeIncomeTax => ["Income before income tax", "Income before income taxes", "Income Before Income Tax", "Income (loss) before income taxes"],
 

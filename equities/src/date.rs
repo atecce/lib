@@ -76,6 +76,7 @@ pub fn parse_financial_headers(text: &str) -> Result<Vec<ReportInterval>, Box<dy
 
         let p1 = match p1_name {
             "Three" => Period::ThreeMonths,
+            "Six" => Period::SixMonths,
             "Nine" => Period::NineMonths,
             _ => Period::PointInTime, // Fallback safety
         };
@@ -96,6 +97,7 @@ pub fn parse_financial_headers(text: &str) -> Result<Vec<ReportInterval>, Box<dy
         {
             let p2 = match p2_name.as_str() {
                 "Three" => Period::ThreeMonths,
+                "Six" => Period::SixMonths,
                 "Nine" => Period::NineMonths,
                 _ => Period::PointInTime, // Fallback safety
             };
