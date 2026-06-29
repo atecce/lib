@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, Read};
+
 use regex::Regex;
+
+use equities::item::Item;
 
 #[derive(Debug)]
 pub struct FinancialValues {
@@ -58,7 +61,7 @@ fn extract_balance_sheet(raw_text: &str) -> Option<&str> {
 }
 
 /// 3. Extracts individual metrics into a Map structure
-pub fn parse_balance_sheet_kv(balance_sheet_text: &str) -> HashMap<String, FinancialValues> {
+pub fn parse_balance_sheet_kv(balance_sheet_text: &str) -> HashMap<Item, FinancialValues> {
     let mut data_map = HashMap::new();
     
     // let re = Regex::new(
@@ -81,16 +84,21 @@ pub fn parse_balance_sheet_kv(balance_sheet_text: &str) -> HashMap<String, Finan
     ).unwrap();
 
     for caps in re.captures_iter(balance_sheet_text) {
-        let key = caps[1].trim().to_string();
-        
-        // Isolate the raw inner numbers to discard punctuation later
-        let val1_str = &caps[2];
-        let val2_str = &caps[3];
+        match caps[1].trim().to_string().parse::<Item>() {
+            Ok(key) => {
+                // Isolate the raw inner numbers to discard punctuation later
+                let val1_str = &caps[2];
+                let val2_str = &caps[3];
 
-        let current_year: f64 = val1_str.replace(",", "").parse().unwrap_or(0.0);
-        let prior_year: f64 = val2_str.replace(",", "").parse().unwrap_or(0.0);
+                let current_year: f64 = val1_str.replace(",", "").parse().unwrap_or(0.0);
+                let prior_year: f64 = val2_str.replace(",", "").parse().unwrap_or(0.0);
 
-        data_map.insert(key, FinancialValues { current_year, prior_year });
+                data_map.insert(key, FinancialValues { current_year, prior_year });
+            },
+            Err(e) => {
+                eprintln!("failed to parse '{}' as Item: {}", &caps[1], e);
+            },
+        }
     }
 
     data_map

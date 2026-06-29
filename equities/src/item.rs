@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::str::FromStr;
 
 macro_rules! items {
@@ -14,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 70] = [
+            pub const ALL: [$item; 78] = [
                 $($item::$variant,)*
             ];
         }
@@ -43,7 +44,7 @@ macro_rules! items {
     };
 }
 
-impl std::fmt::Display for Item {
+impl Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -55,8 +56,10 @@ items! {
         // TODO(atec): Short-term investments
         MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"],
+        VendorNonTradeReceivables => ["Vendor non-trade receivables"],
         Inventories => ["Inventories", "Inventory"],
         PrepaidExpensesAndOtherCurrentAssets => ["Prepaid expenses and other current assets", "Prepaid Expenses and Other Current Assets"],
+        OtherCurrentAssets => ["Other current assets"],
         TotalCurrentAssets => ["Total current assets", "Total Current Assets"],
 
         OperatingLeaseVehiclesNet => ["Operating lease vehicles, net"],
@@ -71,6 +74,8 @@ items! {
         // TODO(atec): Digital assets, net
         NonMarketableEquitySecurities => ["Non-marketable equity securities", "Digital assets, net", "Non-Marketable Equity Securities"],
         OtherAssets => ["Other assets", "Other non-current assets", "Other Assets"],
+        TotalNonCurrentAssets => ["Total non-current assets"],
+
         TotalAssets => ["Total assets", "Total Assets"],
 
         AccountsPayable => ["Accounts payable", "Accounts Payable"],
@@ -78,12 +83,18 @@ items! {
         DeferredRevenue => ["Deferred revenue"],
         // TODO(atec): Current portion of debt and finance leases
         ShortTermDebt => ["Short-term debt", "Current portion of debt and finance leases", "Short-Term Debt"],
+        CommercialPaper => ["Commercial paper"],
+        TermDebt => ["Term debt"],
+        OtherCurrentLiabilities => ["Other current liabilities"],
         TotalCurrentLiabilities => ["Total current liabilities", "Total Current Liabilities"],
         LongTermDebt => ["Long-term debt", "Long-Term Debt"],
         DebtAndFinanceLeasesNetOfCurrentPortion => ["Debt and finance leases, net of current portion"],
         DeferredRevenueNetOfCurrentPortion => ["Deferred revenue, net of current portion"],
         LongTermOperatingLeaseLiabilities => ["Long-term operating lease liabilities", "Long-Term Operating Lease Liabilities"],
         OtherLongTermLiabilities => ["Other long-term liabilities", "Other Long-Term Liabilities"],
+        OtherNonCurrentLiabilities => ["Other non-current liabilities"],
+        TotalNonCurrentLiabilities => ["Total non-current liabilities"],
+
         TotalLiabilities => ["Total liabilities", "Total Liabilities"],
 
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues"],
@@ -147,8 +158,15 @@ items! {
     }
 }
 
+#[derive(Debug)]
 pub enum ItemError {
     ItemNotFound,
+}
+
+impl Display for ItemError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, serde::Serialize)]

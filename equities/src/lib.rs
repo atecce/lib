@@ -28,6 +28,7 @@ macro_rules! count_items {
 pub enum Ticker {
     NVDA,
     TSLA,
+    AAPL,
 }
 
 impl FromStr for Ticker {
@@ -37,6 +38,7 @@ impl FromStr for Ticker {
         match s {
             "NVDA" => Ok(Ticker::NVDA),
             "TSLA" => Ok(Ticker::TSLA),
+            "AAPL" => Ok(Ticker::AAPL),
             _ => Err(TickerError::TickerNotFound),
         }
     }
@@ -51,6 +53,7 @@ impl std::fmt::Display for Ticker {
         match self {
             Ticker::NVDA => write!(f, "NVDA"),
             Ticker::TSLA => write!(f, "TSLA"),
+            Ticker::AAPL => write!(f, "AAPL"),
         }
     }
 }
