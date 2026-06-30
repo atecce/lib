@@ -7,7 +7,7 @@ use equities::tsla::IncomeStatement;
 use equities::item::Item::RestructuringAndOther;
 
 #[test]
-fn Q3_2020_report() {
+fn q3_2020() {
 
     let balance_sheets = vec![
         equities::tsla::Q4_2019_BALANCE_SHEET,
@@ -43,116 +43,116 @@ fn Q3_2020_report() {
         },
     ];
 
-//    let income_statements = vec![
-//        IncomeStatement {
-//            date: chrono::NaiveDate::from_ymd_opt(2019, 6, 30).unwrap(),
-//            period: equities::Period::ThreeMonths,
-//
-//            automotive_sales_revenue: 5_168_000_000.0,
-//            automotive_regulatory_credits: 0.0,
-//            automotive_leasing_revenue: 208_000_000.0,
-//
-//            energy_generation_and_storage_revenue: 369_000_000.0,
-//            services_and_other_revenue: 605_000_000.0,
-//
-//            automotive_sales_cost_of_revenue: 4_254_000_000.0,
-//            automotive_leasing_cost_of_revenue: 106_000_000.0,
-//
-//            energy_generation_and_storage_cost_of_revenue: 326_000_000.0,
-//            services_and_other_cost_of_revenue: 743_000_000.0,
-//
-//            research_and_development: 324_000_000.0,
-//            selling_general_and_administrative: 647_000_000.0,
-//            restructuring_and_other: 117_000_000.0,
-//
-//            interest_income: 10_000_000.0,
-//            interest_expense: -172_000_000.0,
-//            other_expense_income_net: -41_000_000.0,
-//
-//            provision_for_income_taxes: 19_000_000.0,
-//        },
-//        IncomeStatement {
-//            date: chrono::NaiveDate::from_ymd_opt(2019, 6, 30).unwrap(),
-//            period: equities::Period::SixMonths,
-//
-//            automotive_sales_revenue: 8_677_000_000.0,
-//            automotive_regulatory_credits: 0.0,
-//            automotive_leasing_revenue: 423_000_000.0,
-//
-//            energy_generation_and_storage_revenue: 693_000_000.0,
-//            services_and_other_revenue: 1098_000_000.0,
-//
-//            automotive_sales_cost_of_revenue: 7_110_000_000.0,
-//            automotive_leasing_cost_of_revenue: 223_000_000.0,
-//
-//            energy_generation_and_storage_cost_of_revenue: 642_000_000.0,
-//            services_and_other_cost_of_revenue: 1_429_000_000.0,
-//
-//            research_and_development: 664_000_000.0,
-//            selling_general_and_administrative: 1_351_000_000.0,
-//            restructuring_and_other: 161_000_000.0,
-//
-//            interest_income: 19_000_000.0,
-//            interest_expense: -330_000_000.0,
-//            other_expense_income_net: -15_000_000.0,
-//
-//            provision_for_income_taxes: 42_000_000.0,
-//        },
-//        IncomeStatement {
-//            date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
-//            period: equities::Period::ThreeMonths,
-//
-//            automotive_sales_revenue: 4_911_000_000.0,
-//            automotive_regulatory_credits: 0.0,
-//            automotive_leasing_revenue: 268_000_000.0,
-//
-//            energy_generation_and_storage_revenue: 370_000_000.0,
-//            services_and_other_revenue: 487_000_000.0,
-//
-//            automotive_sales_cost_of_revenue: 3_714_000_000.0,
-//            automotive_leasing_cost_of_revenue: 148_000_000.0,
-//
-//            energy_generation_and_storage_cost_of_revenue: 349_000_000.0,
-//            services_and_other_cost_of_revenue: 558_000_000.0,
-//
-//            research_and_development: 279_000_000.0,
-//            selling_general_and_administrative: 661_000_000.0,
-//            restructuring_and_other: 0.0,
-//
-//            interest_income: 8_000_000.0,
-//            interest_expense: -170_000_000.0,
-//            other_expense_income_net: -15_000_000.0,
-//
-//            provision_for_income_taxes: 21_000_000.0,
-//        },
-//        IncomeStatement {
-//            date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
-//            period: equities::Period::SixMonths,
-//
-//            automotive_sales_revenue: 9_804_000_000.0,
-//            automotive_regulatory_credits: 0.0,
-//            automotive_leasing_revenue: 507_000_000.0,
-//
-//            energy_generation_and_storage_revenue: 663_000_000.0,
-//            services_and_other_revenue: 1_047_000_000.0,
-//
-//            automotive_sales_cost_of_revenue: 7_413_000_000.0,
-//            automotive_leasing_cost_of_revenue: 270_000_000.0,
-//
-//            energy_generation_and_storage_cost_of_revenue: 631_000_000.0,
-//            services_and_other_cost_of_revenue: 1_206_000_000.0,
-//
-//            research_and_development: 603_000_000.0,
-//            selling_general_and_administrative: 1_288_000_000.0,
-//            restructuring_and_other: 0.0,
-//
-//            interest_income: 18_000_000.0,
-//            interest_expense: -339_000_000.0,
-//            other_expense_income_net: -69_000_000.0,
-//
-//            provision_for_income_taxes: 23_000_000.0,
-//        },
-//    ];
+    let income_statements = vec![
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2019, 9, 30).unwrap(),
+            period: equities::Period::ThreeMonths,
+
+            automotive_sales_revenue: 5_132_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 221_000_000.0,
+
+            energy_generation_and_storage_revenue: 402_000_000.0,
+            services_and_other_revenue: 548_000_000.0,
+
+            automotive_sales_cost_of_revenue: 4_014_000_000.0,
+            automotive_leasing_cost_of_revenue: 117_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 314_000_000.0,
+            services_and_other_cost_of_revenue: 667_000_000.0,
+
+            research_and_development: 334_000_000.0,
+            selling_general_and_administrative: 596_000_000.0,
+            restructuring_and_other: 0.0,
+
+            interest_income: 15_000_000.0,
+            interest_expense: -185_000_000.0,
+            other_expense_income_net: 85_000_000.0,
+
+            provision_for_income_taxes: 26_000_000.0,
+        },
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2019, 9, 30).unwrap(),
+            period: equities::Period::NineMonths,
+
+            automotive_sales_revenue: 13_809_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 644_000_000.0,
+
+            energy_generation_and_storage_revenue: 1_095_000_000.0,
+            services_and_other_revenue: 1_646_000_000.0,
+
+            automotive_sales_cost_of_revenue: 11_124_000_000.0,
+            automotive_leasing_cost_of_revenue: 340_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 956_000_000.0,
+            services_and_other_cost_of_revenue: 2_096_000_000.0,
+
+            research_and_development: 998_000_000.0,
+            selling_general_and_administrative: 1_947_000_000.0,
+            restructuring_and_other: 161_000_000.0,
+
+            interest_income: 34_000_000.0,
+            interest_expense: -515_000_000.0,
+            other_expense_income_net: 70_000_000.0,
+
+            provision_for_income_taxes: 68_000_000.0,
+        },
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2020, 9, 30).unwrap(),
+            period: equities::Period::ThreeMonths,
+
+            automotive_sales_revenue: 7_346_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 265_000_000.0,
+
+            energy_generation_and_storage_revenue: 579_000_000.0,
+            services_and_other_revenue: 581_000_000.0,
+
+            automotive_sales_cost_of_revenue: 5_361_000_000.0,
+            automotive_leasing_cost_of_revenue: 145_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 558_000_000.0,
+            services_and_other_cost_of_revenue: 644_000_000.0,
+
+            research_and_development: 366_000_000.0,
+            selling_general_and_administrative: 888_000_000.0,
+            restructuring_and_other: 0.0,
+
+            interest_income: 6_000_000.0,
+            interest_expense: -163_000_000.0,
+            other_expense_income_net: -97_000_000.0,
+
+            provision_for_income_taxes: 186_000_000.0,
+        },
+        IncomeStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2020, 9, 30).unwrap(),
+            period: equities::Period::NineMonths,
+
+            automotive_sales_revenue: 17_150_000_000.0,
+            automotive_regulatory_credits: 0.0,
+            automotive_leasing_revenue: 772_000_000.0,
+
+            energy_generation_and_storage_revenue: 1_242_000_000.0,
+            services_and_other_revenue: 1_628_000_000.0,
+
+            automotive_sales_cost_of_revenue: 12_774_000_000.0,
+            automotive_leasing_cost_of_revenue: 415_000_000.0,
+
+            energy_generation_and_storage_cost_of_revenue: 1_189_000_000.0,
+            services_and_other_cost_of_revenue: 1_850_000_000.0,
+
+            research_and_development: 969_000_000.0,
+            selling_general_and_administrative: 2_176_000_000.0,
+            restructuring_and_other: 0.0,
+
+            interest_income: 24_000_000.0,
+            interest_expense: -502_000_000.0,
+            other_expense_income_net: -166_000_000.0,
+
+            provision_for_income_taxes: 209_000_000.0,
+        },
+    ];
 
     let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200930-gen.pdf"), equities::Ticker::TSLA).unwrap();
 
@@ -160,8 +160,8 @@ fn Q3_2020_report() {
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());
-//    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
-//        .map(|stmt| stmt.reported()).flatten()
-//        .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
-//        .collect());
+    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+        .map(|stmt| stmt.reported()).flatten()
+        .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
+        .collect());
 }
