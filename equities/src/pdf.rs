@@ -98,7 +98,10 @@ impl R for Reader {
 
         let present: NaiveDate;
         let past: NaiveDate;
-        if !(NaiveDate::from_ymd_opt(2020, 3, 31).unwrap() == self.date || NaiveDate::from_ymd_opt(2020, 6, 30).unwrap() == self.date) {
+        if !(
+            NaiveDate::from_ymd_opt(2020, 3, 31).unwrap() == self.date ||
+            NaiveDate::from_ymd_opt(2020, 6, 30).unwrap() == self.date ||
+            NaiveDate::from_ymd_opt(2020, 9, 30).unwrap() == self.date) {
 
             let text = page.extract_text();
             let lines = text.lines().collect::<Vec<_>>();
