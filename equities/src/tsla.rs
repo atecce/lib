@@ -160,6 +160,106 @@ impl IncomeStatement {
     }
 }
 
+pub struct CashFlowStatement {
+    pub date: NaiveDate,
+    pub period: Period,
+
+    pub net_income: f64,
+
+    pub depreciation_amortization_and_impairment: f64,
+    pub stock_based_compensation: f64,
+    pub inventory_and_purchase_commitments_write_downs: f64,
+    pub foreign_currency_transaction_net_unrealized_loss: f64,
+    pub deferred_income_taxes: f64,
+    pub non_cash_interest_and_other_operating_activities: f64,
+    pub digital_assets_gain_net: f64,
+
+    pub changes_in_accounts_receivable: f64,
+    pub changes_in_inventory: f64,
+    pub changes_in_operating_lease_vehicles: f64,
+    pub changes_in_prepaid_expenses_and_other_assets: f64,
+    pub changes_in_accounts_payable_accrued_and_other_liabilities: f64,
+    pub changes_in_deferred_revenue: f64,
+
+    pub purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales: f64,
+    pub purchases_of_investments: f64,
+    pub proceeds_from_maturities_of_investments: f64,
+    pub proceeds_from_sales_of_investments: f64,
+
+    pub proceeds_from_issuances_of_debt: f64,
+    pub repayments_of_debt: f64,
+    pub proceeds_from_exercises_of_stock_options_and_other_stock_issuances: f64,
+    pub principal_payments_on_finance_leases: f64,
+    pub proceeds_received_from_directors_in_shareholder_settlement: f64,
+    pub payment_of_legal_fees_associated_with_shareholder_settlement: f64,
+    pub debt_issuance_costs: f64,
+    pub distributions_paid_to_noncontrolling_interests_in_subsidiaries: f64,
+    pub payments_for_buy_outs_of_noncontrolling_interests_in_subsidiaries: f64,
+
+    pub effect_of_exchange_rate_changes_on_cash_and_cash_equivalents_and_restricted_cash: f64,
+
+    pub cash_and_cash_equivalents_and_restricted_cash_beginning_of_period: f64,
+
+    pub acquisitions_of_property_and_equipment_included_in_liabilities: f64,
+    pub leased_assets_obtained_in_exchange_for_finance_lease_liabilities: f64,
+    pub leased_assets_obtained_in_exchange_for_operating_lease_liabilities: f64,
+}
+
+impl Statement for CashFlowStatement {
+    fn ticker(&self) -> Ticker {
+        Ticker::TSLA
+    }
+    fn period(&self) -> Period {
+        self.period
+    }
+}
+
+impl CashFlowStatement {
+    fn net_cash_provided_by_operating_activities(&self) -> f64 {
+        self.net_income
+            + self.depreciation_amortization_and_impairment
+            + self.stock_based_compensation
+            + self.inventory_and_purchase_commitments_write_downs
+            + self.foreign_currency_transaction_net_unrealized_loss
+            + self.deferred_income_taxes
+            + self.non_cash_interest_and_other_operating_activities
+            + self.digital_assets_gain_net
+            + self.changes_in_accounts_receivable
+            + self.changes_in_inventory
+            + self.changes_in_operating_lease_vehicles
+            + self.changes_in_prepaid_expenses_and_other_assets
+            + self.changes_in_accounts_payable_accrued_and_other_liabilities
+            + self.changes_in_deferred_revenue
+    }
+    fn net_cash_used_in_investing_activities(&self) -> f64 {
+        self.purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales
+            + self.purchases_of_investments
+            + self.proceeds_from_maturities_of_investments
+            + self.proceeds_from_sales_of_investments
+    }
+    fn net_cash_provided_by_financing_activities(&self) -> f64 {
+        self.proceeds_from_issuances_of_debt
+            + self.repayments_of_debt
+            + self.proceeds_from_exercises_of_stock_options_and_other_stock_issuances
+            + self.principal_payments_on_finance_leases
+            + self.proceeds_received_from_directors_in_shareholder_settlement
+            + self.payment_of_legal_fees_associated_with_shareholder_settlement
+            + self.debt_issuance_costs
+            + self.distributions_paid_to_noncontrolling_interests_in_subsidiaries
+            + self.payments_for_buy_outs_of_noncontrolling_interests_in_subsidiaries
+    }
+    fn net_increase_in_cash_and_cash_equivalents_and_restricted_cash(&self) -> f64 {
+        self.net_cash_provided_by_operating_activities()
+            + self.net_cash_used_in_investing_activities()
+            + self.net_cash_provided_by_financing_activities()
+            + self.effect_of_exchange_rate_changes_on_cash_and_cash_equivalents_and_restricted_cash
+    }
+    fn cash_and_cash_equivalents_and_restricted_cash_end_of_period(&self) -> f64 {
+        self.net_increase_in_cash_and_cash_equivalents_and_restricted_cash()
+            + self.cash_and_cash_equivalents_and_restricted_cash_beginning_of_period
+    }
+}
+
 pub const Q4_2019_BALANCE_SHEET: BalanceSheet = BalanceSheet {
     date: chrono::NaiveDate::from_ymd_opt(2019, 12, 31).unwrap(),
 
