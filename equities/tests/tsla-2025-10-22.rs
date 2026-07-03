@@ -181,6 +181,97 @@ fn report() {
         },
     ];
 
+    let cash_flow_statements = [
+        CashFlowStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap(),
+            period: equities::Period::NineMonths,
+
+            net_income: income_statements[1].net_income(),
+
+            depreciation_amortization_and_impairment: 3_872_000_000.0,
+            stock_based_compensation: 1_420_000_000.0,
+            inventory_and_purchase_commitments_write_downs: 247_000_000.0,
+            foreign_currency_transaction_net_unrealized_loss: 197_000_000.0,
+            deferred_income_taxes: 471_000_000.0,
+            non_cash_interest_and_other_operating_activities: 83_000_000.0,
+            digital_assets_gain_net: -242_000_000.0,
+
+            changes_in_accounts_receivable: 144_000_000.0,
+            changes_in_inventory: -1_107_000_000.0,
+            changes_in_operating_lease_vehicles: -82_000_000.0,
+            changes_in_prepaid_expenses_and_other_assets: -2_639_000_000.0,
+            changes_in_accounts_payable_accrued_and_other_liabilities: 2_504_000_000.0,
+            changes_in_deferred_revenue: 231_000_000.0,
+
+            purchase_of_property_and_equipment_excluding_finance_leases_net_of_sales: -8_562_000_000.0,
+            purchase_of_investments: -20_797_000_000.0,
+            proceeds_from_maturities_of_investments: 17_975_000_000.0,
+            proceeds_from_sales_of_investments: 200_000_000.0,
+
+            proceeds_from_issuances_of_debt: 4_360_000_000.0,
+            repayments_of_debt: -1_783_000_000.0,
+            proceeds_from_exercises_of_stock_options_and_other_stock_issuances: 788_000_000.0,
+            principal_payments_on_finance_leases: -291_000_000.0,
+            proceeds_received_from_directors_in_shareholder_settlement: 0.0,
+            payment_of_legal_fees_associated_with_shareholder_settlement: 0.0,
+            debt_issuance_costs: -6_000_000.0,
+            distributions_paid_to_noncontrolling_interests_in_subsidiaries: -76_000_000.0,
+            payments_for_buy_outs_of_noncontrolling_interests_in_subsidiaries: -124_000_000.0,
+
+            effect_of_exchange_rate_changes_on_cash_and_cash_equivalents_and_restricted_cash: -8_000_000.0,
+
+            cash_and_cash_equivalents_and_restricted_cash_beginning_of_period: 17_189_000_000.0,
+
+            acquisitions_of_property_and_equipment_included_in_liabilities: 2_727_000_000.0,
+            leased_assets_obtained_in_exchange_for_finance_lease_liabilities: 32_000_000.0,
+            leased_assets_obtained_in_exchange_for_operating_lease_liabilities: 1_232_000_000.0,
+        },
+        CashFlowStatement {
+            date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
+            period: equities::Period::NineMonths,
+
+            net_income: income_statements[3].net_income(),
+
+            depreciation_amortization_and_impairment: 4_505_000_000.0,
+            stock_based_compensation: 1_871_000_000.0,
+            inventory_and_purchase_commitments_write_downs: 313_000_000.0,
+            foreign_currency_transaction_net_unrealized_loss: 160_000_000.0,
+            deferred_income_taxes: 234_000_000.0,
+            non_cash_interest_and_other_operating_activities: 235_000_000.0,
+            digital_assets_gain_net: -239_000_000.0,
+
+            changes_in_accounts_receivable: -306_000_000.0,
+            changes_in_inventory: -416_000_000.0,
+            changes_in_operating_lease_vehicles: 54_000_000.0,
+            changes_in_prepaid_expenses_and_other_assets: -2_280_000_000.0,
+            changes_in_accounts_payable_accrued_and_other_liabilities: 2_979_000_000.0,
+            changes_in_deferred_revenue: 825_000_000.0,
+
+            purchase_of_property_and_equipment_excluding_finance_leases_net_of_sales: -6_134_000_000.0,
+            purchase_of_investments: -24_902_000_000.0,
+            proceeds_from_maturities_of_investments: 22_086_000_000.0,
+            proceeds_from_sales_of_investments: 0.0,
+
+            proceeds_from_issuances_of_debt: 4_232_000_000.0,
+            repayments_of_debt: -4_798_000_000.0,
+            proceeds_from_exercises_of_stock_options_and_other_stock_issuances: 1_040_000_000.0,
+            principal_payments_on_finance_leases: -85_000_000.0,
+            proceeds_received_from_directors_in_shareholder_settlement: 277_000_000.0,
+            payment_of_legal_fees_associated_with_shareholder_settlement: -176_000_000.0,
+            debt_issuance_costs: -5_000_000.0,
+            distributions_paid_to_noncontrolling_interests_in_subsidiaries: -56_000_000.0,
+            payments_for_buy_outs_of_noncontrolling_interests_in_subsidiaries: 0.0,
+
+            effect_of_exchange_rate_changes_on_cash_and_cash_equivalents_and_restricted_cash: 134_000_000.0,
+
+            cash_and_cash_equivalents_and_restricted_cash_beginning_of_period: 17_037_000_000.0,
+
+            acquisitions_of_property_and_equipment_included_in_liabilities: 1_631_000_000.0,
+            leased_assets_obtained_in_exchange_for_finance_lease_liabilities: 0.0,
+            leased_assets_obtained_in_exchange_for_operating_lease_liabilities: 1_171_000_000.0,
+        }
+    ]
+
     let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
     reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
