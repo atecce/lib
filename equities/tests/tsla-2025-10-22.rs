@@ -1,8 +1,10 @@
 mod reported;
 
 use equities::Reader;
+use equities::IncomeStatement as IS;
 use equities::tsla::BalanceSheet;
 use equities::tsla::IncomeStatement;
+use equities::tsla::CashFlowStatement;
 
 #[test]
 fn report() {
@@ -203,8 +205,8 @@ fn report() {
             changes_in_accounts_payable_accrued_and_other_liabilities: 2_504_000_000.0,
             changes_in_deferred_revenue: 231_000_000.0,
 
-            purchase_of_property_and_equipment_excluding_finance_leases_net_of_sales: -8_562_000_000.0,
-            purchase_of_investments: -20_797_000_000.0,
+            purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales: -8_562_000_000.0,
+            purchases_of_investments: -20_797_000_000.0,
             proceeds_from_maturities_of_investments: 17_975_000_000.0,
             proceeds_from_sales_of_investments: 200_000_000.0,
 
@@ -247,8 +249,8 @@ fn report() {
             changes_in_accounts_payable_accrued_and_other_liabilities: 2_979_000_000.0,
             changes_in_deferred_revenue: 825_000_000.0,
 
-            purchase_of_property_and_equipment_excluding_finance_leases_net_of_sales: -6_134_000_000.0,
-            purchase_of_investments: -24_902_000_000.0,
+            purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales: -6_134_000_000.0,
+            purchases_of_investments: -24_902_000_000.0,
             proceeds_from_maturities_of_investments: 22_086_000_000.0,
             proceeds_from_sales_of_investments: 0.0,
 
@@ -270,7 +272,7 @@ fn report() {
             leased_assets_obtained_in_exchange_for_finance_lease_liabilities: 0.0,
             leased_assets_obtained_in_exchange_for_operating_lease_liabilities: 1_171_000_000.0,
         }
-    ]
+    ];
 
     let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
