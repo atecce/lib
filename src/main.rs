@@ -65,7 +65,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                         Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
                     }
                 }
-            }
+            },
+            equities::Ticker::AAPL => todo!(),
         }
     }
 

@@ -5,6 +5,8 @@ use name::Name::Remus;
 use name::Name::Romulus;
 use bible::Source;
 
+use bible::genealogy::יֵשׁוּ;
+
 pub const JUPITER: &Daemon<Source> = &Daemon {
     names: &[name::Name::Jupiter],
     words: &[],
@@ -1424,4 +1426,18 @@ pub const MARCIAN: &Daemon<Source> = &Daemon {
 
     // TODO(atec): multiple emperors
     predecessor: Some(THEODOSIUS_II),
+};
+
+
+// St. Peter, PETRVS; 30 - 64
+pub const PETRVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(יֵשׁוּ),
 };
