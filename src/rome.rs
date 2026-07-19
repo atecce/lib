@@ -1441,3 +1441,198 @@ pub const PETRVS: &Daemon<Source> = &Daemon {
 
     predecessor: Some(יֵשׁוּ),
 };
+
+// St. Linus, LINVS; 64 - 76
+pub const LINVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(PETRVS),
+};
+
+// St. Cletus, CLETVS; 76 - 88
+pub const CLETVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(LINVS),
+};
+
+// St. Clement I, CLEMENS; 88 - 97
+pub const CLEMENS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(CLETVS),
+};
+
+// St. Evaristus, EVARISTVS; 97 - 105
+pub const EVARISTVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(CLEMENS),
+};
+
+// St. Alexander I, ALEXANDER; 105 - 115
+pub const ST_ALEXANDER: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(EVARISTVS),
+};
+
+// St. Sixtus I, XYSTVS; 115 - 125
+pub const XYSTVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ST_ALEXANDER),
+};
+
+// St. Telesphorus, TELESPHORVS; 125 - 136
+pub const TELESPHORVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(XYSTVS),
+};
+
+// St. Hyginus, HYGINVS; 136 - 140
+pub const HYGINVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(TELESPHORVS),
+};
+
+// St. Pius I, PIVS; 140 - 155
+pub const PIVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(HYGINVS),
+};
+
+// St. Anicetus, ANICETVS; 155 - 166/7
+pub const ANICETVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(PIVS),
+};
+
+// St. Soter, SOTER; 166/7 - 174/175
+pub const SOTER: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ANICETVS),
+};
+
+// St. Eleutherius, ELEVTHERIVS; 174/175 - 189
+pub const ELEVTHERIVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(SOTER),
+};
+
+// St. Victor I, VICTOR; 189 - 198/199
+pub const ST_VICTOR: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ELEVTHERIVS),
+};
+
+// St. Zephyrinus, ZEPHYRINVS; 198/199 - 20 December 217
+pub const ZEPHYRINVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ST_VICTOR),
+};
+
+// Natalius, NATALIVS; 198/199 - 199/200
+pub const NATALIVS: &Daemon<Source> = &Daemon {
+    names: &[],
+    words: &[],
+    deeds: &[],
+
+    father: None,
+    mother: None,
+    teacher: None,
+
+    predecessor: Some(ST_VICTOR),
+};
