@@ -78,6 +78,18 @@ fn main() {
             start: 13,
             end: Some(17),
         },
+        bible::Source {
+            book: name::Name::KingsI,
+            chapter: 16,
+            start: 30,
+            end: Some(33),
+        },
+        bible::Source {
+            book: name::Name::KingsI,
+            chapter: 17,
+            start: 15,
+            end: Some(24),
+        },
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
         println!("{}", src);
