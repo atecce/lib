@@ -90,6 +90,66 @@ fn main() {
             start: 15,
             end: Some(24),
         },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 17,
+            start: 18,
+            end: Some(23),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 21,
+            start: 1,
+            end: Some(2),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 21,
+            start: 7,
+            end: Some(16),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 23,
+            start: 21,
+            end: Some(27),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 24,
+            start: 1,
+            end: Some(4),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 24,
+            start: 8,
+            end: Some(13),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 25,
+            start: 1,
+            end: Some(3),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 25,
+            start: 8,
+            end: Some(9),
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 25,
+            start: 21,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::KingsII,
+            chapter: 25,
+            start: 27,
+            end: Some(30),
+        },
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
         println!("{}", src);
