@@ -1026,6 +1026,61 @@ fn main() {
             start: 10,
             end: Some(31),
         },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 5,
+            start: 12,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 7,
+            start: 16,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 7,
+            start: 20,
+            end: Some(22),
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 7,
+            start: 29,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 8,
+            start: 15,
+            end: Some(17),
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 9,
+            start: 3,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 9,
+            start: 9,
+            end: Some(18),
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 10,
+            start: 2,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Ecclesiastes,
+            chapter: 10,
+            start: 11,
+            end: None,
+        },
+
     ];
 
     for src in &srcs {
