@@ -276,6 +276,48 @@ fn main() {
             start: 11,
             end: Some(21),
         },
+        bible::Source {
+            book: name::Name::Ezra,
+            chapter: 1,
+            start: 1,
+            end: Some(5),
+        },
+        bible::Source {
+            book: name::Name::Nehemiah,
+            chapter: 1,
+            start: 8,
+            end: Some(9),
+        },
+        bible::Source {
+            book: name::Name::Nehemiah,
+            chapter: 6,
+            start: 13,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Job,
+            chapter: 1,
+            start: 6,
+            end: Some(12),
+        },
+        bible::Source {
+            book: name::Name::Job,
+            chapter: 5,
+            start: 13,
+            end: Some(16),
+        },
+        bible::Source {
+            book: name::Name::Job,
+            chapter: 38,
+            start: 4,
+            end: None,
+        },
+        bible::Source {
+            book: name::Name::Job,
+            chapter: 38,
+            start: 7,
+            end: None,
+        },
     ] {
         let verses = bible::kjv::word(src.book)[src.chapter as usize - 1];
         println!("{}", src);
