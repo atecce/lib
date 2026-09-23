@@ -1080,7 +1080,12 @@ fn main() {
             start: 11,
             end: None,
         },
-
+        bible::Source {
+            book: name::Name::SongOfSolomon,
+            chapter: 1,
+            start: 5,
+            end: Some(6),
+        },
     ];
 
     for src in &srcs {
