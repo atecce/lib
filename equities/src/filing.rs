@@ -30,6 +30,8 @@ use crate::Ticker;
 pub struct Report {
     pub file: String,
     pub short_name: String,
+    /// "Statements", "Details", "Notes", ...; absent in older summaries.
+    pub category: Option<String>,
 }
 
 pub struct Reader {
@@ -66,6 +68,7 @@ pub fn parse_filing_summary(xml: &str) -> Vec<Report> {
             Some(Report {
                 file: tag(block, "HtmlFileName")?,
                 short_name: tag(block, "ShortName").unwrap_or_default(),
+                category: tag(block, "MenuCategory"),
             })
         })
         .collect()
@@ -74,10 +77,15 @@ pub fn parse_filing_summary(xml: &str) -> Vec<Report> {
 /// Pick the first page whose name matches, skipping parenthetical pages (share
 /// counts and par values). Statements are listed before the notes, so a note
 /// like "Balance Sheet Components" never wins over the statement itself.
+/// When the summary categorizes its pages, only "Statements" are considered:
+/// notes and details can have statement-like names ("Income Tax - ... in
+/// Consolidated Statements of Financial Position (Details)").
 fn find_report<'a>(reports: &'a [Report], matches: impl Fn(&str) -> bool) -> Option<&'a Report> {
+    let categorized = reports.iter().any(|r| r.category.as_deref() == Some("Statements"));
     reports.iter().find(|r| {
         let name = r.short_name.to_lowercase();
-        !name.contains("parenthetical") && matches(&name)
+        (!categorized || r.category.as_deref() == Some("Statements"))
+            && !name.contains("parenthetical") && matches(&name)
     })
 }
 
@@ -188,15 +196,9 @@ fn cell_value(cell: &ElementRef, header: bool) -> Data {
         if let Some(n) = parse_amount(&text) {
             return Data::Float(n);
         }
-    } else if let Some(date) = HEADER_DATE.find(&text) {
-        // Filers reporting in several currencies add the unit under each date:
-        // "Jun. 30, 2021 USD ($)".
-        return Data::String(date.as_str().to_string());
     }
     Data::String(text)
 }
-
-static HEADER_DATE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[A-Z][a-z]{2}\.? \d{1,2}, \d{4}").unwrap());
 
 /// Text a browser would show. Some renderer versions put each value's XBRL tag
 /// in a hidden span next to it (`<span style="display:none">us-gaap_...</span>`).
@@ -311,6 +313,12 @@ fn drop_segment_rows(rows: &[&[Data]], items: &mut [Option<(Item, usize)>]) {
     }
 }
 
+/// A company's own element rather than one from a standard taxonomy (US GAAP,
+/// or IFRS for foreign filers such as TSMC).
+fn is_extension(tag: &str) -> bool {
+    !tag.starts_with("us-gaap_") && !tag.starts_with("ifrs-full_")
+}
+
 /// The item a statement row reports. Its XBRL element decides when it is a
 /// mapped one: labels vary between companies and years, elements do not, and
 /// labels are ambiguous (AAPL's current and non-current marketable securities
@@ -323,7 +331,7 @@ fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
         None => by_label(),
         Some(tag) => match Item::from_xbrl_tag_ranked(tag) {
             Some(item) => Some(item),
-            None if !tag.starts_with("us-gaap_") || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
+            None if is_extension(tag) || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
             None => None,
         },
     }

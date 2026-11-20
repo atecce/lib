@@ -169,14 +169,16 @@ impl Reader {
 
                         if val.is_nan() { continue; }
                         let val = val * sheet_info.multiplier;
-                        match seen.get_mut(&(item, *date, *period)) {
+                        let currency = sheet_info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD);
+                        match seen.get_mut(&(item, *date, *period, currency)) {
                             None => {
-                                seen.insert((item, *date, *period), (reported_items.len(), filled, rank));
+                                seen.insert((item, *date, *period, currency), (reported_items.len(), filled, rank));
                                 reported_items.push(Reported {
                                     ticker,
                                     date: *date,
                                     p: *period,
                                     item,
+                                    currency,
                                     val,
                                 });
                             },

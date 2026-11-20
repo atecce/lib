@@ -2,7 +2,11 @@ use std::collections::HashMap;
 use std::error::Error;
 
 use crate::date::{parse_date_str, parse_date_across_cells, parse_date_across_lines};
-use crate::Period;
+use crate::{Currency, Period};
+
+static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"^(.*?\d{4})\s+([A-Z]{3}) \(.*$").unwrap()
+});
 use crate::item::Item;
 
 use calamine::{Data, DataType};
@@ -20,6 +24,9 @@ pub struct SheetInfo {
     pub labels: usize,
     pub multiplier: f64,
     pub sheet_type: SheetType,
+    /// Currency of each date column whose header names one ("Dec. 31, 2025
+    /// TWD ($)"); columns without one are in US dollars.
+    pub currencies: HashMap<usize, Currency>,
 }
 
 /// The dollar scale stated in a header cell. EDGAR headers name the share and
@@ -54,6 +61,9 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     let mut header_periods: Vec<(usize, usize, Period)> = Vec::new();
     let mut first_date_row: Option<usize> = None;
 
+    let mut currencies: HashMap<usize, Currency> = HashMap::new();
+    let mut skipped: std::collections::HashSet<usize> = std::collections::HashSet::new();
+
     let mut dates_and_periods = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
 
@@ -68,6 +78,12 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         for (c, cell) in row.iter().enumerate() {
             match cell {
                 Data::String(s) => {
+                    // A currency after a date: "Dec. 31, 2025 TWD ($)", possibly
+                    // followed by other units ("... TWD ($) $ / shares").
+                    let (s, currency) = match COLUMN_CURRENCY.captures(s) {
+                        Some(c) => (c[1].to_string(), Some(c[2].to_string())),
+                        None => (s.to_string(), None),
+                    };
                     let s = s.to_lowercase();
 
                     if let Ok(p) = s.parse::<Period>() {
@@ -83,6 +99,13 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
                     if let Some(date) = parse_date_str(&s).or_else(|| parse_date_across_cells(&s, rows.get(r+1).and_then(|next| next.get(c)))) {
                         first_date_row.get_or_insert(r);
+                        match currency.as_deref().map(str::parse::<Currency>) {
+                            Some(Ok(cur)) => { currencies.insert(c, cur); },
+                            // A currency we do not know: leave the column out
+                            // rather than read it as dollars.
+                            Some(Err(())) => { skipped.insert(c); continue; },
+                            None => (),
+                        }
                         match sheet_type {
                             SheetType::BalanceSheet => {
                                 dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
@@ -105,6 +128,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         }
     }
 
+    dates_and_periods.retain(|c, _| !skipped.contains(c));
     if dates_and_periods.is_empty() { return Err("no dates found".into()); }
 
     // Each period heading spans an equal group of date columns, in order, but
@@ -140,6 +164,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         labels: labels,
         multiplier: multiplier,
         sheet_type: sheet_type,
+        currencies: currencies,
     })
 }
 
@@ -204,5 +229,6 @@ pub fn new_sheet_info_from_pdf(rows: &Vec<Vec<Option<String>>>, sheet_type: Shee
         labels: 0,
         multiplier: multiplier,
         sheet_type: sheet_type,
+        currencies: HashMap::new(),
     })
 }

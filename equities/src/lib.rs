@@ -26,12 +26,48 @@ macro_rules! count_items {
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
 }
 
+/// The currency a value is reported in. Filers outside the US report in their
+/// own currency (TSMC in New Taiwan dollars), sometimes with a US dollar
+/// convenience translation of the latest year alongside.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize)]
+pub enum Currency {
+    USD,
+    TWD,
+    EUR,
+    GBP,
+    JPY,
+    CNY,
+}
+
+impl FromStr for Currency {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "USD" => Ok(Currency::USD),
+            "TWD" => Ok(Currency::TWD),
+            "EUR" => Ok(Currency::EUR),
+            "GBP" => Ok(Currency::GBP),
+            "JPY" => Ok(Currency::JPY),
+            "CNY" => Ok(Currency::CNY),
+            _ => Err(()),
+        }
+    }
+}
+
+impl std::fmt::Display for Currency {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Ticker {
     NVDA,
     TSLA,
     AAPL,
     BRK,
+    TSM,
 }
 
 impl Ticker {
@@ -43,6 +79,7 @@ impl Ticker {
             Ticker::TSLA => "TSLA",
             Ticker::AAPL => "AAPL",
             Ticker::BRK => "BRK-B",
+            Ticker::TSM => "TSM",
         }
     }
 }
@@ -56,6 +93,7 @@ impl FromStr for Ticker {
             "TSLA" => Ok(Ticker::TSLA),
             "AAPL" => Ok(Ticker::AAPL),
             "BRK" => Ok(Ticker::BRK),
+            "TSM" => Ok(Ticker::TSM),
             _ => Err(TickerError::TickerNotFound),
         }
     }
@@ -72,6 +110,7 @@ impl std::fmt::Display for Ticker {
             Ticker::TSLA => write!(f, "TSLA"),
             Ticker::AAPL => write!(f, "AAPL"),
             Ticker::BRK => write!(f, "BRK"),
+            Ticker::TSM => write!(f, "TSM"),
         }
     }
 }
@@ -140,6 +179,7 @@ macro_rules! impl_reported {
                             date: self.date,
                             p: self.period(),
                             item: Item::$variant,
+                            currency: Currency::USD,
                             val: impl_reported!(@val self, $kind $source),
                         },
                     )*
@@ -415,9 +455,9 @@ impl_reported! {
 pub fn derive_quarters(items: &mut Vec<Reported>) {
     use std::collections::HashMap;
 
-    let mut latest: HashMap<(Ticker, Item, Period, NaiveDate), f64> = HashMap::new();
+    let mut latest: HashMap<(Ticker, Item, Currency, Period, NaiveDate), f64> = HashMap::new();
     for it in items.iter() {
-        latest.insert((it.ticker, it.item, it.p, it.date), it.val);
+        latest.insert((it.ticker, it.item, it.currency, it.p, it.date), it.val);
     }
 
     let previous = |p: Period| match p {
@@ -427,23 +467,23 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
         _ => None,
     };
 
-    let mut derived: HashMap<(Ticker, Item, NaiveDate), f64> = HashMap::new();
-    for (&(ticker, item, p, date), &total) in &latest {
+    let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), f64> = HashMap::new();
+    for (&(ticker, item, currency, p, date), &total) in &latest {
         let Some(prev_p) = previous(p) else { continue };
-        if latest.contains_key(&(ticker, item, Period::ThreeMonths, date)) {
+        if latest.contains_key(&(ticker, item, currency, Period::ThreeMonths, date)) {
             continue;
         }
-        let prev = latest.iter().find(|((t, i, pp, d), _)| {
-            *t == ticker && *i == item && *pp == prev_p && (80..=100).contains(&(date - *d).num_days())
+        let prev = latest.iter().find(|((t, i, c, pp, d), _)| {
+            *t == ticker && *i == item && *c == currency && *pp == prev_p && (80..=100).contains(&(date - *d).num_days())
         });
         if let Some((_, prev_total)) = prev {
-            derived.insert((ticker, item, date), total - prev_total);
+            derived.insert((ticker, item, currency, date), total - prev_total);
         }
     }
 
     let mut derived: Vec<_> = derived.into_iter().collect();
-    derived.sort_by_key(|((t, i, d), _)| (t.to_string(), *i, *d));
-    items.extend(derived.into_iter().map(|((ticker, item, date), val)| Reported {
-        ticker, date, p: Period::ThreeMonths, item, val,
+    derived.sort_by_key(|((t, i, c, d), _)| (t.to_string(), *i, *c, *d));
+    items.extend(derived.into_iter().map(|((ticker, item, currency, date), val)| Reported {
+        ticker, date, p: Period::ThreeMonths, item, currency, val,
     }));
 }

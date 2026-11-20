@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
-    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL, equities::Ticker::BRK] {
+    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL, equities::Ticker::BRK, equities::Ticker::TSM] {
         // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
         // statements, so read them first. EDGAR is the source of truth where
         // both cover a period: its values are read later and win downstream.
@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Every item read, one per line, sorted: for diffing the output of two versions.
     if std::env::args().any(|a| a == "--dump") {
         let mut lines: Vec<String> = reported_items.iter()
-            .map(|it| format!("{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.val))
+            .map(|it| format!("{}\t{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.currency, it.val))
             .collect();
         lines.sort();
         lines.dedup();
@@ -73,7 +73,8 @@ fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<e
 /// filing's restatement of an earlier period overwrites the original.
 fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
     let cik = edgar.cik(equity.sec_symbol())?;
-    let filings = edgar.filings(cik, &["10-Q", "10-K"])?;
+    // Foreign filers (TSMC) file annual 20-Fs instead of 10-Ks, and no 10-Qs.
+    let filings = edgar.filings(cik, &["10-Q", "10-K", "20-F"])?;
     let mut skipped = 0;
     for f in &filings {
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
@@ -135,16 +136,21 @@ fn print_series(items: &[equities::item::Reported], cash_flow: bool) {
     let mut table: BTreeMap<(String, chrono::NaiveDate), [Vec<f64>; 5]> = BTreeMap::new();
     for it in items {
         if let Some(i) = cols.iter().position(|(item, p, _)| *item == it.item && *p == it.p) {
-            let row = table.entry((it.ticker.to_string(), it.date)).or_default();
+            // Values in other currencies get their own rows, e.g. "TSM:TWD".
+            let name = match it.currency {
+                equities::Currency::USD => it.ticker.to_string(),
+                c => format!("{}:{}", it.ticker, c),
+            };
+            let row = table.entry((name, it.date)).or_default();
             if !row[i].contains(&it.val) { row[i].push(it.val); }
         }
     }
 
-    print!("{:<6}{:<12}", "ticker", "date");
+    print!("{:<9}{:<12}", "ticker", "date");
     for (_, _, name) in &cols { print!("{:>12}", name); }
     println!();
     for ((ticker, date), row) in &table {
-        print!("{:<6}{:<12}", ticker, date.to_string());
+        print!("{:<9}{:<12}", ticker, date.to_string());
         for vals in row {
             let cell = match vals.as_slice() {
                 [] => "-".to_string(),
@@ -167,11 +173,12 @@ fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Erro
         for item in chunk {
             let ts = item.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
-                "reported_item_v12,ticker={},item={},period={} value={} {}\n",
+                "reported_item_v13,ticker={},item={},period={},currency={} value={} {}\n",
                 // lowercase: the Grafana dashboards query ticker = 'tsla' / 'nvda'
                 item.ticker.to_string().to_lowercase(),
                 item.item,
                 item.p,
+                item.currency,
                 item.val,
                 ts
             ));

@@ -63,6 +63,7 @@ impl R for Reader {
                         date: NaiveDate::from_ymd_opt(2026, 3, 28).unwrap(),
                         p: Period::PointInTime,
                         item: *key,
+                        currency: crate::Currency::USD,
                         val: values.current_year,
                     });
 
@@ -71,6 +72,7 @@ impl R for Reader {
                         date: NaiveDate::from_ymd_opt(2025, 9, 27).unwrap(),
                         p: Period::PointInTime,
                         item: *key,
+                        currency: crate::Currency::USD,
                         val: values.prior_year,
                     });
 
@@ -277,6 +279,7 @@ fn parse_val(ticker: Ticker, date: NaiveDate, period: Period, item: Item, val: &
         date: date,
         p: period,
         item: item,
+        currency: crate::Currency::USD,
         val: ret,
     })
 }
