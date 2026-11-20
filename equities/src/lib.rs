@@ -87,10 +87,11 @@ impl FromStr for Period {
         let trimmed = s.trim();
 
         let lower = trimmed.to_lowercase();
-        if lower.contains("three months") { Ok(Period::ThreeMonths) }
-        else if lower.contains("six months") { Ok(Period::SixMonths) }
-        else if lower.contains("nine months") { Ok(Period::NineMonths) }
-        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
+        // EDGAR's Financial_Report.xlsx writes "3 Months Ended", company reports write "Three Months Ended".
+        if lower.contains("three months") || lower.contains("3 months") { Ok(Period::ThreeMonths) }
+        else if lower.contains("six months") || lower.contains("6 months") { Ok(Period::SixMonths) }
+        else if lower.contains("nine months") || lower.contains("9 months") { Ok(Period::NineMonths) }
+        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") || lower.contains("12 months") { Ok(Period::TwelveMonths) }
         else { Err(PeriodError::InvalidPeriod) }
     }
 }
