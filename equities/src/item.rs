@@ -77,8 +77,8 @@ items! {
         OtherCurrentAssets => ["Other current assets"] @ ["OtherAssetsCurrent"],
         TotalCurrentAssets => ["Total current assets", "Total Current Assets"] @ ["AssetsCurrent"],
 
-        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent"],
-        SolarEnergySystemsNet => ["Solar energy systems, net"],
+        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent"],
+        SolarEnergySystemsNet => ["Solar energy systems, net", "Solar Energy Systems [Member]"],
 
         PropertyAndEquipmentNet => ["Property and equipment, net", "Property, plant and equipment, net", "Property and Equipment, Net"] @ ["PropertyPlantAndEquipmentNet", "PropertyPlantAndEquipmentAndFinanceLeaseRightOfUseAssetAfterAccumulatedDepreciationAndAmortization"],
         OperatingLeaseAssets => ["Operating lease assets", "Operating lease right-of-use assets", "Operating Lease Assets"] @ ["OperatingLeaseRightOfUseAsset"],
@@ -175,6 +175,21 @@ items! {
 }
 
 impl Item {
+    /// The item an XBRL element reports and the element's rank among that
+    /// item's elements: 0 for the first listed. Elements are listed most
+    /// inclusive first, so when a statement reports an item twice the total
+    /// wins over a component (Berkshire tags "Sales and service revenues" with
+    /// the element other companies use for total revenue, and its total with
+    /// `Revenues`).
+    pub fn from_xbrl_tag_ranked(tag: &str) -> Option<(Item, usize)> {
+        let item = Item::from_xbrl_tag(tag)?;
+        let name = tag.strip_prefix("us-gaap_").unwrap_or(tag);
+        let rank = Item::XBRL_TAGS.iter()
+            .filter(|(_, i)| *i == item)
+            .position(|(t, _)| *t == name)?;
+        Some((item, rank))
+    }
+
     /// Items reported on the cash flow statement. Some share labels or
     /// elements with balance sheet and income statement items ("Inventories",
     /// "Net income"), so each statement only reports its own.

@@ -104,13 +104,15 @@ impl Reader {
     pub(crate) fn reported_items(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
         let labels = sheet_info.labels;
         Self::reported_items_with(ticker, rows, sheet_info, |_, row| {
-            row.get(labels).and_then(|c| c.get_string()).and_then(|label| label.parse::<Item>().ok())
+            row.get(labels).and_then(|c| c.get_string()).and_then(|label| label.parse::<Item>().ok()).map(|i| (i, 0))
         })
     }
 
     /// Like `reported_items`, but `item_of(row_index, row)` decides which item a
-    /// row reports (e.g. by its XBRL tag rather than its label).
-    pub(crate) fn reported_items_with(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo, item_of: impl Fn(usize, &[Data]) -> Option<Item>) -> Result<Vec<Reported>, Box<dyn Error>> {
+    /// row reports (e.g. by its XBRL tag rather than its label), with a rank:
+    /// when two rows report the same item, the lower rank wins, and among
+    /// equal ranks the first row.
+    pub(crate) fn reported_items_with(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo, item_of: impl Fn(usize, &[Data]) -> Option<(Item, usize)>) -> Result<Vec<Reported>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
 
@@ -121,11 +123,11 @@ impl Reader {
         // first value seen for each (item, date, period) so the face statement wins.
         // A zero filled in from an empty cell (below) is only provisional: a later
         // row with a real number for the same key replaces it.
-        let mut seen: std::collections::HashMap<_, (usize, bool)> = std::collections::HashMap::new();
+        let mut seen: std::collections::HashMap<_, (usize, bool, usize)> = std::collections::HashMap::new();
 
         for (r, row) in rows.iter().enumerate() {
             {
-                if let Some(mut item) = item_of(r, row) {
+                if let Some((mut item, rank)) = item_of(r, row) {
                     // A line item with a number in some period but an empty cell in another
                     // is zero there (EDGAR leaves the cell empty where the filing shows "—").
                     // Rows with no numbers at all are section headers and are skipped.
@@ -169,7 +171,7 @@ impl Reader {
                         let val = val * sheet_info.multiplier;
                         match seen.get_mut(&(item, *date, *period)) {
                             None => {
-                                seen.insert((item, *date, *period), (reported_items.len(), filled));
+                                seen.insert((item, *date, *period), (reported_items.len(), filled, rank));
                                 reported_items.push(Reported {
                                     ticker,
                                     date: *date,
@@ -178,9 +180,10 @@ impl Reader {
                                     val,
                                 });
                             },
-                            Some((idx, was_filled)) if *was_filled && !filled => {
+                            Some((idx, was_filled, was_rank)) if !filled && (*was_filled || rank < *was_rank) => {
                                 reported_items[*idx].val = val;
                                 *was_filled = false;
+                                *was_rank = rank;
                             },
                             Some(_) => (),
                         }

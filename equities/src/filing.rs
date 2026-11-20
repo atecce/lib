@@ -188,9 +188,15 @@ fn cell_value(cell: &ElementRef, header: bool) -> Data {
         if let Some(n) = parse_amount(&text) {
             return Data::Float(n);
         }
+    } else if let Some(date) = HEADER_DATE.find(&text) {
+        // Filers reporting in several currencies add the unit under each date:
+        // "Jun. 30, 2021 USD ($)".
+        return Data::String(date.as_str().to_string());
     }
     Data::String(text)
 }
+
+static HEADER_DATE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^[A-Z][a-z]{2}\.? \d{1,2}, \d{4}").unwrap());
 
 /// Text a browser would show. Some renderer versions put each value's XBRL tag
 /// in a hidden span next to it (`<span style="display:none">us-gaap_...</span>`).
@@ -232,15 +238,15 @@ impl Reader {
         let report = report.ok_or_else(|| format!("{} not found in {:?}", what, self.dir))?;
         let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
         let cash_flow = sheet_type == SheetType::CashFlowStatement;
-        let (rows, items): (Vec<&[Data]>, Vec<Option<Item>>) = table.rows.iter()
+        let (rows, mut items): (Vec<&[Data]>, Vec<Option<(Item, usize)>>) = table.rows.iter()
             .zip(&table.tags)
             .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
             .map(|(row, tag)| {
-                let label = row.first().and_then(|c| match c { Data::String(s) => Some(s.as_str()), _ => None });
-                let item = row_item(tag.as_deref(), label).filter(|i| i.is_cash_flow() == cash_flow);
+                let item = row_item(tag.as_deref(), label(row)).filter(|(i, _)| i.is_cash_flow() == cash_flow);
                 (row.as_slice(), item)
             })
             .unzip();
+        drop_segment_rows(&rows, &mut items);
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
         crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])
     }
@@ -252,17 +258,70 @@ impl Reader {
     }
 }
 
+fn label<'a>(row: &'a [Data]) -> Option<&'a str> {
+    row.first().and_then(|c| match c { Data::String(s) => Some(s.as_str()), _ => None })
+}
+
+/// After the statement itself, EDGAR's pages repeat lines per segment, under
+/// headers like "Insurance and Other [Member]": the same element, qualified
+/// by a member of some axis.
+///
+/// Where the member itself names an item (TSLA's "Operating Lease Vehicles
+/// [Member]" and "Solar Energy Systems [Member]", whose rows are both labeled
+/// "Operating lease net"), the section's rows report that item. Otherwise a
+/// segment row is only kept for an item the statement does not report itself
+/// and that appears in just one segment. Where an item is split across
+/// segments (Berkshire's cash, by business group) no single row is the
+/// company's total, so none is used.
+fn drop_segment_rows(rows: &[&[Data]], items: &mut [Option<(Item, usize)>]) {
+    use std::collections::{HashMap, HashSet};
+    let mut segment: Vec<Option<usize>> = Vec::with_capacity(rows.len());
+    let mut member_items: HashMap<usize, Item> = HashMap::new();
+    let mut current = None;
+    for (r, row) in rows.iter().enumerate() {
+        if let Some(l) = label(row).filter(|l| l.ends_with("[Member]")) {
+            current = Some(r);
+            if let Ok(item) = l.parse::<Item>() {
+                member_items.insert(r, item);
+            }
+        }
+        segment.push(current);
+    }
+    for (i, s) in items.iter_mut().zip(&segment) {
+        if let (Some(_), Some(item)) = (*i, s.and_then(|s| member_items.get(&s))) {
+            *i = Some((*item, 0));
+        }
+    }
+    let face: HashSet<Item> = items.iter().zip(&segment)
+        .filter(|(_, s)| s.is_none())
+        .filter_map(|(i, _)| i.map(|(item, _)| item))
+        .collect();
+    let mut sections: HashMap<Item, HashSet<usize>> = HashMap::new();
+    for (i, s) in items.iter().zip(&segment) {
+        if let (Some((item, _)), Some(s)) = (i, s) {
+            sections.entry(*item).or_default().insert(*s);
+        }
+    }
+    for (i, s) in items.iter_mut().zip(&segment) {
+        if let (Some((item, _)), Some(_)) = (*i, s) {
+            if face.contains(&item) || sections[&item].len() > 1 {
+                *i = None;
+            }
+        }
+    }
+}
+
 /// The item a statement row reports. Its XBRL element decides when it is a
 /// mapped one: labels vary between companies and years, elements do not, and
 /// labels are ambiguous (AAPL's current and non-current marketable securities
 /// are both "Marketable securities"). An unmapped us-gaap element reports
 /// nothing we track. Company extension elements and dimension rows (segment
 /// axes and members) fall back to the label.
-fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<Item> {
-    let by_label = || label.and_then(|l| l.parse::<Item>().ok());
+fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
+    let by_label = || label.and_then(|l| l.parse::<Item>().ok()).map(|i| (i, 0));
     match tag {
         None => by_label(),
-        Some(tag) => match Item::from_xbrl_tag(tag) {
+        Some(tag) => match Item::from_xbrl_tag_ranked(tag) {
             Some(item) => Some(item),
             None if !tag.starts_with("us-gaap_") || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
             None => None,
