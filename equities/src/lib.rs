@@ -384,3 +384,35 @@ impl_reported! {
         NetIncome => method net_income,
     ]
 }
+
+/// Annual reports only give twelve-month figures, so the fourth quarter has no
+/// three-month value. Derive it as the twelve-month value minus the nine-month
+/// value ending about a quarter earlier, wherever no three-month value exists.
+/// When a value was reported more than once (restatements), the last one wins,
+/// matching how later writes overwrite earlier ones downstream.
+pub fn derive_fourth_quarters(items: &mut Vec<Reported>) {
+    use std::collections::HashMap;
+
+    let mut latest: HashMap<(String, Item, Period, NaiveDate), f64> = HashMap::new();
+    for it in items.iter() {
+        latest.insert((it.ticker.to_string(), it.item, it.p, it.date), it.val);
+    }
+
+    let mut derived = Vec::new();
+    for it in items.iter().filter(|it| it.p == Period::TwelveMonths) {
+        let key = |p, d| (it.ticker.to_string(), it.item, p, d);
+        if latest.contains_key(&key(Period::ThreeMonths, it.date)) {
+            continue;
+        }
+        let annual = latest[&key(Period::TwelveMonths, it.date)];
+        let nine_months = latest.iter().find(|((t, item, p, d), _)| {
+            *t == it.ticker.to_string() && *item == it.item && *p == Period::NineMonths
+                && (80..=100).contains(&(it.date - *d).num_days())
+        });
+        if let Some((_, nine)) = nine_months {
+            derived.push(Reported { ticker: it.ticker, date: it.date, p: Period::ThreeMonths, item: it.item, val: annual - nine });
+            latest.insert(key(Period::ThreeMonths, it.date), annual - nine);
+        }
+    }
+    items.extend(derived);
+}
