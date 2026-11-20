@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
-    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL] {
+    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL, equities::Ticker::BRK] {
         // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
         // statements, so read them first. EDGAR is the source of truth where
         // both cover a period: its values are read later and win downstream.
@@ -72,7 +72,7 @@ fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<e
 /// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later
 /// filing's restatement of an earlier period overwrites the original.
 fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let cik = edgar.cik(&equity.to_string())?;
+    let cik = edgar.cik(equity.sec_symbol())?;
     let filings = edgar.filings(cik, &["10-Q", "10-K"])?;
     let mut skipped = 0;
     for f in &filings {

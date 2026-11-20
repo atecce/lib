@@ -31,6 +31,20 @@ pub enum Ticker {
     NVDA,
     TSLA,
     AAPL,
+    BRK,
+}
+
+impl Ticker {
+    /// The symbol in the SEC's ticker map. Berkshire Hathaway trades as two
+    /// share classes, listed separately; both map to the same company.
+    pub fn sec_symbol(&self) -> &'static str {
+        match self {
+            Ticker::NVDA => "NVDA",
+            Ticker::TSLA => "TSLA",
+            Ticker::AAPL => "AAPL",
+            Ticker::BRK => "BRK-B",
+        }
+    }
 }
 
 impl FromStr for Ticker {
@@ -41,6 +55,7 @@ impl FromStr for Ticker {
             "NVDA" => Ok(Ticker::NVDA),
             "TSLA" => Ok(Ticker::TSLA),
             "AAPL" => Ok(Ticker::AAPL),
+            "BRK" => Ok(Ticker::BRK),
             _ => Err(TickerError::TickerNotFound),
         }
     }
@@ -56,6 +71,7 @@ impl std::fmt::Display for Ticker {
             Ticker::NVDA => write!(f, "NVDA"),
             Ticker::TSLA => write!(f, "TSLA"),
             Ticker::AAPL => write!(f, "AAPL"),
+            Ticker::BRK => write!(f, "BRK"),
         }
     }
 }
