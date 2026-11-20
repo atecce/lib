@@ -165,6 +165,14 @@ impl Item {
     /// (cash flow statements). `tag` is as EDGAR's pages write it,
     /// e.g. "us-gaap_NetCashProvidedByUsedInOperatingActivities".
     pub fn from_xbrl_tag(tag: &str) -> Option<Item> {
+        // Company extension elements, for lines a filer tagged with its own
+        // element instead of a us-gaap one in some years.
+        match tag {
+            "nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets" => {
+                return Some(Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets)
+            }
+            _ => (),
+        }
         let name = tag.strip_prefix("us-gaap_")?;
         Some(match name {
             "NetCashProvidedByUsedInOperatingActivities"
