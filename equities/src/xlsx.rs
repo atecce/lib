@@ -23,6 +23,13 @@ pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>>
     })
 }
 
+/// Non-empty rows of a statement sheet.
+fn statement_rows(range: &calamine::Range<Data>) -> Vec<&[Data]> {
+    range.rows()
+        .filter(|row| !row.iter().all(|c| c.is_empty()))
+        .collect()
+}
+
 impl R for Reader {
     fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance Sheets", "Condensed Consolidated Balance S"])
@@ -30,7 +37,7 @@ impl R for Reader {
 
         let range = self.workbook.worksheet_range(&sheet_name)?;
 
-        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+        let rows = statement_rows(&range);
 
         self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
     }
@@ -41,7 +48,7 @@ impl R for Reader {
 
         let range = self.workbook.worksheet_range(&sheet_name)?;
 
-        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+        let rows = statement_rows(&range);
 
         self.reported_items(&rows, new_sheet_info(&rows, IncomeStatement)?)
     }
@@ -50,7 +57,7 @@ impl R for Reader {
 impl Reader {
     pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
         let range = self.workbook.worksheet_range("CASH_FLOW")?;
-        let rows: Vec<&[Data]> = range.rows().filter(|row| !row.iter().all(|c| c.is_empty())).collect();
+        let rows = statement_rows(&range);
 
         self.reported_items(&rows, new_sheet_info(&rows, CashFlowStatement)?)
     }
@@ -95,14 +102,28 @@ impl Reader {
 
         let mut reported_items = Vec::new();
 
+        // EDGAR's Financial_Report.xlsx appends per-segment breakdowns (rows under
+        // headers like "Automotive Sales [Member]") after the statement proper. Some
+        // line items only appear there (TSLA's "Operating lease vehicles, net"), while
+        // others repeat labels from the face of the statement ("Revenues"). Keep the
+        // first value seen for each (item, date, period) so the face statement wins.
+        let mut seen = std::collections::HashSet::new();
+
         for row in rows {
             if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
                 if let Ok(mut item) = label.parse::<Item>() {
+                    // A line item with a number in some period but an empty cell in another
+                    // is zero there (EDGAR leaves the cell empty where the filing shows "—").
+                    // Rows with no numbers at all are section headers and are skipped.
+                    let has_value = sheet_info.dates_and_periods.keys()
+                        .any(|&col| matches!(row.get(col), Some(Data::Float(_)) | Some(Data::Int(_))));
+
                     for (&col, (date, period)) in &sheet_info.dates_and_periods {
 
                         let val = match row.get(col) {
                             Some(Data::Float(f)) => *f,
                             Some(Data::Int(i)) => *i as f64,
+                            Some(Data::Empty) | None if has_value => 0.0,
                             _ => f64::NAN,
                         };
 
@@ -127,7 +148,7 @@ impl Reader {
                             _ => (),
                         }
 
-                        if !val.is_nan() {
+                        if !val.is_nan() && seen.insert((item, *date, *period)) {
                             reported_items.push(Reported {
                                 ticker: self.ticker,
                                 date: *date,
