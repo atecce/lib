@@ -70,7 +70,7 @@ items! {
     pub enum Item {
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"] @ ["CashAndCashEquivalentsAtCarryingValue", "ifrs-full_CashAndCashEquivalents"],
         // TODO(atec): Short-term investments
-        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities", "Short-term marketable securities"] @ ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesCurrent", "DebtSecuritiesCurrent", "ShortTermInvestments", "MarketableSecurities"],
+        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities", "Short-term marketable securities"] @ ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesCurrent", "DebtSecuritiesCurrent", "ShortTermInvestments", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "DebtSecuritiesAvailableForSaleExcludingAccruedInterestCurrent", "MarketableSecurities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"] @ ["AccountsReceivableNetCurrent"],
         VendorNonTradeReceivables => ["Vendor non-trade receivables"] @ ["NontradeReceivablesCurrent"],
         Inventories => ["Inventories", "Inventory"] @ ["InventoryNet", "ifrs-full_Inventories"],

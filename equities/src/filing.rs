@@ -77,14 +77,16 @@ pub fn parse_filing_summary(xml: &str) -> Vec<Report> {
 /// Pick the first page whose name matches, skipping parenthetical pages (share
 /// counts and par values). Statements are listed before the notes, so a note
 /// like "Balance Sheet Components" never wins over the statement itself.
-/// When the summary categorizes its pages, only "Statements" are considered:
-/// notes and details can have statement-like names ("Income Tax - ... in
-/// Consolidated Statements of Financial Position (Details)").
+/// Pages the summary puts in a notes category are skipped: they can have
+/// statement-like names ("Income Tax - ... in Consolidated Statements of
+/// Financial Position (Details)"). Other categories are not trusted to mark
+/// statements: 10-Ks filed in early 2022 list the balance sheet as
+/// "Uncategorized".
 fn find_report<'a>(reports: &'a [Report], matches: impl Fn(&str) -> bool) -> Option<&'a Report> {
-    let categorized = reports.iter().any(|r| r.category.as_deref() == Some("Statements"));
+    const NOT_STATEMENTS: [&str; 4] = ["Notes", "Details", "Policies", "Tables"];
     reports.iter().find(|r| {
         let name = r.short_name.to_lowercase();
-        (!categorized || r.category.as_deref() == Some("Statements"))
+        !r.category.as_deref().is_some_and(|c| NOT_STATEMENTS.contains(&c))
             && !name.contains("parenthetical") && matches(&name)
     })
 }
