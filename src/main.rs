@@ -103,7 +103,8 @@ fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Erro
             let ts = item.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
                 "reported_item_v12,ticker={},item={},period={} value={} {}\n",
-                item.ticker,
+                // lowercase: the Grafana dashboards query ticker = 'tsla' / 'nvda'
+                item.ticker.to_string().to_lowercase(),
                 item.item,
                 item.p,
                 item.val,
