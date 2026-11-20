@@ -3,35 +3,26 @@ use std::fs;
 
 use equities::Reader;
 
+/// Identifies this client to the SEC, as EDGAR's fair access policy requires.
+const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
+
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
+    // Skip EDGAR and use only the local xlsx files (offline, or to compare sources).
+    let no_edgar = std::env::args().any(|a| a == "--no-edgar");
     let mut reported_items = Vec::new();
 
-    let equities = vec![equities::Ticker::NVDA, equities::Ticker::TSLA];
+    let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
-    for equity in equities {
-        let dir = format!("equities/{}", equity);
-        let mut paths: Vec<_> = fs::read_dir(&dir)?
-            .filter_map(|f| f.ok())
-            .map(|f| f.path())
-            .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("xlsx"))
-            .collect();
-        paths.sort();
-
-        for path in paths {
-            match equities::xlsx::new_reader(&path, equity) {
-                Ok(mut r) => {
-                    match r.process_balance_sheet() {
-                        Ok(mut ret) => reported_items.append(&mut ret),
-                        Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
-                    }
-                    match r.process_income_statement() {
-                        Ok(mut ret) => reported_items.append(&mut ret),
-                        Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
-                    }
-                },
-                Err(e) => eprintln!("failed to construct new reader from path: {:?}; {}", path, e),
-            }
+    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA] {
+        // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
+        // statements, so read them first. EDGAR is the source of truth where
+        // both cover a period: its values are read later and win downstream.
+        if equity == equities::Ticker::NVDA || no_edgar {
+            read_xlsx_dir(equity, &format!("equities/{}", equity), &mut reported_items)?;
+        }
+        if !no_edgar {
+            read_edgar(&edgar, equity, &mut reported_items)?;
         }
     }
 
@@ -48,6 +39,57 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let mut paths: Vec<_> = fs::read_dir(dir)?
+        .filter_map(|f| f.ok())
+        .map(|f| f.path())
+        .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("xlsx"))
+        .collect();
+    paths.sort();
+
+    for path in paths {
+        match equities::xlsx::new_reader(&path, equity) {
+            Ok(mut r) => read_statements(&mut r, &format!("{:?}", path), reported_items),
+            Err(e) => eprintln!("failed to construct new reader from path: {:?}; {}", path, e),
+        }
+    }
+    Ok(())
+}
+
+/// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later
+/// filing's restatement of an earlier period overwrites the original.
+fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let cik = edgar.cik(&equity.to_string())?;
+    let filings = edgar.filings(cik, &["10-Q", "10-K"])?;
+    let mut skipped = 0;
+    for f in &filings {
+        let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
+        match edgar.fetch_filing(f) {
+            Ok(dir) => match equities::filing::new_reader(&dir, equity) {
+                Ok(mut r) => read_statements(&mut r, &name, reported_items),
+                Err(e) => eprintln!("failed to read {}: {}", name, e),
+            },
+            Err(e) => match e.downcast_ref::<equities::edgar::EdgarError>() {
+                Some(equities::edgar::EdgarError::NoFilingSummary) => skipped += 1,
+                _ => eprintln!("failed to fetch {}: {}", name, e),
+            },
+        }
+    }
+    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements", equity, filings.len() - skipped, skipped);
+    Ok(())
+}
+
+fn read_statements(r: &mut impl Reader, name: &str, reported_items: &mut Vec<equities::item::Reported>) {
+    match r.process_balance_sheet() {
+        Ok(mut ret) => reported_items.append(&mut ret),
+        Err(e) => eprintln!("failed to process balance sheet for {}; {}", name, e),
+    }
+    match r.process_income_statement() {
+        Ok(mut ret) => reported_items.append(&mut ret),
+        Err(e) => eprintln!("failed to process income statement for {}; {}", name, e),
+    }
 }
 
 /// Print the series charted in Grafana, one row per (ticker, date), to check
