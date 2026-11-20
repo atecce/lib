@@ -25,13 +25,17 @@ pub struct SheetInfo {
 /// The dollar scale stated in a header cell. EDGAR headers name the share and
 /// dollar scales separately ("shares in Thousands, $ in Millions"), so the
 /// dollar one takes priority; plain "USD ($)" with no scale means dollars.
+/// A scale that only applies to shares ("Share data in Thousands") is ignored.
 fn scale(s: &str) -> Option<f64> {
-    let s = s.to_lowercase();
+    let mut s = s.to_lowercase();
+    for share_scale in ["shares in thousands", "shares in millions", "share data in thousands", "share data in millions"] {
+        s = s.replace(share_scale, "");
+    }
     if s.contains("$ in millions") { Some(1_000_000.0) }
     else if s.contains("$ in thousands") { Some(1_000.0) }
     else if s.contains("in millions") { Some(1_000_000.0) }
     else if s.contains("in thousands") { Some(1_000.0) }
-    else if s.contains("usd ($)") { Some(1.0) }
+    else if s.contains("usd ($)") || s.contains("(usd $)") { Some(1.0) }
     else { None }
 }
 
