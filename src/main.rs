@@ -6,23 +6,50 @@ use equities::Reader;
 /// Identifies this client to the SEC, as EDGAR's fair access policy requires.
 const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
 
+/// Read when no tickers are given on the command line.
+const DEFAULT_TICKERS: [equities::Ticker; 7] = [
+    equities::Ticker::NVDA,
+    equities::Ticker::TSLA,
+    equities::Ticker::AAPL,
+    equities::Ticker::BRK,
+    equities::Ticker::TSM,
+    equities::Ticker::KO,
+    equities::Ticker::MCD,
+];
+
+/// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]
+
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
     // Skip EDGAR and use only the local xlsx files (offline, or to compare sources).
     let no_edgar = std::env::args().any(|a| a == "--no-edgar");
     let mut reported_items = Vec::new();
 
+    let mut tickers = Vec::new();
+    for arg in std::env::args().skip(1).filter(|a| !a.starts_with("--")) {
+        match arg.parse::<equities::Ticker>() {
+            Ok(t) => tickers.push(t),
+            Err(_) => return Err(format!("not a ticker symbol: {}", arg).into()),
+        }
+    }
+    if tickers.is_empty() {
+        tickers = DEFAULT_TICKERS.to_vec();
+    }
+
     let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
-    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL, equities::Ticker::BRK, equities::Ticker::TSM, equities::Ticker::KO, equities::Ticker::MCD] {
+    for equity in tickers {
         // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
         // statements, so read them first. EDGAR is the source of truth where
         // both cover a period: its values are read later and win downstream.
-        if equity == equities::Ticker::NVDA || no_edgar {
-            read_xlsx_dir(equity, &format!("equities/{}", equity), &mut reported_items)?;
+        let dir = format!("equities/{}", equity);
+        if (equity == equities::Ticker::NVDA || no_edgar) && std::path::Path::new(&dir).is_dir() {
+            read_xlsx_dir(equity, &dir, &mut reported_items)?;
         }
         if !no_edgar {
-            read_edgar(&edgar, equity, &mut reported_items)?;
+            if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
+                eprintln!("{}: {}", equity, e);
+            }
         }
     }
 
@@ -73,6 +100,7 @@ fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<e
 /// filing's restatement of an earlier period overwrites the original.
 fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
     let cik = edgar.cik(equity.sec_symbol())?;
+    eprintln!("{}: CIK {}", equity, cik);
     // Foreign filers (TSMC) file annual 20-Fs instead of 10-Ks, and no 10-Qs.
     let filings = edgar.filings(cik, &["10-Q", "10-K", "20-F"])?;
     let mut skipped = 0;

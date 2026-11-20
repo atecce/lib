@@ -61,29 +61,67 @@ impl std::fmt::Display for Currency {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
-pub enum Ticker {
-    NVDA,
-    TSLA,
-    AAPL,
-    BRK,
-    TSM,
-    KO,
-    MCD,
+/// A stock ticker symbol, e.g. "NVDA". Any symbol is accepted; which company
+/// it is comes from the SEC's ticker map (see `edgar::Client::cik`).
+///
+/// Stored inline so it stays `Copy`. The tickers this crate has code for
+/// specifically are associated constants, usable as `Ticker::NVDA`.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct Ticker {
+    len: u8,
+    bytes: [u8; Ticker::MAX_LEN],
 }
 
 impl Ticker {
+    const MAX_LEN: usize = 10;
+
+    pub const NVDA: Ticker = Ticker::new("NVDA");
+    pub const TSLA: Ticker = Ticker::new("TSLA");
+    pub const AAPL: Ticker = Ticker::new("AAPL");
+    pub const BRK: Ticker = Ticker::new("BRK");
+    pub const TSM: Ticker = Ticker::new("TSM");
+    pub const KO: Ticker = Ticker::new("KO");
+    pub const MCD: Ticker = Ticker::new("MCD");
+
+    /// For constants. Panics (at compile time, in a const) on anything that
+    /// `from_str` would reject.
+    pub const fn new(symbol: &str) -> Ticker {
+        match Ticker::parse(symbol) {
+            Some(t) => t,
+            None => panic!("invalid ticker symbol"),
+        }
+    }
+
+    /// Up to 10 letters, digits, '.' or '-', stored upper case.
+    const fn parse(symbol: &str) -> Option<Ticker> {
+        let s = symbol.as_bytes();
+        if s.is_empty() || s.len() > Ticker::MAX_LEN {
+            return None;
+        }
+        let mut bytes = [0u8; Ticker::MAX_LEN];
+        let mut i = 0;
+        while i < s.len() {
+            let b = s[i].to_ascii_uppercase();
+            if !(b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'.' || b == b'-') {
+                return None;
+            }
+            bytes[i] = b;
+            i += 1;
+        }
+        Some(Ticker { len: s.len() as u8, bytes })
+    }
+
+    pub fn as_str(&self) -> &str {
+        // Only ASCII is ever stored.
+        std::str::from_utf8(&self.bytes[..self.len as usize]).unwrap()
+    }
+
     /// The symbol in the SEC's ticker map. Berkshire Hathaway trades as two
     /// share classes, listed separately; both map to the same company.
-    pub fn sec_symbol(&self) -> &'static str {
-        match self {
-            Ticker::NVDA => "NVDA",
-            Ticker::TSLA => "TSLA",
-            Ticker::AAPL => "AAPL",
+    pub fn sec_symbol(&self) -> &str {
+        match *self {
             Ticker::BRK => "BRK-B",
-            Ticker::TSM => "TSM",
-            Ticker::KO => "KO",
-            Ticker::MCD => "MCD",
+            _ => self.as_str(),
         }
     }
 }
@@ -92,34 +130,30 @@ impl FromStr for Ticker {
     type Err = TickerError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "NVDA" => Ok(Ticker::NVDA),
-            "TSLA" => Ok(Ticker::TSLA),
-            "AAPL" => Ok(Ticker::AAPL),
-            "BRK" => Ok(Ticker::BRK),
-            "TSM" => Ok(Ticker::TSM),
-            "KO" => Ok(Ticker::KO),
-            "MCD" => Ok(Ticker::MCD),
-            _ => Err(TickerError::TickerNotFound),
-        }
+        Ticker::parse(s.trim()).ok_or(TickerError::InvalidSymbol)
     }
 }
 
+#[derive(Debug)]
 pub enum TickerError {
-    TickerNotFound,
+    InvalidSymbol,
 }
 
 impl std::fmt::Display for Ticker {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Ticker::NVDA => write!(f, "NVDA"),
-            Ticker::TSLA => write!(f, "TSLA"),
-            Ticker::AAPL => write!(f, "AAPL"),
-            Ticker::BRK => write!(f, "BRK"),
-            Ticker::TSM => write!(f, "TSM"),
-            Ticker::KO => write!(f, "KO"),
-            Ticker::MCD => write!(f, "MCD"),
-        }
+        f.write_str(self.as_str())
+    }
+}
+
+impl std::fmt::Debug for Ticker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for Ticker {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
     }
 }
 
@@ -494,4 +528,20 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
     items.extend(derived.into_iter().map(|((ticker, item, currency, date), val)| Reported {
         ticker, date, p: Period::ThreeMonths, item, currency, val,
     }));
+}
+
+#[cfg(test)]
+mod ticker_tests {
+    use super::Ticker;
+
+    #[test]
+    fn parse() {
+        assert_eq!("ko".parse::<Ticker>().unwrap(), Ticker::KO);
+        assert_eq!("BRK-B".parse::<Ticker>().unwrap().as_str(), "BRK-B");
+        assert_eq!(Ticker::BRK.sec_symbol(), "BRK-B");
+        assert_eq!(Ticker::NVDA.to_string(), "NVDA");
+        assert!("".parse::<Ticker>().is_err());
+        assert!("TOOLONGSYMBOL".parse::<Ticker>().is_err());
+        assert!("A B".parse::<Ticker>().is_err());
+    }
 }
