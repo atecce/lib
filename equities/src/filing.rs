@@ -150,8 +150,9 @@ pub fn table_rows(html: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
 /// A cell's text with whitespace collapsed. Header cells and labels stay
 /// strings; amounts like "$ 8,771" or "(1,234)" become numbers.
 fn cell_value(cell: &ElementRef, header: bool) -> Data {
-    let text = cell.text().collect::<Vec<_>>().join(" ");
-    let text = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    let mut parts = Vec::new();
+    visible_text(cell, &mut parts);
+    let text = parts.join(" ").split_whitespace().collect::<Vec<_>>().join(" ");
     if text.is_empty() {
         return Data::Empty;
     }
@@ -161,6 +162,22 @@ fn cell_value(cell: &ElementRef, header: bool) -> Data {
         }
     }
     Data::String(text)
+}
+
+/// Text a browser would show. Some renderer versions put each value's XBRL tag
+/// in a hidden span next to it (`<span style="display:none">us-gaap_...</span>`).
+fn visible_text<'a>(el: &ElementRef<'a>, out: &mut Vec<&'a str>) {
+    for child in el.children() {
+        if let Some(text) = child.value().as_text() {
+            out.push(text);
+        } else if let Some(child) = ElementRef::wrap(child) {
+            let hidden = child.value().attr("style")
+                .is_some_and(|s| s.replace(' ', "").contains("display:none"));
+            if !hidden {
+                visible_text(&child, out);
+            }
+        }
+    }
 }
 
 fn parse_amount(text: &str) -> Option<f64> {
@@ -229,5 +246,11 @@ mod tests {
         assert_eq!(rows[1], vec![Data::Empty, Data::Empty, Data::String("Sep. 30, 2020".into()), Data::String("Sep. 30, 2019".into())]);
         assert_eq!(rows[2], vec![Data::String("Total revenues".into()), Data::Empty, Data::Float(8771.0), Data::Float(-6303.0)]);
         assert_eq!(rows.len(), 4);
+    }
+
+    #[test]
+    fn hidden_xbrl_tags() {
+        let html = r#"<table class="report"><tr><td>Cash</td><td class="nump"><a>$ 19,478</a><span style="display:none;white-space:normal;">us-gaap_Cash</span><span></span></td></tr></table>"#;
+        assert_eq!(table_rows(html).unwrap()[0], vec![Data::String("Cash".into()), Data::Float(19478.0)]);
     }
 }
