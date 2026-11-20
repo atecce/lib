@@ -102,6 +102,15 @@ impl Reader {
     /// Turn statement rows (label column plus one column per date) into reported items.
     /// Shared with `filing::Reader`, whose HTML tables are converted to the same rows.
     pub(crate) fn reported_items(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
+        let labels = sheet_info.labels;
+        Self::reported_items_with(ticker, rows, sheet_info, |_, row| {
+            row.get(labels).and_then(|c| c.get_string()).and_then(|label| label.parse::<Item>().ok())
+        })
+    }
+
+    /// Like `reported_items`, but `item_of(row_index, row)` decides which item a
+    /// row reports (e.g. by its XBRL tag rather than its label).
+    pub(crate) fn reported_items_with(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo, item_of: impl Fn(usize, &[Data]) -> Option<Item>) -> Result<Vec<Reported>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
 
@@ -114,16 +123,19 @@ impl Reader {
         // row with a real number for the same key replaces it.
         let mut seen: std::collections::HashMap<_, (usize, bool)> = std::collections::HashMap::new();
 
-        for row in rows {
-            if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
-                if let Ok(mut item) = label.parse::<Item>() {
+        for (r, row) in rows.iter().enumerate() {
+            {
+                if let Some(mut item) = item_of(r, row) {
                     // A line item with a number in some period but an empty cell in another
                     // is zero there (EDGAR leaves the cell empty where the filing shows "—").
                     // Rows with no numbers at all are section headers and are skipped.
                     let has_value = sheet_info.dates_and_periods.keys()
                         .any(|&col| matches!(row.get(col), Some(Data::Float(_)) | Some(Data::Int(_))));
 
-                    for (&col, (date, period)) in &sheet_info.dates_and_periods {
+                    // Left to right, so which column wins a tie is the same every run.
+                    let mut columns: Vec<_> = sheet_info.dates_and_periods.iter().collect();
+                    columns.sort_by_key(|(col, _)| **col);
+                    for (&col, (date, period)) in columns {
 
                         let (val, filled) = match row.get(col) {
                             Some(Data::Float(f)) => (*f, false),

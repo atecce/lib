@@ -49,6 +49,11 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
     let mut periods = HashMap::new();
 
+    // Period headings ("Three Months Ended") with their row and column, and the
+    // first row holding a date, to tell header cells from line items.
+    let mut header_periods: Vec<(usize, usize, Period)> = Vec::new();
+    let mut first_date_row: Option<usize> = None;
+
     let mut dates_and_periods = HashMap::new();
     for (r, row) in rows.iter().enumerate() {
 
@@ -67,6 +72,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
                     if let Ok(p) = s.parse::<Period>() {
                         periods.insert(c, p);
+                        header_periods.push((r, c, p));
                     }
 
                     if s.contains("form type: 10-k") || s.contains("12 months ended") {
@@ -76,6 +82,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                     if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
 
                     if let Some(date) = parse_date_str(&s).or_else(|| parse_date_across_cells(&s, rows.get(r+1).and_then(|next| next.get(c)))) {
+                        first_date_row.get_or_insert(r);
                         match sheet_type {
                             SheetType::BalanceSheet => {
                                 dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
@@ -99,6 +106,32 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     }
 
     if dates_and_periods.is_empty() { return Err("no dates found".into()); }
+
+    // Each period heading spans an equal group of date columns, in order, but
+    // may sit over any column of its group: NVDA's 2022 sheets put "Six Months
+    // Ended" over the second of its two columns, so looking left from the
+    // first one finds "Three Months Ended". Where the date columns divide
+    // evenly among the headings, assign them by group instead.
+    if sheet_type != SheetType::BalanceSheet {
+        if let Some(first_date_row) = first_date_row {
+            let mut heads: Vec<(usize, Period)> = header_periods.iter()
+                .filter(|(r, _, _)| *r <= first_date_row)
+                .map(|&(_, c, p)| (c, p))
+                .collect();
+            heads.sort_by_key(|&(c, _)| c);
+            heads.dedup_by_key(|&mut (c, _)| c);
+            let mut cols: Vec<usize> = dates_and_periods.keys().copied().collect();
+            cols.sort();
+            if !heads.is_empty() && cols.len() % heads.len() == 0 {
+                let group = cols.len() / heads.len();
+                for (i, c) in cols.iter().enumerate() {
+                    if let Some(entry) = dates_and_periods.get_mut(c) {
+                        entry.1 = heads[i / group].1;
+                    }
+                }
+            }
+        }
+    }
 
     let labels = if col0_count >= col1_count { 0 } else { 1 };
 
