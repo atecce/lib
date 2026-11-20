@@ -4,70 +4,42 @@ use std::fs;
 use equities::Reader;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let dry_run = std::env::args().any(|a| a == "--dry-run");
     let mut reported_items = Vec::new();
 
     let equities = vec![equities::Ticker::NVDA, equities::Ticker::TSLA];
 
     for equity in equities {
-        match equity {
-            equities::Ticker::NVDA => {
-                let dir = format!("equities/{}", equity);
-                let paths: Vec<_> = fs::read_dir(&dir)?
-                    .filter_map(|f| f.ok())
-                    .filter(|f| {
-                         let path = f.path();
-                         let ext = path.extension().and_then(|ext| ext.to_str());
-                         ext == Some("xlsx")
-                    })
-                    .map(|f| f.path())
-                    .collect();
+        let dir = format!("equities/{}", equity);
+        let mut paths: Vec<_> = fs::read_dir(&dir)?
+            .filter_map(|f| f.ok())
+            .map(|f| f.path())
+            .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("xlsx"))
+            .collect();
+        paths.sort();
 
-                for path in paths {
-                    match equities::xlsx::new_reader(&path, equity.clone()) {
-                        Ok(mut r) => {
-                            match r.process_balance_sheet() {
-                                Ok(mut ret) => reported_items.append(&mut ret),
-                                Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
-                            }
-                            match r.process_income_statement() {
-                                Ok(mut ret) => reported_items.append(&mut ret),
-                                Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
-                            }
-                        },
-                        Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
+        for path in paths {
+            match equities::xlsx::new_reader(&path, equity) {
+                Ok(mut r) => {
+                    match r.process_balance_sheet() {
+                        Ok(mut ret) => reported_items.append(&mut ret),
+                        Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
                     }
-                }
+                    match r.process_income_statement() {
+                        Ok(mut ret) => reported_items.append(&mut ret),
+                        Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
+                    }
+                },
+                Err(e) => eprintln!("failed to construct new reader from path: {:?}; {}", path, e),
             }
-            equities::Ticker::TSLA => {
-                let dir = format!("equities/{}", equity);
-                let paths: Vec<_> = fs::read_dir(&dir)?
-                    .filter_map(|f| f.ok())
-                    .filter(|f| {
-                         let path = f.path();
-                         let ext = path.extension().and_then(|ext| ext.to_str());
-                         ext == Some("pdf")
-                    })
-                    .map(|f| f.path())
-                    .collect();
-
-                for path in paths {
-                    match equities::pdf::new_reader(&path, equity.clone()) {
-                        Ok(mut r) => {
-                            match r.process_balance_sheet() {
-                                Ok(mut ret) => reported_items.append(&mut ret),
-                                Err(e) => eprintln!("failed to process balance sheet for path: {:?}; {}", path, e),
-                            }
-                            match r.process_income_statement() {
-                                Ok(mut ret) => reported_items.append(&mut ret),
-                                Err(e) => eprintln!("failed to process income statement for path {:?}; {}", path, e),
-                            }
-                        },
-                        Err(e) => eprintln!("failed to construst new reader from path: {:?}; {}", path, e),
-                    }
-                }
-            },
-            equities::Ticker::AAPL => todo!(),
         }
+    }
+
+    equities::derive_fourth_quarters(&mut reported_items);
+
+    if dry_run {
+        print_series(&reported_items);
+        return Ok(());
     }
 
     if !reported_items.is_empty() {
@@ -76,6 +48,48 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+/// Print the series charted in Grafana, one row per (ticker, date), to check
+/// the data before pushing it. Later reports restate earlier dates, so where a
+/// (ticker, item, period, date) was reported more than once with different
+/// values, the row is marked with '*'.
+fn print_series(items: &[equities::item::Reported]) {
+    use equities::item::Item;
+    use equities::Period;
+    use std::collections::BTreeMap;
+
+    let cols: [(Item, Period, &str); 5] = [
+        (Item::Revenue, Period::ThreeMonths, "revenue"),
+        (Item::NetIncome, Period::ThreeMonths, "net income"),
+        (Item::CashAndCashEquivalents, Period::PointInTime, "cash"),
+        (Item::MarketableSecurities, Period::PointInTime, "mkt sec"),
+        (Item::Inventories, Period::PointInTime, "inventory"),
+    ];
+
+    let mut table: BTreeMap<(String, chrono::NaiveDate), [Vec<f64>; 5]> = BTreeMap::new();
+    for it in items {
+        if let Some(i) = cols.iter().position(|(item, p, _)| *item == it.item && *p == it.p) {
+            let row = table.entry((it.ticker.to_string(), it.date)).or_default();
+            if !row[i].contains(&it.val) { row[i].push(it.val); }
+        }
+    }
+
+    print!("{:<6}{:<12}", "ticker", "date");
+    for (_, _, name) in &cols { print!("{:>12}", name); }
+    println!();
+    for ((ticker, date), row) in &table {
+        print!("{:<6}{:<12}", ticker, date.to_string());
+        for vals in row {
+            let cell = match vals.as_slice() {
+                [] => "-".to_string(),
+                [v] => format!("{:.2}B", v / 1e9),
+                vs => vs.iter().map(|v| format!("{:.2}", v / 1e9)).collect::<Vec<_>>().join("/"),
+            };
+            print!("{:>12}", cell);
+        }
+        println!();
+    }
 }
 
 fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Error>> {
