@@ -39,7 +39,7 @@ impl R for Reader {
 
         let rows = statement_rows(&range);
 
-        self.reported_items(&rows, new_sheet_info(&rows, BalanceSheet)?)
+        Self::reported_items(self.ticker, &rows, new_sheet_info(&rows, BalanceSheet)?)
     }
 
     fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
@@ -50,7 +50,7 @@ impl R for Reader {
 
         let rows = statement_rows(&range);
 
-        self.reported_items(&rows, new_sheet_info(&rows, IncomeStatement)?)
+        Self::reported_items(self.ticker, &rows, new_sheet_info(&rows, IncomeStatement)?)
     }
 }
 
@@ -59,7 +59,7 @@ impl Reader {
         let range = self.workbook.worksheet_range("CASH_FLOW")?;
         let rows = statement_rows(&range);
 
-        self.reported_items(&rows, new_sheet_info(&rows, CashFlowStatement)?)
+        Self::reported_items(self.ticker, &rows, new_sheet_info(&rows, CashFlowStatement)?)
     }
     pub fn items(&mut self, sheet_type: SheetType) -> Result<Vec<Item>, Box<dyn Error>> {
         match sheet_type {
@@ -99,7 +99,9 @@ impl Reader {
         None
     }
 
-    fn reported_items(&self, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
+    /// Turn statement rows (label column plus one column per date) into reported items.
+    /// Shared with `filing::Reader`, whose HTML tables are converted to the same rows.
+    pub(crate) fn reported_items(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
 
         let mut reported_items = Vec::new();
 
@@ -157,7 +159,7 @@ impl Reader {
                             None => {
                                 seen.insert((item, *date, *period), (reported_items.len(), filled));
                                 reported_items.push(Reported {
-                                    ticker: self.ticker,
+                                    ticker,
                                     date: *date,
                                     p: *period,
                                     item,
