@@ -54,7 +54,7 @@ items! {
     pub enum Item {
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"],
         // TODO(atec): Short-term investments
-        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities"],
+        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"],
         VendorNonTradeReceivables => ["Vendor non-trade receivables"],
         Inventories => ["Inventories", "Inventory"],
