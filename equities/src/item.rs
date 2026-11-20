@@ -70,7 +70,7 @@ items! {
     pub enum Item {
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"] @ ["CashAndCashEquivalentsAtCarryingValue", "ifrs-full_CashAndCashEquivalents"],
         // TODO(atec): Short-term investments
-        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities", "Short-term marketable securities"] @ ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesCurrent", "DebtSecuritiesCurrent", "ShortTermInvestments"],
+        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities", "Short-term marketable securities"] @ ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesCurrent", "DebtSecuritiesCurrent", "ShortTermInvestments", "MarketableSecurities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"] @ ["AccountsReceivableNetCurrent"],
         VendorNonTradeReceivables => ["Vendor non-trade receivables"] @ ["NontradeReceivablesCurrent"],
         Inventories => ["Inventories", "Inventory"] @ ["InventoryNet", "ifrs-full_Inventories"],
@@ -113,8 +113,8 @@ items! {
 
         TotalLiabilities => ["Total liabilities", "Total Liabilities"] @ ["Liabilities", "ifrs-full_Liabilities"],
 
-        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers"],
-        CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "ifrs-full_CostOfSales"],
+        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers"],
+        CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales"],
 
 //        AutomotiveSalesRevenue => ["Automotive sales"],
 //        AutomotiveRegulatoryCredits => ["Automotive regulatory credits"],

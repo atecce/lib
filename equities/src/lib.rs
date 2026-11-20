@@ -68,6 +68,8 @@ pub enum Ticker {
     AAPL,
     BRK,
     TSM,
+    KO,
+    MCD,
 }
 
 impl Ticker {
@@ -80,6 +82,8 @@ impl Ticker {
             Ticker::AAPL => "AAPL",
             Ticker::BRK => "BRK-B",
             Ticker::TSM => "TSM",
+            Ticker::KO => "KO",
+            Ticker::MCD => "MCD",
         }
     }
 }
@@ -94,6 +98,8 @@ impl FromStr for Ticker {
             "AAPL" => Ok(Ticker::AAPL),
             "BRK" => Ok(Ticker::BRK),
             "TSM" => Ok(Ticker::TSM),
+            "KO" => Ok(Ticker::KO),
+            "MCD" => Ok(Ticker::MCD),
             _ => Err(TickerError::TickerNotFound),
         }
     }
@@ -111,6 +117,8 @@ impl std::fmt::Display for Ticker {
             Ticker::AAPL => write!(f, "AAPL"),
             Ticker::BRK => write!(f, "BRK"),
             Ticker::TSM => write!(f, "TSM"),
+            Ticker::KO => write!(f, "KO"),
+            Ticker::MCD => write!(f, "MCD"),
         }
     }
 }
