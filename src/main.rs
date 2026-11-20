@@ -28,6 +28,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     equities::derive_quarters(&mut reported_items);
 
+    // Every item read, one per line, sorted: for diffing the output of two versions.
+    if std::env::args().any(|a| a == "--dump") {
+        let mut lines: Vec<String> = reported_items.iter()
+            .map(|it| format!("{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.val))
+            .collect();
+        lines.sort();
+        lines.dedup();
+        println!("{}", lines.join("\n"));
+        return Ok(());
+    }
+
     if dry_run {
         print_series(&reported_items, std::env::args().any(|a| a == "--cash-flow"));
         return Ok(());
