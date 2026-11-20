@@ -194,8 +194,8 @@ impl Client {
         Ok(filings)
     }
 
-    /// Download the filing's `FilingSummary.xml` and its balance sheet and
-    /// income statement pages into the cache (skipping files already there)
+    /// Download the filing's `FilingSummary.xml` and its balance sheet, income
+    /// statement and cash flow statement pages into the cache (skipping files already there)
     /// and return the directory, ready for `filing::new_reader`.
     pub fn fetch_filing(&self, f: &Filing) -> Result<PathBuf, Box<dyn Error>> {
         let dir = self.cache.join(f.cik.to_string()).join(f.accession_dir());
@@ -222,6 +222,7 @@ impl Client {
         let pages = [
             ("balance sheet", filing::balance_sheet(&reports)),
             ("income statement", filing::income_statement(&reports)),
+            ("cash flow statement", filing::cash_flow_statement(&reports)),
         ];
         for (what, report) in pages {
             let report = report.ok_or(EdgarError::StatementNotFound(what))?;

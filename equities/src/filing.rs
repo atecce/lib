@@ -20,7 +20,7 @@ use calamine::Data;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
-use crate::item::Reported;
+use crate::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetType};
 use crate::Reader as R;
 use crate::Ticker;
@@ -87,6 +87,10 @@ pub fn balance_sheet(reports: &[Report]) -> Option<&Report> {
     })
 }
 
+pub fn cash_flow_statement(reports: &[Report]) -> Option<&Report> {
+    find_report(reports, |n| n.contains("cash flow"))
+}
+
 pub fn income_statement(reports: &[Report]) -> Option<&Report> {
     let is_income = |n: &str| {
         n.contains("statement") && (n.contains("operations") || n.contains("income") || n.contains("earnings"))
@@ -101,7 +105,22 @@ pub fn income_statement(reports: &[Report]) -> Option<&Report> {
 /// cell's text goes in its first column and the rest are left empty, matching
 /// how merged cells read from the xlsx.
 pub fn table_rows(html: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
+    Ok(table(html)?.rows)
+}
+
+/// A statement table: its rows (see `table_rows`) and, for each row, the XBRL
+/// element it reports, e.g. "us-gaap_NetCashProvidedByUsedInOperatingActivities".
+pub struct Table {
+    pub rows: Vec<Vec<Data>>,
+    pub tags: Vec<Option<String>>,
+}
+
+static XBRL_TAG: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"defref_([A-Za-z0-9-]+_[A-Za-z0-9]+)").unwrap());
+
+pub fn table(html: &str) -> Result<Table, Box<dyn Error>> {
     let doc = Html::parse_document(html);
+    let link_sel = Selector::parse("a[onclick]").unwrap();
+    let mut tags: Vec<Option<String>> = Vec::new();
     let table_sel = Selector::parse("table.report").unwrap();
     let table = doc.select(&table_sel).next().ok_or("no report table")?;
 
@@ -119,6 +138,11 @@ pub fn table_rows(html: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
 
     for (r, tr) in rows.enumerate() {
         if grid.len() <= r { grid.resize(r + 1, Vec::new()); }
+        if tags.len() <= r { tags.resize(r + 1, None); }
+        // The row's label links to its XBRL definition: Show.showAR(this, 'defref_us-gaap_X', ...).
+        tags[r] = tr.select(&link_sel)
+            .filter_map(|a| a.value().attr("onclick"))
+            .find_map(|js| XBRL_TAG.captures(js).map(|c| c[1].to_string()));
         let mut c = 0;
         for cell in tr.children().filter_map(ElementRef::wrap) {
             let name = cell.value().name();
@@ -142,9 +166,13 @@ pub fn table_rows(html: &str) -> Result<Vec<Vec<Data>>, Box<dyn Error>> {
         }
     }
 
-    Ok(grid.into_iter()
-        .map(|row| row.into_iter().map(|v| v.unwrap_or(Data::Empty)).collect())
-        .collect())
+    tags.resize(grid.len(), None);
+    Ok(Table {
+        rows: grid.into_iter()
+            .map(|row| row.into_iter().map(|v| v.unwrap_or(Data::Empty)).collect())
+            .collect(),
+        tags,
+    })
 }
 
 /// A cell's text with whitespace collapsed. Header cells and labels stay
@@ -207,6 +235,25 @@ impl Reader {
             .filter(|row| !row.iter().all(|c| matches!(c, Data::Empty)))
             .collect();
         crate::xlsx::Reader::reported_items(self.ticker, &rows, new_sheet_info(&rows, sheet_type)?)
+    }
+}
+
+impl Reader {
+    /// Cash flow items are identified by XBRL tag rather than label: companies
+    /// word these lines very differently, but tag them the same way. 10-Qs
+    /// only report cash flows year to date (3, 6, 9 months); see
+    /// `derive_quarters` for the quarterly values.
+    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
+        let report = cash_flow_statement(&self.reports)
+            .ok_or_else(|| format!("cash flow statement not found in {:?}", self.dir))?;
+        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
+        let (rows, tags): (Vec<&[Data]>, Vec<Option<Item>>) = table.rows.iter()
+            .zip(&table.tags)
+            .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
+            .map(|(row, tag)| (row.as_slice(), tag.as_deref().and_then(Item::from_xbrl_tag)))
+            .unzip();
+        let sheet_info = new_sheet_info(&rows, SheetType::CashFlowStatement)?;
+        crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| tags[r])
     }
 }
 

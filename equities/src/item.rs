@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 78] = [
+            pub const ALL: [$item; 79] = [
                 $($item::$variant,)*
             ];
         }
@@ -148,6 +148,7 @@ items! {
         PurchasesOfNonMarketableEquitySecurities => ["Purchases of non-marketable equity securities"],
         AcquisitionsNetOfCashAcquired => ["Acquisitions, net of cash acquired"],
         NetCashUsedInInvestingActivities => ["Net cash used in investing activities"],
+        NetCashUsedInFinancingActivities => ["Net cash used in financing activities"],
         ProceedsRelatedToEmployeeStockPlans => ["Proceeds related to employee stock plans"],
         PaymentsRelatedToRepurchasesOfCommonStock => ["Payments related to repurchases of common stock"],
         PaymentsRelatedToEmployeeStockPlanTaxes => ["Payments related to employee stock plan taxes"],
@@ -155,6 +156,35 @@ items! {
         PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => ["Principal payments on property and equipment and intangible assets"],
         RepaymentOfDebt => ["Repayment of debt"],
         ChangeInCashAndCashEquivalents => ["Change in cash and cash equivalents"],
+    }
+}
+
+impl Item {
+    /// The item an XBRL element reports, for elements whose meaning is the same
+    /// at every company. Used where labels vary too much between companies
+    /// (cash flow statements). `tag` is as EDGAR's pages write it,
+    /// e.g. "us-gaap_NetCashProvidedByUsedInOperatingActivities".
+    pub fn from_xbrl_tag(tag: &str) -> Option<Item> {
+        let name = tag.strip_prefix("us-gaap_")?;
+        Some(match name {
+            "NetCashProvidedByUsedInOperatingActivities"
+            | "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations" => Item::NetCashProvidedByOperatingActivities,
+            "NetCashProvidedByUsedInInvestingActivities"
+            | "NetCashProvidedByUsedInInvestingActivitiesContinuingOperations" => Item::NetCashUsedInInvestingActivities,
+            "NetCashProvidedByUsedInFinancingActivities"
+            | "NetCashProvidedByUsedInFinancingActivitiesContinuingOperations" => Item::NetCashUsedInFinancingActivities,
+            "ShareBasedCompensation" | "AllocatedShareBasedCompensationExpense" => Item::StockBasedCompensationExpense,
+            "DepreciationDepletionAndAmortization" | "DepreciationAmortizationAndAccretionNet"
+            | "DepreciationAndAmortization" => Item::DepreciationAndAmoritization,
+            "PaymentsToAcquirePropertyPlantAndEquipment" | "PaymentsToAcquireProductiveAssets" => Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets,
+            "PaymentsForRepurchaseOfCommonStock" => Item::PaymentsRelatedToRepurchasesOfCommonStock,
+            "PaymentsOfDividends" | "PaymentsOfDividendsCommonStock" => Item::DividendsPaid,
+            "CashAndCashEquivalentsPeriodIncreaseDecrease"
+            | "CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect"
+            | "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect"
+            | "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect" => Item::ChangeInCashAndCashEquivalents,
+            _ => return None,
+        })
     }
 }
 

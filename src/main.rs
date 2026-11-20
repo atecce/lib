@@ -26,10 +26,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    equities::derive_fourth_quarters(&mut reported_items);
+    equities::derive_quarters(&mut reported_items);
 
     if dry_run {
-        print_series(&reported_items);
+        print_series(&reported_items, std::env::args().any(|a| a == "--cash-flow"));
         return Ok(());
     }
 
@@ -68,7 +68,13 @@ fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reporte
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
         match edgar.fetch_filing(f) {
             Ok(dir) => match equities::filing::new_reader(&dir, equity) {
-                Ok(mut r) => read_statements(&mut r, &name, reported_items),
+                Ok(mut r) => {
+                    read_statements(&mut r, &name, reported_items);
+                    match r.process_cash_flow_statement() {
+                        Ok(mut ret) => reported_items.append(&mut ret),
+                        Err(e) => eprintln!("failed to process cash flow statement for {}; {}", name, e),
+                    }
+                },
                 Err(e) => eprintln!("failed to read {}: {}", name, e),
             },
             Err(e) => match e.downcast_ref::<equities::edgar::EdgarError>() {
@@ -96,18 +102,24 @@ fn read_statements(r: &mut impl Reader, name: &str, reported_items: &mut Vec<equ
 /// the data before pushing it. Later reports restate earlier dates, so where a
 /// (ticker, item, period, date) was reported more than once with different
 /// values, the row is marked with '*'.
-fn print_series(items: &[equities::item::Reported]) {
+fn print_series(items: &[equities::item::Reported], cash_flow: bool) {
     use equities::item::Item;
     use equities::Period;
     use std::collections::BTreeMap;
 
-    let cols: [(Item, Period, &str); 5] = [
+    let cols: [(Item, Period, &str); 5] = if cash_flow { [
+        (Item::NetCashProvidedByOperatingActivities, Period::ThreeMonths, "operating"),
+        (Item::NetCashUsedInInvestingActivities, Period::ThreeMonths, "investing"),
+        (Item::NetCashUsedInFinancingActivities, Period::ThreeMonths, "financing"),
+        (Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets, Period::ThreeMonths, "capex"),
+        (Item::ChangeInCashAndCashEquivalents, Period::ThreeMonths, "chg cash"),
+    ] } else { [
         (Item::Revenue, Period::ThreeMonths, "revenue"),
         (Item::NetIncome, Period::ThreeMonths, "net income"),
         (Item::CashAndCashEquivalents, Period::PointInTime, "cash"),
         (Item::MarketableSecurities, Period::PointInTime, "mkt sec"),
         (Item::Inventories, Period::PointInTime, "inventory"),
-    ];
+    ] };
 
     let mut table: BTreeMap<(String, chrono::NaiveDate), [Vec<f64>; 5]> = BTreeMap::new();
     for it in items {

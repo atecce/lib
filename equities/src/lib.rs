@@ -26,7 +26,7 @@ macro_rules! count_items {
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Ticker {
     NVDA,
     TSLA,
@@ -270,6 +270,7 @@ impl_reported! {
         PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
         AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
         NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        NetCashUsedInFinancingActivities => method net_cash_used_in_financing_activities,
         ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
         PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
         PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
@@ -387,34 +388,46 @@ impl_reported! {
     ]
 }
 
-/// Annual reports only give twelve-month figures, so the fourth quarter has no
-/// three-month value. Derive it as the twelve-month value minus the nine-month
-/// value ending about a quarter earlier, wherever no three-month value exists.
-/// When a value was reported more than once (restatements), the last one wins,
-/// matching how later writes overwrite earlier ones downstream.
-pub fn derive_fourth_quarters(items: &mut Vec<Reported>) {
+/// Fill in three-month values that were not reported, from year-to-date
+/// totals: Q2 = 6m - 3m, Q3 = 9m - 6m, Q4 = 12m - 9m, where the shorter
+/// total ends about a quarter earlier. Annual reports only give twelve-month
+/// figures (so every Q4 is derived), and 10-Q cash flow statements only give
+/// year-to-date figures (so cash flow Q2-Q4 are derived). Reported
+/// three-month values are never replaced. When a value was reported more than
+/// once (restatements), the last one wins, matching how later writes
+/// overwrite earlier ones downstream.
+pub fn derive_quarters(items: &mut Vec<Reported>) {
     use std::collections::HashMap;
 
-    let mut latest: HashMap<(String, Item, Period, NaiveDate), f64> = HashMap::new();
+    let mut latest: HashMap<(Ticker, Item, Period, NaiveDate), f64> = HashMap::new();
     for it in items.iter() {
-        latest.insert((it.ticker.to_string(), it.item, it.p, it.date), it.val);
+        latest.insert((it.ticker, it.item, it.p, it.date), it.val);
     }
 
-    let mut derived = Vec::new();
-    for it in items.iter().filter(|it| it.p == Period::TwelveMonths) {
-        let key = |p, d| (it.ticker.to_string(), it.item, p, d);
-        if latest.contains_key(&key(Period::ThreeMonths, it.date)) {
+    let previous = |p: Period| match p {
+        Period::SixMonths => Some(Period::ThreeMonths),
+        Period::NineMonths => Some(Period::SixMonths),
+        Period::TwelveMonths => Some(Period::NineMonths),
+        _ => None,
+    };
+
+    let mut derived: HashMap<(Ticker, Item, NaiveDate), f64> = HashMap::new();
+    for (&(ticker, item, p, date), &total) in &latest {
+        let Some(prev_p) = previous(p) else { continue };
+        if latest.contains_key(&(ticker, item, Period::ThreeMonths, date)) {
             continue;
         }
-        let annual = latest[&key(Period::TwelveMonths, it.date)];
-        let nine_months = latest.iter().find(|((t, item, p, d), _)| {
-            *t == it.ticker.to_string() && *item == it.item && *p == Period::NineMonths
-                && (80..=100).contains(&(it.date - *d).num_days())
+        let prev = latest.iter().find(|((t, i, pp, d), _)| {
+            *t == ticker && *i == item && *pp == prev_p && (80..=100).contains(&(date - *d).num_days())
         });
-        if let Some((_, nine)) = nine_months {
-            derived.push(Reported { ticker: it.ticker, date: it.date, p: Period::ThreeMonths, item: it.item, val: annual - nine });
-            latest.insert(key(Period::ThreeMonths, it.date), annual - nine);
+        if let Some((_, prev_total)) = prev {
+            derived.insert((ticker, item, date), total - prev_total);
         }
     }
-    items.extend(derived);
+
+    let mut derived: Vec<_> = derived.into_iter().collect();
+    derived.sort_by_key(|((t, i, d), _)| (t.to_string(), *i, *d));
+    items.extend(derived.into_iter().map(|((ticker, item, date), val)| Reported {
+        ticker, date, p: Period::ThreeMonths, item, val,
+    }));
 }
