@@ -186,14 +186,45 @@ impl FromStr for Period {
         let trimmed = s.trim();
 
         let lower = trimmed.to_lowercase();
-        // EDGAR's Financial_Report.xlsx writes "3 Months Ended", company reports write "Three Months Ended".
-        if lower.contains("three months") || lower.contains("3 months") { Ok(Period::ThreeMonths) }
-        else if lower.contains("six months") || lower.contains("6 months") { Ok(Period::SixMonths) }
-        else if lower.contains("nine months") || lower.contains("9 months") { Ok(Period::NineMonths) }
-        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") || lower.contains("12 months") { Ok(Period::TwelveMonths) }
+        // EDGAR writes "3 Months Ended", company reports write "Three Months Ended".
+        // For fiscal calendars counted in weeks, EDGAR rounds to whole months:
+        // PepsiCo's 36-week year to date is "8 Months Ended", so any count of
+        // months maps to the nearest quarter boundary.
+        if let Some(months) = MONTHS.captures(&lower).and_then(|c| c[1].parse::<u32>().ok()) {
+            match months {
+                1..=4 => Ok(Period::ThreeMonths),
+                5..=7 => Ok(Period::SixMonths),
+                8..=10 => Ok(Period::NineMonths),
+                11..=13 => Ok(Period::TwelveMonths),
+                _ => Err(PeriodError::InvalidPeriod),
+            }
+        }
+        else if lower.contains("three months") { Ok(Period::ThreeMonths) }
+        else if lower.contains("six months") { Ok(Period::SixMonths) }
+        else if lower.contains("nine months") { Ok(Period::NineMonths) }
+        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
+        // Retailers and others on 52/53-week years count in weeks: PepsiCo's
+        // quarters are 12, 12, 12 and 16 weeks ("24 Weeks Ended" is its first half).
+        else if let Some(weeks) = WEEKS.captures(&lower).and_then(|c| c[1].parse::<u32>().ok()) {
+            match weeks {
+                1..=17 => Ok(Period::ThreeMonths),
+                18..=30 => Ok(Period::SixMonths),
+                31..=43 => Ok(Period::NineMonths),
+                48..=53 => Ok(Period::TwelveMonths),
+                _ => Err(PeriodError::InvalidPeriod),
+            }
+        }
         else { Err(PeriodError::InvalidPeriod) }
     }
 }
+
+static MONTHS: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b(\d{1,2}) months?\b").unwrap()
+});
+
+static WEEKS: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"\b(\d{1,2}) weeks? ended").unwrap()
+});
 
 #[derive(Debug, uniffi::Error)]
 pub enum PeriodError {
@@ -488,7 +519,8 @@ impl_reported! {
 
 /// Fill in three-month values that were not reported, from year-to-date
 /// totals: Q2 = 6m - 3m, Q3 = 9m - 6m, Q4 = 12m - 9m, where the shorter
-/// total ends about a quarter earlier. Annual reports only give twelve-month
+/// total ends about a quarter earlier (75 to 125 days: PepsiCo's fourth
+/// quarter is 16 weeks). Annual reports only give twelve-month
 /// figures (so every Q4 is derived), and 10-Q cash flow statements only give
 /// year-to-date figures (so cash flow Q2-Q4 are derived). Reported
 /// three-month values are never replaced. When a value was reported more than
@@ -516,7 +548,7 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
             continue;
         }
         let prev = latest.iter().find(|((t, i, c, pp, d), _)| {
-            *t == ticker && *i == item && *c == currency && *pp == prev_p && (80..=100).contains(&(date - *d).num_days())
+            *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())
         });
         if let Some((_, prev_total)) = prev {
             derived.insert((ticker, item, currency, date), total - prev_total);
@@ -543,5 +575,23 @@ mod ticker_tests {
         assert!("".parse::<Ticker>().is_err());
         assert!("TOOLONGSYMBOL".parse::<Ticker>().is_err());
         assert!("A B".parse::<Ticker>().is_err());
+    }
+}
+
+#[cfg(test)]
+mod period_tests {
+    use super::Period;
+
+    #[test]
+    fn weeks() {
+        assert_eq!("12 Weeks Ended".parse::<Period>().unwrap(), Period::ThreeMonths);
+        assert_eq!("24 Weeks Ended".parse::<Period>().unwrap(), Period::SixMonths);
+        assert_eq!("36 Weeks Ended".parse::<Period>().unwrap(), Period::NineMonths);
+        assert_eq!("53 Weeks Ended".parse::<Period>().unwrap(), Period::TwelveMonths);
+        assert_eq!("3 Months Ended".parse::<Period>().unwrap(), Period::ThreeMonths);
+        assert_eq!("5 Months Ended".parse::<Period>().unwrap(), Period::SixMonths);
+        assert_eq!("8 Months Ended".parse::<Period>().unwrap(), Period::NineMonths);
+        assert_eq!("12 Months Ended".parse::<Period>().unwrap(), Period::TwelveMonths);
+        assert_eq!("Nine Months Ended".parse::<Period>().unwrap(), Period::NineMonths);
     }
 }

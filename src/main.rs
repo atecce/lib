@@ -7,7 +7,7 @@ use equities::Reader;
 const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
 
 /// Read when no tickers are given on the command line.
-const DEFAULT_TICKERS: [equities::Ticker; 7] = [
+const DEFAULT_TICKERS: [equities::Ticker; 8] = [
     equities::Ticker::NVDA,
     equities::Ticker::TSLA,
     equities::Ticker::AAPL,
@@ -15,6 +15,7 @@ const DEFAULT_TICKERS: [equities::Ticker; 7] = [
     equities::Ticker::TSM,
     equities::Ticker::KO,
     equities::Ticker::MCD,
+    equities::Ticker::new("PEP"),
 ];
 
 /// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]
