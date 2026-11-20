@@ -226,34 +226,47 @@ impl Reader {
         &self.reports
     }
 
+    /// Read one statement page. Each row's item comes from its XBRL element
+    /// (see `row_item`); the statement only reports items that belong on it.
     fn process(&self, report: Option<&Report>, sheet_type: SheetType, what: &str) -> Result<Vec<Reported>, Box<dyn Error>> {
         let report = report.ok_or_else(|| format!("{} not found in {:?}", what, self.dir))?;
-        let html = fs::read_to_string(self.dir.join(&report.file))?;
-        let grid = table_rows(&html)?;
-        let rows: Vec<&[Data]> = grid.iter()
-            .map(|row| row.as_slice())
-            .filter(|row| !row.iter().all(|c| matches!(c, Data::Empty)))
-            .collect();
-        crate::xlsx::Reader::reported_items(self.ticker, &rows, new_sheet_info(&rows, sheet_type)?)
+        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
+        let cash_flow = sheet_type == SheetType::CashFlowStatement;
+        let (rows, items): (Vec<&[Data]>, Vec<Option<Item>>) = table.rows.iter()
+            .zip(&table.tags)
+            .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
+            .map(|(row, tag)| {
+                let label = row.first().and_then(|c| match c { Data::String(s) => Some(s.as_str()), _ => None });
+                let item = row_item(tag.as_deref(), label).filter(|i| i.is_cash_flow() == cash_flow);
+                (row.as_slice(), item)
+            })
+            .unzip();
+        let sheet_info = new_sheet_info(&rows, sheet_type)?;
+        crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])
+    }
+
+    /// 10-Qs only report cash flows year to date (3, 6, 9 months); see
+    /// `derive_quarters` for the quarterly values.
+    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
+        self.process(cash_flow_statement(&self.reports), SheetType::CashFlowStatement, "cash flow statement")
     }
 }
 
-impl Reader {
-    /// Cash flow items are identified by XBRL tag rather than label: companies
-    /// word these lines very differently, but tag them the same way. 10-Qs
-    /// only report cash flows year to date (3, 6, 9 months); see
-    /// `derive_quarters` for the quarterly values.
-    pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
-        let report = cash_flow_statement(&self.reports)
-            .ok_or_else(|| format!("cash flow statement not found in {:?}", self.dir))?;
-        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
-        let (rows, tags): (Vec<&[Data]>, Vec<Option<Item>>) = table.rows.iter()
-            .zip(&table.tags)
-            .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
-            .map(|(row, tag)| (row.as_slice(), tag.as_deref().and_then(Item::from_xbrl_tag)))
-            .unzip();
-        let sheet_info = new_sheet_info(&rows, SheetType::CashFlowStatement)?;
-        crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| tags[r])
+/// The item a statement row reports. Its XBRL element decides when it is a
+/// mapped one: labels vary between companies and years, elements do not, and
+/// labels are ambiguous (AAPL's current and non-current marketable securities
+/// are both "Marketable securities"). An unmapped us-gaap element reports
+/// nothing we track. Company extension elements and dimension rows (segment
+/// axes and members) fall back to the label.
+fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<Item> {
+    let by_label = || label.and_then(|l| l.parse::<Item>().ok());
+    match tag {
+        None => by_label(),
+        Some(tag) => match Item::from_xbrl_tag(tag) {
+            Some(item) => Some(item),
+            None if !tag.starts_with("us-gaap_") || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
+            None => None,
+        },
     }
 }
 
