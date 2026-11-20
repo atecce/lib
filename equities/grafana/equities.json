@@ -1196,7 +1196,7 @@
       "panel-cf-1": {
         "kind": "Panel",
         "spec": {
-          "id": 11,
+          "id": 101,
           "title": "nvda cash flows",
           "description": "",
           "links": [],
@@ -1584,7 +1584,7 @@
       "panel-cf-2": {
         "kind": "Panel",
         "spec": {
-          "id": 12,
+          "id": 102,
           "title": "tsla cash flows",
           "description": "",
           "links": [],
@@ -1972,7 +1972,7 @@
       "panel-cf-3": {
         "kind": "Panel",
         "spec": {
-          "id": 13,
+          "id": 103,
           "title": "aapl cash flows",
           "description": "",
           "links": [],
@@ -2748,7 +2748,7 @@
       "panel-cf-4": {
         "kind": "Panel",
         "spec": {
-          "id": 14,
+          "id": 104,
           "title": "brk cash flows",
           "description": "",
           "links": [],
@@ -3524,7 +3524,7 @@
       "panel-cf-5": {
         "kind": "Panel",
         "spec": {
-          "id": 15,
+          "id": 105,
           "title": "tsm cash flows (annual, USD)",
           "description": "",
           "links": [],
@@ -4300,7 +4300,7 @@
       "panel-cf-6": {
         "kind": "Panel",
         "spec": {
-          "id": 16,
+          "id": 106,
           "title": "ko cash flows",
           "description": "",
           "links": [],
@@ -5076,7 +5076,7 @@
       "panel-cf-7": {
         "kind": "Panel",
         "spec": {
-          "id": 17,
+          "id": 107,
           "title": "mcd cash flows",
           "description": "",
           "links": [],
@@ -5852,7 +5852,7 @@
       "panel-cf-8": {
         "kind": "Panel",
         "spec": {
-          "id": 18,
+          "id": 108,
           "title": "pep cash flows",
           "description": "",
           "links": [],
@@ -6628,7 +6628,7 @@
       "panel-cf-9": {
         "kind": "Panel",
         "spec": {
-          "id": 19,
+          "id": 109,
           "title": "oscr cash flows (Oscar Health)",
           "description": "",
           "links": [],
@@ -7404,7 +7404,7 @@
       "panel-cf-10": {
         "kind": "Panel",
         "spec": {
-          "id": 20,
+          "id": 110,
           "title": "net cash flows (Cloudflare)",
           "description": "",
           "links": [],
@@ -8180,7 +8180,7 @@
       "panel-cf-11": {
         "kind": "Panel",
         "spec": {
-          "id": 21,
+          "id": 111,
           "title": "xyz cash flows (Block, formerly Square)",
           "description": "",
           "links": [],
