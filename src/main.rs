@@ -7,7 +7,7 @@ use equities::Reader;
 const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
 
 /// Read when no tickers are given on the command line.
-const DEFAULT_TICKERS: [equities::Ticker; 8] = [
+const DEFAULT_TICKERS: [equities::Ticker; 11] = [
     equities::Ticker::NVDA,
     equities::Ticker::TSLA,
     equities::Ticker::AAPL,
@@ -16,6 +16,10 @@ const DEFAULT_TICKERS: [equities::Ticker; 8] = [
     equities::Ticker::KO,
     equities::Ticker::MCD,
     equities::Ticker::new("PEP"),
+    equities::Ticker::new("OSCR"),
+    equities::Ticker::new("NET"),
+    // Block, formerly Square (SQ until January 2025).
+    equities::Ticker::new("XYZ"),
 ];
 
 /// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]
@@ -73,11 +77,31 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if !reported_items.is_empty() {
-        push_to_influx(&reported_items)?;
-        println!("Successfully pushed {} items to InfluxDB", reported_items.len());
+        let items = latest(reported_items);
+        push_to_influx(&items)?;
+        println!("Successfully pushed {} items to InfluxDB", items.len());
     }
 
     Ok(())
+}
+
+/// One value per (ticker, item, period, currency, date): the last one read.
+/// Filings are read oldest first, so a restatement replaces the original.
+/// Resolved here rather than left to InfluxDB, which does not reliably keep
+/// the last of two points with the same series and timestamp in one write.
+fn latest(items: Vec<equities::item::Reported>) -> Vec<equities::item::Reported> {
+    let mut index = std::collections::HashMap::new();
+    let mut out: Vec<equities::item::Reported> = Vec::with_capacity(items.len());
+    for it in items {
+        match index.entry((it.ticker, it.item, it.p, it.currency, it.date)) {
+            std::collections::hash_map::Entry::Occupied(e) => out[*e.get()] = it,
+            std::collections::hash_map::Entry::Vacant(e) => {
+                e.insert(out.len());
+                out.push(it);
+            }
+        }
+    }
+    out
 }
 
 fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
