@@ -32,7 +32,7 @@ fn statement_rows(range: &calamine::Range<Data>) -> Vec<&[Data]> {
 
 impl R for Reader {
     fn process_balance_sheet(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
-        let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance Sheets", "Condensed Consolidated Balance S"])
+        let sheet_name = self.find_sheet(&["BALANCE_SHEET", "Consolidated Balance"])
             .ok_or("Balance sheet not found")?;
 
         let range = self.workbook.worksheet_range(&sheet_name)?;
@@ -43,7 +43,7 @@ impl R for Reader {
     }
 
     fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {
-        let sheet_name = self.find_sheet(&["INCOME_STATEMENT", "Consolidated Statements of Oper", "Consolidated Statements of Inco", "Condensed Consolidated Statemen"])
+        let sheet_name = self.find_sheet(&["INCOME_STATEMENT", "Consolidated Statements of Oper", "Consolidated Statements of Inco", "Consolidated Statem"])
             .ok_or("Income statement not found")?;
 
         let range = self.workbook.worksheet_range(&sheet_name)?;
@@ -90,7 +90,8 @@ impl Reader {
         let names = self.workbook.sheet_names();
         for m in matches {
             for name in &names {
-                if name.to_lowercase().contains(&m.to_lowercase()) {
+                // Older EDGAR workbooks use underscores for spaces ("Condensed_Consolidated_Balance").
+                if name.replace('_', " ").to_lowercase().contains(&m.replace('_', " ").to_lowercase()) {
                     return Some(name.clone());
                 }
             }
@@ -107,7 +108,9 @@ impl Reader {
         // line items only appear there (TSLA's "Operating lease vehicles, net"), while
         // others repeat labels from the face of the statement ("Revenues"). Keep the
         // first value seen for each (item, date, period) so the face statement wins.
-        let mut seen = std::collections::HashSet::new();
+        // A zero filled in from an empty cell (below) is only provisional: a later
+        // row with a real number for the same key replaces it.
+        let mut seen: std::collections::HashMap<_, (usize, bool)> = std::collections::HashMap::new();
 
         for row in rows {
             if let Some(label) = row.get(sheet_info.labels).and_then(|c| c.get_string()) {
@@ -120,11 +123,11 @@ impl Reader {
 
                     for (&col, (date, period)) in &sheet_info.dates_and_periods {
 
-                        let val = match row.get(col) {
-                            Some(Data::Float(f)) => *f,
-                            Some(Data::Int(i)) => *i as f64,
-                            Some(Data::Empty) | None if has_value => 0.0,
-                            _ => f64::NAN,
+                        let (val, filled) = match row.get(col) {
+                            Some(Data::Float(f)) => (*f, false),
+                            Some(Data::Int(i)) => (*i as f64, false),
+                            Some(Data::Empty) | None if has_value => (0.0, true),
+                            _ => (f64::NAN, false),
                         };
 
                         match sheet_info.sheet_type {
@@ -148,14 +151,24 @@ impl Reader {
                             _ => (),
                         }
 
-                        if !val.is_nan() && seen.insert((item, *date, *period)) {
-                            reported_items.push(Reported {
-                                ticker: self.ticker,
-                                date: *date,
-                                p: *period,
-                                item,
-                                val: val * sheet_info.multiplier,
-                            });
+                        if val.is_nan() { continue; }
+                        let val = val * sheet_info.multiplier;
+                        match seen.get_mut(&(item, *date, *period)) {
+                            None => {
+                                seen.insert((item, *date, *period), (reported_items.len(), filled));
+                                reported_items.push(Reported {
+                                    ticker: self.ticker,
+                                    date: *date,
+                                    p: *period,
+                                    item,
+                                    val,
+                                });
+                            },
+                            Some((idx, was_filled)) if *was_filled && !filled => {
+                                reported_items[*idx].val = val;
+                                *was_filled = false;
+                            },
+                            Some(_) => (),
                         }
                     }
                 }
