@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
-    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA] {
+    for equity in [equities::Ticker::NVDA, equities::Ticker::TSLA, equities::Ticker::AAPL] {
         // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
         // statements, so read them first. EDGAR is the source of truth where
         // both cover a period: its values are read later and win downstream.

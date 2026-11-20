@@ -54,7 +54,7 @@ items! {
     pub enum Item {
         CashAndCashEquivalents => ["Cash and cash equivalents", "Cash and Cash Equivalents"],
         // TODO(atec): Short-term investments
-        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities"],
+        MarketableSecurities => ["Marketable securities", "Short-term investments", "Marketable Securities", "Marketable debt securities", "Short-term marketable securities"],
         AccountsReceivableNet => ["Accounts receivable, net", "Accounts Receivable, Net"],
         VendorNonTradeReceivables => ["Vendor non-trade receivables"],
         Inventories => ["Inventories", "Inventory"],
@@ -97,8 +97,8 @@ items! {
 
         TotalLiabilities => ["Total liabilities", "Total Liabilities"],
 
-        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues"],
-        CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues"],
+        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales"],
+        CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales"],
 
 //        AutomotiveSalesRevenue => ["Automotive sales"],
 //        AutomotiveRegulatoryCredits => ["Automotive regulatory credits"],
