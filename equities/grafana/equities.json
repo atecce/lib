@@ -1,0 +1,764 @@
+{
+  "uid": "equities-financials",
+  "title": "equities",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "utc",
+  "graphTooltip": 0,
+  "time": {
+    "from": "2010-01-01T00:00:00.000Z",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "ticker",
+        "label": "Ticker",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "efm3zlbhro268a"
+        },
+        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": false,
+        "current": {
+          "text": [
+            "nvda"
+          ],
+          "value": [
+            "nvda"
+          ]
+        },
+        "options": [],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "period",
+        "label": "Flows over",
+        "query": "3m,12m",
+        "current": {
+          "text": "3m",
+          "value": "3m"
+        },
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "options": [
+          {
+            "text": "3m",
+            "value": "3m",
+            "selected": true
+          },
+          {
+            "text": "12m",
+            "value": "12m",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "type": "query",
+        "name": "currency",
+        "label": "Currency",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "efm3zlbhro268a"
+        },
+        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "refresh": 1,
+        "sort": 1,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "USD",
+          "value": "USD"
+        },
+        "options": [],
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "$ticker",
+      "repeat": "ticker",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "$ticker ($currency, $period flows)",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "efm3zlbhro268a"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "revenue",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "Revenue"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "net income",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "NetIncome"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "cash and cash equivalents",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "CashAndCashEquivalents"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^pit$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "marketable securities",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "MarketableSecurities"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^pit$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "inventories",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "Inventories"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^pit$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "$ticker cash flows ($currency, $period)",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "efm3zlbhro268a"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "operating cash flow",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "NetCashProvidedByOperatingActivities"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "investing cash flow",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "NetCashUsedInInvestingActivities"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "financing cash flow",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "NetCashUsedInFinancingActivities"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "capital expenditures",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "share repurchases",
+          "measurement": "reported_item_v14",
+          "policy": "financials",
+          "resultFormat": "time_series",
+          "orderByTime": "ASC",
+          "groupBy": [],
+          "select": [
+            [
+              {
+                "type": "field",
+                "params": [
+                  "value"
+                ]
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "ticker",
+              "operator": "=~",
+              "value": "/^$ticker$/"
+            },
+            {
+              "condition": "AND",
+              "key": "item",
+              "operator": "=",
+              "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+            },
+            {
+              "condition": "AND",
+              "key": "period",
+              "operator": "=~",
+              "value": "/^$period$/"
+            },
+            {
+              "condition": "AND",
+              "key": "currency",
+              "operator": "=~",
+              "value": "/^$currency$/"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

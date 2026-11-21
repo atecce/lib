@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Runs run.sh under launchd until every ticker is done, then removes itself.
+     launchd does not expand variables, so the path to run.sh below is fixed;
+     for a checkout elsewhere, install with that path substituted:
+     Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.sp500.plist > ~/Library/LaunchAgents/pub.atec.sp500.plist &&
+              launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.sp500.plist
+     Stop:    launchctl bootout gui/$(id -u)/pub.atec.sp500 (and remove the copy) -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>pub.atec.sp500</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/caffeinate</string><string>-ims</string>
+    <string>/Users/atec/lib/equities/sp500/run.sh</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/atec/lib</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>300</integer>
+  <key>StandardOutPath</key><string>/Users/atec/lib/equities/sp500/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/atec/lib/equities/sp500/launchd.log</string>
+</dict>
+</plist>
