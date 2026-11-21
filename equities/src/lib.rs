@@ -600,3 +600,46 @@ mod period_tests {
         assert!("4 Weeks Ended".parse::<Period>().is_err());
     }
 }
+
+/// Treat period end dates less than a week apart, within one company, as the
+/// same date: the one from the filing read last. Companies on 52/53-week
+/// years date the same quarter differently from filing to filing (Ciena:
+/// "Oct. 31, 2018" in one, "Nov. 03, 2018" in the next), which would chart
+/// the quarter twice. No two quarters end within a week of each other.
+pub fn merge_nearby_dates(items: &mut [Reported]) {
+    use std::collections::HashMap;
+    const WITHIN_DAYS: i64 = 7;
+
+    // Each company's dates, in the order they were read, so a later filing's
+    // date becomes the one its cluster keeps.
+    let mut order: HashMap<Ticker, Vec<NaiveDate>> = HashMap::new();
+    for it in items.iter() {
+        let dates = order.entry(it.ticker).or_default();
+        dates.retain(|d| *d != it.date);
+        dates.push(it.date);
+    }
+
+    let mut canonical: HashMap<(Ticker, NaiveDate), NaiveDate> = HashMap::new();
+    for (ticker, dates) in order {
+        let mut sorted = dates.clone();
+        sorted.sort();
+        // Clusters of dates each within a week of the previous one.
+        let mut clusters: Vec<Vec<NaiveDate>> = Vec::new();
+        for d in sorted {
+            match clusters.last_mut() {
+                Some(c) if (d - *c.last().unwrap()).num_days() < WITHIN_DAYS => c.push(d),
+                _ => clusters.push(vec![d]),
+            }
+        }
+        let last_read = |c: &Vec<NaiveDate>| *dates.iter().rev().find(|d| c.contains(d)).unwrap();
+        for c in &clusters {
+            let keep = last_read(c);
+            for d in c {
+                canonical.insert((ticker, *d), keep);
+            }
+        }
+    }
+    for it in items.iter_mut() {
+        it.date = canonical[&(it.ticker, it.date)];
+    }
+}

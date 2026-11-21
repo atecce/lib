@@ -7,7 +7,7 @@ use equities::Reader;
 const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
 
 /// Read when no tickers are given on the command line.
-const DEFAULT_TICKERS: [equities::Ticker; 17] = [
+const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::NVDA,
     equities::Ticker::TSLA,
     equities::Ticker::AAPL,
@@ -28,6 +28,26 @@ const DEFAULT_TICKERS: [equities::Ticker; 17] = [
     equities::Ticker::new("GOOGL"),
     equities::Ticker::new("IBM"),
     equities::Ticker::new("ORCL"),
+    // Hardware behind the AI build-out: compute, memory and storage,
+    // networking, servers, power and cooling, chip equipment.
+    equities::Ticker::new("AMD"),
+    equities::Ticker::new("AVGO"),
+    equities::Ticker::new("MU"),
+    equities::Ticker::new("SNDK"),
+    equities::Ticker::new("WDC"),
+    equities::Ticker::new("STX"),
+    equities::Ticker::new("ANET"),
+    equities::Ticker::new("MRVL"),
+    equities::Ticker::new("CSCO"),
+    equities::Ticker::new("COHR"),
+    equities::Ticker::new("CIEN"),
+    equities::Ticker::new("SMCI"),
+    equities::Ticker::new("DELL"),
+    equities::Ticker::new("HPE"),
+    equities::Ticker::new("VRT"),
+    equities::Ticker::new("AMAT"),
+    equities::Ticker::new("LRCX"),
+    equities::Ticker::new("KLAC"),
 ];
 
 /// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]
@@ -66,6 +86,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
+    equities::merge_nearby_dates(&mut reported_items);
     equities::derive_quarters(&mut reported_items);
 
     // Every item read, one per line, sorted: for diffing the output of two versions.
