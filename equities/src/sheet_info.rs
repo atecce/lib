@@ -6,6 +6,13 @@ use crate::{Currency, Period};
 static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(r"^(.*?\d{4})\s+([A-Z]{3}) \(.*$").unwrap()
 });
+
+/// A currency for the whole table, in its title: "CONSOLIDATED STATEMENT OF
+/// FINANCIAL POSITION - JPY (¥) ¥ in Millions" (Toyota since 2015), or
+/// "Consolidated Balance Sheets (JPY ¥)" (Toyota in 2014).
+static TITLE_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r" - ([A-Z]{3}) \(|\(([A-Z]{3}) [^)\w]+\)").unwrap()
+});
 use crate::item::Item;
 
 use calamine::{Data, DataType};
@@ -133,6 +140,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     let mut first_date_row: Option<usize> = None;
 
     let mut currencies: HashMap<usize, Currency> = HashMap::new();
+    let mut title_currency: Option<String> = None;
     let mut skipped: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
     let mut dates_and_periods = HashMap::new();
@@ -149,6 +157,11 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         for (c, cell) in row.iter().enumerate() {
             match cell {
                 Data::String(s) => {
+                    if title_currency.is_none() && first_date_row.is_none() {
+                        title_currency = TITLE_CURRENCY.captures(s)
+                            .and_then(|c| c.get(1).or(c.get(2)))
+                            .map(|m| m.as_str().to_string());
+                    }
                     // A currency after a date: "Dec. 31, 2025 TWD ($)", possibly
                     // followed by other units ("... TWD ($) $ / shares").
                     let (s, currency) = match COLUMN_CURRENCY.captures(s) {
@@ -222,6 +235,16 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 },
                 _ => continue,
             }
+        }
+    }
+
+    // Columns without a currency of their own are in the title's, if it
+    // names one; without either, dollars. A currency we do not know leaves
+    // the table out rather than read as dollars.
+    if let Some(code) = &title_currency {
+        let cur = code.parse::<Currency>().map_err(|_| format!("currency {} not supported", code))?;
+        for c in dates_and_periods.keys() {
+            currencies.entry(*c).or_insert(cur);
         }
     }
 
@@ -303,7 +326,23 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
 #[cfg(test)]
 mod tests {
-    use super::{scale, share_scale};
+    use super::{new_sheet_info, scale, share_scale, Currency, Data, SheetType};
+
+    #[test]
+    fn currency_in_title() {
+        let header = [Data::String("CONSOLIDATED STATEMENT OF FINANCIAL POSITION - JPY (¥) ¥ in Millions".into()), Data::String("Mar. 31, 2026".into())];
+        let row = [Data::String("Cash and cash equivalents".into()), Data::Float(12659622.0)];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        let info = new_sheet_info(&rows, SheetType::BalanceSheet).unwrap();
+        assert_eq!(info.currencies.get(&1), Some(&Currency::JPY));
+        assert_eq!(info.multiplier, 1_000_000.0);
+        let header = [Data::String("Balance Sheet - KRW (₩) ₩ in Millions".into()), Data::String("Mar. 31, 2026".into())];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        assert!(new_sheet_info(&rows, SheetType::BalanceSheet).is_err());
+        let header = [Data::String("Consolidated Balance Sheets (JPY ¥) In Millions, unless otherwise specified".into()), Data::String("Mar. 31, 2014".into())];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        assert_eq!(new_sheet_info(&rows, SheetType::BalanceSheet).unwrap().currencies.get(&1), Some(&Currency::JPY));
+    }
 
     #[test]
     fn share_scales() {

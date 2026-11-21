@@ -189,7 +189,8 @@ fn visible_text<'a>(el: &ElementRef<'a>, out: &mut Vec<&'a str>) {
 }
 
 fn parse_amount(text: &str) -> Option<f64> {
-    let t: String = text.chars().filter(|c| !matches!(c, '$' | ',' | ' ')).collect();
+    // The currency sign on a column's first row: "$ 20,431", "¥ 1,679,200".
+    let t: String = text.chars().filter(|c| !matches!(c, '$' | '¥' | '€' | '£' | ',' | ' ')).collect();
     let (negative, digits) = match t.strip_prefix('(').and_then(|t| t.strip_suffix(')')) {
         Some(inner) => (true, inner),
         None => (false, t.as_str()),
