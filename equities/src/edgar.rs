@@ -3,7 +3,10 @@
 //!
 //! Filings never change once published, so their pages are cached on disk
 //! under `<cache>/<cik>/<accession>/` and only fetched once. The filing list
-//! and ticker map do change and are fetched on every run.
+//! (`<cache>/<cik>/submissions.json`) and ticker map
+//! (`<cache>/company_tickers.json`) do change, and are fetched again once
+//! their copies are older than `SUBMISSIONS_MAX_AGE` and `TICKERS_MAX_AGE`.
+//! Delete them to fetch them now.
 //!
 //! The SEC asks automated clients to send a User-Agent naming who they are
 //! and to stay under 10 requests per second.
@@ -21,6 +24,12 @@ use serde::Deserialize;
 use crate::filing;
 
 const MIN_INTERVAL: Duration = Duration::from_millis(125);
+
+/// Under a day, so a nightly run sees the day's new filings, while a second
+/// run the same day reads everything from disk.
+const SUBMISSIONS_MAX_AGE: Duration = Duration::from_secs(20 * 3600);
+/// Tickers change rarely, and a ticker missing from the copy fetches it again.
+const TICKERS_MAX_AGE: Duration = Duration::from_secs(7 * 24 * 3600);
 
 /// Written in a filing's cache directory when EDGAR has no `FilingSummary.xml`
 /// for it (filings before XBRL), so it is not requested again.
@@ -89,6 +98,8 @@ struct SubmissionFilings {
 #[derive(Deserialize)]
 struct SubmissionFile {
     name: String,
+    #[serde(rename = "filingCount")]
+    filing_count: usize,
 }
 
 /// EDGAR lists filings column-wise: the i-th entry of each vector is filing i.
@@ -144,29 +155,64 @@ impl Client {
         }
     }
 
-    fn get_json<T: serde::de::DeserializeOwned>(&self, url: &str) -> Result<T, Box<dyn Error>> {
-        Ok(self.get(url)?.error_for_status()?.json()?)
+    /// `url` as JSON, from its copy at `path` while that is younger than
+    /// `max_age` (`None`: any copy) and parses, else fetched and saved there.
+    /// When the fetch fails, an older copy is better than none.
+    fn cached_json<T: serde::de::DeserializeOwned>(&self, url: &str, path: &Path, max_age: Option<Duration>) -> Result<T, Box<dyn Error>> {
+        let age = fs::metadata(path).and_then(|m| m.modified()).ok()
+            .map(|t| t.elapsed().unwrap_or_default());
+        let read = || -> Option<T> { serde_json::from_slice(&fs::read(path).ok()?).ok() };
+        if age.is_some_and(|a| max_age.is_none_or(|m| a < m)) {
+            if let Some(v) = read() { return Ok(v); }
+        }
+        let fetched = self.get(url).and_then(|r| Ok(r.error_for_status()?.bytes()?));
+        match fetched {
+            Ok(bytes) => {
+                let v = serde_json::from_slice(&bytes)?;
+                if let Some(dir) = path.parent() { fs::create_dir_all(dir)?; }
+                write_atomic(path, &bytes)?;
+                Ok(v)
+            },
+            Err(e) => match read() {
+                Some(v) => { eprintln!("{}: {}; using the copy on disk", url, e); Ok(v) },
+                None => Err(e),
+            },
+        }
     }
 
     /// The company's Central Index Key, from the SEC's ticker map.
     pub fn cik(&self, ticker: &str) -> Result<u64, Box<dyn Error>> {
-        let map: std::collections::HashMap<String, TickerEntry> =
-            self.get_json("https://www.sec.gov/files/company_tickers.json")?;
-        map.into_values()
+        const URL: &str = "https://www.sec.gov/files/company_tickers.json";
+        let path = self.cache.join("company_tickers.json");
+        let find = |map: std::collections::HashMap<String, TickerEntry>| map.into_values()
             // Class shares: "BF.B" in most lists, "BF-B" at the SEC.
             .find(|e| e.ticker.replace('.', "-").eq_ignore_ascii_case(&ticker.replace('.', "-")))
-            .map(|e| e.cik_str)
+            .map(|e| e.cik_str);
+        if let Some(cik) = find(self.cached_json(URL, &path, Some(TICKERS_MAX_AGE))?) {
+            return Ok(cik);
+        }
+        // Listed since the copy was saved: fetch the map again, once.
+        find(self.cached_json(URL, &path, Some(Duration::ZERO))?)
             .ok_or_else(|| EdgarError::TickerNotFound(ticker.to_string()).into())
     }
 
     /// The company's filings of the given forms, oldest first, including the
     /// older history EDGAR pages out of the main submissions file.
     pub fn filings(&self, cik: u64, forms: &[&str]) -> Result<Vec<Filing>, Box<dyn Error>> {
-        let subs: Submissions = self.get_json(&format!("https://data.sec.gov/submissions/CIK{:010}.json", cik))?;
+        let dir = self.cache.join(cik.to_string());
+        let subs: Submissions = self.cached_json(
+            &format!("https://data.sec.gov/submissions/CIK{:010}.json", cik),
+            &dir.join("submissions.json"), Some(SUBMISSIONS_MAX_AGE))?;
 
+        // Older history, paged out of the main file. A page's copy is good as
+        // long as it holds as many filings as the main file says it does.
         let mut pages = vec![subs.filings.recent];
         for file in &subs.filings.files {
-            pages.push(self.get_json(&format!("https://data.sec.gov/submissions/{}", file.name))?);
+            let path = dir.join(&file.name);
+            let page: FilingColumns = self.cached_json(&format!("https://data.sec.gov/submissions/{}", file.name), &path, None)?;
+            pages.push(if page.form.len() == file.filing_count { page } else {
+                self.cached_json(&format!("https://data.sec.gov/submissions/{}", file.name), &path, Some(Duration::ZERO))?
+            });
         }
 
         let mut filings = Vec::new();
