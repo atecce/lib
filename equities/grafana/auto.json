@@ -4,7 +4,7 @@
   "schemaVersion": 39,
   "version": 1,
   "editable": true,
-  "description": "Car makers side by side: dollars on the left axis, yen (dashed) on the right. Companies follow equities/auto/all.txt.",
+  "description": "Car makers side by side: dollars on the left axis; yen (dashed) and euros (dotted) on the right. Companies follow equities/auto/all.txt.",
   "timezone": "utc",
   "graphTooltip": 1,
   "time": {
@@ -17,19 +17,21 @@
         "type": "custom",
         "name": "ticker",
         "label": "Companies",
-        "query": "tsla,f,tm,7203.t",
+        "query": "tsla,f,tm,7203.t,race",
         "multi": true,
         "includeAll": false,
         "current": {
           "text": [
             "tsla",
             "f",
-            "tm"
+            "tm",
+            "race"
           ],
           "value": [
             "tsla",
             "f",
-            "tm"
+            "tm",
+            "race"
           ]
         },
         "options": [
@@ -52,6 +54,11 @@
             "text": "7203.t",
             "value": "7203.t",
             "selected": false
+          },
+          {
+            "text": "race",
+            "value": "race",
+            "selected": true
           }
         ],
         "hide": 0
@@ -121,7 +128,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Revenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Revenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -162,6 +169,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -204,7 +233,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'AutomotiveRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'AutomotiveRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -245,6 +274,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -287,7 +338,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -331,6 +382,28 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
+                }
+              }
+            ]
           }
         ]
       },
@@ -370,7 +443,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -411,6 +484,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -466,7 +561,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'FinancialServicesRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'FinancialServicesRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -507,6 +602,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -549,7 +666,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT sum(\"value\") FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" =~ /^FinanceReceivables/ AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY time(1d), \"ticker\", \"currency\" fill(none)",
+          "query": "SELECT sum(\"value\") FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" =~ /^FinanceReceivables/ AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY time(1d), \"ticker\", \"currency\" fill(none)",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -590,6 +707,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -632,7 +771,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingLeaseVehiclesNet' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingLeaseVehiclesNet' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -676,6 +815,28 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
+                }
+              }
+            ]
           }
         ]
       },
@@ -715,7 +876,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'RegulatoryCreditsRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'RegulatoryCreditsRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -756,6 +917,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -811,7 +994,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" * -1 FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" * -1 FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -852,6 +1035,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -894,7 +1099,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'ResearchAndDevelopment' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'ResearchAndDevelopment' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -935,6 +1140,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -977,7 +1204,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Inventories' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Inventories' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1021,6 +1248,28 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1060,7 +1309,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetCashProvidedByOperatingActivities' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetCashProvidedByOperatingActivities' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1101,6 +1350,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -1156,7 +1427,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalAssets' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalAssets' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1197,6 +1468,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -1239,7 +1532,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'StockholdersEquity' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'StockholdersEquity' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1280,6 +1573,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
@@ -1322,7 +1637,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'CashAndCashEquivalents' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'CashAndCashEquivalents' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1366,6 +1681,28 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1405,7 +1742,7 @@
           },
           "rawQuery": true,
           "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalLiabilities' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" != 'tm' OR \"currency\" = 'JPY') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalLiabilities' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
           "alias": "$tag_ticker $tag_currency"
         }
       ],
@@ -1446,6 +1783,28 @@
                     10,
                     10
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*EUR.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot"
                 }
               }
             ]
