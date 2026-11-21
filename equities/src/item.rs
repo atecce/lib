@@ -179,7 +179,7 @@ items! {
         PurchasesOfMarketableSecurities => ["Purchases of marketable securities"],
         PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => ["Purchases related to property and equipment and intangible assets"] @ ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets", "nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets", "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities"],
         PurchasesOfNonMarketableEquitySecurities => ["Purchases of non-marketable equity securities"],
-        AcquisitionsNetOfCashAcquired => ["Acquisitions, net of cash acquired"],
+        AcquisitionsNetOfCashAcquired => ["Acquisitions, net of cash acquired"] @ ["PaymentsToAcquireBusinessesNetOfCashAcquired", "PaymentsToAcquireBusinessesAndInterestInAffiliates", "PaymentsToAcquireBusinessesGross"],
         NetCashUsedInInvestingActivities => ["Net cash used in investing activities"] @ ["NetCashProvidedByUsedInInvestingActivities", "NetCashProvidedByUsedInInvestingActivitiesContinuingOperations", "ifrs-full_CashFlowsFromUsedInInvestingActivities"],
         NetCashUsedInFinancingActivities => ["Net cash used in financing activities"] @ ["NetCashProvidedByUsedInFinancingActivities", "NetCashProvidedByUsedInFinancingActivitiesContinuingOperations", "ifrs-full_CashFlowsFromUsedInFinancingActivities"],
         ProceedsRelatedToEmployeeStockPlans => ["Proceeds related to employee stock plans"],
