@@ -3,7 +3,6 @@ uniffi::setup_scaffolding!();
 pub mod date;
 pub mod item;
 pub mod xlsx;
-pub mod pdf;
 pub mod filing;
 pub mod edgar;
 pub mod nvda;

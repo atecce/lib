@@ -154,7 +154,7 @@ fn report() {
         },
     ];
 
-    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200630-gen_0.pdf"), equities::Ticker::TSLA).unwrap();
+    let mut r = equities::filing::new_reader(std::path::Path::new("edgar/1318605/000156459020033670"), equities::Ticker::TSLA).unwrap();
 
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()

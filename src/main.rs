@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::fs;
 
 use equities::Reader;
 
@@ -50,12 +49,10 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::new("KLAC"),
 ];
 
-/// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]
+/// Usage: lib [--dry-run [--cash-flow] | --dump] [TICKER ...]
 
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
-    // Skip EDGAR and use only the local xlsx files (offline, or to compare sources).
-    let no_edgar = std::env::args().any(|a| a == "--no-edgar");
     let mut reported_items = Vec::new();
 
     let mut tickers = Vec::new();
@@ -72,17 +69,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
 
     for equity in tickers {
-        // NVDA's own spreadsheets go back to 2001, before EDGAR rendered
-        // statements, so read them first. EDGAR is the source of truth where
-        // both cover a period: its values are read later and win downstream.
-        let dir = format!("equities/{}", equity);
-        if (equity == equities::Ticker::NVDA || no_edgar) && std::path::Path::new(&dir).is_dir() {
-            read_xlsx_dir(equity, &dir, &mut reported_items)?;
-        }
-        if !no_edgar {
-            if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
-                eprintln!("{}: {}", equity, e);
-            }
+        if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
+            eprintln!("{}: {}", equity, e);
         }
     }
 
@@ -131,23 +119,6 @@ fn latest(items: Vec<equities::item::Reported>) -> Vec<equities::item::Reported>
         }
     }
     out
-}
-
-fn read_xlsx_dir(equity: equities::Ticker, dir: &str, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let mut paths: Vec<_> = fs::read_dir(dir)?
-        .filter_map(|f| f.ok())
-        .map(|f| f.path())
-        .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("xlsx"))
-        .collect();
-    paths.sort();
-
-    for path in paths {
-        match equities::xlsx::new_reader(&path, equity) {
-            Ok(mut r) => read_statements(&mut r, &format!("{:?}", path), reported_items),
-            Err(e) => eprintln!("failed to construct new reader from path: {:?}; {}", path, e),
-        }
-    }
-    Ok(())
 }
 
 /// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later

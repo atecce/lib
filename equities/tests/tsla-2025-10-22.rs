@@ -274,7 +274,7 @@ fn report() {
         }
     ];
 
-    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
+    let mut r = equities::filing::new_reader(std::path::Path::new("edgar/1318605/000162828025045968"), equities::Ticker::TSLA).unwrap();
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
     reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }

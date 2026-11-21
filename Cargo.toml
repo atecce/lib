@@ -25,8 +25,8 @@ reqwest = { version = "0.13.3", features = ["blocking"] }
 resolver = "3" # TODO(atec): why 3
 members = ["bible", "daemon", "equities", "greece", "gutenberg", "name", "scrape", "shakespeare"]
 
-# Optimize dependencies in dev/test builds. pdfsink-rs is ~15x slower
-# unoptimized (TSLA pdf tests: 20s per pdf -> ~1s). Workspace crates stay
+# Optimize dependencies in dev/test builds (calamine, scraper, regex parse
+# whole filings in tests and examples). Workspace crates stay
 # at opt-level 0, so incremental builds remain fast.
 [profile.dev.package."*"]
 opt-level = 3
