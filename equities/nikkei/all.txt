@@ -1,0 +1,5 @@
+# Nikkei 225 companies that file with the SEC (20-F), checked 2026-11-21.
+# Most of the index does not: its filings are on EDINET, Japan's EDGAR.
+# NTT (to 2017) and Canon (to 2022) have since deregistered; kept for their
+# history. Hitachi and Tokio Marine have no rendered statements on EDGAR.
+TM SONY HMC MUFG SMFG MFG NMR IX TAK NTTYY CAJPY

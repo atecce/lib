@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Nightly EDGAR fetch and InfluxDB push (run.sh), at 22:00, or on wake if the
+  Nightly EDGAR fetch and InfluxDB push of the S&P 500 (run.sh), at 22:00, or on wake if the
   Mac was asleep then. For a checkout elsewhere, substitute its path:
   Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.equities.nightly.plist > ~/Library/LaunchAgents/pub.atec.equities.nightly.plist &&
            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities.nightly.plist
@@ -17,6 +17,7 @@
 		<string>/usr/bin/caffeinate</string>
 		<string>-ims</string>
 		<string>/Users/atec/lib/equities/nightly/run.sh</string>
+		<string>equities/sp500/all.txt</string>
 	</array>
 	<key>WorkingDirectory</key>
 	<string>/Users/atec/lib</string>
