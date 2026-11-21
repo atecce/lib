@@ -162,7 +162,7 @@ items! {
         WeightedAverageSharesDiluted @ ["WeightedAverageNumberOfDilutedSharesOutstanding"],
 
         StockBasedCompensationExpense => ["Stock-based compensation expense"] @ ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense", "ifrs-full_AdjustmentsForSharebasedPayments"],
-        DepreciationAndAmoritization => ["Depreciation and amortization"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"],
+        DepreciationAndAmoritization => ["Depreciation and amortization"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization", "tsla_DepreciationAmortizationAndImpairment"],
         DeferredIncomeTaxes => ["Deferred income taxes"],
         GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => ["securities, net"],
         Other,
