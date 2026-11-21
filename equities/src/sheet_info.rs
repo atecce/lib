@@ -9,7 +9,7 @@ static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock:
 use crate::item::Item;
 
 use calamine::{Data, DataType};
-use chrono::NaiveDate;
+use chrono::{Datelike, NaiveDate};
 
 #[derive(PartialEq)]
 pub enum SheetType {
@@ -121,6 +121,11 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     let mut periods: HashMap<usize, Option<Period>> = HashMap::new();
     let mut unknown_headings: HashMap<usize, String> = HashMap::new();
     let mut unknown_cols: std::collections::HashSet<usize> = std::collections::HashSet::new();
+    // "4 Months Ended" headings, and the date columns under them: a 16-week
+    // first quarter on a 52/53-week calendar (Kroger's), or a four-month stub
+    // after a merger. Told apart below by the column dates.
+    let mut four_month_heads: std::collections::HashSet<usize> = std::collections::HashSet::new();
+    let mut four_month_cols: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
     // Period headings ("Three Months Ended") with their row and column, and the
     // first row holding a date, to tell header cells from line items.
@@ -152,7 +157,12 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                     };
                     let s = s.to_lowercase();
 
-                    if let Ok(p) = s.parse::<Period>() {
+                    if FOUR_MONTHS.is_match(&s) && !matches!(periods.get(&c), Some(Some(_))) {
+                        periods.insert(c, Some(Period::ThreeMonths));
+                        header_periods.push((r, c, Some(Period::ThreeMonths)));
+                        unknown_headings.insert(c, s.clone());
+                        four_month_heads.insert(c);
+                    } else if let Ok(p) = s.parse::<Period>() {
                         periods.insert(c, Some(p));
                         header_periods.push((r, c, Some(p)));
                     } else if c > 0 && first_date_row.is_none_or(|d| r <= d) && is_period_heading(&s)
@@ -194,6 +204,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                                 for offset in (0..=c).rev().take(4) {
                                     if let Some(detected_p) = periods.get(&offset) {
                                         p = Some(*detected_p);
+                                        if four_month_heads.contains(&offset) { four_month_cols.insert(c); }
                                         break;
                                     }
                                 }
@@ -245,6 +256,8 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 .all(|(g, (hc, _))| cols[g * group] <= *hc && *hc <= cols[g * group + group - 1]);
             if within {
                 for (i, c) in cols.iter().enumerate() {
+                    if four_month_heads.contains(&heads[i / group].0) { four_month_cols.insert(*c); }
+                    else { four_month_cols.remove(c); }
                     match heads[i / group].1 {
                         Some(p) => {
                             unknown_cols.remove(c);
@@ -255,6 +268,16 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 }
             }
         }
+    }
+
+    // A 52/53-week year ends on a weekday, rarely the last of a month; a stub
+    // period of a calendar-year company ends on a month end. Any month end
+    // among the four-month columns makes them all a stub, which is no quarter.
+    let month_end = |d: NaiveDate| d.succ_opt().is_some_and(|n| n.day() == 1);
+    if four_month_cols.iter().any(|c| dates_and_periods.get(c).is_some_and(|(d, _)| month_end(*d))) {
+        unknown_cols.extend(four_month_cols.iter().copied());
+    } else {
+        unknown_headings.retain(|c, _| !four_month_heads.contains(c));
     }
 
     if !unknown_cols.is_empty() {
@@ -302,3 +325,7 @@ mod tests {
         }
     }
 }
+
+static FOUR_MONTHS: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"^\s*(4|four) months? ended").unwrap()
+});
