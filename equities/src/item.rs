@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 85] = [
+            pub const ALL: [$item; 90] = [
                 $($item::$variant,)*
             ];
 
@@ -91,7 +91,11 @@ items! {
         // 流動資産合計 (ryūdō shisan gōkei): total current assets
         TotalCurrentAssets => ["Total current assets", "Total Current Assets", "流動資産", "流動資産合計"] @ ["AssetsCurrent", "ifrs-full_CurrentAssets", "jpigp_cor:CurrentAssetsIFRS", "jppfs_cor:CurrentAssets"],
 
-        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent"],
+        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]", "Equipment on operating leases"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent", "f_NetInvestmentInOperatingLeasesNoncurrent", "gm_OperatingLeaseRightofuseAssetNoncurrent", "tm_VehiclesAndEquipmentOnOperatingLeases"],
+        // A car maker's lending arm: loans and leases to buyers and dealers
+        // (Ford Credit; Toyota's 金融事業, kin'yū jigyō, financial services).
+        FinanceReceivablesCurrent => ["Ford Credit finance receivables, net"] @ ["NotesAndLoansReceivableNetCurrent", "tm_CurrentReceivablesRelatedToFinancialServices"],
+        FinanceReceivablesNonCurrent @ ["NotesAndLoansReceivableNetNoncurrent", "tm_NoncurrentReceivablesRelatedToFinancialServices"],
         SolarEnergySystemsNet => ["Solar energy systems, net", "Solar Energy Systems [Member]"],
 
         // 有形固定資産 (yūkei kotei shisan): property, plant and equipment
@@ -149,7 +153,17 @@ items! {
         // 売上高 (uriagedaka): net sales
         // 売上収益 (uriage shūeki): revenue
         // 営業収益 (eigyō shūeki): operating revenue: banks, brokers, utilities
-        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "E02144:TotalNetRevenuesIFRS", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults"],
+        // Parts of revenue, from a statement's segment sections (see
+        // `Item::part_of`): a car maker's vehicles against its lending arm.
+        // Sections are named by member: Tesla's "Automotive Revenues", Ford's
+        // "Company excluding Ford Credit", GM's "Automotive", Toyota's "Sales
+        // of products" (製品売上, seihin uriage).
+        AutomotiveRevenue => ["Automotive Revenues", "Total automotive revenues", "Company excluding Ford Credit", "Automotive", "Sales of products"] @ ["E02144:SalesOfProductsIFRS"],
+        // 金融事業 (kin'yū jigyō): financial services.
+        FinancialServicesRevenue => ["Ford Credit", "GM Financial", "Financial services", "Financial Services", "Financing operations", "金融事業"] @ ["E02144:FinancingOperationsIFRS"],
+        // Emission credits sold to other car makers.
+        RegulatoryCreditsRevenue => ["Automotive regulatory credits"],
+        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "E02144:TotalNetRevenuesIFRS", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer"],
         // 売上原価 (uriage genka): cost of sales
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales", "売上原価"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales", "jpigp_cor:CostOfSalesIFRS", "jppfs_cor:CostOfSales"],
 
@@ -260,6 +274,18 @@ impl Item {
             .filter(|(_, i)| *i == item)
             .position(|(t, _)| *t == name)?;
         Some((item, rank))
+    }
+
+    /// The item this one is a part of, for items read from a statement's
+    /// segment sections: within a section named for one, only rows reporting
+    /// the whole (revenue) report the part. Tesla's "Automotive Revenues"
+    /// section also lists its cost of revenues, which is no revenue.
+    pub fn part_of(&self) -> Option<Item> {
+        use Item::*;
+        match self {
+            AutomotiveRevenue | FinancialServicesRevenue | RegulatoryCreditsRevenue => Some(Revenue),
+            _ => None,
+        }
     }
 
     /// What the item's values count: money in the column's currency, shares,

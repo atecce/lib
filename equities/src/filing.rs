@@ -213,15 +213,15 @@ impl Reader {
         let report = report.ok_or_else(|| format!("{} not found in {:?}", what, self.dir))?;
         let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
         let cash_flow = sheet_type == SheetType::CashFlowStatement;
-        let (rows, mut items): (Vec<&[Data]>, Vec<Option<(Item, usize)>>) = table.rows.iter()
+        let (rows, (tags, mut items)): (Vec<&[Data]>, (Vec<Option<&str>>, Vec<Option<(Item, usize)>>)) = table.rows.iter()
             .zip(&table.tags)
             .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
             .map(|(row, tag)| {
                 let item = row_item(tag.as_deref(), label(row)).filter(|(i, _)| i.is_cash_flow() == cash_flow);
-                (row.as_slice(), item)
+                (row.as_slice(), (tag.as_deref(), item))
             })
             .unzip();
-        drop_segment_rows(&rows, &mut items);
+        drop_segment_rows(&rows, &tags, &mut items);
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
         let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
         crate::calibrate_shares(&mut reported);
@@ -250,23 +250,35 @@ fn label<'a>(row: &'a [Data]) -> Option<&'a str> {
 /// and that appears in just one segment. Where an item is split across
 /// segments (Berkshire's cash, by business group) no single row is the
 /// company's total, so none is used.
-fn drop_segment_rows(rows: &[&[Data]], items: &mut [Option<(Item, usize)>]) {
+///
+/// A section starts at a row labeled "… [Member]" (the xlsx), or one whose
+/// element is the axis ("srt_ProductOrServiceAxis", labeled with the member,
+/// "Automotive Revenues"). Where the member names a part of an item
+/// (`Item::part_of`), only that item's rows report the part.
+fn drop_segment_rows(rows: &[&[Data]], tags: &[Option<&str>], items: &mut [Option<(Item, usize)>]) {
     use std::collections::{HashMap, HashSet};
     let mut segment: Vec<Option<usize>> = Vec::with_capacity(rows.len());
     let mut member_items: HashMap<usize, Item> = HashMap::new();
     let mut current = None;
     for (r, row) in rows.iter().enumerate() {
-        if let Some(l) = label(row).filter(|l| l.ends_with("[Member]")) {
+        let axis = tags.get(r).copied().flatten().is_some_and(|t| t.ends_with("Axis"));
+        if let Some(l) = label(row).filter(|l| l.ends_with("[Member]") || l.ends_with("[member]") || axis) {
             current = Some(r);
-            if let Ok(item) = l.parse::<Item>() {
+            // "[Member]", or "[member]" (Honda).
+            let member = l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim();
+            if let Ok(item) = l.parse::<Item>().or_else(|_| member.parse::<Item>()) {
                 member_items.insert(r, item);
             }
         }
         segment.push(current);
     }
     for (i, s) in items.iter_mut().zip(&segment) {
-        if let (Some(_), Some(item)) = (*i, s.and_then(|s| member_items.get(&s))) {
-            *i = Some((*item, 0));
+        if let (Some((row_item, _)), Some(item)) = (*i, s.and_then(|s| member_items.get(&s))) {
+            match item.part_of() {
+                None => *i = Some((*item, 0)),
+                Some(whole) if whole == row_item => *i = Some((*item, 0)),
+                Some(_) => (),
+            }
         }
     }
     let face: HashSet<Item> = items.iter().zip(&segment)
