@@ -9,7 +9,7 @@
 //! reader parses and reuses its parsing.
 //!
 //! A filing is read from a directory holding `FilingSummary.xml` and the `R`
-//! pages it names, e.g. `edgar/<cik>/<accession>/`.
+//! pages it names, e.g. `edgar/cache/<cik>/<accession>/` (see the `edgar` crate).
 
 use std::error::Error;
 use std::fs;
@@ -25,14 +25,7 @@ use crate::sheet_info::{new_sheet_info, SheetType};
 use crate::Reader as R;
 use crate::Ticker;
 
-/// One statement page listed in `FilingSummary.xml`.
-#[derive(Debug, Clone)]
-pub struct Report {
-    pub file: String,
-    pub short_name: String,
-    /// "Statements", "Details", "Notes", ...; absent in older summaries.
-    pub category: Option<String>,
-}
+pub use edgar::{parse_filing_summary, Report};
 
 pub struct Reader {
     dir: PathBuf,
@@ -47,31 +40,6 @@ pub fn new_reader(dir: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> 
         ticker,
         reports: parse_filing_summary(&summary),
     })
-}
-
-static REPORT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?s)<Report\b.*?</Report>").unwrap());
-
-fn tag(block: &str, name: &str) -> Option<String> {
-    let open = format!("<{}>", name);
-    let close = format!("</{}>", name);
-    let start = block.find(&open)? + open.len();
-    let end = block[start..].find(&close)? + start;
-    Some(block[start..end].trim().to_string())
-}
-
-/// The pages listed in `FilingSummary.xml`, in filing order (cover page, then
-/// statements, then notes).
-pub fn parse_filing_summary(xml: &str) -> Vec<Report> {
-    REPORT.find_iter(xml)
-        .filter_map(|m| {
-            let block = m.as_str();
-            Some(Report {
-                file: tag(block, "HtmlFileName")?,
-                short_name: tag(block, "ShortName").unwrap_or_default(),
-                category: tag(block, "MenuCategory"),
-            })
-        })
-        .collect()
 }
 
 /// Pick the first page whose name matches, skipping parenthetical pages (share

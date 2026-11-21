@@ -2,9 +2,6 @@ use std::error::Error;
 
 use equities::Reader;
 
-/// Identifies this client to the SEC, as EDGAR's fair access policy requires.
-const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
-
 /// Read when no tickers are given on the command line.
 const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::NVDA,
@@ -49,10 +46,11 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::new("KLAC"),
 ];
 
-/// Usage: lib [--bulk] [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
+/// Usage: lib [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
 /// --dump prints every value read; with --latest, only the values pushed.
-/// --bulk reads filing lists from EDGAR's nightly submissions.zip (1.6 GB,
-/// one request) instead of one request or more per company.
+/// Filings are read from the EDGAR cache (edgar/cache), which `fetch`
+/// (the edgar crate's executable) brings up to date; nothing here touches
+/// the network but the push to InfluxDB.
 
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
@@ -69,13 +67,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         tickers = DEFAULT_TICKERS.to_vec();
     }
 
-    let mut edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
-    if std::env::args().any(|a| a == "--bulk") {
-        edgar = edgar.bulk_submissions();
-    }
+    let cache = edgar::Cache::new(edgar::Cache::default_dir());
 
     for equity in tickers {
-        if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
+        if let Err(e) = read_edgar(&cache, equity, &mut reported_items) {
             eprintln!("{}: {}", equity, e);
         }
     }
@@ -130,15 +125,14 @@ fn latest(items: Vec<equities::item::Reported>) -> Vec<equities::item::Reported>
 
 /// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later
 /// filing's restatement of an earlier period overwrites the original.
-fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let cik = edgar.cik(equity.sec_symbol())?;
+fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let cik = cache.cik(equity.sec_symbol())?;
     eprintln!("{}: CIK {}", equity, cik);
-    // Foreign filers (TSMC) file annual 20-Fs instead of 10-Ks, and no 10-Qs.
-    let filings = edgar.filings(cik, &["10-Q", "10-K", "20-F"])?;
-    let mut skipped = 0;
+    let filings = cache.filings(cik, &edgar::FORMS)?;
+    let (mut skipped, mut missing) = (0, 0);
     for f in &filings {
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
-        match edgar.fetch_filing(f) {
+        match cache.filing(f) {
             Ok(dir) => match equities::filing::new_reader(&dir, equity) {
                 Ok(mut r) => {
                     read_statements(&mut r, &name, reported_items);
@@ -149,13 +143,15 @@ fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reporte
                 },
                 Err(e) => eprintln!("failed to read {}: {}", name, e),
             },
-            Err(e) => match e.downcast_ref::<equities::edgar::EdgarError>() {
-                Some(equities::edgar::EdgarError::NoFilingSummary) => skipped += 1,
-                _ => eprintln!("failed to fetch {}: {}", name, e),
+            Err(e) => match e.downcast_ref::<edgar::EdgarError>() {
+                Some(edgar::EdgarError::NoFilingSummary) => skipped += 1,
+                Some(edgar::EdgarError::NotFetched(_)) => missing += 1,
+                _ => eprintln!("failed to read {}: {}", name, e),
             },
         }
     }
-    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements", equity, filings.len() - skipped, skipped);
+    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements{}", equity, filings.len() - skipped - missing, skipped,
+        if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
     Ok(())
 }
 
