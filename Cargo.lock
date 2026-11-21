@@ -622,6 +622,7 @@ dependencies = [
  "scraper",
  "serde",
  "serde_json",
+ "tiingo",
  "uniffi",
 ]
 
@@ -1298,6 +1299,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "tiingo",
  "uniffi",
 ]
 
@@ -2455,6 +2457,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tiingo"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
