@@ -542,23 +542,31 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
         _ => None,
     };
 
-    let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), f64> = HashMap::new();
+    // Derived values with the period they came from: a fiscal year change can
+    // derive the same quarter twice (ADM's 2012 transition reports both July-
+    // December and the calendar year), and the shorter period wins.
+    let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), (Period, f64)> = HashMap::new();
     for (&(ticker, item, currency, p, date), &total) in &latest {
         let Some(prev_p) = previous(p) else { continue };
         if latest.contains_key(&(ticker, item, currency, Period::ThreeMonths, date)) {
             continue;
         }
-        let prev = latest.iter().find(|((t, i, c, pp, d), _)| {
-            *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())
-        });
+        // Where two earlier periods fall in the window, the one nearest a
+        // quarter back, so the result does not depend on the map's order.
+        let prev = latest.iter()
+            .filter(|((t, i, c, pp, d), _)| {
+                *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())
+            })
+            .min_by_key(|((_, _, _, _, d), _)| ((date - *d).num_days().abs_diff(91), *d));
         if let Some((_, prev_total)) = prev {
-            derived.insert((ticker, item, currency, date), total - prev_total);
+            let entry = derived.entry((ticker, item, currency, date)).or_insert((p, total - prev_total));
+            if p < entry.0 { *entry = (p, total - prev_total); }
         }
     }
 
     let mut derived: Vec<_> = derived.into_iter().collect();
     derived.sort_by_key(|((t, i, c, d), _)| (t.to_string(), *i, *c, *d));
-    items.extend(derived.into_iter().map(|((ticker, item, currency, date), val)| Reported {
+    items.extend(derived.into_iter().map(|((ticker, item, currency, date), (_, val))| Reported {
         ticker, date, p: Period::ThreeMonths, item, currency, val,
     }));
 }
