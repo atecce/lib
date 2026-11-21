@@ -153,7 +153,8 @@ impl Client {
         let map: std::collections::HashMap<String, TickerEntry> =
             self.get_json("https://www.sec.gov/files/company_tickers.json")?;
         map.into_values()
-            .find(|e| e.ticker.eq_ignore_ascii_case(ticker))
+            // Class shares: "BF.B" in most lists, "BF-B" at the SEC.
+            .find(|e| e.ticker.replace('.', "-").eq_ignore_ascii_case(&ticker.replace('.', "-")))
             .map(|e| e.cik_str)
             .ok_or_else(|| EdgarError::TickerNotFound(ticker.to_string()).into())
     }

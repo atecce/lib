@@ -20,8 +20,8 @@
           "type": "influxdb",
           "uid": "efm3zlbhro268a"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v13\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v13\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
         "refresh": 1,
         "sort": 1,
         "multi": true,
@@ -70,8 +70,8 @@
           "type": "influxdb",
           "uid": "efm3zlbhro268a"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v13\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v13\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
         "refresh": 1,
         "sort": 1,
         "multi": false,
@@ -195,7 +195,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "revenue",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -243,7 +243,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "net income",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -291,7 +291,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "cash and cash equivalents",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -339,7 +339,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "marketable securities",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -387,7 +387,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "inventories",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -525,7 +525,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "operating cash flow",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -573,7 +573,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "investing cash flow",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -621,7 +621,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "financing cash flow",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -669,7 +669,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "capital expenditures",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -717,7 +717,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "share repurchases",
-          "measurement": "reported_item_v13",
+          "measurement": "reported_item_v14",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
