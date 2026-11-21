@@ -103,7 +103,9 @@ pub fn cash_flow_statement(reports: &[Report]) -> Option<&Report> {
 
 pub fn income_statement(reports: &[Report]) -> Option<&Report> {
     let is_income = |n: &str| {
-        n.contains("statement") && (n.contains("operations") || n.contains("income") || n.contains("earnings"))
+        // Sysco titles it "Consolidated Results of Operations", without "statement".
+        (n.contains("statement") && (n.contains("operations") || n.contains("income") || n.contains("earnings"))
+            || n.starts_with("consolidated results of operations"))
             && !n.contains("cash flow") && !n.contains("equity") && !n.contains("stockholders")
     };
     find_report(reports, |n| is_income(n) && !n.contains("comprehensive"))
