@@ -20,8 +20,8 @@
           "type": "influxdb",
           "uid": "efm3zlbhro268a"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "query": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"ticker\" WHERE time > '1990-01-01T00:00:00Z'",
         "refresh": 1,
         "sort": 1,
         "multi": true,
@@ -70,8 +70,8 @@
           "type": "influxdb",
           "uid": "efm3zlbhro268a"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v14\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "query": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
+        "definition": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"currency\" WHERE time > '1990-01-01T00:00:00Z'",
         "refresh": 1,
         "sort": 1,
         "multi": false,
@@ -195,7 +195,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "total assets",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -243,7 +243,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "total liabilities",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -291,7 +291,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "stockholders' equity",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -339,7 +339,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "long-term debt",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -477,7 +477,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "revenue",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -525,7 +525,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "operating income",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -573,7 +573,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "net income",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -621,7 +621,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "buybacks",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -675,7 +675,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "dividends",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -819,7 +819,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "cash",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -867,7 +867,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "marketable securities",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -915,7 +915,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "receivables",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -963,7 +963,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "inventories",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1101,7 +1101,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "operating",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1149,7 +1149,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "investing",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1197,7 +1197,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "financing",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1335,7 +1335,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "property and equipment",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1383,7 +1383,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "goodwill",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1431,7 +1431,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "intangibles",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1569,7 +1569,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "capex",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1623,7 +1623,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "depreciation and amortization",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
@@ -1671,7 +1671,7 @@
             "uid": "efm3zlbhro268a"
           },
           "alias": "acquisitions",
-          "measurement": "reported_item_v14",
+          "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
           "orderByTime": "ASC",
