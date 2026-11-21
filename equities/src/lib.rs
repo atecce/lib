@@ -465,6 +465,7 @@ impl_reported! {
         DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
         OtherLongTermLiabilities => field other_long_term_liabilities,
         TotalLiabilities => method total_liabilities,
+        StockholdersEquity => field stockholders_equity,
     ]
 }
 

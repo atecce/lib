@@ -40,6 +40,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 10_666_000_000.0,
             deferred_revenue_net_of_current_portion: 1_199_000_000.0,
             other_long_term_liabilities: 2_667_000_000.0,
+
+            stockholders_equity: 9_173_000_000.0,
         },
     ];
 

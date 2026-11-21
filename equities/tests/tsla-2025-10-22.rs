@@ -39,6 +39,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 5_757_000_000.0,
             deferred_revenue_net_of_current_portion: 3_317_000_000.0,
             other_long_term_liabilities: 10_495_000_000.0,
+
+            stockholders_equity: 72_913_000_000.0,
         },
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
@@ -69,6 +71,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 5_778_000_000.0,
             deferred_revenue_net_of_current_portion: 3_746_000_000.0,
             other_long_term_liabilities: 12_205_000_000.0,
+
+            stockholders_equity: 79_970_000_000.0,
         },
     ];
 

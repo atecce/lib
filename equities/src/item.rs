@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 83] = [
+            pub const ALL: [$item; 84] = [
                 $($item::$variant,)*
             ];
 
@@ -119,6 +119,9 @@ items! {
         TotalNonCurrentLiabilities => ["Total non-current liabilities"] @ ["LiabilitiesNoncurrent", "ifrs-full_NoncurrentLiabilities"],
 
         TotalLiabilities => ["Total liabilities", "Total Liabilities"] @ ["Liabilities", "ifrs-full_Liabilities"],
+        // Book value: the parent's equity first, total equity where that is all
+        // a company reports.
+        StockholdersEquity @ ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "ifrs-full_EquityAttributableToOwnersOfParent", "ifrs-full_Equity"],
 
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales"],

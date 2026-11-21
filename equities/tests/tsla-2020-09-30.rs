@@ -40,6 +40,8 @@ fn q3_2020() {
             debt_and_finance_leases_net_of_current_portion: 10_559_000_000.0,
             deferred_revenue_net_of_current_portion: 1_233_000_000.0,
             other_long_term_liabilities: 3_049_000_000.0,
+
+            stockholders_equity: 16_031_000_000.0,
         },
     ];
 
