@@ -191,11 +191,13 @@ impl FromStr for Period {
         // PepsiCo's 36-week year to date is "8 Months Ended", so any count of
         // months maps to the nearest quarter boundary.
         if let Some(months) = MONTHS.captures(&lower).and_then(|c| c[1].parse::<u32>().ok()) {
+            // Only lengths a quarter, half or year rounds to; anything else
+            // (a one-month stub period after an acquisition) is not a quarter.
             match months {
-                1..=4 => Ok(Period::ThreeMonths),
-                5..=7 => Ok(Period::SixMonths),
-                8..=10 => Ok(Period::NineMonths),
-                11..=13 => Ok(Period::TwelveMonths),
+                3 => Ok(Period::ThreeMonths),
+                5..=6 => Ok(Period::SixMonths),
+                8..=9 => Ok(Period::NineMonths),
+                12..=13 => Ok(Period::TwelveMonths),
                 _ => Err(PeriodError::InvalidPeriod),
             }
         }
@@ -207,10 +209,10 @@ impl FromStr for Period {
         // quarters are 12, 12, 12 and 16 weeks ("24 Weeks Ended" is its first half).
         else if let Some(weeks) = WEEKS.captures(&lower).and_then(|c| c[1].parse::<u32>().ok()) {
             match weeks {
-                1..=17 => Ok(Period::ThreeMonths),
-                18..=30 => Ok(Period::SixMonths),
-                31..=43 => Ok(Period::NineMonths),
-                48..=53 => Ok(Period::TwelveMonths),
+                12..=14 | 16..=17 => Ok(Period::ThreeMonths),
+                24..=27 => Ok(Period::SixMonths),
+                36..=40 => Ok(Period::NineMonths),
+                52..=53 => Ok(Period::TwelveMonths),
                 _ => Err(PeriodError::InvalidPeriod),
             }
         }
@@ -593,5 +595,8 @@ mod period_tests {
         assert_eq!("8 Months Ended".parse::<Period>().unwrap(), Period::NineMonths);
         assert_eq!("12 Months Ended".parse::<Period>().unwrap(), Period::TwelveMonths);
         assert_eq!("Nine Months Ended".parse::<Period>().unwrap(), Period::NineMonths);
+        assert!("2 Months Ended".parse::<Period>().is_err());
+        assert!("0 Months Ended".parse::<Period>().is_err());
+        assert!("4 Weeks Ended".parse::<Period>().is_err());
     }
 }
