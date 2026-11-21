@@ -87,6 +87,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut book = equities::book_value_per_share(&reported_items);
     reported_items.append(&mut book);
 
+    // Daily market values, for tickers with prices in the tiingo cache.
+    let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
+    let mut tickers: Vec<equities::Ticker> = reported_items.iter().map(|i| i.ticker).collect();
+    tickers.sort_by_key(|t| t.as_str().to_string());
+    tickers.dedup();
+    let mut market = Vec::new();
+    for t in tickers {
+        let Ok(p) = prices.prices(t.as_str()) else { continue };
+        let mut m = equities::valuation::market(t, &p, &reported_items);
+        if let Some(last) = m.last() {
+            eprintln!("{}: market cap {:.1}B on {}{}", t, last.market_cap / 1e9, last.date,
+                last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default());
+        }
+        market.append(&mut m);
+    }
+
     // Every item read, one per line, sorted: for diffing the output of two versions.
     if std::env::args().any(|a| a == "--dump") {
         let reported_items = if std::env::args().any(|a| a == "--latest") { latest(reported_items) } else { reported_items };
@@ -108,6 +124,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let items = latest(reported_items);
         push_to_influx(&items)?;
         println!("Successfully pushed {} items to InfluxDB", items.len());
+    }
+    if !dry_run && !market.is_empty() {
+        push_market(&market)?;
+        println!("Successfully pushed {} market days to InfluxDB", market.len());
     }
 
     Ok(())
@@ -243,6 +263,31 @@ fn print_series(items: &[equities::item::Reported], cash_flow: bool) {
         }
         println!();
     }
+}
+
+/// Daily market values, in their own measurement: one point per ticker and
+/// day, with the close, market cap and (where known) price-to-book.
+fn push_market(days: &[equities::valuation::Market]) -> Result<(), Box<dyn Error>> {
+    let client = reqwest::blocking::Client::new();
+    let auth_token = std::env::var("INFLUXDB3_AUTH_TOKEN")
+        .map_err(|_| "INFLUXDB3_AUTH_TOKEN environment variable not set")?;
+    for chunk in days.chunks(5000) {
+        let mut payload = String::new();
+        for m in chunk {
+            let ts = m.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
+            payload.push_str(&format!("market_v1,ticker={},currency={} close={},market_cap={}{} {}\n",
+                m.ticker.to_string().to_lowercase(), m.currency, m.close, m.market_cap,
+                m.price_to_book.map(|pb| format!(",price_to_book={}", pb)).unwrap_or_default(), ts));
+        }
+        let res = client.post("http://localhost:8181/write?db=financials")
+            .bearer_auth(&auth_token)
+            .body(payload)
+            .send()?;
+        if !res.status().is_success() {
+            return Err(format!("InfluxDB write failed: {}", res.text()?).into());
+        }
+    }
+    Ok(())
 }
 
 fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Error>> {

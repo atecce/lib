@@ -36,6 +36,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             t => tickers.push(t.to_string()),
         }
     }
+    // Tokyo tickers (7203.T) are EDINET's, not EDGAR's.
+    tickers.retain(|t| !t.to_uppercase().ends_with(".T"));
     if tickers.is_empty() {
         return Err("usage: fetch [--bulk] [--list FILE ...] [TICKER ...]".into());
     }
