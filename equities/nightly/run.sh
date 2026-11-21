@@ -16,9 +16,14 @@ list=${1:?usage: run.sh LIST}
 name=${${list:h}:t}   # equities/nikkei/all.txt -> nikkei
 log=equities/nightly/log.$name.$(date +%Y%m%d-%H%M%S)
 
+# One fetch at a time: wait for the lock (zsh's flock), hold it while fetching.
+zmodload zsh/system
+touch edgar/cache/.fetch.lock
+zsystem flock -f lock edgar/cache/.fetch.lock || exit 1
 # fetch prints the tickers with new filings on stdout, progress on stderr.
-new=$(/usr/bin/lockf edgar/cache/.fetch.lock ./target/release/fetch --list $list 2>>$log)
+new=$(./target/release/fetch --list $list 2>>$log)
 fetched=$?
+zsystem flock -u $lock
 echo "=== $name new filings: ${new:-none}" | tee -a $log
 if [ -n "$new" ]; then
   ./target/release/lib $(echo $new) >> $log 2>&1 || exit 1
