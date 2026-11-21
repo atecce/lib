@@ -8,10 +8,17 @@
 //! their copies are older than `SUBMISSIONS_MAX_AGE` and `TICKERS_MAX_AGE`.
 //! Delete them to fetch them now.
 //!
+//! With `bulk_submissions`, filing lists come instead from EDGAR's nightly
+//! `submissions.zip` (every filer's, about 1.6 GB), saved as
+//! `<cache>/submissions.zip` and fetched again when older than
+//! `SUBMISSIONS_MAX_AGE`: one request rather than one or more per company,
+//! which pays off across thousands of companies. A company missing from the
+//! zip (its first filing since it was built) is fetched on its own.
+//!
 //! The SEC asks automated clients to send a User-Agent naming who they are
 //! and to stay under 10 requests per second.
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -39,6 +46,9 @@ pub struct Client {
     http: reqwest::blocking::Client,
     cache: PathBuf,
     last_request: Cell<Option<Instant>>,
+    bulk: bool,
+    /// The opened `submissions.zip`, once `bulk` has needed it.
+    archive: RefCell<Option<zip::ZipArchive<fs::File>>>,
 }
 
 #[derive(Debug, Clone)]
@@ -127,6 +137,8 @@ impl Client {
             http: reqwest::blocking::Client::builder().user_agent(user_agent).build()?,
             cache: cache.into(),
             last_request: Cell::new(None),
+            bulk: false,
+            archive: RefCell::new(None),
         })
     }
 
@@ -153,6 +165,55 @@ impl Client {
             }
             sleep(Duration::from_secs(1 << attempt));
         }
+    }
+
+    /// Read filing lists from EDGAR's nightly `submissions.zip`.
+    pub fn bulk_submissions(mut self) -> Self {
+        self.bulk = true;
+        self
+    }
+
+    /// `name` from `submissions.zip`, downloading the zip first when there is
+    /// no copy younger than `SUBMISSIONS_MAX_AGE`. `None` when the zip has
+    /// no such entry.
+    fn bulk_json<T: serde::de::DeserializeOwned>(&self, name: &str) -> Result<Option<T>, Box<dyn Error>> {
+        let mut archive = self.archive.borrow_mut();
+        if archive.is_none() {
+            const URL: &str = "https://www.sec.gov/Archives/edgar/daily-index/bulkdata/submissions.zip";
+            let path = self.cache.join("submissions.zip");
+            let fresh = fs::metadata(&path).and_then(|m| m.modified()).ok()
+                .is_some_and(|t| t.elapsed().unwrap_or_default() < SUBMISSIONS_MAX_AGE);
+            if !fresh {
+                eprintln!("downloading {}", URL);
+                self.download(URL, &path)?;
+            }
+            *archive = Some(zip::ZipArchive::new(fs::File::open(&path)?)?);
+        }
+        let archive = archive.as_mut().unwrap();
+        let entry = match archive.by_name(name) {
+            Ok(entry) => entry,
+            Err(zip::result::ZipError::FileNotFound) => return Ok(None),
+            Err(e) => return Err(e.into()),
+        };
+        Ok(Some(serde_json::from_reader(std::io::BufReader::new(entry))?))
+    }
+
+    /// Stream a large file to `path`, through a temporary file so an
+    /// interrupted download is never taken for a complete one.
+    fn download(&self, url: &str, path: &Path) -> Result<(), Box<dyn Error>> {
+        if let Some(last) = self.last_request.get() {
+            sleep(MIN_INTERVAL.saturating_sub(last.elapsed()));
+        }
+        self.last_request.set(Some(Instant::now()));
+        // The client's default 30-second timeout is far too short for 1.6 GB.
+        let mut res = self.http.get(url).timeout(Duration::from_secs(3600)).send()?.error_for_status()?;
+        if let Some(dir) = path.parent() { fs::create_dir_all(dir)?; }
+        let tmp = path.with_extension("partial");
+        let mut file = fs::File::create(&tmp)?;
+        std::io::copy(&mut res, &mut file)?;
+        file.sync_all()?;
+        fs::rename(&tmp, path)?;
+        Ok(())
     }
 
     /// `url` as JSON, from its copy at `path` while that is younger than
@@ -200,8 +261,19 @@ impl Client {
     /// older history EDGAR pages out of the main submissions file.
     pub fn filings(&self, cik: u64, forms: &[&str]) -> Result<Vec<Filing>, Box<dyn Error>> {
         let dir = self.cache.join(cik.to_string());
+        let main = format!("CIK{:010}.json", cik);
+        if self.bulk {
+            if let Some(subs) = self.bulk_json::<Submissions>(&main)? {
+                let mut pages = vec![subs.filings.recent];
+                for file in &subs.filings.files {
+                    pages.push(self.bulk_json(&file.name)?
+                        .ok_or_else(|| format!("{} not in submissions.zip", file.name))?);
+                }
+                return Ok(filings_of(cik, pages, forms));
+            }
+        }
         let subs: Submissions = self.cached_json(
-            &format!("https://data.sec.gov/submissions/CIK{:010}.json", cik),
+            &format!("https://data.sec.gov/submissions/{}", main),
             &dir.join("submissions.json"), Some(SUBMISSIONS_MAX_AGE))?;
 
         // Older history, paged out of the main file. A page's copy is good as
@@ -215,30 +287,7 @@ impl Client {
             });
         }
 
-        let mut filings = Vec::new();
-        for page in pages {
-            for i in 0..page.form.len() {
-                if !forms.contains(&page.form[i].as_str()) {
-                    continue;
-                }
-                let (Ok(report_date), Ok(filing_date)) = (
-                    NaiveDate::parse_from_str(&page.report_date[i], "%Y-%m-%d"),
-                    NaiveDate::parse_from_str(&page.filing_date[i], "%Y-%m-%d"),
-                ) else {
-                    continue;
-                };
-                filings.push(Filing {
-                    cik,
-                    accession: page.accession_number[i].clone(),
-                    form: page.form[i].clone(),
-                    report_date,
-                    filing_date,
-                });
-            }
-        }
-        filings.sort_by_key(|f| (f.filing_date, f.accession.clone()));
-        filings.dedup_by(|a, b| a.accession == b.accession);
-        Ok(filings)
+        Ok(filings_of(cik, pages, forms))
     }
 
     /// Download the filing's `FilingSummary.xml` and its balance sheet, income
@@ -284,6 +333,36 @@ impl Client {
 }
 
 /// Write via a temporary file so an interrupted download never leaves a
+
+/// The given forms among a company's filings, oldest first: EDGAR lists
+/// them in pages, newest first.
+fn filings_of(cik: u64, pages: Vec<FilingColumns>, forms: &[&str]) -> Vec<Filing> {
+    let mut filings = Vec::new();
+    for page in pages {
+        for i in 0..page.form.len() {
+            if !forms.contains(&page.form[i].as_str()) {
+                continue;
+            }
+            let (Ok(report_date), Ok(filing_date)) = (
+                NaiveDate::parse_from_str(&page.report_date[i], "%Y-%m-%d"),
+                NaiveDate::parse_from_str(&page.filing_date[i], "%Y-%m-%d"),
+            ) else {
+                continue;
+            };
+            filings.push(Filing {
+                cik,
+                accession: page.accession_number[i].clone(),
+                form: page.form[i].clone(),
+                report_date,
+                filing_date,
+            });
+        }
+    }
+    filings.sort_by_key(|f| (f.filing_date, f.accession.clone()));
+    filings.dedup_by(|a, b| a.accession == b.accession);
+    filings
+}
+
 /// partial file that later runs would treat as cached.
 fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), Box<dyn Error>> {
     let tmp = path.with_extension("part");

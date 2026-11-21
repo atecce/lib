@@ -49,8 +49,10 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::new("KLAC"),
 ];
 
-/// Usage: lib [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
+/// Usage: lib [--bulk] [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
 /// --dump prints every value read; with --latest, only the values pushed.
+/// --bulk reads filing lists from EDGAR's nightly submissions.zip (1.6 GB,
+/// one request) instead of one request or more per company.
 
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
@@ -67,7 +69,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         tickers = DEFAULT_TICKERS.to_vec();
     }
 
-    let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
+    let mut edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
+    if std::env::args().any(|a| a == "--bulk") {
+        edgar = edgar.bulk_submissions();
+    }
 
     for equity in tickers {
         if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
