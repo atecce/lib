@@ -2,8 +2,11 @@
 # Resumable S&P 500 run, 25 tickers at a time, each batch pushed to InfluxDB
 # when it finishes. Tickers listed in priority.txt (one per line, any symbol)
 # go first; finished tickers are recorded in done_tickers.txt and skipped.
-cd /Users/atec/lib || exit 1
 source ~/.profile
+# The checkout to run in: $LIB if set, else the one this script is in
+# ($LIB/equities/sp500/run.sh).
+LIB=${LIB:-${0:A:h:h:h}}
+cd $LIB || exit 1
 S=equities/sp500
 touch $S/done_tickers.txt $S/priority.txt
 # The run order: the constituent list, unless an order was already written.
