@@ -1,6 +1,5 @@
 uniffi::setup_scaffolding!();
 
-pub mod date;
 pub mod item;
 pub mod xlsx;
 pub mod filing;
@@ -595,8 +594,9 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
         if latest.contains_key(&(ticker, item, currency, Period::ThreeMonths, date)) {
             continue;
         }
-        // Where two earlier periods fall in the window, the one nearest a
-        // quarter back, so the result does not depend on the map's order.
+        // Where two earlier periods fall in the window (a fiscal year change,
+        // as ADM's in 2012), the one nearest a quarter back, so the result does
+        // not depend on the map's iteration order.
         let prev = latest.iter()
             .filter(|((t, i, c, pp, d), _)| {
                 *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())

@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::error::Error;
 
-use crate::date::{parse_date_str, parse_date_across_cells};
 use crate::{Currency, Period};
 
 static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
@@ -83,6 +82,28 @@ fn share_scale(s: &str) -> Option<f64> {
 fn is_period_heading(s: &str) -> bool {
     ["month", "week", "year", "quarter"].iter().any(|unit| s.contains(unit))
         && (s.contains("ended") || s.contains("months") || s.contains("weeks"))
+}
+
+/// A header date: "Oct. 26, 2025", "October 26 2025", "10/26/2025", "2025-10-26".
+fn parse_date_str(s: &str) -> Option<NaiveDate> {
+    let s = s.trim().replace(",", "");
+    let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
+    formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())
+}
+
+/// A date split over two rows, "October 26," above the year (NVDA's own
+/// spreadsheets).
+fn parse_date_across_cells(s: &str, next_cell: Option<&Data>) -> Option<NaiveDate> {
+    if s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2 {
+        if let Some(year) = next_cell.and_then(|c| match c {
+            Data::Float(f) => Some(*f as i32),
+            Data::Int(i) => Some(*i as i32),
+            _ => None,
+        }).filter(|&y| y > 1900 && y < 2100) {
+            return parse_date_str(&format!("{} {}", s, year))
+        }
+    }
+    None
 }
 
 pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetInfo, Box<dyn Error>> {
