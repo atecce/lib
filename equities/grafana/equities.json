@@ -9340,6 +9340,3886 @@
             }
           }
         }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "id": 13,
+          "title": "amzn (Amazon)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "revenue",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Revenue"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "net income",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetIncome"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "cash and cash equivalents",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "CashAndCashEquivalents"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "marketable securities",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "MarketableSecurities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "inventories",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Inventories"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-cf-13": {
+        "kind": "Panel",
+        "spec": {
+          "id": 113,
+          "title": "amzn cash flows (Amazon)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "operating cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashProvidedByOperatingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "investing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInInvestingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "financing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInFinancingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "capital expenditures",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "share repurchases",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "amzn"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-14": {
+        "kind": "Panel",
+        "spec": {
+          "id": 14,
+          "title": "msft (Microsoft, fiscal year ends June)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "revenue",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Revenue"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "net income",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetIncome"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "cash and cash equivalents",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "CashAndCashEquivalents"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "marketable securities",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "MarketableSecurities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "inventories",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Inventories"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-cf-14": {
+        "kind": "Panel",
+        "spec": {
+          "id": 114,
+          "title": "msft cash flows (Microsoft, fiscal year ends June)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "operating cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashProvidedByOperatingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "investing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInInvestingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "financing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInFinancingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "capital expenditures",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "share repurchases",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "msft"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "id": 15,
+          "title": "googl (Alphabet)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "revenue",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Revenue"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "net income",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetIncome"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "cash and cash equivalents",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "CashAndCashEquivalents"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "marketable securities",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "MarketableSecurities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "inventories",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Inventories"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-cf-15": {
+        "kind": "Panel",
+        "spec": {
+          "id": 115,
+          "title": "googl cash flows (Alphabet)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "operating cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashProvidedByOperatingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "investing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInInvestingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "financing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInFinancingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "capital expenditures",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "share repurchases",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "googl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-16": {
+        "kind": "Panel",
+        "spec": {
+          "id": 16,
+          "title": "ibm",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "revenue",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Revenue"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "net income",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetIncome"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "cash and cash equivalents",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "CashAndCashEquivalents"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "marketable securities",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "MarketableSecurities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "inventories",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Inventories"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-cf-16": {
+        "kind": "Panel",
+        "spec": {
+          "id": 116,
+          "title": "ibm cash flows",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "operating cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashProvidedByOperatingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "investing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInInvestingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "financing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInFinancingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "capital expenditures",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "share repurchases",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "ibm"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-17": {
+        "kind": "Panel",
+        "spec": {
+          "id": 17,
+          "title": "orcl (Oracle, fiscal year ends May)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "revenue",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Revenue"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "net income",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetIncome"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "cash and cash equivalents",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "CashAndCashEquivalents"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "marketable securities",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "MarketableSecurities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "inventories",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "Inventories"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "pit"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-cf-17": {
+        "kind": "Panel",
+        "spec": {
+          "id": 117,
+          "title": "orcl cash flows (Oracle, fiscal year ends May)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "A",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "operating cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashProvidedByOperatingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "B",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "investing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInInvestingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "C",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "financing cash flow",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "NetCashUsedInFinancingActivities"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "D",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "capital expenditures",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "refId": "E",
+                    "hidden": false,
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "influxdb",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "efm3zlbhro268a"
+                      },
+                      "spec": {
+                        "alias": "share repurchases",
+                        "groupBy": [],
+                        "measurement": "reported_item_v13",
+                        "orderByTime": "ASC",
+                        "policy": "financials",
+                        "resultFormat": "time_series",
+                        "select": [
+                          [
+                            {
+                              "params": [
+                                "value"
+                              ],
+                              "type": "field"
+                            }
+                          ]
+                        ],
+                        "tags": [
+                          {
+                            "key": "ticker",
+                            "operator": "=",
+                            "value": "orcl"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "item",
+                            "operator": "=",
+                            "value": "PaymentsRelatedToRepurchasesOfCommonStock"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "period",
+                            "operator": "=",
+                            "value": "3m"
+                          },
+                          {
+                            "condition": "AND",
+                            "key": "currency",
+                            "operator": "=",
+                            "value": "USD"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.0.1-0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "currencyUSD",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
       }
     },
     "layout": {
@@ -9655,6 +13535,136 @@
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-cf-12"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 120,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-13"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 120,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-cf-13"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 130,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-14"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 130,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-cf-14"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 140,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-15"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 140,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-cf-15"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 150,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-16"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 150,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-cf-16"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 160,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-17"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 160,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-cf-17"
               }
             }
           }

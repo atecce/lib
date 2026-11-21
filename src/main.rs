@@ -7,7 +7,7 @@ use equities::Reader;
 const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
 
 /// Read when no tickers are given on the command line.
-const DEFAULT_TICKERS: [equities::Ticker; 12] = [
+const DEFAULT_TICKERS: [equities::Ticker; 17] = [
     equities::Ticker::NVDA,
     equities::Ticker::TSLA,
     equities::Ticker::AAPL,
@@ -21,6 +21,13 @@ const DEFAULT_TICKERS: [equities::Ticker; 12] = [
     // Block, formerly Square (SQ until January 2025).
     equities::Ticker::new("XYZ"),
     equities::Ticker::new("PLTR"),
+    equities::Ticker::new("AMZN"),
+    equities::Ticker::new("MSFT"),
+    // Alphabet; also listed as GOOG (same company). Google Inc.'s filings
+    // before the 2015 reorganization are under a different CIK.
+    equities::Ticker::new("GOOGL"),
+    equities::Ticker::new("IBM"),
+    equities::Ticker::new("ORCL"),
 ];
 
 /// Usage: lib [--dry-run [--cash-flow] | --dump] [--no-edgar] [TICKER ...]

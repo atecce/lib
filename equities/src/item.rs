@@ -171,7 +171,7 @@ items! {
         DividendsPaid => ["Dividends paid"] @ ["PaymentsOfDividends", "PaymentsOfDividendsCommonStock", "ifrs-full_DividendsPaidClassifiedAsFinancingActivities"],
         PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => ["Principal payments on property and equipment and intangible assets"],
         RepaymentOfDebt => ["Repayment of debt"],
-        ChangeInCashAndCashEquivalents => ["Change in cash and cash equivalents"] @ ["CashAndCashEquivalentsPeriodIncreaseDecrease", "CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect", "ifrs-full_IncreaseDecreaseInCashAndCashEquivalents"],
+        ChangeInCashAndCashEquivalents => ["Change in cash and cash equivalents"] @ ["CashAndCashEquivalentsPeriodIncreaseDecrease", "CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect", "NetCashProvidedByUsedInContinuingOperations", "ifrs-full_IncreaseDecreaseInCashAndCashEquivalents"],
     }
 }
 
