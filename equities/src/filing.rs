@@ -228,6 +228,57 @@ impl Reader {
         Ok(reported)
     }
 
+    /// Shares outstanding from the cover page, every class with a claim on
+    /// the company summed (not special voting shares), as of the
+    /// date the cover gives (a 20-F's: the fiscal year end). Berkshire's
+    /// Class A shares count as the 1,500 Class B shares each converts into,
+    /// so the total prices at the Class B quote.
+    pub fn process_cover(&self) -> Result<Vec<Reported>, Box<dyn Error>> {
+        let report = self.reports.iter()
+            .find(|r| r.category.as_deref() == Some("Cover") || r.kind.as_deref() == Some("Document"))
+            .ok_or("no cover page")?;
+        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
+        // The header's dates by column ("Oct. 15, 2026", or "Mar. 31, 2026
+        // shares" in a 20-F), and its share scale ("shares in Millions").
+        let mut dates = std::collections::HashMap::new();
+        let mut multiplier = 1.0;
+        for row in table.rows.iter().take(3) {
+            for (c, cell) in row.iter().enumerate() {
+                if let Data::String(s) = cell {
+                    let s = s.trim_end_matches(" shares").trim();
+                    if let Some(d) = crate::sheet_info::parse_date_str(s) {
+                        dates.insert(c, d);
+                    }
+                    if let Some(m) = crate::sheet_info::share_scale(&s.to_lowercase()) {
+                        multiplier = m;
+                    }
+                }
+            }
+        }
+        let mut total: Option<(chrono::NaiveDate, f64)> = None;
+        let mut member = "";
+        for (row, tag) in table.rows.iter().zip(&table.tags) {
+            let tag = tag.as_deref().unwrap_or("");
+            if tag.ends_with("Axis") {
+                member = label(row).unwrap_or("");
+                continue;
+            }
+            if tag != "dei_EntityCommonStockSharesOutstanding" { continue; }
+            // Loyalty shares (Ferrari's, Stellantis's) vote but own nothing.
+            if member.to_lowercase().contains("special voting") { continue; }
+            for (c, cell) in row.iter().enumerate() {
+                let (Data::Float(v), Some(date)) = (cell, dates.get(&c)) else { continue };
+                let per_share = if self.ticker == Ticker::BRK && member.contains("Class A") { 1500.0 } else { 1.0 };
+                let (d, sum) = total.get_or_insert((*date, 0.0));
+                if *d == *date {
+                    *sum += v * multiplier * per_share;
+                }
+            }
+        }
+        let (date, val) = total.ok_or("no shares outstanding on the cover page")?;
+        Ok(vec![Reported { ticker: self.ticker, date, p: crate::Period::PointInTime, item: Item::SharesOutstanding, currency: crate::Currency::USD, val }])
+    }
+
     /// 10-Qs only report cash flows year to date (3, 6, 9 months); see
     /// `derive_quarters` for the quarterly values.
     pub fn process_cash_flow_statement(&mut self) -> Result<Vec<Reported>, Box<dyn Error>> {

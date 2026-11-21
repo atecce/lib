@@ -84,6 +84,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     equities::merge_nearby_dates(&mut reported_items);
     equities::derive_quarters(&mut reported_items);
+    let mut book = equities::book_value_per_share(&reported_items);
+    reported_items.append(&mut book);
 
     // Every item read, one per line, sorted: for diffing the output of two versions.
     if std::env::args().any(|a| a == "--dump") {
@@ -146,6 +148,10 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
                     match r.process_cash_flow_statement() {
                         Ok(mut ret) => reported_items.append(&mut ret),
                         Err(e) => eprintln!("failed to process cash flow statement for {}; {}", name, e),
+                    }
+                    // Older filings' cover pages may not be fetched yet.
+                    if let Ok(mut ret) = r.process_cover() {
+                        reported_items.append(&mut ret);
                     }
                 },
                 Err(e) => eprintln!("failed to read {}: {}", name, e),

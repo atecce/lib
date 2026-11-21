@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 90] = [
+            pub const ALL: [$item; 92] = [
                 $($item::$variant,)*
             ];
 
@@ -216,6 +216,12 @@ items! {
         EarningsPerShareBasic => ["基本的１株当たり当期利益", "１株当たり当期純利益"] @ ["EarningsPerShareBasic", "EarningsPerShareBasicAndDiluted", "ifrs-full_BasicEarningsLossPerShare", "jpigp_cor:BasicEarningsLossPerShareIFRS", "jpigp_cor:BasicAndDilutedEarningsLossPerShareIFRS", "jpcrp_cor:BasicEarningsLossPerShareIFRSSummaryOfBusinessResults", "jpcrp_cor:BasicEarningsLossPerShareSummaryOfBusinessResults"],
         // 希薄化後１株当たり当期利益 (kihakuka-go hitokabu atari tōki rieki): diluted earnings per share
         EarningsPerShareDiluted => ["希薄化後１株当たり当期利益"] @ ["EarningsPerShareDiluted", "ifrs-full_DilutedEarningsLossPerShare", "jpigp_cor:DilutedEarningsLossPerShareIFRS", "jpcrp_cor:DilutedEarningsPerShareIFRSSummaryOfBusinessResults", "jpcrp_cor:DilutedEarningsPerShareSummaryOfBusinessResults"],
+        // As stated on a filing's cover page, dated as of the cover (a few
+        // weeks after the period ends): every class of common stock.
+        SharesOutstanding @ ["dei_EntityCommonStockSharesOutstanding"],
+        // Stockholders' equity over shares outstanding, as of each cover
+        // page (see `equities::book_value_per_share`).
+        BookValuePerShare,
         WeightedAverageSharesBasic @ ["WeightedAverageNumberOfSharesOutstandingBasic", "WeightedAverageNumberOfShareOutstandingBasicAndDiluted"],
         WeightedAverageSharesDiluted @ ["WeightedAverageNumberOfDilutedSharesOutstanding"],
 
@@ -294,8 +300,8 @@ impl Item {
     pub fn unit(&self) -> Unit {
         use Item::*;
         match self {
-            EarningsPerShareBasic | EarningsPerShareDiluted => Unit::PerShare,
-            WeightedAverageSharesBasic | WeightedAverageSharesDiluted => Unit::Shares,
+            EarningsPerShareBasic | EarningsPerShareDiluted | BookValuePerShare => Unit::PerShare,
+            WeightedAverageSharesBasic | WeightedAverageSharesDiluted | SharesOutstanding => Unit::Shares,
             _ => Unit::Money,
         }
     }

@@ -664,8 +664,10 @@ pub fn merge_nearby_dates(items: &mut [Reported]) {
 
     // Each company's dates, in the order they were read, so a later filing's
     // date becomes the one its cluster keeps.
+    // Share counts are dated by the cover page, not a period: never merged.
+    let merged = |it: &Reported| it.item != crate::item::Item::SharesOutstanding;
     let mut order: HashMap<Ticker, Vec<NaiveDate>> = HashMap::new();
-    for it in items.iter() {
+    for it in items.iter().filter(|it| merged(it)) {
         let dates = order.entry(it.ticker).or_default();
         dates.retain(|d| *d != it.date);
         dates.push(it.date);
@@ -691,7 +693,42 @@ pub fn merge_nearby_dates(items: &mut [Reported]) {
             }
         }
     }
-    for it in items.iter_mut() {
+    for it in items.iter_mut().filter(|it| merged(it)) {
         it.date = canonical[&(it.ticker, it.date)];
     }
+}
+
+/// Book value per share at each cover page's date: the latest stockholders'
+/// equity reported by then (a balance sheet's date is before its filing's
+/// cover), in its currency, over the shares outstanding on the cover. Only
+/// what was public on that date: no later restatement reaches back.
+pub fn book_value_per_share(items: &[Reported]) -> Vec<Reported> {
+    use crate::item::Item::{BookValuePerShare, SharesOutstanding, StockholdersEquity};
+    let mut out = Vec::new();
+    let mut tickers: Vec<Ticker> = items.iter().map(|i| i.ticker).collect();
+    tickers.sort_by_key(|t| t.as_str().to_string());
+    tickers.dedup();
+    for ticker in tickers {
+        // Equity as first reported for each date: items come in filing order,
+        // and a later filing's restatement was not public on earlier covers.
+        let mut equity: Vec<&Reported> = Vec::new();
+        for i in items.iter().filter(|i| i.ticker == ticker && i.item == StockholdersEquity && i.p == Period::PointInTime) {
+            if !equity.iter().any(|e| e.date == i.date && e.currency == i.currency) {
+                equity.push(i);
+            }
+        }
+        equity.sort_by_key(|i| i.date);
+        for shares in items.iter().filter(|i| i.ticker == ticker && i.item == SharesOutstanding && i.val > 0.0) {
+            // Each currency the company reports equity in (Toyota: yen).
+            let mut currencies: Vec<Currency> = equity.iter().map(|e| e.currency).collect();
+            currencies.dedup();
+            for currency in currencies {
+                let Some(e) = equity.iter().rev().find(|e| e.currency == currency && e.date <= shares.date) else { continue };
+                // A balance sheet more than a year old is not this cover's.
+                if (shares.date - e.date).num_days() > 400 { continue; }
+                out.push(Reported { ticker, date: shares.date, p: Period::PointInTime, item: BookValuePerShare, currency, val: e.val / shares.val });
+            }
+        }
+    }
+    out
 }
