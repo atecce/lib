@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 79] = [
+            pub const ALL: [$item; 83] = [
                 $($item::$variant,)*
             ];
 
@@ -58,6 +58,13 @@ macro_rules! items {
             }
         }
     };
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Unit {
+    Money,
+    Shares,
+    PerShare,
 }
 
 impl Display for Item {
@@ -144,6 +151,13 @@ items! {
         IncomeTaxExpense => ["Income tax expense", "Provision for income taxes", "Provision for (benefit from) income taxes", "Income Tax Expense"] @ ["IncomeTaxExpenseBenefit", "ifrs-full_IncomeTaxExpenseContinuingOperations"],
         NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss"] @ ["ProfitLoss", "NetIncomeLoss", "ifrs-full_ProfitLoss"],
 
+        // Per share and share counts, for valuation (market cap, P/E). Read
+        // by tag only: their labels ("Basic", "Diluted") say nothing alone.
+        EarningsPerShareBasic @ ["EarningsPerShareBasic", "EarningsPerShareBasicAndDiluted", "ifrs-full_BasicEarningsLossPerShare"],
+        EarningsPerShareDiluted @ ["EarningsPerShareDiluted", "ifrs-full_DilutedEarningsLossPerShare"],
+        WeightedAverageSharesBasic @ ["WeightedAverageNumberOfSharesOutstandingBasic", "WeightedAverageNumberOfShareOutstandingBasicAndDiluted"],
+        WeightedAverageSharesDiluted @ ["WeightedAverageNumberOfDilutedSharesOutstanding"],
+
         StockBasedCompensationExpense => ["Stock-based compensation expense"] @ ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense", "ifrs-full_AdjustmentsForSharebasedPayments"],
         DepreciationAndAmoritization => ["Depreciation and amortization"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"],
         DeferredIncomeTaxes => ["Deferred income taxes"],
@@ -189,6 +203,18 @@ impl Item {
             .filter(|(_, i)| *i == item)
             .position(|(t, _)| *t == name)?;
         Some((item, rank))
+    }
+
+    /// What the item's values count: money in the column's currency, shares,
+    /// or money per share. Each is scaled differently ("shares in Thousands,
+    /// $ in Millions"), and only money adds up across periods.
+    pub fn unit(&self) -> Unit {
+        use Item::*;
+        match self {
+            EarningsPerShareBasic | EarningsPerShareDiluted => Unit::PerShare,
+            WeightedAverageSharesBasic | WeightedAverageSharesDiluted => Unit::Shares,
+            _ => Unit::Money,
+        }
     }
 
     /// Items reported on the cash flow statement. Some share labels or

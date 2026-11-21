@@ -518,6 +518,48 @@ impl_reported! {
     ]
 }
 
+/// Share counts at the scale their statement actually uses.
+///
+/// Headers often misstate it: McDonald's pages say only "$ in Millions"
+/// over share counts in millions, Berkshire's "In Millions" over counts in
+/// units. But basic EPS times basic weighted shares is net income (to within
+/// noncontrolling interests and rounding), in every column. Where that
+/// product is consistently off by a power of 1,000, the shares are rescaled
+/// by it. Columns with EPS under 10 cents are too coarse to tell.
+pub(crate) fn calibrate_shares(items: &mut [Reported]) {
+    use std::collections::HashMap;
+    use crate::item::Unit;
+
+    let mut columns: HashMap<(NaiveDate, Period, Currency), [Option<f64>; 3]> = HashMap::new();
+    for it in items.iter() {
+        let slot = match it.item {
+            Item::NetIncome => 0,
+            Item::EarningsPerShareBasic => 1,
+            Item::WeightedAverageSharesBasic => 2,
+            _ => continue,
+        };
+        columns.entry((it.date, it.p, it.currency)).or_default()[slot] = Some(it.val);
+    }
+
+    let mut powers = Vec::new();
+    for [ni, eps, shares] in columns.into_values() {
+        let (Some(ni), Some(eps), Some(shares)) = (ni, eps, shares) else { continue };
+        if eps.abs() < 0.10 || shares <= 0.0 { continue; }
+        let ratio = ni / (eps * shares);
+        if ratio <= 0.0 { continue; }
+        let power = (ratio.log10() / 3.0).round() as i32;
+        if (ratio / 1000f64.powi(power) - 1.0).abs() < 0.25 {
+            powers.push(power);
+        }
+    }
+    let Some(&power) = powers.first() else { return };
+    if power == 0 || powers.iter().any(|&p| p != power) { return; }
+    let factor = 1000f64.powi(power);
+    for it in items.iter_mut().filter(|it| it.item.unit() == Unit::Shares) {
+        it.val *= factor;
+    }
+}
+
 /// Fill in three-month values that were not reported, from year-to-date
 /// totals: Q2 = 6m - 3m, Q3 = 9m - 6m, Q4 = 12m - 9m, where the shorter
 /// total ends about a quarter earlier (75 to 125 days: PepsiCo's fourth
@@ -548,6 +590,8 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
     let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), (Period, f64)> = HashMap::new();
     for (&(ticker, item, currency, p, date), &total) in &latest {
         let Some(prev_p) = previous(p) else { continue };
+        // A year's average share count or EPS minus nine months' is no quarter's.
+        if item.unit() != crate::item::Unit::Money { continue; }
         if latest.contains_key(&(ticker, item, currency, Period::ThreeMonths, date)) {
             continue;
         }

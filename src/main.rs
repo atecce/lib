@@ -49,7 +49,8 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::new("KLAC"),
 ];
 
-/// Usage: lib [--dry-run [--cash-flow] | --dump] [TICKER ...]
+/// Usage: lib [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
+/// --dump prints every value read; with --latest, only the values pushed.
 
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
@@ -79,6 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Every item read, one per line, sorted: for diffing the output of two versions.
     if std::env::args().any(|a| a == "--dump") {
+        let reported_items = if std::env::args().any(|a| a == "--latest") { latest(reported_items) } else { reported_items };
         let mut lines: Vec<String> = reported_items.iter()
             .map(|it| format!("{}\t{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.currency, it.val))
             .collect();

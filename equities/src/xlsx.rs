@@ -142,7 +142,8 @@ impl Reader {
                         let (val, filled) = match row.get(col) {
                             Some(Data::Float(f)) => (*f, false),
                             Some(Data::Int(i)) => (*i as f64, false),
-                            Some(Data::Empty) | None if has_value => (0.0, true),
+                            // Only money: an EPS or share count left empty is unknown, not zero.
+                            Some(Data::Empty) | None if has_value && item.unit() == crate::item::Unit::Money => (0.0, true),
                             _ => (f64::NAN, false),
                         };
 
@@ -168,7 +169,11 @@ impl Reader {
                         }
 
                         if val.is_nan() { continue; }
-                        let val = val * sheet_info.multiplier;
+                        let val = val * match item.unit() {
+                            crate::item::Unit::Money => sheet_info.multiplier,
+                            crate::item::Unit::Shares => sheet_info.share_multiplier,
+                            crate::item::Unit::PerShare => 1.0,
+                        };
                         let currency = sheet_info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD);
                         match seen.get_mut(&(item, *date, *period, currency)) {
                             None => {

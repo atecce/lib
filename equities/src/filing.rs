@@ -254,7 +254,9 @@ impl Reader {
             .unzip();
         drop_segment_rows(&rows, &mut items);
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
-        crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])
+        let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
+        crate::calibrate_shares(&mut reported);
+        Ok(reported)
     }
 
     /// 10-Qs only report cash flows year to date (3, 6, 9 months); see
