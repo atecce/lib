@@ -68,9 +68,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let cache = edgar::Cache::new(edgar::Cache::default_dir());
+    let japan = edinet::Cache::new(edinet::Cache::default_dir());
 
     for equity in tickers {
-        if let Err(e) = read_edgar(&cache, equity, &mut reported_items) {
+        // Tokyo tickers ("7203.T") come from EDINET, the rest from EDGAR.
+        let read = if is_edinet(equity) {
+            read_edinet(&japan, equity, &mut reported_items)
+        } else {
+            read_edgar(&cache, equity, &mut reported_items)
+        };
+        if let Err(e) = read {
             eprintln!("{}: {}", equity, e);
         }
     }
@@ -155,6 +162,19 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
     Ok(())
 }
 
+/// A Tokyo Stock Exchange ticker, read from EDINET.
+fn is_edinet(t: equities::Ticker) -> bool {
+    t.as_str().ends_with(".T")
+}
+
+fn read_edinet(cache: &edinet::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let (mut items, read, missing) = equities::edinet::read_company(cache, equity)?;
+    eprintln!("{}: read {} EDINET reports{}", equity, read,
+        if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
+    reported_items.append(&mut items);
+    Ok(())
+}
+
 fn read_statements(r: &mut impl Reader, name: &str, reported_items: &mut Vec<equities::item::Reported>) {
     match r.process_balance_sheet() {
         Ok(mut ret) => reported_items.append(&mut ret),
@@ -229,12 +249,14 @@ fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Erro
         for item in chunk {
             let ts = item.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
-                "reported_item_v15,ticker={},item={},period={},currency={} value={} {}\n",
+                "reported_item_v15,ticker={},item={},period={},currency={}{} value={} {}\n",
                 // lowercase: the Grafana dashboards query ticker = 'tsla' / 'nvda'
                 item.ticker.to_string().to_lowercase(),
                 item.item,
                 item.p,
                 item.currency,
+                // EDGAR values carry no source tag (they came first).
+                if is_edinet(item.ticker) { ",source=edinet" } else { "" },
                 item.val,
                 ts
             ));
