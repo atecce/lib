@@ -1,0 +1,6 @@
+# Car makers, chosen one by one for the auto industry dashboard
+# (equities/grafana/auto.json, whose ticker list follows this one).
+# TM is Toyota's 20-F on EDGAR (annual only); 7203.T is Toyota on EDINET,
+# with quarters. Candidates not yet added: GM, HMC / 7267.T (Honda),
+# STLA (Stellantis, EUR), RIVN, LCID.
+TSLA F TM 7203.T
