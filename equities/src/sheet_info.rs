@@ -114,7 +114,12 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                         is_10k = true;
                     }
 
-                    if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
+                    // The scale is stated in the header. Row labels mention units
+                    // too ("Weighted average shares (in thousands)"), which must
+                    // not rescale the dollars.
+                    if first_date_row.is_none_or(|d| r <= d) {
+                        if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
+                    }
 
                     if let Some(date) = parse_date_str(&s).or_else(|| parse_date_across_cells(&s, rows.get(r+1).and_then(|next| next.get(c)))) {
                         first_date_row.get_or_insert(r);
