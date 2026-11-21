@@ -60,7 +60,9 @@ def snapshot():
         if 0 < (started(b) - started(a)).total_seconds() < 7200
     ][-4:]
     eta = "-"
-    if durations:
+    if finished >= total:
+        eta = "done"
+    elif durations:
         per_batch = sum(durations) / len(durations)
         # What is left of the running batch, then the batches after it.
         elapsed = (datetime.now() - started(current)).total_seconds() if current else 0
