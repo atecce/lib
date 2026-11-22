@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 92] = [
+            pub const ALL: [$item; 95] = [
                 $($item::$variant,)*
             ];
 
@@ -148,6 +148,14 @@ items! {
         // a company reports.
         // 親会社の所有者に帰属する持分 (oyagaisha no shoyūsha ni kizoku suru mochibun): equity attributable to owners of the parent
         // 純資産合計 (jun shisan gōkei): total net assets
+        // Borrowings on the face of the balance sheet, current and
+        // non-current, summed (see `filing::total_debt`).
+        TotalDebt,
+        // A car maker's debt by business, where its balance sheet splits it:
+        // Ford's "Company excluding Ford Credit" and "Ford Credit", GM's
+        // "Automotive" and "GM Financial".
+        AutomotiveDebt,
+        FinancialServicesDebt,
         StockholdersEquity => ["親会社の所有者に帰属する持分", "純資産合計"] @ ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "ifrs-full_EquityAttributableToOwnersOfParent", "ifrs-full_Equity", "jpigp_cor:EquityAttributableToOwnersOfParentIFRS", "jpigp_cor:EquityIFRS", "jppfs_cor:NetAssets"],
 
         // 売上高 (uriagedaka): net sales

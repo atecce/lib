@@ -104,7 +104,16 @@ fn report() {
 
     let mut r = equities::filing::new_reader(std::path::Path::new("../edgar/cache/1318605/000156459020019931"), equities::Ticker::TSLA).unwrap();
 
-    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
+    let balance = r.process_balance_sheet().unwrap();
+    // Total debt: the current portion of debt and finance leases plus the
+    // rest (3,217 + 10,666 and 1,785 + 11,634, in millions).
+    let mut debt: Vec<(String, f64)> = balance.iter()
+        .filter(|i| i.item == equities::item::Item::TotalDebt)
+        .map(|i| (i.date.to_string(), i.val))
+        .collect();
+    debt.sort_by(|a, b| a.0.cmp(&b.0));
+    assert_eq!(debt, [("2019-12-31".to_string(), 13_419_000_000.0), ("2020-03-31".to_string(), 13_883_000_000.0)]);
+    reported::assert(balance, balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());

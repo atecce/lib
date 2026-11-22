@@ -359,7 +359,7 @@
             "type": "influxdb",
             "uid": "efm3zlbhro268a"
           },
-          "alias": "long-term debt",
+          "alias": "total debt",
           "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
@@ -385,7 +385,7 @@
               "condition": "AND",
               "key": "item",
               "operator": "=",
-              "value": "LongTermDebt"
+              "value": "TotalDebt"
             },
             {
               "condition": "AND",
@@ -413,7 +413,7 @@
           "query": "SELECT \"market_cap\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
         }
       ],
-      "description": "Book: total assets, liabilities, stockholders' equity and long-term debt from the balance sheet. Market: market cap each trading day (the close times the latest cover page's shares). Market cap against stockholders' equity is the market's valuation of the equity against the accounts'."
+      "description": "Book: total assets, liabilities, stockholders' equity and total debt (every borrowing line, current and non-current) from the balance sheet. Market: market cap each trading day (the close times the latest cover page's shares). Market cap against stockholders' equity is the market's valuation of the equity against the accounts'."
     },
     {
       "id": 3,

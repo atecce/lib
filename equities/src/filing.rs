@@ -222,8 +222,11 @@ impl Reader {
             })
             .unzip();
         drop_segment_rows(&rows, &tags, &mut items);
+        let balance_sheet = sheet_type == SheetType::BalanceSheet;
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
+        let mut debt = if balance_sheet { total_debt(self.ticker, &rows, &tags, &sheet_info) } else { Vec::new() };
         let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
+        reported.append(&mut debt);
         crate::calibrate_shares(&mut reported);
         Ok(reported)
     }
@@ -349,6 +352,122 @@ fn drop_segment_rows(rows: &[&[Data]], tags: &[Option<&str>], items: &mut [Optio
             }
         }
     }
+}
+
+/// Elements for money borrowed, on the face of a balance sheet: due within a
+/// year, after, or either. Not debt securities the company holds.
+const DEBT: &[&str] = &[
+    "us-gaap_LoansPayable", "us-gaap_NotesAndLoansPayable", "us-gaap_NotesAndLoansPayableCurrent", "us-gaap_LongTermNotesAndLoans",
+    "us-gaap_ConvertibleDebtCurrent", "us-gaap_ConvertibleDebtNoncurrent", "us-gaap_ConvertibleNotesPayable",
+    "us-gaap_SeniorLongTermNotes", "us-gaap_UnsecuredLongTermDebt", "us-gaap_SecuredDebtCurrent",
+    "us-gaap_OtherLongTermDebtCurrent", "us-gaap_OtherLongTermDebtNoncurrent",
+    "us-gaap_LinesOfCreditCurrent", "us-gaap_LongTermLineOfCredit", "us-gaap_LineOfCredit",
+    "us-gaap_DebtAndCapitalLeaseObligations", "us-gaap_DebtLongtermAndShorttermCombinedAmount",
+    "us-gaap_JuniorSubordinatedNotes",
+    "ifrs-full_ShorttermBorrowings", "ifrs-full_LongtermBorrowings", "ifrs-full_CurrentPortionOfLongtermBorrowings",
+    "ifrs-full_CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings",
+    "ifrs-full_NoncurrentPortionOfNoncurrentBondsIssued", "ifrs-full_CurrentPortionOfNoncurrentBondsIssued",
+    "us-gaap_LongTermDebtNoncurrent", "us-gaap_LongTermDebtCurrent", "us-gaap_LongTermDebt",
+    "us-gaap_LongTermDebtAndCapitalLeaseObligations", "us-gaap_LongTermDebtAndCapitalLeaseObligationsCurrent",
+    "us-gaap_DebtCurrent", "us-gaap_ShortTermBorrowings", "us-gaap_OtherShortTermBorrowings",
+    "us-gaap_CommercialPaper", "us-gaap_NotesPayable", "us-gaap_NotesPayableCurrent",
+    "us-gaap_SecuredDebt", "us-gaap_UnsecuredDebt", "us-gaap_SeniorNotes", "us-gaap_ConvertibleLongTermNotesPayable",
+    "us-gaap_FinanceLeaseLiabilityCurrent", "us-gaap_FinanceLeaseLiabilityNoncurrent",
+    "us-gaap_LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities",
+    "ifrs-full_CurrentBorrowings", "ifrs-full_NoncurrentBorrowings", "ifrs-full_Borrowings",
+];
+
+/// A borrowing line: a standard element in `DEBT`, or a company's own whose
+/// name says so (Tesla's "LongTermDebtAndFinanceLeasesCurrent", Kroger's
+/// "LongTermDebtAndFinanceLease", W. R. Berkley's "SeniorNotesAndOtherDebt",
+/// Bloom Energy's "LongTermPortionOfRecourseDebt…"),
+/// but not debt it holds or costs of it.
+fn is_debt(tag: &str) -> bool {
+    if DEBT.contains(&tag) { return true; }
+    if !is_extension(tag) { return false; }
+    let name = tag.split_once('_').map(|(_, n)| n).unwrap_or(tag);
+    ["Debt", "Borrowings", "SeniorNotes"].iter().any(|w| name.contains(w))
+        // Not an asset, a reserve in equity, or a liability named for not
+        // being debt (Procter & Gamble's "ReserveForEsopDebtRetirement",
+        // AES's "DebtServiceReserves…Deposits", Ecolab's "OperatingLease…
+        // ExcludedFromLongTermDebt", Xcel's "…OtherThanLongTermDebt…").
+        && !["Securities", "Receivable", "Investment", "Issuance", "Interest", "Repayment", "Proceeds", "FairValue",
+             "Reserve", "Deposits", "OperatingLease", "Excluded", "OtherThan"].iter().any(|w| name.contains(w))
+}
+
+/// Total debt: every borrowing line on the face of the balance sheet, current
+/// and non-current, summed per column. Companies split debt across a dozen
+/// elements (long-term debt, its current portion, short-term borrowings,
+/// commercial paper, senior notes, finance leases), so no one element is it.
+/// Where a total that includes current maturities (`LongTermDebt`,
+/// `Borrowings`) sits beside the split, only the split counts.
+///
+/// Some companies state debt only per business, in segment sections: Ford
+/// ("Company excluding Ford Credit", "Ford Credit"), GM ("Automotive", "GM
+/// Financial"), Berkshire (by business group). Where the face has none, the
+/// sections together are the company; a car maker's automotive and lending
+/// sections are also reported on their own (AutomotiveDebt,
+/// FinancialServicesDebt).
+fn total_debt(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], info: &crate::sheet_info::SheetInfo) -> Vec<Reported> {
+    use std::collections::HashMap;
+    // Each row's section: None on the face, else the member's label.
+    let mut section: Option<&str> = None;
+    let mut lines: Vec<(Option<&str>, &str, &[Data])> = Vec::new();
+    for (row, tag) in rows.iter().zip(tags) {
+        let l = label(row);
+        if tag.is_some_and(|t| t.ends_with("Axis")) || l.is_some_and(|l| l.ends_with("[Member]") || l.ends_with("[member]")) {
+            section = l;
+            continue;
+        }
+        if let Some(t) = tag.filter(|t| is_debt(t)) {
+            lines.push((section, t, row));
+        }
+    }
+    let on_face = lines.iter().any(|(s, _, _)| s.is_none());
+    // Sums by (section, column) over the lines that count.
+    let mut sums: HashMap<(Option<&str>, usize), f64> = HashMap::new();
+    let sections: Vec<Option<&str>> = {
+        let mut v: Vec<_> = lines.iter().map(|(s, _, _)| *s).collect();
+        v.dedup();
+        v
+    };
+    for s in &sections {
+        if on_face && s.is_some() { continue; }
+        let here: Vec<_> = lines.iter().filter(|(ls, _, _)| ls == s).collect();
+        let has = |t: &str| here.iter().any(|(_, tag, _)| *tag == t);
+        let split = has("us-gaap_LongTermDebtCurrent") || has("us-gaap_LongTermDebtNoncurrent")
+            || has("ifrs-full_CurrentBorrowings") || has("ifrs-full_NoncurrentBorrowings")
+            || has("ifrs-full_LongtermBorrowings");
+        for (_, tag, row) in &here {
+            if split && (*tag == "us-gaap_LongTermDebt" || *tag == "ifrs-full_Borrowings") { continue; }
+            for &col in info.dates_and_periods.keys() {
+                if let Some(Data::Float(v)) = row.get(col) {
+                    *sums.entry((*s, col)).or_default() += v;
+                }
+            }
+        }
+    }
+    let make = |item: Item, col: usize, v: f64| {
+        let (date, p) = info.dates_and_periods[&col];
+        Reported { ticker, date, p, item, currency: info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD), val: v * info.multiplier }
+    };
+    let mut totals: HashMap<usize, f64> = HashMap::new();
+    let mut out = Vec::new();
+    for ((s, col), v) in &sums {
+        *totals.entry(*col).or_default() += v;
+        // A car maker's automotive or lending section, by the item its
+        // member names (as for revenue).
+        let part = s.map(|l| l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim())
+            .and_then(|m| m.parse::<Item>().ok());
+        match part {
+            Some(Item::AutomotiveRevenue) => out.push(make(Item::AutomotiveDebt, *col, *v)),
+            Some(Item::FinancialServicesRevenue) => out.push(make(Item::FinancialServicesDebt, *col, *v)),
+            _ => (),
+        }
+    }
+    out.extend(totals.into_iter().map(|(col, v)| make(Item::TotalDebt, col, v)));
+    out.sort_by_key(|r| (r.date, r.item));
+    out
 }
 
 /// A company's own element rather than one from a standard taxonomy (US GAAP,
