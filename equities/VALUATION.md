@@ -141,6 +141,81 @@ For asset-light companies, most of what they're worth never appears on a
 balance sheet (internally built software, brands, research), so nearly all of
 $`M - B`$ is the market's forecast of residual income.
 
+## 5. Earnings yield and the cost of equity
+
+### What the dashboard measures
+
+```math
+\text{earnings yield}_t \;=\; \frac{E^{\text{TTM}}_t}{M_t}
+```
+
+net income over the last four quarters (as first reported) over the market
+cap that day (`equities/src/valuation.rs`): the inverse of the trailing P/E.
+It is *observed*: past accounting earnings against today's price.
+
+### What $`r`$ is
+
+$`r`$ is exogenous to the residual income model (an input, not something it
+solves for), but it is not the Treasury rate. It is the **cost of equity**:
+the return investors could expect elsewhere on something *equally risky*,
+and so the opportunity cost of the shareholders' capital. The Treasury rate
+is its floor, and a risk premium sits on top. In the capital asset pricing
+model (CAPM):
+
+```math
+r \;=\; r_f + \beta\,\bigl(\mathbb{E}[R_m] - r_f\bigr)
+```
+
+with $`r_f`$ the risk-free (Treasury) rate, $`\mathbb{E}[R_m] - r_f`$ the
+equity risk premium, and $`\beta`$ how strongly the stock moves with the
+market. With Treasuries around 4% and a premium of 4–6%, a typical stock's
+$`r`$ is around 8–10%. A company earning only the Treasury rate on its book
+value would trade *below* book: its shareholders bear risk its bondholders
+don't. Unlike earnings yield, $`r`$ is *expected* (forward-looking) and
+cannot be observed.
+
+### How they relate
+
+From the justified price-to-book, $`M/B = (\mathrm{ROE} - g)/(r - g)`$:
+
+```math
+\frac{E}{M} \;=\; \frac{\mathrm{ROE}}{M/B} \;=\; \mathrm{ROE}\cdot\frac{r-g}{\mathrm{ROE}-g}
+```
+
+1. **$`\mathrm{ROE} = r`$:** then $`E/M = r`$ whatever the growth. Growth
+   that only earns the cost of capital adds no value, so price is book and
+   earnings yield is $`r`$. GM is close to this case (ROE 6.5%, earnings
+   yield 6.3%, price-to-book 1.06). Read literally that makes the market's
+   $`r`$ for GM about 6.5%, low for a car maker; more likely the market
+   expects its ROE to fall.
+2. **$`\mathrm{ROE} > r`$, with growth:** then $`E/M < r`$. The price
+   includes future excess returns, so today's earnings look small against
+   it. Apple's 2.7% earnings yield doesn't mean its shareholders expect
+   2.7%; they are paying for decades of very high ROE.
+3. **$`\mathrm{ROE} < r`$:** then $`E/M > r`$, and the company trades below
+   book.
+
+So earnings yield is $`r`$ blurred by expected growth in excess returns.
+Comparing a market's earnings yield directly with Treasury yields (the
+"Fed model") treats the first case as if it always held. Asness (2003)
+criticizes it for a second reason too: earnings grow with inflation, while
+a bond's yield is fixed in nominal terms.
+
+### The implied cost of capital
+
+Since $`r`$ can't be observed, it can be backed out instead: take the price,
+book value and an earnings forecast, and solve the residual income model for
+the $`r`$ that reproduces the price (Gebhardt, Lee and Swaminathan 2001;
+Claus and Thomas 2001). Under constant ROE and growth:
+
+```math
+r \;=\; g + \frac{\mathrm{ROE} - g}{M/B}
+```
+
+This, not the earnings yield, is the number to compare with the Treasury
+rate: their difference is the market's implied equity risk premium for the
+company. It depends on the growth assumed, and on ROE staying where it is.
+
 ## References
 
 - Preinreich, G. A. D. (1938). Annual survey of economic theory: The theory of
@@ -157,6 +232,15 @@ $`M - B`$ is the market's forecast of residual income.
   Research*, 11(2), 689–731.
 - Gordon, M. J. (1959). Dividends, earnings, and stock prices. *Review of
   Economics and Statistics*, 41(2), 99–105.
+- Sharpe, W. F. (1964). Capital asset prices: A theory of market equilibrium
+  under conditions of risk. *Journal of Finance*, 19(3), 425–442.
+- Claus, J., & Thomas, J. (2001). Equity premia as low as three percent?
+  Evidence from analysts' earnings forecasts for domestic and international
+  stock markets. *Journal of Finance*, 56(5), 1629–1666.
+- Gebhardt, W. R., Lee, C. M. C., & Swaminathan, B. (2001). Toward an
+  implied cost of capital. *Journal of Accounting Research*, 39(1), 135–176.
+- Asness, C. S. (2003). Fight the Fed model. *Journal of Portfolio
+  Management*, 30(1), 11–24.
 
 The attribution to Preinreich, Edwards and Bell, and Peasnell before Ohlson is
 the usual one in the accounting literature; the model is often called
