@@ -40,7 +40,8 @@ pub struct Market {
 /// may not move: the ratio changes instead (and Tiingo records no split).
 /// Toyota's (TM) were 2 ordinary shares until its 5-for-1 split on
 /// 2021-10-01, then 10; Honda's (HMC) 1 until its 3-for-1 split on
-/// 2023-10-01, then 3. Checked against each price series around the split.
+/// 2023-10-01, then 3; TSMC's (TSM) 5. Checked against each price series
+/// around the split.
 fn shares_per_listed(ticker: Ticker, date: NaiveDate) -> f64 {
     let before = |y, m, d| date < NaiveDate::from_ymd_opt(y, m, d).unwrap();
     match ticker.as_str() {
@@ -48,6 +49,8 @@ fn shares_per_listed(ticker: Ticker, date: NaiveDate) -> f64 {
         "TM" => 10.0,
         "HMC" if before(2023, 10, 1) => 1.0,
         "HMC" => 3.0,
+        // TSMC's have always been 5 common shares.
+        "TSM" => 5.0,
         _ => 1.0,
     }
 }
