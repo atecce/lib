@@ -18,6 +18,7 @@ mops = { path = "mops", default-features = false }
 tiingo = { path = "equities/tiingo", default-features = false }
 equities = { path = "equities" }
 greece = { path = "greece" }
+influx = { path = "influx" }
 name = { path = "name" }
 serde = { version = "1.0", features = ["derive"] }
 store = { path = "equities/store" }
@@ -29,7 +30,7 @@ reqwest = { version = "0.13.3", features = ["blocking"] }
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "daemon", "edgar", "edinet", "equities", "equities/backtest", "equities/store", "equities/tiingo", "fred", "greece", "gutenberg", "mops", "name", "scrape", "shakespeare"]
+members = ["bible", "daemon", "edgar", "edinet", "equities", "equities/backtest", "equities/store", "equities/tiingo", "fred", "greece", "gutenberg", "influx", "mops", "name", "scrape", "shakespeare"]
 
 # Optimize dependencies in dev/test builds (calamine, scraper, regex parse
 # whole filings in tests and examples). Workspace crates stay

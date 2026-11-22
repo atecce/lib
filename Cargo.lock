@@ -1523,6 +1523,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "influx"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "uniffi",
+]
+
+[[package]]
 name = "instant"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1663,6 +1674,7 @@ dependencies = [
  "equities",
  "fred",
  "greece",
+ "influx",
  "mops",
  "name",
  "reqwest",

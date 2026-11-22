@@ -7,7 +7,7 @@ import PackageDescription;
 let package = Package(
     name: "Library",
     platforms: [
-        .macOS(.v10_15), .iOS(.v13)
+        .macOS(.v12)
     ],
     products: [
         .library(
@@ -17,11 +17,11 @@ let package = Package(
     ],
     dependencies: [ ],
     targets: [
-        .binaryTarget(name: "libFFI", path: "./libFFI.xcframework"),
+        .binaryTarget(name: "bibleFFI", path: "./bibleFFI.xcframework"),
         .target(
             name: "Library",
             dependencies: [
-                .target(name: "libFFI")
+                .target(name: "bibleFFI")
             ]
         ),
     ]
