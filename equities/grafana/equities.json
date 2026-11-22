@@ -103,7 +103,7 @@
     {
       "id": 2,
       "type": "timeseries",
-      "title": "$ticker stocks: equity and debt ($currency)",
+      "title": "$ticker stocks: equity and debt, at book and market ($currency)",
       "datasource": {
         "type": "influxdb",
         "uid": "efm3zlbhro268a"
@@ -168,7 +168,28 @@
             }
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "market cap"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "custom.spanNulls",
+                "value": true
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "annotations": {
@@ -379,8 +400,20 @@
               "value": "/^$currency$/"
             }
           ]
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "market cap",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"market_cap\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
         }
-      ]
+      ],
+      "description": "Book: total assets, liabilities, stockholders' equity and long-term debt from the balance sheet. Market: market cap each trading day (the close times the latest cover page's shares). Market cap against stockholders' equity is the market's valuation of the equity against the accounts'."
     },
     {
       "id": 3,
