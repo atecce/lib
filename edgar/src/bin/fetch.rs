@@ -15,6 +15,7 @@
 //! on old filings) is reported and tried again on the next run.
 
 use std::error::Error;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use edgar::{Cache, Client, EdgarError, FORMS, USER_AGENT};
 
@@ -80,20 +81,33 @@ struct Fetched {
     errors: usize,
 }
 
+/// Filings fetched at once. EDGAR takes about half a second per page, so
+/// eight in flight keep near the client's eight requests a second.
+const WORKERS: usize = 8;
+
 fn fetch(client: &Client, ticker: &str) -> Result<Fetched, Box<dyn Error>> {
     let cik = client.cik(ticker)?;
     let filings = client.filings(cik, &FORMS)?;
-    let (mut new, mut old, mut errors) = (0, 0, 0);
-    for f in &filings {
-        let had = client.cache().filing(f).is_ok();
-        match client.fetch_filing(f) {
-            Ok(_) => if !had { new += 1 },
-            Err(e) if matches!(e.downcast_ref(), Some(EdgarError::NoFilingSummary)) => old += 1,
-            Err(e) => {
-                eprintln!("{} {} {} ({}): {}", ticker, f.form, f.report_date, f.accession, e);
-                errors += 1;
-            },
+    let (new, old, errors) = (AtomicUsize::new(0), AtomicUsize::new(0), AtomicUsize::new(0));
+    let next = AtomicUsize::new(0);
+    std::thread::scope(|s| {
+        for _ in 0..WORKERS.min(filings.len()) {
+            s.spawn(|| {
+                while let Some(f) = filings.get(next.fetch_add(1, Ordering::Relaxed)) {
+                    let had = client.cache().filing(f).is_ok();
+                    match client.fetch_filing(f) {
+                        Ok(_) => if !had { new.fetch_add(1, Ordering::Relaxed); },
+                        Err(e) if matches!(e.downcast_ref(), Some(EdgarError::NoFilingSummary)) => {
+                            old.fetch_add(1, Ordering::Relaxed);
+                        },
+                        Err(e) => {
+                            eprintln!("{} {} {} ({}): {}", ticker, f.form, f.report_date, f.accession, e);
+                            errors.fetch_add(1, Ordering::Relaxed);
+                        },
+                    }
+                }
+            });
         }
-    }
-    Ok(Fetched { filings: filings.len(), new, old, errors })
+    });
+    Ok(Fetched { filings: filings.len(), new: new.into_inner(), old: old.into_inner(), errors: errors.into_inner() })
 }
