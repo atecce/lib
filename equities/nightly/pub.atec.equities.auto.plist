@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Nightly EDGAR fetch and InfluxDB push of the car makers (run.sh), at 21:45, or on wake if the
+  Morning EDINET fetch, prices and InfluxDB push of the car makers (run.sh), at 06:45, after
+  the night's EDGAR fetch (edgar/nightly/all.sh), or on wake if the
   Mac was asleep then. For a checkout elsewhere, substitute its path:
   Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.equities.auto.plist > ~/Library/LaunchAgents/pub.atec.equities.auto.plist &&
            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities.auto.plist
@@ -24,7 +25,7 @@
 	<key>StartCalendarInterval</key>
 	<dict>
 		<key>Hour</key>
-		<integer>21</integer>
+		<integer>6</integer>
 		<key>Minute</key>
 		<integer>45</integer>
 	</dict>

@@ -5,7 +5,7 @@
 #
 #     all.sh
 #
-# Fetch only: pushing to InfluxDB is equities' job (equities/nightly/run.sh).
+# Fetch only: equities/nightly/run.sh pushes to InfluxDB in the morning.
 #
 # The first run fills the cache over a few days (about two million requests at
 # the SEC's limit); filings already on disk are skipped, so an interrupted run

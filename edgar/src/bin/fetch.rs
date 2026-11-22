@@ -27,11 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         match arg.as_str() {
             "--bulk" => bulk = true,
             "--list" => {
-                let path = args.next().ok_or("--list needs a file")?;
-                for line in std::fs::read_to_string(&path)?.lines() {
-                    let line = line.split('#').next().unwrap_or("");
-                    tickers.extend(line.split([' ', '\t', ',']).filter(|t| !t.is_empty()).map(str::to_string));
-                }
+                tickers.extend(edgar::read_list(args.next().ok_or("--list needs a file")?)?);
             },
             a if a.starts_with("--") => return Err(format!("unknown option {}", a).into()),
             t => tickers.push(t.to_string()),
