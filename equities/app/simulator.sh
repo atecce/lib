@@ -2,6 +2,7 @@
 # Build the iOS app and run it in the Simulator, reading InfluxDB on this Mac.
 #
 #     equities/app/simulator.sh [DEVICE]      e.g. "iPhone 15 Pro" (the default)
+#     EQUITIES_TICKER=aapl equities/app/simulator.sh    # open a company at launch
 #
 # The Simulator shares the Mac's network, so the app reaches InfluxDB at
 # localhost:8181 as the macOS app does. Its token comes from ~/.profile, like
@@ -42,5 +43,5 @@ xcrun simctl install $id build/Build/Products/Debug-iphonesimulator/Equities.app
 # environment with the prefix removed, so the Rust code sees
 # INFLUXDB3_AUTH_TOKEN just as it does on the Mac. --terminate-running-process
 # restarts the app if it was already open, so a new build takes effect.
-SIMCTL_CHILD_INFLUXDB3_AUTH_TOKEN=$INFLUXDB3_AUTH_TOKEN \
+SIMCTL_CHILD_INFLUXDB3_AUTH_TOKEN=$INFLUXDB3_AUTH_TOKEN SIMCTL_CHILD_EQUITIES_TICKER=$EQUITIES_TICKER \
   xcrun simctl launch --terminate-running-process $id pub.atec.Equities

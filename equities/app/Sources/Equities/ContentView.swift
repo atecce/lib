@@ -23,6 +23,10 @@ struct ContentView: View {
         .task {
             do {
                 tickers = try await Task.detached { try Library.tickers() }.value
+                // EQUITIES_TICKER=aapl opens a company at launch (simulator.sh).
+                if let t = ProcessInfo.processInfo.environment["EQUITIES_TICKER"]?.lowercased(), tickers.contains(t) {
+                    ticker = t
+                }
             } catch {
                 self.error = describe(error)
             }
@@ -34,32 +38,114 @@ struct ContentView: View {
     }
 }
 
-/// The panels of equities.json ported so far, for one company.
+/// The two sides of a company's accounts: stocks are levels at a point in
+/// time (the balance sheet, market value), flows are what changes them over
+/// a period (the income and cash flow statements).
+enum Side: String, CaseIterable, Identifiable {
+    case stocks, flows
+    var id: Self { self }
+}
+
+/// The period of a flow: a quarter or a year (`3m`, `12m` in InfluxDB).
+enum FlowPeriod: String, CaseIterable, Identifiable {
+    case quarter = "3m", year = "12m"
+    var id: Self { self }
+    var label: String { self == .quarter ? "Quarter" : "Year" }
+}
+
+/// One chart's worth: what equities.json shows in a panel.
+struct PanelSpec {
+    let title: String
+    let lines: [(String, Source)]
+    var format: Format? = nil   // money in the company's currency unless set
+    var log = false
+}
+
+/// The panels of equities.json for one company, stocks and flows on two
+/// tabs. Each stock panel has a flow panel at the same position, the flows
+/// that change it, as in the dashboard's rows.
 struct Dashboard: View {
     let ticker: String
     @State private var currencies: [String] = []
     @State private var currency = "USD"
+    // Kept across companies, and across launches.
+    @AppStorage("side") private var side = Side.stocks
+    @AppStorage("period") private var period = FlowPeriod.quarter
+
+    private func pit(_ item: String) -> Source { .reported(item: item, period: "pit") }
+    private func flow(_ item: String) -> Source { .reported(item: item, period: period.rawValue) }
+
+    private var stocks: [PanelSpec] {[
+        PanelSpec(title: "equity and debt", lines: [
+            ("total assets", pit("TotalAssets")),
+            ("total liabilities", pit("TotalLiabilities")),
+            ("stockholders' equity", pit("StockholdersEquity")),
+            ("total debt", pit("TotalDebt")),
+        ]),
+        PanelSpec(title: "cash and working capital", lines: [
+            ("cash", pit("CashAndCashEquivalents")),
+            ("marketable securities", pit("MarketableSecurities")),
+            ("receivables", pit("AccountsReceivableNet")),
+            ("inventories", pit("Inventories")),
+        ]),
+        PanelSpec(title: "long-lived assets", lines: [
+            ("property and equipment", pit("PropertyAndEquipmentNet")),
+            ("goodwill", pit("Goodwill")),
+            ("intangibles", pit("IntangibleAssetsNet")),
+        ]),
+        PanelSpec(title: "market value and book value (log scale)", lines: [
+            ("market cap", .market(field: "market_cap")),
+            ("book value", pit("StockholdersEquity")),
+        ], log: true),
+        PanelSpec(title: "price-to-book", lines: [
+            ("price-to-book", .market(field: "price_to_book")),
+        ], format: .ratio),
+    ]}
+
+    private var flows: [PanelSpec] {[
+        PanelSpec(title: "income and returns to shareholders", lines: [
+            ("revenue", flow("Revenue")),
+            ("operating income", flow("OperatingIncome")),
+            ("net income", flow("NetIncome")),
+            ("buybacks", flow("PaymentsRelatedToRepurchasesOfCommonStock")),
+            ("dividends", flow("DividendsPaid")),
+        ]),
+        PanelSpec(title: "cash", lines: [
+            ("operating", flow("NetCashProvidedByOperatingActivities")),
+            ("investing", flow("NetCashUsedInInvestingActivities")),
+            ("financing", flow("NetCashUsedInFinancingActivities")),
+        ]),
+        PanelSpec(title: "investment", lines: [
+            ("capex", flow("PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets")),
+            ("depreciation and amortization", flow("DepreciationAndAmoritization")),
+            ("acquisitions", flow("AcquisitionsNetOfCashAcquired")),
+        ]),
+        // Always the last four quarters, whatever the period picked.
+        PanelSpec(title: "return on equity and earnings yield (last four quarters)", lines: [
+            ("return on equity", .market(field: "return_on_equity")),
+            ("earnings yield", .market(field: "earnings_yield")),
+        ], format: .percent),
+    ]}
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Panel(title: "stocks: equity and debt", ticker: ticker, currency: currency, lines: [
-                    ("total assets", .reported(item: "TotalAssets", period: "pit")),
-                    ("total liabilities", .reported(item: "TotalLiabilities", period: "pit")),
-                    ("stockholders' equity", .reported(item: "StockholdersEquity", period: "pit")),
-                    ("total debt", .reported(item: "TotalDebt", period: "pit")),
-                ], format: .money(currency))
-                Panel(title: "stocks: market value and book value (log scale)", ticker: ticker, currency: currency, lines: [
-                    ("market cap", .market(field: "market_cap")),
-                    ("book value", .reported(item: "StockholdersEquity", period: "pit")),
-                ], format: .money(currency), log: true)
-                Panel(title: "price-to-book", ticker: ticker, currency: currency, lines: [
-                    ("price-to-book", .market(field: "price_to_book")),
-                ], format: .ratio)
-                Panel(title: "flows: return on equity and earnings yield (last four quarters)", ticker: ticker, currency: currency, lines: [
-                    ("return on equity", .market(field: "return_on_equity")),
-                    ("earnings yield", .market(field: "earnings_yield")),
-                ], format: .percent)
+                Picker("Side", selection: $side) {
+                    ForEach(Side.allCases) { Text($0.rawValue.capitalized).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                if side == .flows {
+                    Picker("Period", selection: $period) {
+                        ForEach(FlowPeriod.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+                ForEach(side == .stocks ? stocks : flows, id: \.title) { spec in
+                    Panel(title: "\(side.rawValue): \(spec.title)", ticker: ticker, currency: currency,
+                          lines: spec.lines, format: spec.format ?? .money(currency), log: spec.log)
+                }
             }
             .padding()
         }
@@ -100,6 +186,11 @@ struct Panel: View {
     var log = false
 
     @State private var series: [Series] = []
+
+    /// What the panel draws: fetch again when it changes.
+    private var key: String {
+        currency + lines.map { "\($0.0)=\($0.1)" }.joined(separator: ",")
+    }
     @State private var error: String?
 
     var body: some View {
@@ -128,7 +219,7 @@ struct Panel: View {
             }
             .frame(height: 260)
         }
-        .task(id: currency) {
+        .task(id: key) {
             do {
                 series = try await load(lines, ticker: ticker, currency: currency)
                 error = nil
