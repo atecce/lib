@@ -101,14 +101,28 @@ struct PanelSpec {
 /// that change it, as in the dashboard's rows.
 struct Dashboard: View {
     let ticker: String
-    @State private var currencies: [String] = []
     @State private var currency = "USD"
+    /// Everything the two tabs draw, fetched in one query when the company
+    /// opens: switching tabs, periods or currencies fetches nothing.
+    @State private var data: CompanyData?
+    @State private var error: String?
     // Kept across companies, and across launches.
     @AppStorage("side") private var side = Side.stocks
     @AppStorage("period") private var period = FlowPeriod.quarter
 
     private func pit(_ item: String) -> Source { .reported(item: item, period: "pit") }
     private func flow(_ item: String) -> Source { .reported(item: item, period: period.rawValue) }
+
+    /// Every line of both tabs, for both flow periods: what to fetch.
+    private var allSources: [Source] {
+        (stocks + flows).flatMap { $0.lines.map(\.1) }
+            + flows.flatMap { $0.lines.map(\.1) }.compactMap {
+                if case let .reported(item, _) = $0 { return .reported(item: item, period: "12m") }
+                return nil
+            }
+    }
+
+    private var currencies: [String] { (data?.keys).map { $0.sorted() } ?? [] }
 
     private var stocks: [PanelSpec] {[
         PanelSpec(title: "equity and debt", lines: [
@@ -177,9 +191,16 @@ struct Dashboard: View {
                     .pickerStyle(.segmented)
                     .labelsHidden()
                 }
+                if let error {
+                    Text(error).foregroundStyle(.red).font(.callout)
+                }
                 ForEach(side == .stocks ? stocks : flows, id: \.title) { spec in
-                    Panel(title: "\(side.rawValue): \(spec.title)", ticker: ticker, currency: currency,
-                          lines: spec.lines, format: spec.format ?? .money(currency), log: spec.log)
+                    Panel(title: "\(ticker.uppercased()) \(side.rawValue): \(spec.title) (\(currency))",
+                          series: spec.lines.map { name, source in
+                              Series(name: name, points: data?[currency]?[source.key] ?? [])
+                          },
+                          loading: data == nil && error == nil,
+                          format: spec.format ?? .money(currency), log: spec.log)
                 }
             }
             .padding()
@@ -193,9 +214,17 @@ struct Dashboard: View {
             }
         }
         .task {
-            let found = (try? await Task.detached { [ticker] in try Library.currencies(ticker: ticker) }.value) ?? []
-            currencies = found
-            if let first = found.first, !found.contains(currency) { currency = first }
+            do {
+                let fetched = try await fetchCompany(ticker, sources: allSources, periods: ["pit", "3m", "12m"])
+                // The company's reporting currency: USD if it has it, else
+                // the one with the most series (a Tokyo listing's JPY).
+                if fetched[currency] == nil {
+                    currency = fetched.max { a, b in a.value.count < b.value.count }?.key ?? currency
+                }
+                data = fetched
+            } catch {
+                self.error = describe(error)
+            }
         }
     }
 }
@@ -214,26 +243,14 @@ enum Format {
 
 struct Panel: View {
     let title: String
-    let ticker: String
-    let currency: String
-    let lines: [(String, Source)]
+    let series: [Series]
+    let loading: Bool
     let format: Format
     var log = false
 
-    @State private var series: [Series] = []
-
-    /// What the panel draws: fetch again when it changes.
-    private var key: String {
-        currency + lines.map { "\($0.0)=\($0.1)" }.joined(separator: ",")
-    }
-    @State private var error: String?
-
     var body: some View {
         VStack(alignment: .leading) {
-            Text("\(ticker.uppercased()) \(title) (\(currency))").font(.headline)
-            if let error {
-                Text(error).foregroundStyle(.red).font(.caption)
-            }
+            Text(title).font(.headline)
             Chart {
                 ForEach(series) { s in
                     ForEach(s.points, id: \.time) { p in
@@ -253,14 +270,7 @@ struct Panel: View {
                 }
             }
             .frame(height: 260)
-        }
-        .task(id: key) {
-            do {
-                series = try await load(lines, ticker: ticker, currency: currency)
-                error = nil
-            } catch {
-                self.error = describe(error)
-            }
+            .overlay { if loading { ProgressView() } }
         }
     }
 }

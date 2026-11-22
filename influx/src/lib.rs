@@ -127,6 +127,61 @@ pub fn market(ticker: String, field: String, currency: String) -> Result<Vec<Poi
         literal(&ticker), literal(&currency)), &field)
 }
 
+/// A series of a company's dashboard: a reported `item` for a `period`
+/// (`3m`, `12m`, `pit`), or a field of `market_v1` with period `market`, in
+/// a `currency`.
+#[derive(Clone, Debug, PartialEq, uniffi::Record)]
+pub struct TimeSeries {
+    pub item: String,
+    pub period: String,
+    pub currency: String,
+    pub points: Vec<Point>,
+}
+
+/// Everything a company's dashboard draws, in one query: the reported
+/// `items` for each of `periods`, and the `market` fields of `market_v1`, in
+/// every currency the company reports in (more than one if it changed).
+/// One scan of the company's files, rather than one per line (a series
+/// costs about 0.3 s, the whole of a dashboard about 1 s).
+#[uniffi::export]
+pub fn dashboard(ticker: String, items: Vec<String>, periods: Vec<String>,
+                 market: Vec<String>) -> Result<Vec<TimeSeries>, InfluxError> {
+    let list = |v: &[String]| v.iter().map(|s| literal(s)).collect::<Vec<_>>().join(", ");
+    let t = literal(&ticker);
+    let mut parts = Vec::new();
+    if !items.is_empty() && !periods.is_empty() {
+        parts.push(format!(
+            "SELECT time, item, period, currency, value FROM reported_item_v15 WHERE ticker = {t} \
+             AND item IN ({}) AND period IN ({})", list(&items), list(&periods)));
+    }
+    for field in &market {
+        if !field.chars().all(|ch| ch.is_ascii_lowercase() || ch == '_') {
+            return Err(InfluxError::Query { message: format!("not a field: {}", field) });
+        }
+        parts.push(format!(
+            "SELECT time, '{field}' AS item, 'market' AS period, currency, \"{field}\" AS value \
+             FROM market_v1 WHERE ticker = {t} AND \"{field}\" IS NOT NULL"));
+    }
+    if parts.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut by_series: std::collections::BTreeMap<(String, String, String), Vec<Point>> = Default::default();
+    for row in query(&parts.join(" UNION ALL "))? {
+        let get = |k: &str| row.get(k).and_then(|v| v.as_str()).map(str::to_string);
+        let (Some(item), Some(period), Some(currency), Some(time), Some(value)) = (get("item"),
+            get("period"), get("currency"), get("time").as_deref().and_then(parse_time),
+            row.get("value").and_then(|v| v.as_f64()))
+        else {
+            return Err(InfluxError::Query { message: format!("unexpected row: {:?}", row) });
+        };
+        by_series.entry((item, period, currency)).or_default().push(Point { time, value });
+    }
+    Ok(by_series.into_iter().map(|((item, period, currency), mut points)| {
+        points.sort_by(|a, b| a.time.cmp(&b.time));
+        TimeSeries { item, period, currency, points }
+    }).collect())
+}
+
 fn points(sql: &str, field: &str) -> Result<Vec<Point>, InfluxError> {
     query(sql)?.iter().map(|row| {
         let time = row.get("time").and_then(|t| t.as_str()).and_then(parse_time);
@@ -202,6 +257,19 @@ mod tests {
         assert!(assets.len() > 20 && assets.windows(2).all(|w| w[0].time < w[1].time));
         assert!(!market("nvda".into(), "market_cap".into(), "USD".into()).unwrap().is_empty());
         assert!(market("nvda".into(), "x; drop".into(), "USD".into()).is_err());
+    }
+
+    #[test]
+    #[ignore]
+    fn live_dashboard() {
+        let series = dashboard("nvda".into(),
+            vec!["TotalAssets".into(), "Revenue".into()], vec!["pit".into(), "3m".into()],
+            vec!["market_cap".into()]).unwrap();
+        let find = |i: &str, p: &str| series.iter().find(|s| s.item == i && s.period == p && s.currency == "USD");
+        let assets = find("TotalAssets", "pit").unwrap();
+        assert_eq!(assets.points, reported("nvda".into(), "TotalAssets".into(), "pit".into(), "USD".into()).unwrap());
+        assert!(find("Revenue", "3m").is_some() && find("market_cap", "market").is_some());
+        assert!(find("Revenue", "12m").is_none());
     }
 
     /// Through Cloudflare Access: `source ~/.cloudflared/equities-app.env`,

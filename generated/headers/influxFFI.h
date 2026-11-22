@@ -253,6 +253,11 @@ void uniffi_influx_fn_func_configure(RustBuffer server, RustCallStatus *_Nonnull
 RustBuffer uniffi_influx_fn_func_currencies(RustBuffer ticker, RustCallStatus *_Nonnull out_status
 );
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_DASHBOARD
+#define UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_DASHBOARD
+RustBuffer uniffi_influx_fn_func_dashboard(RustBuffer ticker, RustBuffer items, RustBuffer periods, RustBuffer market, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_MARKET
 #define UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_MARKET
 RustBuffer uniffi_influx_fn_func_market(RustBuffer ticker, RustBuffer field, RustBuffer currency, RustCallStatus *_Nonnull out_status
@@ -538,6 +543,12 @@ uint16_t uniffi_influx_checksum_func_configure(void
 #ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_CURRENCIES
 #define UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_CURRENCIES
 uint16_t uniffi_influx_checksum_func_currencies(void
+    
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_DASHBOARD
+#define UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_DASHBOARD
+uint16_t uniffi_influx_checksum_func_dashboard(void
     
 );
 #endif

@@ -652,6 +652,73 @@ public func FfiConverterTypeServer_lower(_ value: Server) -> RustBuffer {
 }
 
 
+/**
+ * A series of a company's dashboard: a reported `item` for a `period`
+ * (`3m`, `12m`, `pit`), or a field of `market_v1` with period `market`, in
+ * a `currency`.
+ */
+public struct TimeSeries: Equatable, Hashable {
+    public var item: String
+    public var period: String
+    public var currency: String
+    public var points: [Point]
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(item: String, period: String, currency: String, points: [Point]) {
+        self.item = item
+        self.period = period
+        self.currency = currency
+        self.points = points
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension TimeSeries: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeTimeSeries: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> TimeSeries {
+        return
+            try TimeSeries(
+                item: FfiConverterString.read(from: &buf), 
+                period: FfiConverterString.read(from: &buf), 
+                currency: FfiConverterString.read(from: &buf), 
+                points: FfiConverterSequenceTypePoint.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: TimeSeries, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.item, into: &buf)
+        FfiConverterString.write(value.period, into: &buf)
+        FfiConverterString.write(value.currency, into: &buf)
+        FfiConverterSequenceTypePoint.write(value.points, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeTimeSeries_lift(_ buf: RustBuffer) throws -> TimeSeries {
+    return try FfiConverterTypeTimeSeries.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeTimeSeries_lower(_ value: TimeSeries) -> RustBuffer {
+    return FfiConverterTypeTimeSeries.lower(value)
+}
+
+
 public enum InfluxError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
 
     
@@ -834,6 +901,31 @@ fileprivate struct FfiConverterSequenceTypePoint: FfiConverterRustBuffer {
         return seq
     }
 }
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterSequenceTypeTimeSeries: FfiConverterRustBuffer {
+    typealias SwiftType = [TimeSeries]
+
+    public static func write(_ value: [TimeSeries], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeTimeSeries.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [TimeSeries] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [TimeSeries]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeTimeSeries.read(from: &buf))
+        }
+        return seq
+    }
+}
 /**
  * Use this server from now on, rather than the environment's; `None` goes
  * back to the environment.
@@ -852,6 +944,23 @@ public func currencies(ticker: String)throws  -> [String]  {
     return try  FfiConverterSequenceString.lift(try rustCallWithError(FfiConverterTypeInfluxError_lift) {
     uniffi_influx_fn_func_currencies(
         FfiConverterString.lower(ticker),$0
+    )
+})
+}
+/**
+ * Everything a company's dashboard draws, in one query: the reported
+ * `items` for each of `periods`, and the `market` fields of `market_v1`, in
+ * every currency the company reports in (more than one if it changed).
+ * One scan of the company's files, rather than one per line (a series
+ * costs about 0.3 s, the whole of a dashboard about 1 s).
+ */
+public func dashboard(ticker: String, items: [String], periods: [String], market: [String])throws  -> [TimeSeries]  {
+    return try  FfiConverterSequenceTypeTimeSeries.lift(try rustCallWithError(FfiConverterTypeInfluxError_lift) {
+    uniffi_influx_fn_func_dashboard(
+        FfiConverterString.lower(ticker),
+        FfiConverterSequenceString.lower(items),
+        FfiConverterSequenceString.lower(periods),
+        FfiConverterSequenceString.lower(market),$0
     )
 })
 }
@@ -913,6 +1022,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_influx_checksum_func_currencies() != 45658) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_influx_checksum_func_dashboard() != 10195) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_influx_checksum_func_market() != 52847) {

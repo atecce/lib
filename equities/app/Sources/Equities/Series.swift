@@ -8,30 +8,45 @@ struct Series: Identifiable {
     var id: String { name }
 }
 
-/// What a chart draws, and how to fetch it.
+/// What a chart line draws.
 enum Source {
     /// A reported item: `item` as in `equities::Item`, `period` 3m, 12m or pit.
     case reported(item: String, period: String)
     /// A field of `market_v1`.
     case market(field: String)
 
-    func fetch(ticker: String, currency: String) throws -> [Point] {
+    /// Its place in a company's `Dashboard` data.
+    var key: String {
         switch self {
-        case let .reported(item, period):
-            return try Library.reported(ticker: ticker, item: item, period: period, currency: currency)
-        case let .market(field):
-            return try Library.market(ticker: ticker, field: field, currency: currency)
+        case let .reported(item, period): return "\(item)/\(period)"
+        case let .market(field): return "\(field)/market"
         }
     }
 }
 
-/// The calls into Rust block on the network: run them off the main thread.
-func load(_ lines: [(String, Source)], ticker: String, currency: String) async throws -> [Series] {
-    try await Task.detached {
-        try lines.map { name, source in
-            Series(name: name, points: try source.fetch(ticker: ticker, currency: currency))
+/// A company's dashboard data, by currency, then by `Source.key`.
+typealias CompanyData = [String: [String: [Point]]]
+
+/// Everything the given lines need, every period and currency, in one query
+/// (Library.dashboard). The call blocks on the network: run it off the main
+/// thread.
+func fetchCompany(_ ticker: String, sources: [Source], periods: [String]) async throws -> CompanyData {
+    var items = Set<String>(), fields = Set<String>()
+    for source in sources {
+        switch source {
+        case let .reported(item, _): items.insert(item)
+        case let .market(field): fields.insert(field)
         }
+    }
+    let (itemList, fieldList) = (items.sorted(), fields.sorted())
+    let series = try await Task.detached {
+        try Library.dashboard(ticker: ticker, items: itemList, periods: periods, market: fieldList)
     }.value
+    var data = CompanyData()
+    for s in series {
+        data[s.currency, default: [:]]["\(s.item)/\(s.period)"] = s.points
+    }
+    return data
 }
 
 /// A message for an error from Rust.
