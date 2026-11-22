@@ -97,8 +97,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         let Ok(p) = prices.prices(t.as_str()) else { continue };
         let mut m = equities::valuation::market(t, &p, &reported_items);
         if let Some(last) = m.last() {
-            eprintln!("{}: market cap {:.1}B on {}{}", t, last.market_cap / 1e9, last.date,
-                last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default());
+            eprintln!("{}: market cap {:.1}B on {}{}{}{}", t, last.market_cap / 1e9, last.date,
+                last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default(),
+                last.return_on_equity.map(|r| format!(", ROE {:.1}%", r * 100.0)).unwrap_or_default(),
+                last.earnings_yield.map(|e| format!(", earnings yield {:.1}%", e * 100.0)).unwrap_or_default());
         }
         market.append(&mut m);
     }
@@ -277,7 +279,8 @@ fn push_market(days: &[equities::valuation::Market]) -> Result<(), Box<dyn Error
             let ts = m.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!("market_v1,ticker={},currency={} close={},market_cap={}{} {}\n",
                 m.ticker.to_string().to_lowercase(), m.currency, m.close, m.market_cap,
-                m.price_to_book.map(|pb| format!(",price_to_book={}", pb)).unwrap_or_default(), ts));
+                [("price_to_book", m.price_to_book), ("return_on_equity", m.return_on_equity), ("earnings_yield", m.earnings_yield)]
+                    .iter().filter_map(|(k, v)| v.map(|v| format!(",{}={}", k, v))).collect::<String>(), ts));
         }
         let res = client.post("http://localhost:8181/write?db=financials")
             .bearer_auth(&auth_token)
