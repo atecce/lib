@@ -1,0 +1,8 @@
+# One minimum OS version for Rust and the C code some crates compile (aws-lc,
+# under reqwest's TLS): left to themselves the C objects target the SDK's
+# version, newer than rustc links for, and an iOS link fails on symbols such
+# as ___chkstk_darwin. Keep these at or below the Library package's platforms
+# (cargo swift package -p macos@12 ios@15).
+[env]
+IPHONEOS_DEPLOYMENT_TARGET = "15.0"
+MACOSX_DEPLOYMENT_TARGET = "12.0"

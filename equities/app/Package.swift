@@ -1,9 +1,10 @@
 // swift-tools-version:5.9
-// A macOS app for the equities dashboards, reading InfluxDB through the Rust
-// `influx` crate (exported by uniffi in ../../Library).
+// An app for the equities dashboards, reading InfluxDB through the Rust
+// `influx` crate (exported by uniffi in ../../Library). This package is the
+// macOS app; Equities.xcodeproj builds the same sources for iOS.
 //
-//     cargo swift package -p macos@13 -n Library -y   # from the workspace root
-//     source ~/.profile && swift run                   # from here
+//     cargo swift package -p macos@12 ios@15 -n Library -y   # from the workspace root
+//     source ~/.profile && swift run                          # from here
 
 import PackageDescription
 
