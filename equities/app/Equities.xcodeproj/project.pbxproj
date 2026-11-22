@@ -155,7 +155,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FGV2S93UJ7;
+				DEVELOPMENT_TEAM = Y82E2K77P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Equities;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Equities reads its data from InfluxDB on your Mac.";
@@ -182,7 +182,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FGV2S93UJ7;
+				DEVELOPMENT_TEAM = Y82E2K77P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Equities;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Equities reads its data from InfluxDB on your Mac.";
