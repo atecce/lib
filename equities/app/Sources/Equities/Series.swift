@@ -37,7 +37,7 @@ func load(_ lines: [(String, Source)], ticker: String, currency: String) async t
 /// A message for an error from Rust.
 func describe(_ error: Error) -> String {
     switch error {
-    case InfluxError.NoToken: return "INFLUXDB3_AUTH_TOKEN is not set: run from a shell that has sourced ~/.profile."
+    case InfluxError.NoToken: return "No InfluxDB token: set one in Server settings, or run from a shell that has sourced ~/.profile."
     case let InfluxError.Query(message): return message
     default: return error.localizedDescription
     }

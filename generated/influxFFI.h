@@ -243,6 +243,11 @@ typedef void (*UniffiForeignFutureCompleteVoid)(uint64_t, UniffiForeignFutureRes
     );
 
 #endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_CONFIGURE
+#define UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_CONFIGURE
+void uniffi_influx_fn_func_configure(RustBuffer server, RustCallStatus *_Nonnull out_status
+);
+#endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_CURRENCIES
 #define UNIFFI_FFIDEF_UNIFFI_INFLUX_FN_FUNC_CURRENCIES
 RustBuffer uniffi_influx_fn_func_currencies(RustBuffer ticker, RustCallStatus *_Nonnull out_status
@@ -522,6 +527,12 @@ void ffi_influx_rust_future_free_void(uint64_t handle
 #ifndef UNIFFI_FFIDEF_FFI_INFLUX_RUST_FUTURE_COMPLETE_VOID
 #define UNIFFI_FFIDEF_FFI_INFLUX_RUST_FUTURE_COMPLETE_VOID
 void ffi_influx_rust_future_complete_void(uint64_t handle, RustCallStatus *_Nonnull out_status
+);
+#endif
+#ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_CONFIGURE
+#define UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_CONFIGURE
+uint16_t uniffi_influx_checksum_func_configure(void
+    
 );
 #endif
 #ifndef UNIFFI_FFIDEF_UNIFFI_INFLUX_CHECKSUM_FUNC_CURRENCIES

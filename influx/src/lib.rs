@@ -9,11 +9,15 @@
 //! - `market_v1`: fields `close`, `market_cap`, `price_to_book`,
 //!   `return_on_equity`, `earnings_yield`; tags `ticker` and `currency`.
 //!
-//! The server and token come from `INFLUXDB_URL` (default
-//! `http://localhost:8181`) and `INFLUXDB3_AUTH_TOKEN`.
+//! The server comes from `configure` (an app's settings), or else from the
+//! environment: `INFLUXDB_URL` (default `http://localhost:8181`),
+//! `INFLUXDB3_AUTH_TOKEN`, and, for a server behind Cloudflare Access
+//! (`https://influx.atec.pub`, see tunnel/README.md), the service token in
+//! `CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET`.
 
 uniffi::setup_scaffolding!();
 
+use std::sync::RwLock;
 use std::time::{Duration, SystemTime};
 
 const DEFAULT_URL: &str = "http://localhost:8181";
@@ -21,7 +25,7 @@ const DATABASE: &str = "financials";
 
 #[derive(Debug, uniffi::Error)]
 pub enum InfluxError {
-    /// `INFLUXDB3_AUTH_TOKEN` is not set.
+    /// No token: not configured, and `INFLUXDB3_AUTH_TOKEN` is not set.
     NoToken,
     /// The request failed, or InfluxDB answered with an error.
     Query { message: String },
@@ -38,6 +42,41 @@ impl std::fmt::Display for InfluxError {
 
 impl std::error::Error for InfluxError {}
 
+/// Where InfluxDB is and how to get in.
+#[derive(Clone, Debug, PartialEq, uniffi::Record)]
+pub struct Server {
+    /// e.g. `http://localhost:8181`, or `https://influx.atec.pub`.
+    pub url: String,
+    /// InfluxDB's token.
+    pub token: String,
+    /// A Cloudflare Access service token, for a server behind Access.
+    pub access_client_id: Option<String>,
+    pub access_client_secret: Option<String>,
+}
+
+static SERVER: RwLock<Option<Server>> = RwLock::new(None);
+
+/// Use this server from now on, rather than the environment's; `None` goes
+/// back to the environment.
+#[uniffi::export]
+pub fn configure(server: Option<Server>) {
+    *SERVER.write().unwrap() = server;
+}
+
+/// The configured server, else the environment's.
+fn server() -> Result<Server, InfluxError> {
+    if let Some(s) = SERVER.read().unwrap().clone() {
+        return Ok(s);
+    }
+    let env = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
+    Ok(Server {
+        url: env("INFLUXDB_URL").unwrap_or_else(|| DEFAULT_URL.to_string()),
+        token: env("INFLUXDB3_AUTH_TOKEN").ok_or(InfluxError::NoToken)?,
+        access_client_id: env("CF_ACCESS_CLIENT_ID"),
+        access_client_secret: env("CF_ACCESS_CLIENT_SECRET"),
+    })
+}
+
 /// One value of a series: a `Date` in Swift.
 #[derive(Clone, Debug, PartialEq, uniffi::Record)]
 pub struct Point {
@@ -45,10 +84,13 @@ pub struct Point {
     pub value: f64,
 }
 
-/// The tickers with reported items.
+/// The tickers with reported items in the last 400 days: companies still
+/// filing. (Over all time the query reads every row, about 20 seconds; this
+/// reads a year's partitions, about a tenth of a second.)
 #[uniffi::export]
 pub fn tickers() -> Result<Vec<String>, InfluxError> {
-    let rows = query("SELECT DISTINCT ticker FROM reported_item_v15 ORDER BY ticker")?;
+    let rows = query("SELECT DISTINCT ticker FROM reported_item_v15 \
+        WHERE time > now() - INTERVAL '400 days' ORDER BY ticker")?;
     Ok(rows.iter().filter_map(|r| r.get("ticker")?.as_str().map(str::to_string)).collect())
 }
 
@@ -111,12 +153,19 @@ fn literal(s: &str) -> String {
 type Row = serde_json::Map<String, serde_json::Value>;
 
 fn query(sql: &str) -> Result<Vec<Row>, InfluxError> {
-    let token = std::env::var("INFLUXDB3_AUTH_TOKEN").map_err(|_| InfluxError::NoToken)?;
-    let url = std::env::var("INFLUXDB_URL").unwrap_or_else(|_| DEFAULT_URL.to_string());
-    let err = |e: reqwest::Error| InfluxError::Query { message: e.to_string() };
-    let res = reqwest::blocking::Client::new()
-        .post(format!("{}/api/v3/query_sql", url))
-        .bearer_auth(token)
+    let server = server()?;
+    if server.token.is_empty() {
+        return Err(InfluxError::NoToken);
+    }
+    let err = |e: reqwest::Error| InfluxError::Query { message: e.without_url().to_string() };
+    let mut req = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(120)).build().map_err(err)?
+        .post(format!("{}/api/v3/query_sql", server.url.trim_end_matches('/')))
+        .bearer_auth(&server.token);
+    if let (Some(id), Some(secret)) = (&server.access_client_id, &server.access_client_secret) {
+        req = req.header("CF-Access-Client-Id", id).header("CF-Access-Client-Secret", secret);
+    }
+    let res = req
         .header("Content-Type", "application/json")
         .body(serde_json::json!({ "db": DATABASE, "q": sql, "format": "json" }).to_string())
         .send().map_err(err)?;
@@ -153,5 +202,24 @@ mod tests {
         assert!(assets.len() > 20 && assets.windows(2).all(|w| w[0].time < w[1].time));
         assert!(!market("nvda".into(), "market_cap".into(), "USD".into()).unwrap().is_empty());
         assert!(market("nvda".into(), "x; drop".into(), "USD".into()).is_err());
+    }
+
+    /// Through Cloudflare Access: `source ~/.cloudflared/equities-app.env`,
+    /// then `cargo test -p influx -- --ignored`.
+    #[test]
+    #[ignore]
+    fn through_access() {
+        let env = |k: &str| std::env::var(k).ok();
+        let server = Server {
+            url: "https://influx.atec.pub".into(),
+            token: env("INFLUXDB3_AUTH_TOKEN").unwrap(),
+            access_client_id: env("CF_ACCESS_CLIENT_ID"),
+            access_client_secret: env("CF_ACCESS_CLIENT_SECRET"),
+        };
+        configure(Some(Server { access_client_id: None, ..server.clone() }));
+        assert!(tickers().is_err(), "Access let a request without its service token through");
+        configure(Some(server));
+        assert!(tickers().unwrap().contains(&"net".to_string()));
+        configure(None);
     }
 }

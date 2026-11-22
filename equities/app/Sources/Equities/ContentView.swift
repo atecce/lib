@@ -7,28 +7,63 @@ struct ContentView: View {
     @State private var ticker: String?
     @State private var search = ""
     @State private var error: String?
+    @State private var loading = true
+    @State private var showSettings = false
+    /// Bumped after the settings change, to load the companies again.
+    @State private var loads = 0
+
+    init() {
+        ServerSettings.load().apply()
+    }
 
     var body: some View {
         NavigationSplitView {
             List(filtered, id: \.self, selection: $ticker) { Text($0.uppercased()) }
                 .searchable(text: $search, placement: .sidebar)
                 .navigationSplitViewColumnWidth(min: 120, ideal: 150)
+                // In the list, so a phone shows it too (its detail pane is
+                // hidden until a company is picked).
+                .overlay {
+                    if loading {
+                        ProgressView()
+                    } else if let error {
+                        VStack(spacing: 12) {
+                            Text(error).font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                            Button("Server settings") { showSettings = true }
+                        }
+                        .padding()
+                    }
+                }
+                .toolbar {
+                    ToolbarItem {
+                        Button { showSettings = true } label: { Label("Server", systemImage: "gearshape") }
+                    }
+                }
         } detail: {
             if let ticker {
                 Dashboard(ticker: ticker).id(ticker)
             } else {
-                Text(error ?? "Choose a company").foregroundStyle(.secondary)
+                Text("Choose a company").foregroundStyle(.secondary)
             }
         }
-        .task {
+        .sheet(isPresented: $showSettings) {
+            SettingsView { loads += 1 }
+        }
+        .task(id: loads) {
+            loading = true
+            defer { loading = false }
             do {
                 tickers = try await Task.detached { try Library.tickers() }.value
+                error = nil
                 // EQUITIES_TICKER=aapl opens a company at launch (simulator.sh).
                 if let t = ProcessInfo.processInfo.environment["EQUITIES_TICKER"]?.lowercased(), tickers.contains(t) {
                     ticker = t
                 }
             } catch {
+                tickers = []
                 self.error = describe(error)
+                // Nothing configured, as on a new phone: ask.
+                if case InfluxError.NoToken = error { showSettings = true }
             }
         }
     }

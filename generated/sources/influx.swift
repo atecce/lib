@@ -569,12 +569,95 @@ public func FfiConverterTypePoint_lower(_ value: Point) -> RustBuffer {
 }
 
 
+/**
+ * Where InfluxDB is and how to get in.
+ */
+public struct Server: Equatable, Hashable {
+    /**
+     * e.g. `http://localhost:8181`, or `https://influx.atec.pub`.
+     */
+    public var url: String
+    /**
+     * InfluxDB's token.
+     */
+    public var token: String
+    /**
+     * A Cloudflare Access service token, for a server behind Access.
+     */
+    public var accessClientId: String?
+    public var accessClientSecret: String?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(
+        /**
+         * e.g. `http://localhost:8181`, or `https://influx.atec.pub`.
+         */url: String, 
+        /**
+         * InfluxDB's token.
+         */token: String, 
+        /**
+         * A Cloudflare Access service token, for a server behind Access.
+         */accessClientId: String?, accessClientSecret: String?) {
+        self.url = url
+        self.token = token
+        self.accessClientId = accessClientId
+        self.accessClientSecret = accessClientSecret
+    }
+
+    
+
+    
+}
+
+#if compiler(>=6)
+extension Server: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeServer: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Server {
+        return
+            try Server(
+                url: FfiConverterString.read(from: &buf), 
+                token: FfiConverterString.read(from: &buf), 
+                accessClientId: FfiConverterOptionString.read(from: &buf), 
+                accessClientSecret: FfiConverterOptionString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: Server, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.url, into: &buf)
+        FfiConverterString.write(value.token, into: &buf)
+        FfiConverterOptionString.write(value.accessClientId, into: &buf)
+        FfiConverterOptionString.write(value.accessClientSecret, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeServer_lift(_ buf: RustBuffer) throws -> Server {
+    return try FfiConverterTypeServer.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeServer_lower(_ value: Server) -> RustBuffer {
+    return FfiConverterTypeServer.lower(value)
+}
+
+
 public enum InfluxError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
 
     
     
     /**
-     * `INFLUXDB3_AUTH_TOKEN` is not set.
+     * No token: not configured, and `INFLUXDB3_AUTH_TOKEN` is not set.
      */
     case NoToken
     /**
@@ -657,6 +740,54 @@ public func FfiConverterTypeInfluxError_lower(_ value: InfluxError) -> RustBuffe
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
+fileprivate struct FfiConverterOptionString: FfiConverterRustBuffer {
+    typealias SwiftType = String?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterString.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterString.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+fileprivate struct FfiConverterOptionTypeServer: FfiConverterRustBuffer {
+    typealias SwiftType = Server?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeServer.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeServer.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
 fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [String]
 
@@ -704,6 +835,16 @@ fileprivate struct FfiConverterSequenceTypePoint: FfiConverterRustBuffer {
     }
 }
 /**
+ * Use this server from now on, rather than the environment's; `None` goes
+ * back to the environment.
+ */
+public func configure(server: Server?)  {try! rustCall() {
+    uniffi_influx_fn_func_configure(
+        FfiConverterOptionTypeServer.lower(server),$0
+    )
+}
+}
+/**
  * The currencies a ticker reports in (a company that changed its reporting
  * currency has more than one).
  */
@@ -742,7 +883,9 @@ public func reported(ticker: String, item: String, period: String, currency: Str
 })
 }
 /**
- * The tickers with reported items.
+ * The tickers with reported items in the last 400 days: companies still
+ * filing. (Over all time the query reads every row, about 20 seconds; this
+ * reads a year's partitions, about a tenth of a second.)
  */
 public func tickers()throws  -> [String]  {
     return try  FfiConverterSequenceString.lift(try rustCallWithError(FfiConverterTypeInfluxError_lift) {
@@ -766,6 +909,9 @@ private let initializationResult: InitializationResult = {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
+    if (uniffi_influx_checksum_func_configure() != 19944) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_influx_checksum_func_currencies() != 45658) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -775,7 +921,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_influx_checksum_func_reported() != 47093) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_influx_checksum_func_tickers() != 55219) {
+    if (uniffi_influx_checksum_func_tickers() != 4757) {
         return InitializationResult.apiChecksumMismatch
     }
 

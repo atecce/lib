@@ -10,6 +10,7 @@
 		E0000000000000000000A001 /* EquitiesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000B001 /* EquitiesApp.swift */; };
 		E0000000000000000000A002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000B002 /* ContentView.swift */; };
 		E0000000000000000000A003 /* Series.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000B003 /* Series.swift */; };
+		E0000000000000000000A005 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000000000000000000B005 /* Settings.swift */; };
 		E0000000000000000000A004 /* Library in Frameworks */ = {isa = PBXBuildFile; productRef = E0000000000000000000C002 /* Library */; };
 /* End PBXBuildFile section */
 
@@ -17,6 +18,7 @@
 		E0000000000000000000B001 /* EquitiesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquitiesApp.swift; sourceTree = "<group>"; };
 		E0000000000000000000B002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E0000000000000000000B003 /* Series.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Series.swift; sourceTree = "<group>"; };
+		E0000000000000000000B005 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		E0000000000000000000B004 /* Equities.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Equities.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -46,6 +48,7 @@
 				E0000000000000000000B001 /* EquitiesApp.swift */,
 				E0000000000000000000B002 /* ContentView.swift */,
 				E0000000000000000000B003 /* Series.swift */,
+				E0000000000000000000B005 /* Settings.swift */,
 			);
 			path = Sources/Equities;
 			sourceTree = "<group>";
@@ -119,6 +122,7 @@
 				E0000000000000000000A001 /* EquitiesApp.swift in Sources */,
 				E0000000000000000000A002 /* ContentView.swift in Sources */,
 				E0000000000000000000A003 /* Series.swift in Sources */,
+				E0000000000000000000A005 /* Settings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
