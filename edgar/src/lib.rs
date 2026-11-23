@@ -174,7 +174,13 @@ impl Cache {
     }
 
     /// The company's Central Index Key, from the SEC's ticker map.
+    /// `ticker` can also be a CIK, written `CIK1018724`: a company without a
+    /// ticker (acquired, bankrupt, delisted, or never listed), which the
+    /// ticker map doesn't have.
     pub fn cik(&self, ticker: &str) -> Result<u64, Box<dyn Error>> {
+        if let Some(cik) = parse_cik(ticker) {
+            return Ok(cik);
+        }
         let path = self.tickers_path();
         let map = read_json(&path)?;
         find_cik(&map, ticker).ok_or_else(|| EdgarError::TickerNotFound(ticker.to_string()).into())
@@ -223,6 +229,15 @@ type TickerMap = std::collections::HashMap<String, TickerEntry>;
 /// The CIK for `ticker`. Class shares are "BF.B" in most lists, "BF-B" at the
 /// SEC. A company listed only by its classes (Berkshire Hathaway: BRK-A,
 /// BRK-B) is found by the bare symbol, "BRK", when all classes share one CIK.
+/// "CIK1018724" or "CIK0001018724" (any case): the number.
+pub fn parse_cik(s: &str) -> Option<u64> {
+    let digits = s.get(..3).filter(|p| p.eq_ignore_ascii_case("CIK")).map(|_| &s[3..])?;
+    if digits.is_empty() || !digits.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    digits.parse().ok()
+}
+
 fn find_cik(map: &TickerMap, ticker: &str) -> Option<u64> {
     let want = ticker.replace('.', "-");
     if let Some(e) = map.values().find(|e| e.ticker.replace('.', "-").eq_ignore_ascii_case(&want)) {
@@ -298,6 +313,14 @@ fn filings_of(cik: u64, pages: Vec<FilingColumns>, forms: &[&str]) -> Vec<Filing
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn ciks() {
+        assert_eq!(super::parse_cik("CIK1018724"), Some(1018724));
+        assert_eq!(super::parse_cik("cik0001018724"), Some(1018724));
+        assert_eq!(super::parse_cik("CIEN"), None);
+        assert_eq!(super::parse_cik("CIK"), None);
+    }
+
     use super::*;
 
     fn report(short_name: &str, category: Option<&str>, kind: Option<&str>) -> Report {
