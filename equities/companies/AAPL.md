@@ -77,6 +77,62 @@ HP (HPQ), Dell and Sandisk have too few usable years: HP and Dell have had
 negative book equity, where residual income on book means nothing, and
 Sandisk is a recent spin-off.
 
+## The wrong baseline
+
+"Computer and office equipment" is a poor yardstick for Apple, and the
+reason is the entrepreneurship itself. An industry code sorts companies by
+what they already make; Apple was given 3571 as a computer maker, and kept
+it while the iPhone became about half its revenue and services a quarter.
+The rivals that mattered after 2007 sat elsewhere: Nokia and BlackBerry in
+radio telephones (3663), Sony in consumer electronics (3651), Google in
+services (7370), and, with the Watch and the pricing, arguably luxury goods.
+
+Schumpeter's "new combinations" include a new good, a new quality of a good
+and a new market: doing that redraws who competes with whom. Kirzner's
+entrepreneur is alert to what others haven't noticed, here what people
+would value and couldn't ask for. Either way competition is a discovery
+procedure (Hayek), and the industry is among the things discovered, so a
+fixed category can't be the null of how fast an advantage should fade.
+
+**What the achievement was shows in gross margin**, the price over the cost
+of what was sold. Apple's design, integration and brand, more an aesthetic
+achievement than a technical one, let it sell hardware at about twice the
+margin of the box makers it's classified with, from largely the same
+suppliers:
+
+| Gross margin | 2011 | 2016 | 2021 | 2025 | 2026 |
+|---|---|---|---|---|---|
+| Apple | 40% | 39% | 42% | 47% | 49% |
+| Dell | | 16% | 31% | 22% | 20% |
+| HP | | | | 21% | 21% |
+
+Services lift the later years; the gap was there in 2011. Its intangible
+source is expensed as incurred and never reaches book value, so residual
+income is high partly *because* the asset earning it isn't recorded: the
+excess over $`r`$ is the return on what the balance sheet leaves out.
+Residual income doesn't care whether an advantage is technical or
+aesthetic; it measures the rent, not its source. The measure holds; the
+baseline doesn't.
+
+**The market as the baseline**, as Fama and French (2000) used all firms:
+pooled over every issuer in Postgres (shell years and data errors left out,
+see `store/examples/persistence.rs`):
+
+| | Pooled ω | Median company | At or above Apple's 1.12 |
+|---|---|---|---|
+| Every issuer (414 with 8+ years) | 0.84 ± 0.01 | 0.79 | 30 |
+| Without finance (326) | 0.85 ± 0.01 | 0.80 | 23 |
+
+So across the market residual income fades about 16% a year (at
+$`r = 7\%`$, 13%); Apple's grew, a top-7% persistence. The market here is
+mostly today's S&P 500, survivors, so the true fade is faster still.
+
+Better peer groups, for later: **text-based industries** (Hoberg and
+Phillips 2016), built each year from the product descriptions in the
+companies' own 10-Ks, so that a computer maker that starts selling phones
+gets phone makers as peers; and **return-based peers**, companies whose
+stock returns move together, the market's own classification.
+
 ## What it says
 
 **The market never priced Apple's advantage as fading.** Every year the
@@ -137,4 +193,8 @@ last forever, growing a little. But it assumed far less growth than came:
   XBRL): book value, earnings and shares, to see what the price implied
   when Jobs came back.
 - The same table for Nokia and BlackBerry, whose advantages didn't last.
-- Fama–French industries instead of SIC groups (`VALUATION.md` section 8).
+- Hoberg–Phillips text-based peers (their data is published free), and
+  Fama–French industries for comparison with the literature.
+- Southwest's (LUV) 2010–2011 values are stored unscaled (equity 6,237
+  where the 10-K means $6,237 million): an EDGAR reader bug with older
+  filings' scale, found by this market-wide fit.

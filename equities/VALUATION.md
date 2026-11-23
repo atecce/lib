@@ -566,6 +566,14 @@ over years.) Which companies form an industry is a classification:
   from SIC codes, published with the mappings on Kenneth French's data
   library; the convention in asset pricing papers, so results compare. A
   mapping table from SIC is all they take.
+- **Text-based industries** (Hoberg and Phillips 2016): each company's
+  peers from the similarity of the product descriptions in its 10-K, redrawn
+  every year. Industries this way follow the companies, which is the point
+  for entrepreneurs: a new good redraws who competes with whom, and a fixed
+  code can't (see `companies/AAPL.md`, "The wrong baseline").
+- **The whole market**: no classification at all, the null that assumes
+  nothing about who competes with whom. Fama and French (2000) measure it
+  this way.
 - **Japan and Taiwan**: EDINET and MOPS carry their exchanges' own industry
   codes (TSE's 33 sectors; TWSE's industry categories), to map when those
   companies join the comparison.
@@ -687,6 +695,14 @@ breadth where length can't help.
   expectation, and cross-sectional stock returns. *Journal of Accounting and
   Economics*, 25(3), 283–319. Residual income value over price predicts
   returns.
+- Hayek, F. A. (2002). Competition as a discovery procedure. *Quarterly
+  Journal of Austrian Economics*, 5(3), 9–23 (German original 1968).
+  Competition finds out what nobody knew beforehand, including who
+  competes with whom.
+- Hoberg, G., & Phillips, G. (2016). Text-based network industries and
+  endogenous product differentiation. *Journal of Political Economy*,
+  124(5), 1423–1465. Industries from 10-K product descriptions, redrawn
+  yearly.
 - Dechow, P. M., Hutton, A. P., & Sloan, R. G. (1999). An empirical
   assessment of the residual income valuation model. *Journal of Accounting
   and Economics*, 26(1–3), 1–34. Abnormal earnings persist with
