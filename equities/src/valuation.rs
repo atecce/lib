@@ -45,15 +45,20 @@ pub struct Market {
 /// 2023-10-01, then 3; TSMC's (TSM) 5. Checked against each price series
 /// around the split.
 fn shares_per_listed(ticker: Ticker, date: NaiveDate) -> f64 {
-    let before = |y, m, d| date < NaiveDate::from_ymd_opt(y, m, d).unwrap();
+    depositary_ratios(ticker).iter().rev()
+        .find(|(from, _)| from.parse::<NaiveDate>().is_ok_and(|f| f <= date))
+        .map_or(1.0, |(_, n)| *n)
+}
+
+/// How many of the company's shares one listed share represents, from each
+/// date it changed: empty for an ordinary listing (always 1). TSMC's have
+/// always been 5 common shares.
+pub fn depositary_ratios(ticker: Ticker) -> &'static [(&'static str, f64)] {
     match ticker.as_str() {
-        "TM" if before(2021, 10, 1) => 2.0,
-        "TM" => 10.0,
-        "HMC" if before(2023, 10, 1) => 1.0,
-        "HMC" => 3.0,
-        // TSMC's have always been 5 common shares.
-        "TSM" => 5.0,
-        _ => 1.0,
+        "TM" => &[("1900-01-01", 2.0), ("2021-10-01", 10.0)],
+        "HMC" => &[("1900-01-01", 1.0), ("2023-10-01", 3.0)],
+        "TSM" => &[("1900-01-01", 5.0)],
+        _ => &[],
     }
 }
 

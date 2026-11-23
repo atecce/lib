@@ -138,7 +138,14 @@ LEFT JOIN LATERAL (
 WHERE p.ticker = 'TM';
 ```
 
-What `equities::valuation` does in Rust, as a query that can check it.
+What `equities::valuation` does in Rust, as a query that can check it, and
+stricter: it takes the share count as of the day it was *filed*, where
+`valuation.rs` takes it as of the date on the cover page (weeks earlier).
+They agree away from those weeks. It also shows bad first reports plainly:
+Toyota's 2019 20-F cover gives 283,243,167 shares, a tenth of the real
+count, and the query uses it until the next 20-F is filed. Not adjusted for
+splits between filings either (`price.split_factor` has them), so near a
+split it is off by the split's factor.
 
 **EDGAR against EDINET.** Toyota's figures from both (144 of 166 matched
 when compared by hand):
@@ -159,7 +166,25 @@ FROM market WHERE return_on_equity > earnings_yield
 ORDER BY ticker, date DESC;
 ```
 
+## Using it
+
+```sh
+# Postgres from Homebrew (postgresql@17), database financials:
+createdb financials
+# Write companies to it (migrations run on connect; STORE_URL overrides
+# host=localhost dbname=financials):
+lib --postgres AAPL TM 7203.T       # Postgres and InfluxDB
+lib --postgres-only AAPL TM 7203.T  # Postgres alone
+```
+
+Every write is an upsert: running it again changes nothing that didn't
+change. `SAME_ISSUER` (in `src/lib.rs`) links a Tokyo company's EDINET code
+to the US listing it files on EDGAR under, so Toyota is one issuer with two
+listings, `TM` and `7203.T`.
+
 ## The plan
+
+Steps 1 to 3 are done; 4 to 6 aren't.
 
 1. **Postgres on the Mac** (Homebrew, `postgresql@17`), a `financials`
    database, this schema.

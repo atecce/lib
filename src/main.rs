@@ -122,6 +122,17 @@ fn main() -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
+    // --postgres writes to Postgres too (store crate, STORE_URL); with
+    // --postgres-only, to Postgres alone. Every version of every value, with
+    // its filing, rather than the latest only.
+    let postgres_only = std::env::args().any(|a| a == "--postgres-only");
+    if postgres_only || std::env::args().any(|a| a == "--postgres") {
+        push_to_postgres(&cache, &japan, &prices, &reported_items, &market)?;
+    }
+    if postgres_only {
+        return Ok(());
+    }
+
     if !reported_items.is_empty() {
         let items = latest(reported_items);
         push_to_influx(&items)?;
@@ -133,6 +144,67 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+/// Write each company read to Postgres: its issuer and listing, its filings
+/// and every value they reported, its prices and market values.
+fn push_to_postgres(edgar: &edgar::Cache, edinet: &edinet::Cache, prices: &tiingo::Cache,
+                    items: &[equities::item::Reported], market: &[equities::valuation::Market]) -> Result<(), Box<dyn Error>> {
+    let mut db = store::Store::connect(&store::default_url())?;
+    for m in db.migrate()? {
+        eprintln!("postgres: applied migration {}", m);
+    }
+    db.sync_items()?;
+
+    let mut by_ticker: std::collections::BTreeMap<String, Vec<equities::item::Reported>> = Default::default();
+    for it in items {
+        by_ticker.entry(it.ticker.as_str().to_string()).or_default().push(it.clone());
+    }
+    let (mut filings, mut facts, mut days, mut markets) = (0, 0, 0, 0);
+    for (ticker, its) in &by_ticker {
+        let t: equities::Ticker = ticker.parse().map_err(|_| format!("not a ticker: {}", ticker))?;
+        let company = match company(edgar, edinet, t) {
+            Ok(c) => c,
+            Err(e) => { eprintln!("postgres: {}: {}", ticker, e); continue; },
+        };
+        let issuer = db.write_company(&company)?;
+        let (f, n) = db.write_facts(issuer, its)?;
+        filings += f;
+        facts += n;
+        if let Ok(p) = prices.prices(ticker) {
+            days += db.write_prices(ticker, &p)?;
+        }
+        let m: Vec<_> = market.iter().filter(|m| m.ticker == t).cloned().collect();
+        markets += db.write_market(&m)?;
+    }
+    println!("Successfully wrote {} companies, {} filings, {} facts, {} price days, {} market days to Postgres",
+        by_ticker.len(), filings, facts, days, markets);
+    Ok(())
+}
+
+/// What the caches know of a listing's issuer.
+fn company(edgar: &edgar::Cache, edinet: &edinet::Cache, t: equities::Ticker) -> Result<store::Company, Box<dyn Error>> {
+    if is_edinet(t) {
+        let last = edinet.reports(t.as_str())?.pop().ok_or("no EDINET reports")?;
+        let code = last.edinet_code.clone();
+        // The same issuer on EDGAR, through its US depositary shares.
+        let cik = code.as_deref()
+            .and_then(|c| store::SAME_ISSUER.iter().find(|(e, _)| *e == c))
+            .and_then(|(_, us)| edgar.cik(us).ok())
+            .map(|c| c as i64);
+        Ok(store::Company { ticker: t.as_str().to_string(), name: last.filer_name.clone(), cik, edinet_code: code,
+            exchange: Some("TSE".to_string()), currency: "JPY".to_string() })
+    } else {
+        let cik = edgar.cik(t.sec_symbol())?;
+        let info = edgar.company(cik).ok();
+        let exchange = info.as_ref().and_then(|i| {
+            let at = i.tickers.iter().position(|x| x.eq_ignore_ascii_case(t.sec_symbol()))?;
+            i.exchanges.get(at).cloned().flatten()
+        });
+        let edinet_code = store::SAME_ISSUER.iter().find(|(_, us)| *us == t.as_str()).map(|(e, _)| e.to_string());
+        Ok(store::Company { ticker: t.as_str().to_string(), name: info.map(|i| i.name), cik: Some(cik as i64),
+            edinet_code, exchange, currency: "USD".to_string() })
+    }
 }
 
 /// One value per (ticker, item, period, currency, date): the last one read.
