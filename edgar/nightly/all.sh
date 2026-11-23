@@ -15,7 +15,7 @@
 # resumes where it stopped, and once caught up a night is only the day's new
 # filings. launchd starts no second copy while one is still running.
 #
-# (progress.py counts both.)
+# (edgar-progress counts both.)
 #
 # Companies go in chunks, each holding the cache lock only while it fetches,
 # so the other nightly jobs (S&P 500, Nikkei) get their turn in between and

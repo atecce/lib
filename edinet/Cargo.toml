@@ -23,3 +23,7 @@ zip = { version = "7.2.0", default-features = false, features = ["deflate"], opt
 name = "edinet-fetch"
 path = "src/bin/fetch.rs"
 required-features = ["fetch"]
+
+[[bin]]
+name = "edinet-progress"
+path = "src/bin/progress.rs"

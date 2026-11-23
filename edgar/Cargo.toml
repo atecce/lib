@@ -25,3 +25,7 @@ required-features = ["fetch"]
 [[bin]]
 name = "universe"
 required-features = ["fetch"]
+
+[[bin]]
+name = "edgar-progress"
+path = "src/bin/progress.rs"
