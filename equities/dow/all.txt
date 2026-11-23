@@ -1,0 +1,7 @@
+# The Dow Jones Industrial Average's 30 companies, as of its last changes I
+# know of (November 2024: NVDA and SHW in, INTC and DOW out). Today's
+# members, so a backtest over them has survivorship bias: Fama's 1965 Dow
+# (1956–62) had Anaconda, Bethlehem Steel, Johns-Manville ...
+AAPL AMGN AMZN AXP BA CAT CRM CSCO CVX DIS
+GS HD HON IBM JNJ JPM KO MCD MMM MRK
+MSFT NKE NVDA PG SHW TRV UNH V VZ WMT
