@@ -66,8 +66,8 @@
           "type": "grafana-postgresql-datasource",
           "uid": "financials-postgres"
         },
-        "query": "SELECT DISTINCT f.currency FROM fact f JOIN listing l USING (issuer_id) WHERE l.ticker = '$ticker' ORDER BY 1",
-        "definition": "SELECT DISTINCT f.currency FROM fact f JOIN listing l USING (issuer_id) WHERE l.ticker = '$ticker' ORDER BY 1",
+        "query": "SELECT DISTINCT f.currency FROM fact f JOIN listing l USING (issuer_id) WHERE l.ticker IN (${ticker}) ORDER BY 1",
+        "definition": "SELECT DISTINCT f.currency FROM fact f JOIN listing l USING (issuer_id) WHERE l.ticker IN (${ticker}) ORDER BY 1",
         "refresh": 1,
         "sort": 1,
         "multi": false,
@@ -193,7 +193,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', 'pit', '$currency', ARRAY['TotalAssets', 'TotalLiabilities', 'StockholdersEquity', 'TotalDebt']) f\nJOIN (VALUES ('TotalAssets', 'total assets'), ('TotalLiabilities', 'total liabilities'), ('StockholdersEquity', 'stockholders'' equity'), ('TotalDebt', 'total debt')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['TotalAssets', 'TotalLiabilities', 'StockholdersEquity', 'TotalDebt']) f\nJOIN (VALUES ('TotalAssets', 'total assets'), ('TotalLiabilities', 'total liabilities'), ('StockholdersEquity', 'stockholders'' equity'), ('TotalDebt', 'total debt')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ],
       "description": "Total assets, liabilities, stockholders' equity and total debt (every borrowing line, current and non-current) from the balance sheet. Market cap against book value is in the valuation row below."
@@ -295,7 +295,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', '$period', '$currency', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -396,7 +396,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', 'pit', '$currency', ARRAY['CashAndCashEquivalents', 'MarketableSecurities', 'AccountsReceivableNet', 'Inventories']) f\nJOIN (VALUES ('CashAndCashEquivalents', 'cash'), ('MarketableSecurities', 'marketable securities'), ('AccountsReceivableNet', 'receivables'), ('Inventories', 'inventories')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['CashAndCashEquivalents', 'MarketableSecurities', 'AccountsReceivableNet', 'Inventories']) f\nJOIN (VALUES ('CashAndCashEquivalents', 'cash'), ('MarketableSecurities', 'marketable securities'), ('AccountsReceivableNet', 'receivables'), ('Inventories', 'inventories')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -497,7 +497,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', '$period', '$currency', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -598,7 +598,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', 'pit', '$currency', ARRAY['PropertyAndEquipmentNet', 'Goodwill', 'IntangibleAssetsNet']) f\nJOIN (VALUES ('PropertyAndEquipmentNet', 'property and equipment'), ('Goodwill', 'goodwill'), ('IntangibleAssetsNet', 'intangibles')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['PropertyAndEquipmentNet', 'Goodwill', 'IntangibleAssetsNet']) f\nJOIN (VALUES ('PropertyAndEquipmentNet', 'property and equipment'), ('Goodwill', 'goodwill'), ('IntangibleAssetsNet', 'intangibles')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -699,7 +699,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('$ticker', '$period', '$currency', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -838,7 +838,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT date::timestamp AS \"time\", 'market cap' AS metric, market_cap AS value FROM market\nWHERE ticker = '$ticker' AND currency = '$currency' AND market_cap IS NOT NULL\nUNION ALL\nSELECT period_end::timestamp, 'book value (stockholders'' equity)', value\nFROM listing_facts('$ticker', 'pit', '$currency', ARRAY['StockholdersEquity'])\nUNION ALL\nSELECT date::timestamp AS \"time\", 'price-to-book' AS metric, price_to_book AS value FROM market\nWHERE ticker = '$ticker' AND currency = '$currency' AND price_to_book IS NOT NULL\nORDER BY 1"
+          "rawSql": "SELECT date::timestamp AS \"time\", 'market cap' AS metric, market_cap AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = '${currency:raw}' AND market_cap IS NOT NULL\nUNION ALL\nSELECT period_end::timestamp, 'book value (stockholders'' equity)', value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['StockholdersEquity'])\nUNION ALL\nSELECT date::timestamp AS \"time\", 'price-to-book' AS metric, price_to_book AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = '${currency:raw}' AND price_to_book IS NOT NULL\nORDER BY 1"
         }
       ],
       "description": "Market cap each trading day against book value (stockholders' equity). On a log scale the gap between them is price-to-book, also on the right axis: the market pays that multiple of the accounts. Book value records what owners put in and the company kept, at historical cost; market value prices expected future profits, including what accounting leaves off the balance sheet (brands, software, R&D) and growth."
@@ -940,7 +940,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT date::timestamp AS \"time\", 'return on equity' AS metric, return_on_equity AS value FROM market\nWHERE ticker = '$ticker' AND currency = '$currency' AND return_on_equity IS NOT NULL\nUNION ALL\nSELECT date::timestamp AS \"time\", 'earnings yield' AS metric, earnings_yield AS value FROM market\nWHERE ticker = '$ticker' AND currency = '$currency' AND earnings_yield IS NOT NULL\nORDER BY 1"
+          "rawSql": "SELECT date::timestamp AS \"time\", 'return on equity' AS metric, return_on_equity AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = '${currency:raw}' AND return_on_equity IS NOT NULL\nUNION ALL\nSELECT date::timestamp AS \"time\", 'earnings yield' AS metric, earnings_yield AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = '${currency:raw}' AND earnings_yield IS NOT NULL\nORDER BY 1"
         }
       ],
       "description": "Net income over the last four quarters, over average book equity (return on equity) and over market cap (earnings yield, the inverse of P/E). Price-to-book is roughly their ratio: where return on equity runs above the earnings yield, the market values the equity above book. Each day uses only quarters reported by then."
