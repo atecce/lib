@@ -27,6 +27,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("006_flow_period", include_str!("../migrations/006_flow_period.sql")),
     ("007_flow_period_fallback", include_str!("../migrations/007_flow_period_fallback.sql")),
     ("008_mops", include_str!("../migrations/008_mops.sql")),
+    ("009_sic", include_str!("../migrations/009_sic.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
@@ -90,6 +91,18 @@ impl Store {
             applied.push(*version);
         }
         Ok(applied)
+    }
+
+    /// Set issuers' SIC industry codes, by CIK; returns how many issuers
+    /// changed. CIKs not in the database are skipped.
+    pub fn set_sic(&mut self, codes: &[(i64, String)]) -> Result<u64, Box<dyn Error>> {
+        let mut tx = self.db.transaction()?;
+        let mut changed = 0;
+        for (cik, sic) in codes {
+            changed += tx.execute("UPDATE issuer SET sic = $2 WHERE cik = $1 AND sic IS DISTINCT FROM $2", &[cik, sic])?;
+        }
+        tx.commit()?;
+        Ok(changed)
     }
 
     /// Bring the `item` table in step with `equities::item::Item`.

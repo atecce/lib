@@ -175,6 +175,10 @@ createdb financials
 # host=localhost dbname=financials):
 lib --postgres AAPL TM 7203.T       # Postgres and InfluxDB
 lib --postgres-only AAPL TM 7203.T  # Postgres alone
+# Each issuer's SIC industry code, from EDGAR's list of filers:
+universe | store-sic
+# Residual income persistence against the industry (equities/VALUATION.md §8):
+cargo run --release -p store --example persistence -- AAPL
 ```
 
 Every write is an upsert: running it again changes nothing that didn't

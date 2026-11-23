@@ -520,8 +520,10 @@ The three steps, each from data already in Postgres:
    cost of capital). Compare within industries (SIC codes from EDGAR), since
    leverage alone raises a bank's ROE.
 2. **Its persistence against competition's.** Estimate each company's
-   $`\omega`$ by regressing $`x^a_{t+1}/B_t`$ on $`x^a_t/B_{t-1}`$, and the
-   industry's the same way, pooled. The anomaly is a company $`\omega`$
+   $`\omega`$ by regressing $`x^a_{t+1}`$ on $`x^a_t`$, both divided by the
+   same total assets $`A_{t-1}`$ (a common deflator, so size drops out and
+   $`\omega`$ keeps its meaning), and the industry's the same way, pooled
+   over its companies (below). The anomaly is a company $`\omega`$
    well above its industry's, or a *changepoint* in residual income: an
    advantage forming or collapsing. This is where augurs' changepoint
    detection belongs: on the economically meaningful series, not on raw
@@ -535,6 +537,42 @@ The three steps, each from data already in Postgres:
    returns. The backtest: sort on 
    $`\omega_{\text{realized}} - \omega_{\text{implied}}`$ known at each filing date, and measure the
    returns that follow.
+
+### Industries
+
+An industry's $`\omega`$ is the same regression with every company-year of
+the industry's companies in it, one pooled fit:
+
+```math
+\frac{x^a_{i,t+1}}{A_{i,t-1}} \;=\; \omega_{\text{industry}}\,\frac{x^a_{i,t}}{A_{i,t-1}} + \varepsilon_{i,t+1}
+```
+
+(Fama and French 2000 do the cross-sectional version: each year, the change
+in profitability regressed on its distance from the expected level, averaged
+over years.) Which companies form an industry is a classification:
+
+- **SIC**, the Standard Industrial Classification (US, 1937; four digits:
+  division, major group 35, industry group 357, industry 3571). Frozen
+  since 1987 for most uses, but the SEC still assigns one to every filer, so
+  EDGAR's submissions carry it: in Postgres as `issuer.sic` (migration 009,
+  filled by `universe | store-sic`). Free, and on every company here.
+- **NAICS**, the North American Industry Classification System (1997),
+  which replaced SIC for US, Canadian and Mexican statistics; six digits,
+  better for services and technology. Not in EDGAR's filer data.
+- **GICS**, the Global Industry Classification Standard (MSCI and S&P,
+  1999): 11 sectors down to 163 sub-industries, by what drives revenue; what
+  the S&P 500's sectors are. Proprietary.
+- **Fama–French industries**: 5, 10, 12, 17, 30, 38, 48 or 49 groups built
+  from SIC codes, published with the mappings on Kenneth French's data
+  library; the convention in asset pricing papers, so results compare. A
+  mapping table from SIC is all they take.
+- **Japan and Taiwan**: EDINET and MOPS carry their exchanges' own industry
+  codes (TSE's 33 sectors; TWSE's industry categories), to map when those
+  companies join the comparison.
+
+`store/examples/persistence.rs` groups by the first three SIC digits (the
+industry group; `--digits` changes it). For Apple that is computer and
+office equipment, 357; `companies/AAPL.md` is the worked example.
 
 **The data is long enough for industries, barely for companies.** XBRL
 starts in 2009, so about 16 annual observations per company (60-odd
