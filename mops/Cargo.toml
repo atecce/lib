@@ -22,3 +22,7 @@ reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true
 name = "mops-fetch"
 path = "src/bin/fetch.rs"
 required-features = ["fetch"]
+
+[[bin]]
+name = "mops-progress"
+path = "src/bin/progress.rs"
