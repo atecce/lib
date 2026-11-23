@@ -298,6 +298,128 @@ subperiods, against the filter rules' result. It needs prices for the
 universe (Tiingo's free plan allows 500 symbols a month) and, against
 survivorship bias, the companies that no longer trade.
 
+## 7. Prices, residuals and retention: Samuelson, Fama, Shiller
+
+The valuation identities above say what a price *is* given expectations.
+Three results say how prices *move*, and what the unforecastable part, the
+residual, has to look like.
+
+### Samuelson: properly anticipated prices fluctuate randomly
+
+Let $`V`$ be what the stock pays out, discounted, and let the price be its
+expectation given the information $`\Phi_t`$ at $`t`$ (constant $`r`$):
+
+```math
+P_t \;=\; \mathbb{E}\!\left[\,\sum_{k=1}^{\infty} \frac{D_{t+k}}{(1+r)^{k}} \;\middle|\; \Phi_t \right]
+```
+
+Then the discounted price with dividends reinvested is a martingale: by the
+law of iterated expectations,
+
+```math
+\mathbb{E}\!\left[\,P_{t+1} + D_{t+1} \mid \Phi_t\right] \;=\; (1+r)\,P_t,
+\qquad
+\varepsilon_{t+1} \;=\; \frac{P_{t+1} + D_{t+1}}{P_t} - (1+r),
+\qquad
+\mathbb{E}\!\left[\varepsilon_{t+1} \mid \Phi_t\right] = 0
+```
+
+The return's surprise $`\varepsilon`$ is uncorrelated with anything known at
+$`t`$. Prices change only on news, and news is unforecastable by definition:
+randomness is the mark of an informed market, not of a careless one
+(Samuelson 1965).
+
+### Fama: efficiency is a statement about residuals
+
+Fama (1970) made this the definition: a market is efficient relative to
+information $`\Phi_t`$ if the residuals of its expected-return model are
+unforecastable from $`\Phi_t`$,
+
+```math
+\mathbb{E}\!\left[\,R_{t+1} - \mathbb{E}_m[R_{t+1} \mid \Phi_t] \;\middle|\; \Phi_t\right] \;=\; 0,
+```
+
+with $`\mathbb{E}_m`$ the market's model of expected returns. Weak form:
+$`\Phi_t`$ is past prices (the filter rules and serial correlations of
+`FORECASTING.md`); semi-strong: all public information (the statements);
+strong: everything. Every test is a joint test of efficiency and the model
+$`\mathbb{E}_m`$: a residual that looks forecastable may be mispricing or a
+wrong model of risk (the joint-hypothesis problem).
+
+### Retention: residual income and the growth it buys
+
+Clean surplus (section 2) splits earnings between payout and retention,
+$`B_t = B_{t-1} + E_t - D_t`$. With a retention rate $`b = 1 - D_t/E_t`$ and
+constant $`\mathrm{ROE}`$, book value, earnings and dividends all grow at
+
+```math
+g \;=\; b \cdot \mathrm{ROE}
+```
+
+and the Gordon model, $`P = D_1/(r - g)`$, becomes
+
+```math
+P_0 \;=\; \frac{(1-b)\,\mathrm{ROE}\;B_0}{r - b\,\mathrm{ROE}},
+\qquad
+\frac{P_0}{B_0} \;=\; \frac{\mathrm{ROE} - g}{r - g},
+```
+
+the justified price-to-book of section 2 again. Retaining more raises value
+only if $`\mathrm{ROE} > r`$: differentiating,
+
+```math
+\frac{\partial P_0}{\partial b} \;=\; \frac{\mathrm{ROE}\,B_0\,(\mathrm{ROE} - r)}{(r - b\,\mathrm{ROE})^2},
+```
+
+positive when retained earnings earn more than shareholders require, zero
+when they earn exactly $`r`$ (where payout policy is irrelevant, Miller and
+Modigliani's result), negative below. Each dollar retained adds a dollar of
+book value; it adds more than a dollar of market value only by earning
+residual income, $`(\mathrm{ROE} - r)\,B`$. Market minus book is the present
+value of the residual income retention is expected to buy.
+
+### Shiller: prices move too much
+
+Define the ex post rational price $`P^*_t`$, the present value of the
+dividends that were actually paid. Rational expectations make the price its
+forecast, so the forecast error is uncorrelated with the forecast:
+
+```math
+P^*_t \;=\; P_t + u_t, \qquad \operatorname{Cov}(P_t, u_t) = 0
+\quad\Longrightarrow\quad
+\operatorname{Var}(P^*_t) \;=\; \operatorname{Var}(P_t) + \operatorname{Var}(u_t) \;\ge\; \operatorname{Var}(P_t).
+```
+
+A forecast can't vary more than what it forecasts. Shiller (1981) found the
+reverse in a century of US data: detrended prices several times as volatile
+as $`P^*`$, the "excess volatility" that was one of the first cracks in the
+efficient market view. In residual income terms the same bound applies to
+$`M - B`$ against the present value of the residual income actually earned:
+market-to-book should move less than realized excess profitability does.
+
+The log-linear version (Campbell and Shiller 1988) says where the movement
+must go. With $`p`$ and $`d`$ log price and dividend and $`\rho`$ slightly
+below 1,
+
+```math
+p_t - d_t \;\approx\; \text{const} + \sum_{j=0}^{\infty} \rho^{j}\left(\Delta d_{t+1+j} - r_{t+1+j}\right),
+```
+
+so a high price relative to dividends must be followed either by fast
+dividend growth or by low returns. Empirically it's mostly low returns:
+valuation ratios forecast returns over years (Fama and French 1988;
+Campbell and Shiller 1988), while daily and monthly returns stay nearly
+unforecastable. That reconciles Samuelson and Shiller, and Fama and Shiller
+shared the 2013 Nobel Prize for it.
+
+### For this project
+
+The dashboard already holds both sides: market value and book value
+(section 4), so $`M - B`$, and from the statements the residual income each
+year, $`E_t - r\,B_{t-1}`$, retained or paid out. Shiller's bound and Black's
+factor of two ("Noise", 1986) are both testable against them: how far
+$`M - B`$ wanders from the present value of residual income later earned.
+
 ## References
 
 - Preinreich, G. A. D. (1938). Annual survey of economic theory: The theory of
@@ -345,6 +467,27 @@ survivorship bias, the companies that no longer trade.
 - Hou, K., Xue, C., & Zhang, L. (2015). Digesting anomalies: An investment
   approach. *Review of Financial Studies*, 28(3), 650–705. The q-factor model,
   with an ROE factor.
+- Samuelson, P. A. (1965). Proof that properly anticipated prices fluctuate
+  randomly. *Industrial Management Review*, 6(2), 41–49. Prices that are
+  expectations follow a martingale.
+- Fama, E. F. (1970). Efficient capital markets: A review of theory and
+  empirical work. *Journal of Finance*, 25(2), 383–417. Efficiency as
+  unforecastable residuals; weak, semi-strong and strong forms.
+- Miller, M. H., & Modigliani, F. (1961). Dividend policy, growth, and the
+  valuation of shares. *Journal of Business*, 34(4), 411–433. Payout policy
+  doesn't change value; investment does.
+- Shiller, R. J. (1981). Do stock prices move too much to be justified by
+  subsequent changes in dividends? *American Economic Review*, 71(3),
+  421–436. The variance bound, and its violation.
+- Campbell, J. Y., & Shiller, R. J. (1988). The dividend-price ratio and
+  expectations of future dividends and discount factors. *Review of
+  Financial Studies*, 1(3), 195–228. The log-linear identity.
+- Fama, E. F., & French, K. R. (1988). Dividend yields and expected stock
+  returns. *Journal of Financial Economics*, 22(1), 3–25. Valuation ratios
+  forecast returns over long horizons.
+- Black, F. (1986). Noise. *Journal of Finance*, 41(3), 529–543. Noise
+  makes trading possible and prices imperfect: within a factor of two of
+  value.
 - McLean, R. D., & Pontiff, J. (2016). Does academic research destroy stock
   return predictability? *Journal of Finance*, 71(1), 5–32. Anomaly returns
   fall by over half after publication.
