@@ -30,7 +30,8 @@
           "value": "AAPL"
         },
         "options": [],
-        "hide": 0
+        "hide": 0,
+        "allowCustomValue": false
       },
       {
         "type": "custom",
@@ -76,7 +77,8 @@
           "value": "reporting"
         },
         "options": [],
-        "hide": 0
+        "hide": 0,
+        "allowCustomValue": false
       }
     ]
   },
