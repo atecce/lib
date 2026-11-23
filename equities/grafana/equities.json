@@ -37,9 +37,9 @@
         "type": "custom",
         "name": "period",
         "label": "Flows over",
-        "query": "auto,3m,12m",
+        "query": "quarters\\, else years : auto,quarters : 3m,years : 12m",
         "current": {
-          "text": "auto",
+          "text": "quarters, else years",
           "value": "auto"
         },
         "multi": false,
@@ -47,22 +47,22 @@
         "hide": 0,
         "options": [
           {
-            "text": "auto",
+            "text": "quarters, else years",
             "value": "auto",
             "selected": true
           },
           {
-            "text": "3m",
+            "text": "quarters",
             "value": "3m",
             "selected": false
           },
           {
-            "text": "12m",
+            "text": "years",
             "value": "12m",
             "selected": false
           }
         ],
-        "description": "auto: quarters where the company reports them, else years (20-F filers such as TSMC)"
+        "description": "Quarters where the company reports them, else years (20-F filers such as TSMC report annually)."
       },
       {
         "type": "query",
@@ -208,7 +208,7 @@
     {
       "id": 3,
       "type": "timeseries",
-      "title": "$ticker flows: income and returns to shareholders (${currency:text}, $period)",
+      "title": "$ticker flows: income and returns to shareholders (${currency:text}, ${period:text})",
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "financials-postgres"
@@ -302,7 +302,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -410,7 +410,7 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "$ticker flows: cash (${currency:text}, $period)",
+      "title": "$ticker flows: cash (${currency:text}, ${period:text})",
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "financials-postgres"
@@ -504,7 +504,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -612,7 +612,7 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "$ticker flows: investment (${currency:text}, $period)",
+      "title": "$ticker flows: investment (${currency:text}, ${period:text})",
       "datasource": {
         "type": "grafana-postgresql-datasource",
         "uid": "financials-postgres"
@@ -706,7 +706,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },

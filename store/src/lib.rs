@@ -25,6 +25,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("004_reporting_currency", include_str!("../migrations/004_reporting_currency.sql")),
     ("005_ticker_case", include_str!("../migrations/005_ticker_case.sql")),
     ("006_flow_period", include_str!("../migrations/006_flow_period.sql")),
+    ("007_flow_period_fallback", include_str!("../migrations/007_flow_period_fallback.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
