@@ -43,6 +43,8 @@ macro_rules! impl_reported {
 // them, implementing the generic traits below.
 #[path = "../aapl/mod.rs"]
 pub mod aapl;
+#[path = "../brk/mod.rs"]
+pub mod brk;
 #[path = "../nvda/mod.rs"]
 pub mod nvda;
 #[path = "../tsla/mod.rs"]
@@ -282,21 +284,49 @@ pub trait Reader {
 }
 
 
+/// What every balance sheet has: assets, and the claims on them.
 pub trait BalanceSheet {
-    fn total_current_assets(&self) -> f64;
     fn total_assets(&self) -> f64;
-    fn total_current_liabilities(&self) -> f64;
     fn total_liabilities(&self) -> f64;
 }
 
+/// A balance sheet split into current and non-current, as most industrial
+/// companies present it (insurers and banks don't: Berkshire's is
+/// unclassified).
+pub trait ClassifiedBalanceSheet: BalanceSheet {
+    fn total_current_assets(&self) -> f64;
+    fn total_current_liabilities(&self) -> f64;
+}
+
+/// What every income statement arrives at.
 pub trait IncomeStatement {
+    fn income_before_income_tax(&self) -> f64;
+    fn net_income(&self) -> f64;
+}
+
+/// The multi-step form: gross profit, then operating expenses, then
+/// operating income. Single-step statements (revenues less costs and
+/// expenses, as insurers and conglomerates present them) have no gross
+/// profit.
+pub trait MultiStepIncomeStatement: IncomeStatement {
     fn gross_profit(&self) -> f64;
     fn total_operating_expenses(&self) -> f64;
     fn operating_income(&self) -> f64 {
         self.gross_profit() - self.total_operating_expenses()
     }
-    fn income_before_income_tax(&self) -> f64;
-    fn net_income(&self) -> f64;
+}
+
+/// The three sections of a cash flow statement; the change in cash is their
+/// sum (plus currency effects, where a company reports them).
+pub trait CashFlowStatement {
+    fn net_cash_from_operating_activities(&self) -> f64;
+    fn net_cash_from_investing_activities(&self) -> f64;
+    fn net_cash_from_financing_activities(&self) -> f64;
+    fn change_in_cash(&self) -> f64 {
+        self.net_cash_from_operating_activities()
+            + self.net_cash_from_investing_activities()
+            + self.net_cash_from_financing_activities()
+    }
 }
 
 

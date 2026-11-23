@@ -3,6 +3,9 @@ use crate::Period;
 use crate::Statement;
 use crate::BalanceSheet as BS;
 use crate::IncomeStatement as IS;
+use crate::ClassifiedBalanceSheet as CBS;
+use crate::MultiStepIncomeStatement as MIS;
+use crate::CashFlowStatement as CFS;
 
 use chrono::NaiveDate;
 
@@ -41,13 +44,6 @@ impl Statement for BalanceSheet {
 }
 
 impl BS for BalanceSheet {
-    fn total_current_assets(&self) -> f64 {
-        self.cash_and_cash_equivalents
-            + self.marketable_securities
-            + self.accounts_receivable_net
-            + self.inventories
-            + self.prepaid_expenses_and_other_current_assets
-    }
     fn total_assets(&self) -> f64 {
         self.total_current_assets()
             + self.property_and_equipment_net
@@ -57,16 +53,26 @@ impl BS for BalanceSheet {
             + self.deferred_income_tax_assets
             + self.other_assets
     }
-    fn total_current_liabilities(&self) -> f64 {
-        self.accounts_payable
-            + self.accrued_and_other_current_liabilities
-            + self.short_term_debt
-    }
     fn total_liabilities(&self) -> f64 {
         self.total_current_liabilities()
             + self.long_term_debt
             + self.long_term_operating_lease_liabilities
             + self.other_long_term_liabilities
+    }
+}
+
+impl CBS for BalanceSheet {
+    fn total_current_assets(&self) -> f64 {
+        self.cash_and_cash_equivalents
+            + self.marketable_securities
+            + self.accounts_receivable_net
+            + self.inventories
+            + self.prepaid_expenses_and_other_current_assets
+    }
+    fn total_current_liabilities(&self) -> f64 {
+        self.accounts_payable
+            + self.accrued_and_other_current_liabilities
+            + self.short_term_debt
     }
 }
 
@@ -98,17 +104,20 @@ impl Statement for IncomeStatement {
 }
 
 impl IS for IncomeStatement {
-    fn gross_profit(&self) -> f64 {
-        self.revenue - self.cost_of_revenue
-    }
-    fn total_operating_expenses(&self) -> f64 {
-        self.research_and_development + self.sales_general_and_administrative
-    }
     fn income_before_income_tax(&self) -> f64 {
         self.operating_income() + self.total_other_income_net()
     }
     fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.income_tax_expense
+    }
+}
+
+impl MIS for IncomeStatement {
+    fn gross_profit(&self) -> f64 {
+        self.revenue - self.cost_of_revenue
+    }
+    fn total_operating_expenses(&self) -> f64 {
+        self.research_and_development + self.sales_general_and_administrative
     }
 }
 
@@ -291,4 +300,16 @@ impl_reported! {
         IncomeTaxExpense => field income_tax_expense,
         NetIncome => method net_income,
     ]
+}
+
+impl CFS for CashFlowStatement {
+    fn net_cash_from_operating_activities(&self) -> f64 {
+        self.net_cash_provided_by_operating_activities()
+    }
+    fn net_cash_from_investing_activities(&self) -> f64 {
+        self.net_cash_used_in_investing_activities()
+    }
+    fn net_cash_from_financing_activities(&self) -> f64 {
+        self.net_cash_used_in_financing_activities()
+    }
 }

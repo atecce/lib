@@ -9,6 +9,8 @@ use crate::Period;
 use crate::Statement;
 use crate::BalanceSheet as BS;
 use crate::IncomeStatement as IS;
+use crate::ClassifiedBalanceSheet as CBS;
+use crate::MultiStepIncomeStatement as MIS;
 
 use chrono::NaiveDate;
 
@@ -54,6 +56,15 @@ impl Statement for BalanceSheet {
 }
 
 impl BS for BalanceSheet {
+    fn total_assets(&self) -> f64 {
+        self.total_current_assets() + self.total_non_current_assets()
+    }
+    fn total_liabilities(&self) -> f64 {
+        self.total_current_liabilities() + self.total_non_current_liabilities()
+    }
+}
+
+impl CBS for BalanceSheet {
     fn total_current_assets(&self) -> f64 {
         self.cash_and_cash_equivalents
             + self.marketable_securities
@@ -62,18 +73,12 @@ impl BS for BalanceSheet {
             + self.inventories
             + self.other_current_assets
     }
-    fn total_assets(&self) -> f64 {
-        self.total_current_assets() + self.total_non_current_assets()
-    }
     fn total_current_liabilities(&self) -> f64 {
         self.accounts_payable
             + self.other_current_liabilities
             + self.deferred_revenue
             + self.commercial_paper
             + self.term_debt
-    }
-    fn total_liabilities(&self) -> f64 {
-        self.total_current_liabilities() + self.total_non_current_liabilities()
     }
 }
 
@@ -126,18 +131,21 @@ impl Statement for IncomeStatement {
 }
 
 impl IS for IncomeStatement {
+    fn income_before_income_tax(&self) -> f64 {
+        self.operating_income() + self.other_income_expense_net
+    }
+    fn net_income(&self) -> f64 {
+        self.income_before_income_tax() - self.provision_for_income_taxes
+    }
+}
+
+impl MIS for IncomeStatement {
     /// Apple calls it "gross margin", in dollars.
     fn gross_profit(&self) -> f64 {
         self.net_sales - self.cost_of_sales
     }
     fn total_operating_expenses(&self) -> f64 {
         self.research_and_development + self.selling_general_and_administrative
-    }
-    fn income_before_income_tax(&self) -> f64 {
-        self.operating_income() + self.other_income_expense_net
-    }
-    fn net_income(&self) -> f64 {
-        self.income_before_income_tax() - self.provision_for_income_taxes
     }
 }
 
