@@ -14,42 +14,103 @@ cargo run --release -p backtest --example persistence -- AAPL --r 0.07
 | | |
 |---|---|
 | Statements (XBRL, EDGAR) | fiscal 2009–2026 (years end in late September), as first reported |
+| Statements (10-Ks before XBRL, EDGAR) | fiscal 1991–2010: net income, equity, shares, as first reported |
 | Prices (Tiingo) | 1980 (the IPO)–2026, daily |
 | Industry | SIC 3571, electronic computers; group 357, computer and office equipment |
 
 Jobs returned to Apple in 1997 (interim CEO that September), resigned as CEO
 on August 24, 2011, and died on October 5, 2011. XBRL statements begin in
-2009, so the statements cover his last years and then Tim Cook's; his
-fourteen years from 1997, and everything before, are so far in the prices
-only.
+2009; the years before come from the 10-Ks as filed, back to fiscal 1991
+(below). The 1980s, filed on paper, are in the prices only.
 
 ## Residual income and what the price implied
 
 With $`r = 9\%`$, residual income $`x^a_t = E_t - r\,B_{t-1}`$, market value
 $`M`$ the fiscal year end's close times the shares on the 10-K's cover, and
-the implied decay $`\omega = R(M - B)/(x^a + M - B)`$ (section 8):
+the implied decay $`\omega = R(M - B)/(x^a + M - B)`$ (section 8), where
+residual income is positive and the price above book.
 
-| Fiscal year | ROE | Operating income / assets | Residual income | Market value | M/B | ω implied | Implied growth |
-|---|---|---|---|---|---|---|---|
-| 2011 | 54% | 45% | $22bn | $376bn | 4.9 | 1.02 | +1.7% |
-| 2012 | 54% | 47% | $35bn | $628bn | 5.3 | 1.02 | +2.0% |
-| 2013 | 31% | 28% | $26bn | $434bn | 3.5 | 1.00 | +0.5% |
-| 2014 | 32% | 25% | $28bn | $591bn | 5.3 | 1.03 | +2.9% |
-| 2015 | 48% | 31% | $43bn | $640bn | 5.4 | 1.01 | +0.6% |
-| 2016 | 38% | 21% | $35bn | $601bn | 4.7 | 1.01 | +1.5% |
-| 2017 | 38% | 19% | $37bn | $791bn | 5.9 | 1.03 | +3.2% |
-| 2018 | 44% | 19% | $48bn | $1,071bn | 10.0 | 1.04 | +3.9% |
-| 2019 | 52% | 17% | $46bn | $972bn | 10.7 | 1.04 | +3.6% |
-| 2020 | 63% | 20% | $49bn | $1,909bn | 29.2 | 1.06 | +6.2% |
-| 2021 | 145% | 34% | $89bn | $2,410bn | 38.2 | 1.05 | +5.0% |
-| 2022 | 158% | 34% | $94bn | $2,393bn | 47.2 | 1.05 | +4.8% |
-| 2023 | 191% | 32% | $92bn | $2,663bn | 42.8 | 1.05 | +5.3% |
-| 2024 | 151% | 35% | $88bn | $3,443bn | 60.5 | 1.06 | +6.2% |
-| 2025 | 197% | 36% | $107bn | $3,775bn | 51.2 | 1.06 | +5.9% |
-| 2026 | 179% | 44% | $126bn | $4,956bn | 44.2 | 1.06 | +6.2% |
+Fiscal 1991–2010 come from the 10-Ks themselves, filed before XBRL: their
+five-year tables, balance sheets and statements of shareholders' equity, as
+first reported (`BEFORE_XBRL` in `mod.rs`, each year with its filing;
+`cargo run --release -p equities --example aapl_history`). EDGAR begins
+with the fiscal 1994 10-K, whose statement of equity reaches back to
+September 1991; the 1980s were filed on paper. 2011 on is from XBRL
+(`backtest`'s `persistence` example). Fiscal years end in late September,
+so "1997" is the year to September 1997, Jobs interim CEO for its last ten
+days.
+
+| Fiscal year | CEO | ROE | Operating income / assets | Residual income | Market value | M/B | ω implied | Implied growth |
+|---|---|---|---|---|---|---|---|---|
+| 1991 | Sculley |  |  |  | $5.8bn | 3.3 |  |  |
+| 1992 | Sculley | 30% |  | $0.37bn | $5.4bn | 2.5 | 0.98 | −2.3% |
+| 1993 | Spindler | 4% |  | −$0.11bn | $2.9bn | 1.4 |  |  |
+| 1994 | Spindler | 15% |  | $0.13bn | $4.0bn | 1.7 | 1.01 | +1.2% |
+| 1995 | Spindler | 18% |  | $0.21bn | $4.6bn | 1.6 | 0.97 | −3.1% |
+| 1996 | Amelio | −28% |  | −$1.08bn | $2.8bn | 1.4 |  |  |
+| 1997 | Jobs (interim) | −51% |  | −$1.23bn | $2.7bn | 2.3 |  |  |
+| 1998 | Jobs | 26% |  | $0.20bn | $5.2bn | 3.2 | 1.03 | +3.2% |
+| 1999 | Jobs | 37% |  | $0.45bn | $10.5bn | 3.4 | 1.03 | +2.7% |
+| 2000 | Jobs | 25% |  | $0.51bn | $8.6bn | 2.1 | 0.98 | −1.9% |
+| 2001 | Jobs | −1% |  | −$0.39bn | $5.5bn | 1.4 |  |  |
+| 2002 | Jobs | 2% |  | −$0.29bn | $5.3bn | 1.3 |  |  |
+| 2003 | Jobs | 2% |  | −$0.30bn | $7.6bn | 1.8 |  |  |
+| 2004 | Jobs | 7% |  | −$0.10bn | $15.0bn | 3.0 |  |  |
+| 2005 | Jobs | 26% |  | $0.88bn | $44.8bn | 6.0 | 1.06 | +6.5% |
+| 2006 | Jobs | 27% |  | $1.3bn | $66.1bn | 6.6 | 1.06 | +6.5% |
+| 2007 | Jobs | 35% |  | $2.6bn | $134bn | 9.2 | 1.07 | +6.7% |
+| 2008 | Jobs | 33% |  | $3.5bn | $114bn | 5.4 | 1.05 | +5.0% |
+| 2009 | Jobs | 27% |  | $3.8bn | $164bn | 5.9 | 1.06 | +6.0% |
+| 2010 | Jobs | 44% |  | $11bn | $268bn | 5.6 | 1.04 | +3.7% |
+| 2011 | Cook | 54% | 45% | $22bn | $376bn | 4.9 | 1.02 | +1.7% |
+| 2012 | Cook | 54% | 47% | $35bn | $628bn | 5.3 | 1.02 | +2.0% |
+| 2013 | Cook | 31% | 28% | $26bn | $434bn | 3.5 | 1.00 | +0.5% |
+| 2014 | Cook | 32% | 25% | $28bn | $591bn | 5.3 | 1.03 | +2.9% |
+| 2015 | Cook | 48% | 31% | $43bn | $640bn | 5.4 | 1.01 | +0.6% |
+| 2016 | Cook | 38% | 21% | $35bn | $601bn | 4.7 | 1.01 | +1.5% |
+| 2017 | Cook | 38% | 19% | $37bn | $791bn | 5.9 | 1.03 | +3.2% |
+| 2018 | Cook | 44% | 19% | $48bn | $1,071bn | 10.0 | 1.04 | +3.9% |
+| 2019 | Cook | 52% | 17% | $46bn | $972bn | 10.7 | 1.04 | +3.6% |
+| 2020 | Cook | 63% | 20% | $49bn | $1,909bn | 29.2 | 1.06 | +6.2% |
+| 2021 | Cook | 145% | 34% | $89bn | $2,410bn | 38.2 | 1.05 | +5.0% |
+| 2022 | Cook | 158% | 34% | $94bn | $2,393bn | 47.2 | 1.05 | +4.8% |
+| 2023 | Cook | 191% | 32% | $92bn | $2,663bn | 42.8 | 1.05 | +5.3% |
+| 2024 | Cook | 151% | 35% | $88bn | $3,443bn | 60.5 | 1.06 | +6.2% |
+| 2025 | Cook | 197% | 36% | $107bn | $3,775bn | 51.2 | 1.06 | +5.9% |
+| 2026 | Cook | 179% | 44% | $126bn | $4,956bn | 44.2 | 1.06 | +6.2% |
 
 **Realized:** residual income grew **12.4% a year** from 2011 to 2026, and
-Apple's own $`\omega`$ fits at **1.12 ± 0.07** over 15 years.
+Apple's own $`\omega`$ fits at **1.12 ± 0.07** over 15 years. From 2005,
+the first year the iPod's profits show, it grew from $0.88bn to $126bn:
+**27% a year for 21 years**, against the 6.5% a year the 2005 price implied.
+
+**What the longer table adds:**
+
+- **The 1990s priced Apple as an ordinary company,** and it was one. Its
+  implied growth sat near zero (−3% to +3%), M/B between 1.4 and 3.4, and
+  ROE swung from 30% to −51%. No moat was priced, and none persisted:
+  residual income turned negative within four years of each good year.
+- **In the loss years the price stayed above book**, which section 8's
+  formula can't read ($`\omega`$ needs positive residual income). In
+  Ohlson's terms the value was in the other information $`\nu`$, not in
+  current earnings: in 1997, with a loss of $1bn and book of $1.2bn, the
+  market still paid $2.7bn, a bet on recovery, and on Jobs, before any
+  of it showed in the statements. In July 1997, at the low ($13.75 a share,
+  about 128 million shares), it paid $1.8bn: a little above book value, which fell from $2.1bn
+  to $1.2bn over that fiscal year.
+- **2001–2004 earned less than the cost of equity**: ROE of −1% to 7%
+  while the iPod (October 2001) and the iTunes Store (April 2003) were
+  being built. The price, M/B rising from 1.3 to 3.0, anticipated what
+  residual income showed only from 2005.
+- **From 2005 the price expected durable growth** (+5% to +7% a year
+  implied), more than at any time in the 1990s and about what it expects
+  now. It was still far too little: 27% a year came.
+
+The 2006 10-K restated 2002–2005 earnings (options backdating: 2005 from
+$1,335M to $1,328M), and the 2010 10-K restated 2008 and 2009 for the
+iPhone's revenue recognition (2009 net income from $5,704M to $8,235M);
+each year above is as its own 10-K reported it, and each ROE divides by the
+prior year's equity as that same 10-K shows it.
 
 ## Against its industry
 
@@ -234,9 +295,7 @@ XBRL (below).
 
 ## To do
 
-- Apple's statements for 1997–2008, from the 10-Ks as filed (text, before
-  XBRL): book value, earnings and shares, to see what the price implied
-  when Jobs came back.
+- Apple's 1980s statements (annual reports on paper, before EDGAR).
 - The same table for Nokia and BlackBerry, whose advantages didn't last.
 - Hoberg–Phillips text-based peers (their data is published free), and
   Fama–French industries for comparison with the literature.

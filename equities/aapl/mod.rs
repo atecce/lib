@@ -281,3 +281,52 @@ mod tests {
         assert!(agreed >= 30, "only {} items agreed", agreed);
     }
 }
+
+/// A fiscal year from a 10-K filed before XBRL: what the 10-K itself said,
+/// in millions of dollars (its five-year table, balance sheet, or statement
+/// of shareholders' equity), so as known when it was filed.
+pub struct Annual {
+    pub year_end: NaiveDate,
+    pub net_income: f64,
+    pub equity: f64,
+    /// The year before's equity as this 10-K shows it (restatements make
+    /// it differ from the year before's own 10-K: options backdating in
+    /// 2006, the iPhone revenue recognition change in 2010).
+    pub prior_equity: Option<f64>,
+    /// Millions of shares: on the 10-K's cover, or at the year end where the
+    /// cover predates EDGAR.
+    pub shares: f64,
+    /// The filing it comes from, in the EDGAR cache as the full submission.
+    pub accession: &'static str,
+}
+
+const fn year(y: i32, m: u32, d: u32, net_income: f64, equity: f64, prior_equity: Option<f64>, shares: f64, accession: &'static str) -> Annual {
+    Annual { year_end: NaiveDate::from_ymd_opt(y, m, d).unwrap(), net_income, equity, prior_equity, shares, accession }
+}
+
+/// Fiscal 1991–2010 (years end on the last Saturday of September), from
+/// Apple's first 10-K on EDGAR (fiscal 1994, whose statement of
+/// shareholders' equity starts at September 1991) to the last before
+/// rendered XBRL statements. Earlier years were filed on paper.
+pub const BEFORE_XBRL: [Annual; 20] = [
+    year(1991, 9, 27, 309.841, 1766.676, None, 118.386, "0000320193-94-000016"),
+    year(1992, 9, 25, 530.373, 2187.370, Some(1766.676), 118.479, "0000320193-94-000016"),
+    year(1993, 9, 24, 86.589, 2026.378, Some(2187.370), 116.147, "0000320193-94-000016"),
+    year(1994, 9, 30, 310.178, 2383.301, Some(2026.378), 119.891418, "0000320193-94-000016"),
+    year(1995, 9, 29, 424.0, 2901.0, Some(2383.0), 123.022624, "0000320193-95-000016"),
+    year(1996, 9, 27, -816.0, 2058.0, Some(2901.0), 124.552511, "0000320193-96-000023"),
+    year(1997, 9, 26, -1045.0, 1200.0, Some(2058.0), 127.993412, "0001047469-97-006960"),
+    year(1998, 9, 25, 309.0, 1642.0, Some(1200.0), 135.319779, "0001047469-98-044981"),
+    year(1999, 9, 25, 601.0, 3104.0, Some(1642.0), 161.158987, "0000912057-99-010244"),
+    year(2000, 9, 30, 786.0, 4107.0, Some(3104.0), 335.881977, "0000912057-00-053623"),
+    year(2001, 9, 29, -25.0, 3920.0, Some(4107.0), 351.722532, "0000912057-01-544436"),
+    year(2002, 9, 28, 65.0, 4095.0, Some(3920.0), 359.135584, "0001047469-02-007674"),
+    year(2003, 9, 27, 69.0, 4223.0, Some(4095.0), 367.734960, "0001047469-03-041604"),
+    year(2004, 9, 25, 276.0, 5076.0, Some(4223.0), 402.057856, "0001047469-04-035975"),
+    year(2005, 9, 24, 1335.0, 7466.0, Some(5076.0), 842.767948, "0001104659-05-058421"),
+    year(2006, 9, 30, 1989.0, 9984.0, Some(7428.0), 859.273757, "0001104659-06-084288"),
+    year(2007, 9, 29, 3496.0, 14532.0, Some(9984.0), 875.540274, "0001047469-07-009340"),
+    year(2008, 9, 27, 4834.0, 21030.0, Some(14532.0), 888.935123, "0001193125-08-224958"),
+    year(2009, 9, 26, 5704.0, 27832.0, Some(21030.0), 900.678473, "0001193125-09-214859"),
+    year(2010, 9, 25, 14013.0, 47791.0, Some(31640.0), 917.307099, "0001193125-10-238044"),
+];
