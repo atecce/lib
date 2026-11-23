@@ -1,0 +1,21 @@
+# Grafana's data source for the financials in Postgres (DATA.md), provisioned
+# from this file at startup: grafana.ini's [paths] provisioning points at
+# this directory. The role `grafana` can only read (SELECT on public); local
+# connections need no password (Homebrew's trust authentication), and
+# Postgres listens on localhost only.
+apiVersion: 1
+
+datasources:
+  - name: financials (Postgres)
+    uid: financials-postgres
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: localhost:5432
+    user: grafana
+    jsonData:
+      database: financials
+      sslmode: disable
+      postgresVersion: 1700
+      timescaledb: false
+      maxOpenConns: 10
+    editable: false

@@ -21,6 +21,7 @@ use postgres::{Client, NoTls, Transaction};
 const MIGRATIONS: &[(&str, &str)] = &[
     ("001_schema", include_str!("../migrations/001_schema.sql")),
     ("002_listing_written_at", include_str!("../migrations/002_listing_written_at.sql")),
+    ("003_listing_facts", include_str!("../migrations/003_listing_facts.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
