@@ -19,7 +19,7 @@ cargo test -p equities --lib brk
 | Market value per share, 1965–2018 | the same table's market column |
 | Book value, 2019–2025 | the 10-Ks (XBRL, in Postgres): shareholders' equity over Class A equivalent shares |
 | Statements | the 2025 10-K, as Berkshire presents them (`mod.rs`) |
-| Prices | Class A from Tiingo (fetch pending, see below); Class B in Postgres from 1996 |
+| Prices | Class A from Tiingo, 1980–2025; before 1980 the scorecard's market column; Class B in Postgres from 1996 |
 | Industry | SIC 6331, fire, marine and casualty insurance |
 
 The scorecard's yearly changes are transcribed into `mod.rs`, and a test
@@ -98,14 +98,119 @@ businesses rather than marketable stocks; those businesses are carried far
 below their value; and buybacks above book value but below intrinsic value
 raise value per share while lowering book value per share.
 
-## Market value against book (pending the Class A prices)
+## Market value against book
 
-`brk_history` scales the scorecard's market column to the actual 2018
-year-end Class A close and uses Tiingo's closes from 2019, giving each
-year's price to book, the implied ω and implied growth, and the market's
-return by era. The Class A history (`tiingo-fetch --full BRK-A`) is queued
-behind the S&P 500 price batch on the free plan's 50 requests an hour;
-this section is filled in when it arrives.
+Prices per Class A share at each year end: Tiingo's closes from 1980, and
+before them the scorecard's market column scaled to the 2018 close (it
+meets Tiingo's 1979 close: $321). Implied $`\omega = R(P - B)/(x + P - B)`$
+where residual income is positive and the price above book.
+
+| Era | P/B (mean) | Market return a year | Book growth a year | Realized ω | Implied ω (typical) |
+|---|---|---|---|---|---|
+| 1965–1979 | 0.81 | +24.2% | 20.9% | 0.95 | price below book: none |
+| 1980–1998 | 1.54 | +32.8% | 28.2% | 0.92 | 0.2–0.9 |
+| 1999–2018 | 1.48 | +7.7% | 9.0% | −0.16 | 0.85–1.08 |
+| 2019–2025 | 1.38 | +13.8% | 13.0% | −0.25 | 0.8–1.06 |
+
+**What the price said, against what came:**
+
+- **1965–1979: the market priced Berkshire below its book value** (P/B
+  0.43–0.97, 0.81 on average) while book value per share compounded at 21%
+  a year. A price below book says residual income will be negative: that
+  the business will earn less than its cost of capital. It was a failing
+  New England textile mill, after all, and in 1974–75, with ROE of 5% and
+  the market at its worst since the Depression, the price fell to 0.43–0.51
+  of book. Persistence was 0.95. This is the anomaly of section 8 at its
+  starkest, and the market return (24% a year) shows what it paid.
+- **1980–1998: the price rose above book but kept assuming decay.** Implied
+  ω ran 0.2–0.9: in 1980–82 the price allowed the excess to fade within a
+  few years (ω 0.20–0.45) while ROE ran 19–40%. Realized, ω was 0.92 with
+  book growing 28% a year. The market return (33%) beat book growth (28%):
+  the price-to-book rerating from about 1 to about 2 was the market slowly
+  catching up to a persistence it had underpriced for thirty years.
+- **1999–2018: the price got it right.** P/B averaged 1.5 and implied ω
+  sat near 1 (0.85–1.08): a modest excess, lasting. What came was an
+  excess of zero (ROE 9.0% against r of 9%), and the market returned 7.7%
+  a year, a little under the cost of equity, as a price slightly above
+  what was earned implies. The anomaly was gone, and the price no longer
+  paid for one.
+- **2019–2025: about the same**, P/B 1.2–1.5, with buybacks below
+  intrinsic value (Buffett's test) and above book.
+
+Over the whole sixty years the market return beat book growth (the
+scorecard's 2,472,627% against 1,091,899% to 2018) because the price
+started at 0.64 of book in 1964 and ended near 1.4: the market's estimate
+of Berkshire's persistence rose from "none" to "modest", and most of the
+excess persistence came before it did.
+
+<details>
+<summary>Every year, 1965–2025 (r = 9%, per Class A share)</summary>
+
+| Year | Book value | Price | P/B | ROE | ROE − r | Residual income | ω implied | Implied growth |
+|---|---|---|---|---|---|---|---|---|
+| 1965 | $24 | $19 | 0.77 | 23.8% | +14.8% | $3 |  |  |
+| 1966 | $29 | $18 | 0.62 | 20.3% | +11.3% | $3 |  |  |
+| 1967 | $32 | $20 | 0.63 | 11.0% | +2.0% | $1 |  |  |
+| 1968 | $38 | $36 | 0.94 | 19.0% | +10.0% | $3 |  |  |
+| 1969 | $44 | $43 | 0.97 | 16.2% | +7.2% | $3 |  |  |
+| 1970 | $50 | $41 | 0.83 | 12.0% | +3.0% | $1 |  |  |
+| 1971 | $58 | $74 | 1.28 | 16.4% | +7.4% | $4 | 0.89 | −11.2% |
+| 1972 | $71 | $80 | 1.14 | 21.7% | +12.7% | $7 | 0.62 | −38.2% |
+| 1973 | $74 | $78 | 1.06 | 4.7% | −4.3% | −$3 |  |  |
+| 1974 | $78 | $40 | 0.51 | 5.5% | −3.5% | −$3 |  |  |
+| 1975 | $95 | $41 | 0.43 | 21.9% | +12.9% | $10 |  |  |
+| 1976 | $151 | $94 | 0.62 | 59.3% | +50.3% | $48 |  |  |
+| 1977 | $200 | $138 | 0.69 | 31.9% | +22.9% | $35 |  |  |
+| 1978 | $248 | $159 | 0.64 | 24.0% | +15.0% | $30 |  |  |
+| 1979 | $336 | $321 | 0.96 | 35.7% | +26.7% | $66 |  |  |
+| 1980 | $401 | $425 | 1.06 | 19.3% | +10.3% | $35 | 0.45 | −55.2% |
+| 1981 | $527 | $560 | 1.06 | 31.4% | +22.4% | $90 | 0.29 | −70.5% |
+| 1982 | $737 | $775 | 1.05 | 40.0% | +31.0% | $163 | 0.20 | −79.6% |
+| 1983 | $976 | $1,310 | 1.34 | 32.3% | +23.3% | $172 | 0.72 | −28.0% |
+| 1984 | $1,108 | $1,275 | 1.15 | 13.6% | +4.6% | $45 | 0.86 | −14.1% |
+| 1985 | $1,642 | $2,470 | 1.50 | 48.2% | +39.2% | $434 | 0.71 | −28.5% |
+| 1986 | $2,071 | $2,820 | 1.36 | 26.1% | +17.1% | $281 | 0.79 | −20.7% |
+| 1987 | $2,475 | $2,950 | 1.19 | 19.5% | +10.5% | $217 | 0.75 | −25.2% |
+| 1988 | $2,972 | $4,700 | 1.58 | 20.1% | +11.1% | $275 | 0.94 | −6.0% |
+| 1989 | $4,292 | $8,675 | 2.02 | 44.4% | +35.4% | $1,052 | 0.88 | −12.1% |
+| 1990 | $4,610 | $6,675 | 1.45 | 7.4% | −1.6% | −$69 |  |  |
+| 1991 | $6,435 | $9,050 | 1.41 | 39.6% | +30.6% | $1,411 | 0.71 | −29.2% |
+| 1992 | $7,742 | $11,750 | 1.52 | 20.3% | +11.3% | $727 | 0.92 | −7.7% |
+| 1993 | $8,849 | $16,325 | 1.84 | 14.3% | +5.3% | $410 | 1.03 | +3.3% |
+| 1994 | $10,079 | $20,400 | 2.02 | 13.9% | +4.9% | $434 | 1.05 | +4.6% |
+| 1995 | $14,422 | $32,100 | 2.23 | 43.1% | +34.1% | $3,437 | 0.91 | −8.7% |
+| 1996 | $19,009 | $34,100 | 1.79 | 31.8% | +22.8% | $3,288 | 0.89 | −10.5% |
+| 1997 | $25,491 | $46,000 | 1.80 | 34.1% | +25.1% | $4,771 | 0.88 | −11.6% |
+| 1998 | $37,803 | $70,000 | 1.85 | 48.3% | +39.3% | $10,018 | 0.83 | −16.9% |
+| 1999 | $37,992 | $56,100 | 1.48 | 0.5% | −8.5% | −$3,213 |  |  |
+| 2000 | $40,461 | $71,000 | 1.75 | 6.5% | −2.5% | −$950 |  |  |
+| 2001 | $37,953 | $75,600 | 1.99 | -6.2% | −15.2% | −$6,150 |  |  |
+| 2002 | $41,748 | $72,750 | 1.74 | 10.0% | +1.0% | $380 | 1.08 | +7.7% |
+| 2003 | $50,515 | $84,250 | 1.67 | 21.0% | +12.0% | $5,010 | 0.95 | −5.1% |
+| 2004 | $55,819 | $87,900 | 1.57 | 10.5% | +1.5% | $758 | 1.06 | +6.5% |
+| 2005 | $59,392 | $88,620 | 1.49 | 6.4% | −2.6% | −$1,451 |  |  |
+| 2006 | $70,320 | $109,990 | 1.56 | 18.4% | +9.4% | $5,583 | 0.96 | −4.4% |
+| 2007 | $78,055 | $141,600 | 1.81 | 11.0% | +2.0% | $1,406 | 1.07 | +6.6% |
+| 2008 | $70,562 | $96,600 | 1.37 | -9.6% | −18.6% | −$14,518 |  |  |
+| 2009 | $84,533 | $99,200 | 1.17 | 19.8% | +10.8% | $7,621 | 0.72 | −28.3% |
+| 2010 | $95,522 | $120,450 | 1.26 | 13.0% | +4.0% | $3,381 | 0.96 | −4.0% |
+| 2011 | $99,916 | $114,755 | 1.15 | 4.6% | −4.4% | −$4,203 |  |  |
+| 2012 | $114,304 | $134,060 | 1.17 | 14.4% | +5.4% | $5,395 | 0.86 | −14.4% |
+| 2013 | $135,107 | $177,900 | 1.32 | 18.2% | +9.2% | $10,516 | 0.87 | −12.5% |
+| 2014 | $146,321 | $226,000 | 1.54 | 8.3% | −0.7% | −$946 |  |  |
+| 2015 | $155,686 | $197,800 | 1.27 | 6.4% | −2.6% | −$3,804 |  |  |
+| 2016 | $172,344 | $244,121 | 1.42 | 10.7% | +1.7% | $2,647 | 1.05 | +5.1% |
+| 2017 | $211,984 | $297,600 | 1.40 | 23.0% | +14.0% | $24,128 | 0.85 | −15.0% |
+| 2018 | $212,832 | $306,000 | 1.44 | 0.4% | −8.6% | −$18,231 |  |  |
+| 2019 | $261,919 | $339,590 | 1.30 | 23.1% | +14.1% | $29,932 | 0.79 | −21.3% |
+| 2020 | $289,824 | $347,815 | 1.20 | 10.7% | +1.7% | $4,332 | 1.01 | +1.4% |
+| 2021 | $343,459 | $450,662 | 1.31 | 18.5% | +9.5% | $27,552 | 0.87 | −13.3% |
+| 2022 | $324,435 | $468,711 | 1.44 | -5.5% | −14.5% | −$49,936 |  |  |
+| 2023 | $390,253 | $542,625 | 1.39 | 20.3% | +11.3% | $36,619 | 0.88 | −12.1% |
+| 2024 | $452,217 | $680,920 | 1.51 | 15.9% | +6.9% | $26,841 | 0.98 | −2.4% |
+| 2025 | $499,607 | $754,800 | 1.51 | 10.5% | +1.5% | $6,691 | 1.06 | +6.2% |
+
+</details>
 
 ## Against its industry (GAAP, 2011–2025)
 
@@ -193,7 +298,6 @@ undiminished while held. When Berkshire sold much of its Apple stake in
 
 ## To do
 
-- The market side, when the Class A prices arrive (above).
 - The Treasury rate as r, year by year.
 - Buffett's operating earnings (after tax, before investment gains) from
   the 10-Ks since 2018, for a residual income free of the portfolio's
