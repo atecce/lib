@@ -14,13 +14,14 @@ cargo run --release -p backtest --example persistence -- AAPL --r 0.07
 | | |
 |---|---|
 | Statements (XBRL, EDGAR) | fiscal 2009–2026 (years end in late September), as first reported |
-| Prices (Tiingo) | 1990–2026, daily |
+| Prices (Tiingo) | 1980 (the IPO)–2026, daily |
 | Industry | SIC 3571, electronic computers; group 357, computer and office equipment |
 
 Jobs returned to Apple in 1997 (interim CEO that September), resigned as CEO
 on August 24, 2011, and died on October 5, 2011. XBRL statements begin in
 2009, so the statements cover his last years and then Tim Cook's; his
-fourteen years from 1997 are, so far, in the prices only.
+fourteen years from 1997, and everything before, are so far in the prices
+only.
 
 ## Residual income and what the price implied
 
@@ -156,17 +157,61 @@ last forever, growing a little. But it assumed far less growth than came:
   way the advantage he built outlasted him, which is the strongest thing the
   statements can say about it; whether Cook's operations (supply chain,
   services, buybacks) or Jobs's products deserve the credit, they can't say.
-- **The Jobs years in prices.** Split and dividend adjusted closes from
-  Postgres:
 
-  | From | To | Multiple | A year |
-  |---|---|---|---|
-  | 1997-09-16, interim CEO | 2011-08-24, resigned | 69× | 35% |
-  | 1997-07-08, the low | 2011-08-24 | 109× | 40% |
-  | 2011-08-24 | 2026-11-20 | 30× | 25% |
+## The whole price history
 
-  What the 1997 price implied about persistence needs that year's book value
-  and earnings, from 10-Ks filed before XBRL (below).
+From the IPO on December 12, 1980, adjusted closes (splits, and dividends
+reinvested) from Tiingo, against SPY (the S&P 500 fund, from 1993):
+
+```sh
+cargo run --release -p backtest --example eras -- AAPL SPY 1980-12-12="IPO" 1985-09-17="Sculley" ...
+```
+
+| From | To | Era | Multiple | A year | Worst drawdown | SPY a year |
+|---|---|---|---|---|---|---|
+| 1980-12-12 | 1985-09-17 | IPO; Jobs chairman, until he resigns | 0.5× | −12% | −77% | |
+| 1985-09-17 | 1993-06-18 | Sculley | 5.7× | +25% | −57% | |
+| 1993-06-18 | 1996-02-02 | Spindler | 0.7× | −11% | −46% | +17% |
+| 1996-02-02 | 1997-07-09 | Amelio | 0.5× | −41% | −56% | +31% |
+| 1997-07-09 | 2011-08-24 | Jobs returns (interim CEO from September) | 110× | +39% | −82% | +4% |
+| 2011-08-24 | 2026-11-23 | Cook | 31× | +25% | −44% | +15% |
+| 1980-12-12 | 2026-11-23 | **the whole history** | **3,551×** | **+19%** | −82% | |
+
+Jobs's second era, in three parts:
+
+| From | To | | Multiple | A year | Worst drawdown | SPY a year |
+|---|---|---|---|---|---|---|
+| 1997-07-09 | 2000-03-22 | the iMac, to the dot-com peak | 10.5× | +139% | −56% | +22% |
+| 2000-03-22 | 2003-04-17 | the bust | 0.2× | −43% | −82% | −14% |
+| 2003-04-17 | 2011-08-24 | iPod, iTunes Store, iPhone, App Store | 57× | +62% | −61% | +5% |
+
+What the prices say, before any statements:
+
+- **Jobs's first era lost money.** From the IPO to his resignation in 1985
+  the stock halved, with a 77% fall inside it: the Lisa and the early
+  Macintosh sold poorly, and the board sided with Sculley. The aesthetic
+  achievement was there (the Macintosh, 1984) before the business was.
+- **Sculley's years were good, then not.** The Macintosh found its market
+  in desktop publishing; the gains came early, and the 57% drawdown came
+  at the end.
+- **Under Spindler and Amelio the market priced Apple as dying**: −11% and
+  −41% a year while the S&P 500 gained 17% and 31%. The July 1997 low is
+  where the market's expectation of Apple's residual income was lowest,
+  arguably below zero.
+- **Jobs's return paid 110×** in fourteen years, against an S&P 500 that
+  barely moved (+4% a year across two crashes), with an 82% drawdown in the
+  middle: an investor needed to hold through losing four fifths of the
+  stake. The iPod-to-App-Store stretch alone was 57×.
+- **Cook's fifteen years paid 31×**, 25% a year against the market's 15%,
+  with the smallest drawdown of any era: the advantage made durable, which
+  is what the residual income above shows.
+
+Whole history: one dollar at the IPO is $3,551 now, 19% a year for 46
+years.
+
+What the July 1997 price implied about persistence, in residual income
+terms, needs that year's book value and earnings, from 10-Ks filed before
+XBRL (below).
 
 ## Caveats, seen here
 

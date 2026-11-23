@@ -102,15 +102,26 @@ impl Client {
     /// Bring a ticker's prices up to date: its whole history the first time,
     /// then the days since the last one cached. Returns the days added.
     pub fn fetch(&self, ticker: &str) -> Result<usize, Box<dyn Error>> {
+        self.fetch_from(ticker, false)
+    }
+
+    /// A ticker's whole history again, replacing what's cached: for tickers
+    /// first fetched from 1990 (before `HISTORY_START`), and to make the
+    /// adjusted closes consistent as of today. Returns the days now cached.
+    pub fn fetch_full(&self, ticker: &str) -> Result<usize, Box<dyn Error>> {
+        self.fetch_from(ticker, true)
+    }
+
+    fn fetch_from(&self, ticker: &str, full: bool) -> Result<usize, Box<dyn Error>> {
         let sym = symbol(ticker);
-        let mut prices = self.cache.prices(ticker).unwrap_or_default();
+        let mut prices = if full { Vec::new() } else { self.cache.prices(ticker).unwrap_or_default() };
         let last = prices.last().and_then(Price::day);
         let today = Local::now().date_naive();
         // Closes are final the next day; nothing to ask for before then.
         if last.is_some_and(|d| d >= today - chrono::Duration::days(1)) {
             return Ok(0);
         }
-        let start = last.map(|d| d + chrono::Duration::days(1)).unwrap_or(NaiveDate::from_ymd_opt(1990, 1, 1).unwrap());
+        let start = last.map(|d| d + chrono::Duration::days(1)).unwrap_or(HISTORY_START);
         self.reserve(&sym)?;
         // The key goes in a header, never the URL (errors quote URLs).
         let res = self.http.get(format!("https://api.tiingo.com/tiingo/daily/{}/prices?startDate={}", sym, start))
@@ -124,6 +135,10 @@ impl Client {
         let tmp = path.with_extension("part");
         fs::write(&tmp, serde_json::to_vec(&prices)?)?;
         fs::rename(&tmp, &path)?;
-        Ok(added)
+        Ok(if full { prices.len() } else { added })
     }
 }
+
+/// Where a first fetch starts: before Tiingo's earliest US prices (1962), so
+/// it gets a ticker's whole history. (Until 2026-11-23 it was 1990.)
+pub const HISTORY_START: NaiveDate = NaiveDate::from_ymd_opt(1962, 1, 1).unwrap();

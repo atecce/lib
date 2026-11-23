@@ -1,6 +1,9 @@
 //! Bring the Tiingo price cache up to date for some tickers.
 //!
-//!     tiingo-fetch [--list FILE ...] [TICKER ...]
+//!     tiingo-fetch [--full] [--list FILE ...] [TICKER ...]
+//!
+//! `--full` refetches each ticker's whole history, replacing its cache (for
+//! tickers first fetched when history started in 1990).
 //!
 //! Needs a key in `TIINGO_API_KEY`. Paces itself to the free plan (50
 //! requests an hour), so a long list takes hours: run it from a scheduler.
@@ -13,6 +16,7 @@ use tiingo::{Cache, Client};
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let mut tickers = Vec::new();
+    let mut full = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--list" => {
@@ -22,6 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     tickers.extend(line.split([' ', '\t', ',']).filter(|t| !t.is_empty()).map(str::to_string));
                 }
             },
+            "--full" => full = true,
             a if a.starts_with("--") => return Err(format!("unknown option {}", a).into()),
             t => tickers.push(t.to_string()),
         }
@@ -34,7 +39,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let client = Client::new(key, Cache::new(Cache::default_dir()))?;
     let mut failed = Vec::new();
     for t in &tickers {
-        match client.fetch(t) {
+        match if full { client.fetch_full(t) } else { client.fetch(t) } {
+            Ok(n) if full => eprintln!("{}: {} days, all of its history", t, n),
             Ok(n) => eprintln!("{}: {} new days", t, n),
             Err(e) => {
                 eprintln!("{}: {}", t, e);
