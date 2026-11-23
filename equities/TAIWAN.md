@@ -107,7 +107,19 @@ Some of the large names, with the US ADRs where they have them:
 - **Postgres**: `issuer.mops_code`; TSMC's TSM and 2330.TW are one issuer,
   each listing drawn from its own regulator; 2330.TW has quarters.
 - **Nightly**: `equities/taiwan/all.txt`, pushed at 06:40
-  (`pub.atec.equities.taiwan`).
+  (`pub.atec.equities.taiwan`): the 50 largest listed companies by market
+  cap, standing in for the Taiwan 50 (FTSE publishes its list as PDFs),
+  computed from TWSE's OpenAPI (`opendata/t187ap03_L`: every listed
+  company's paid-in capital and par value, so its shares;
+  `exchangeReport/STOCK_DAY_ALL`: closing prices). The 50 are 82% of the
+  market, TSMC alone 42%. Depositary receipts (康師傅-DR, Kāngshīfu, a Hong
+  Kong company) are left out. The API dates its data in the Republic of
+  China calendar (1151120: 2026-11-20). The first fetch of the 50 takes
+  about 19 hours at MOPS's pace.
+- **Financial holding companies** (金控, jīnkòng: Fubon, Cathay, CTBC ...)
+  are a fifth of the 50; their statements use banking lines (利息淨收益,
+  lìxī jìng shōuyì, net interest income) the reader doesn't map yet, as
+  with EDINET's banks.
 
 Still to do: Taipei prices (TWSE's daily JSON), so 2330.TW has market
 values; more line items (debt; cash where a layout labels it otherwise).
