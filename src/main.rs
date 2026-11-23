@@ -53,8 +53,15 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
 /// the network but the push to InfluxDB.
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let dry_run = std::env::args().any(|a| a == "--dry-run");
-    let mut reported_items = Vec::new();
+    let flag = |f: &str| std::env::args().any(|a| a == f);
+    let dry_run = flag("--dry-run");
+    let dump = flag("--dump");
+    // --postgres writes to Postgres too (store crate, STORE_URL); with
+    // --postgres-only, to Postgres alone. Every version of every value, with
+    // its filing, rather than the latest only.
+    let postgres_only = flag("--postgres-only");
+    let postgres = postgres_only || flag("--postgres");
+    let influx = !postgres_only;
 
     let mut tickers = Vec::new();
     for arg in std::env::args().skip(1).filter(|a| !a.starts_with("--")) {
@@ -69,46 +76,71 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let cache = edgar::Cache::new(edgar::Cache::default_dir());
     let japan = edinet::Cache::new(edinet::Cache::default_dir());
+    let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
 
+    // One company at a time: read, derive, write, then the next, so what's
+    // written shows as it goes, an interruption loses one company, and memory
+    // stays flat however long the list. (Every step below works per ticker.)
+    // --dump and --dry-run print everything together, so they collect it.
+    let collect = dump || dry_run;
+    let mut db = if postgres && !collect { Some(open_store()?) } else { None };
+    let (mut all_items, mut all_market) = (Vec::new(), Vec::new());
+    let mut totals = Totals::default();
     for equity in tickers {
+        let mut items = Vec::new();
         // Tokyo tickers ("7203.T") come from EDINET, the rest from EDGAR.
         let read = if is_edinet(equity) {
-            read_edinet(&japan, equity, &mut reported_items)
+            read_edinet(&japan, equity, &mut items)
         } else {
-            read_edgar(&cache, equity, &mut reported_items)
+            read_edgar(&cache, equity, &mut items)
         };
         if let Err(e) = read {
             eprintln!("{}: {}", equity, e);
         }
-    }
+        if items.is_empty() {
+            continue;
+        }
+        equities::merge_nearby_dates(&mut items);
+        equities::derive_quarters(&mut items);
+        let mut book = equities::book_value_per_share(&items);
+        items.append(&mut book);
 
-    equities::merge_nearby_dates(&mut reported_items);
-    equities::derive_quarters(&mut reported_items);
-    let mut book = equities::book_value_per_share(&reported_items);
-    reported_items.append(&mut book);
-
-    // Daily market values, for tickers with prices in the tiingo cache.
-    let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
-    let mut tickers: Vec<equities::Ticker> = reported_items.iter().map(|i| i.ticker).collect();
-    tickers.sort_by_key(|t| t.as_str().to_string());
-    tickers.dedup();
-    let mut market = Vec::new();
-    for t in tickers {
-        let Ok(p) = prices.prices(t.as_str()) else { continue };
-        let mut m = equities::valuation::market(t, &p, &reported_items);
-        if let Some(last) = m.last() {
-            eprintln!("{}: market cap {:.1}B on {}{}{}{}", t, last.market_cap / 1e9, last.date,
+        // Daily market values, if the tiingo cache has the ticker's prices.
+        let company_prices = prices.prices(equity.as_str()).ok();
+        let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &items)).unwrap_or_default();
+        if let Some(last) = market.last() {
+            eprintln!("{}: market cap {:.1}B on {}{}{}{}", equity, last.market_cap / 1e9, last.date,
                 last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default(),
                 last.return_on_equity.map(|r| format!(", ROE {:.1}%", r * 100.0)).unwrap_or_default(),
                 last.earnings_yield.map(|e| format!(", earnings yield {:.1}%", e * 100.0)).unwrap_or_default());
         }
-        market.append(&mut m);
+
+        if collect {
+            all_items.append(&mut items);
+            all_market.extend(market);
+            continue;
+        }
+        if let Some(db) = db.as_mut() {
+            match write_company(db, &cache, &japan, equity, &items, company_prices.as_deref(), &market) {
+                Ok(t) => totals.add(t),
+                Err(e) => eprintln!("postgres: {}: {}", equity, e),
+            }
+        }
+        if influx {
+            let latest_items = latest(items);
+            push_to_influx(&latest_items)?;
+            totals.influx_items += latest_items.len();
+            if !market.is_empty() {
+                push_market(&market)?;
+                totals.influx_market += market.len();
+            }
+        }
     }
 
     // Every item read, one per line, sorted: for diffing the output of two versions.
-    if std::env::args().any(|a| a == "--dump") {
-        let reported_items = if std::env::args().any(|a| a == "--latest") { latest(reported_items) } else { reported_items };
-        let mut lines: Vec<String> = reported_items.iter()
+    if dump {
+        let items = if flag("--latest") { latest(all_items) } else { all_items };
+        let mut lines: Vec<String> = items.iter()
             .map(|it| format!("{}\t{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.currency, it.val))
             .collect();
         lines.sort();
@@ -116,70 +148,69 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("{}", lines.join("\n"));
         return Ok(());
     }
-
     if dry_run {
-        print_series(&reported_items, std::env::args().any(|a| a == "--cash-flow"));
+        print_series(&all_items, flag("--cash-flow"));
         return Ok(());
     }
 
-    // --postgres writes to Postgres too (store crate, STORE_URL); with
-    // --postgres-only, to Postgres alone. Every version of every value, with
-    // its filing, rather than the latest only.
-    let postgres_only = std::env::args().any(|a| a == "--postgres-only");
-    if postgres_only || std::env::args().any(|a| a == "--postgres") {
-        push_to_postgres(&cache, &japan, &prices, &reported_items, &market)?;
+    if postgres {
+        println!("Successfully wrote {} companies, {} filings, {} facts, {} price days, {} market days to Postgres",
+            totals.companies, totals.filings, totals.facts, totals.prices, totals.market);
     }
-    if postgres_only {
-        return Ok(());
+    if influx {
+        println!("Successfully pushed {} items to InfluxDB", totals.influx_items);
+        println!("Successfully pushed {} market days to InfluxDB", totals.influx_market);
     }
-
-    if !reported_items.is_empty() {
-        let items = latest(reported_items);
-        push_to_influx(&items)?;
-        println!("Successfully pushed {} items to InfluxDB", items.len());
-    }
-    if !dry_run && !market.is_empty() {
-        push_market(&market)?;
-        println!("Successfully pushed {} market days to InfluxDB", market.len());
-    }
-
     Ok(())
+}
+
+/// What a run wrote, for its summary.
+#[derive(Default)]
+struct Totals {
+    companies: usize,
+    filings: usize,
+    facts: usize,
+    prices: usize,
+    market: usize,
+    influx_items: usize,
+    influx_market: usize,
+}
+
+impl Totals {
+    fn add(&mut self, t: Totals) {
+        self.companies += t.companies;
+        self.filings += t.filings;
+        self.facts += t.facts;
+        self.prices += t.prices;
+        self.market += t.market;
+    }
 }
 
 /// Write each company read to Postgres: its issuer and listing, its filings
 /// and every value they reported, its prices and market values.
-fn push_to_postgres(edgar: &edgar::Cache, edinet: &edinet::Cache, prices: &tiingo::Cache,
-                    items: &[equities::item::Reported], market: &[equities::valuation::Market]) -> Result<(), Box<dyn Error>> {
+/// The store, with its schema up to date and the items table in step with
+/// the Rust enum.
+fn open_store() -> Result<store::Store, Box<dyn Error>> {
     let mut db = store::Store::connect(&store::default_url())?;
     for m in db.migrate()? {
         eprintln!("postgres: applied migration {}", m);
     }
     db.sync_items()?;
+    Ok(db)
+}
 
-    let mut by_ticker: std::collections::BTreeMap<String, Vec<equities::item::Reported>> = Default::default();
-    for it in items {
-        by_ticker.entry(it.ticker.as_str().to_string()).or_default().push(it.clone());
-    }
-    let (mut filings, mut facts, mut days, mut markets) = (0, 0, 0, 0);
-    for (ticker, its) in &by_ticker {
-        let t: equities::Ticker = ticker.parse().map_err(|_| format!("not a ticker: {}", ticker))?;
-        let company = match company(edgar, edinet, t) {
-            Ok(c) => c,
-            Err(e) => { eprintln!("postgres: {}: {}", ticker, e); continue; },
-        };
-        let issuer = db.write_company(&company)?;
-        let (f, n) = db.write_facts(issuer, its)?;
-        filings += f;
-        facts += n;
-        if let Ok(p) = prices.prices(ticker) {
-            days += db.write_prices(ticker, &p)?;
-        }
-        let m: Vec<_> = market.iter().filter(|m| m.ticker == t).cloned().collect();
-        markets += db.write_market(&m)?;
-    }
-    println!("Successfully wrote {} companies, {} filings, {} facts, {} price days, {} market days to Postgres",
-        by_ticker.len(), filings, facts, days, markets);
-    Ok(())
+/// One company to Postgres: issuer and listing, its filings and every
+/// version of every value, its prices and market values, each in its own
+/// transaction.
+fn write_company(db: &mut store::Store, edgar: &edgar::Cache, edinet: &edinet::Cache, ticker: equities::Ticker,
+                 items: &[equities::item::Reported], prices: Option<&[tiingo::Price]>,
+                 market: &[equities::valuation::Market]) -> Result<Totals, Box<dyn Error>> {
+    let company = company(edgar, edinet, ticker)?;
+    let issuer = db.write_company(&company)?;
+    let (filings, facts) = db.write_facts(issuer, items)?;
+    let prices = match prices { Some(p) => db.write_prices(ticker.as_str(), p)?, None => 0 };
+    let market = db.write_market(market)?;
+    Ok(Totals { companies: 1, filings, facts, prices, market, ..Default::default() })
 }
 
 /// What the caches know of a listing's issuer.

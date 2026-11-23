@@ -170,10 +170,15 @@ impl Store {
         }
         copy(&mut tx, "CREATE TEMP TABLE tmp_fact (LIKE fact) ON COMMIT DROP",
             "COPY tmp_fact (issuer_id, item, period, period_end, currency, value, accession, derived) FROM STDIN", &buf)?;
+        // Replace, not merge: a filing's facts are what the reader reads from it
+        // now, so a value a reader fix no longer produces (a zero read from an
+        // empty cell) goes. Only the filings read this run; one that failed to
+        // read keeps what it had. One transaction, so never half replaced.
+        tx.execute("DELETE FROM fact WHERE issuer_id = $1 AND accession IN (SELECT accession FROM tmp_filing)",
+            &[&issuer_id])?;
         tx.execute("INSERT INTO fact SELECT * FROM tmp_fact
                     ON CONFLICT (issuer_id, item, period, period_end, currency, accession)
-                    DO UPDATE SET value = EXCLUDED.value, derived = EXCLUDED.derived
-                    WHERE fact.value IS DISTINCT FROM EXCLUDED.value OR fact.derived IS DISTINCT FROM EXCLUDED.derived", &[])?;
+                    DO UPDATE SET value = EXCLUDED.value, derived = EXCLUDED.derived", &[])?;
         tx.commit()?;
         Ok((filings.len(), facts.len()))
     }
