@@ -81,6 +81,37 @@ Some of the large names, with the US ADRs where they have them:
 | 3711 | 日月光投控 (*Rìyuèguāng Tóukòng*), ASE Technology | ASX |
 | 2412 | 中華電信 (*Zhōnghuá Diànxìn*), Chunghwa Telecom | CHT |
 
+## Built (2026-11-22)
+
+- **The `mops` crate**: each company's quarterly report from MOPS's XBRL
+  viewer (`t164sb01`, consolidated statements, else the company's own),
+  one page per company and quarter with all three statements, cached as
+  served (Big5 HTML) under `mops/cache/<code>/<year>Q<n>.html`, from 2013
+  Q1; quarters MOPS lacks are remembered once overdue. One request every two
+  seconds; pages run 200–800 KB and come slowly, about 25 s each, so a
+  company's history takes about 25 minutes. `mops-fetch 2330.TW ...`.
+  The bulk zips (`tifrs-YYYYQn.zip`, every company's XBRL for a quarter)
+  exist but are served at about 15 KB/s.
+- **The reader** (`equities::mops`): two layouts, to 2018 Chinese labels
+  only, from 2019 account codes with Chinese and English labels; mapped by
+  the Chinese label, which both share. Columns from their headers: a date
+  (年月日), a quarter (第N季), a range (至), a year (年度). Amounts in
+  thousands of NT dollars. A value's filing date is the report's due date
+  (45 days after the quarter; March 31 for the annual report): MOPS doesn't
+  say when it was filed.
+- **Checked against TSMC**: revenue and operating cash flow equal its 20-F
+  figures to the thousand dollars, 2015–2019; 2019's quarterly revenue
+  (218.7, 241.0, 293.0, 317.2 billion) sums to the year. Net income differs,
+  and MOPS is right (306.6 billion for 2015, 351.1 for 2018): the EDGAR
+  reader takes the wrong line for TSMC's 20-F.
+- **Postgres**: `issuer.mops_code`; TSMC's TSM and 2330.TW are one issuer,
+  each listing drawn from its own regulator; 2330.TW has quarters.
+- **Nightly**: `equities/taiwan/all.txt`, pushed at 06:40
+  (`pub.atec.equities.taiwan`).
+
+Still to do: Taipei prices (TWSE's daily JSON), so 2330.TW has market
+values; more line items (debt; cash where a layout labels it otherwise).
+
 ## The plan
 
 A `mops` crate beside `edgar` and `edinet`, the same shape: a cache of

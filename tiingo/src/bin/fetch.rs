@@ -26,8 +26,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             t => tickers.push(t.to_string()),
         }
     }
-    // Tokyo tickers (7203.T) have no Tiingo prices.
-    tickers.retain(|t| !t.to_uppercase().ends_with(".T"));
+    // Tokyo and Taipei tickers (7203.T) have no Tiingo prices.
+    tickers.retain(|t| { let t = t.to_uppercase(); !t.ends_with(".T") && !t.ends_with(".TW") });
     tickers.dedup();
 
     let key = std::env::var("TIINGO_API_KEY").map_err(|_| "TIINGO_API_KEY is not set")?;

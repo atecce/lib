@@ -1,0 +1,5 @@
+# Taiwan's largest listed companies (equities/TAIWAN.md), from MOPS, and the
+# US listings of those that have them, from EDGAR. Prices: TSM, UMC, ASX and
+# CHT through Tiingo; Taipei prices aren't fetched yet.
+2330.TW 2317.TW 2454.TW 2308.TW 2303.TW 3711.TW 2412.TW
+TSM UMC ASX CHT

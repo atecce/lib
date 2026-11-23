@@ -23,6 +23,7 @@ jobs=(
   pub.atec.edinet.all 26
   pub.atec.equities.nightly 26
   pub.atec.equities.nikkei 26
+  pub.atec.equities.taiwan 26
 )
 
 for label hours in $jobs; do
