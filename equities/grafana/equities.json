@@ -2,7 +2,6 @@
   "uid": "equities-financials",
   "title": "equities",
   "schemaVersion": 39,
-  "version": 3,
   "editable": true,
   "timezone": "utc",
   "graphTooltip": 0,
@@ -17,22 +16,18 @@
         "name": "ticker",
         "label": "Ticker",
         "datasource": {
-          "type": "influxdb",
-          "uid": "efm3zlbhro268a"
+          "type": "grafana-postgresql-datasource",
+          "uid": "financials-postgres"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"ticker\" WHERE time > now() - 400d",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"ticker\" WHERE time > now() - 400d",
+        "query": "SELECT ticker FROM listing ORDER BY ticker",
+        "definition": "SELECT ticker FROM listing ORDER BY ticker",
         "refresh": 1,
         "sort": 1,
         "multi": true,
         "includeAll": false,
         "current": {
-          "text": [
-            "nvda"
-          ],
-          "value": [
-            "nvda"
-          ]
+          "text": "AAPL",
+          "value": "AAPL"
         },
         "options": [],
         "hide": 0
@@ -67,18 +62,18 @@
         "name": "currency",
         "label": "Currency",
         "datasource": {
-          "type": "influxdb",
-          "uid": "efm3zlbhro268a"
+          "type": "grafana-postgresql-datasource",
+          "uid": "financials-postgres"
         },
-        "query": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"currency\" WHERE time > now() - 400d",
-        "definition": "SHOW TAG VALUES FROM \"reported_item_v15\" WITH KEY = \"currency\" WHERE time > now() - 400d",
+        "query": "SELECT __text, __value FROM (\nSELECT 'reporting currency' AS __text, 'reporting' AS __value, 0 AS n\nUNION ALL\nSELECT f.currency, f.currency, count(*) FROM fact f JOIN listing l USING (issuer_id)\nWHERE l.ticker IN (${ticker}) GROUP BY f.currency\n) x\nORDER BY n = 0 DESC, n DESC",
+        "definition": "SELECT __text, __value FROM (\nSELECT 'reporting currency' AS __text, 'reporting' AS __value, 0 AS n\nUNION ALL\nSELECT f.currency, f.currency, count(*) FROM fact f JOIN listing l USING (issuer_id)\nWHERE l.ticker IN (${ticker}) GROUP BY f.currency\n) x\nORDER BY n = 0 DESC, n DESC",
         "refresh": 1,
-        "sort": 1,
+        "sort": 0,
         "multi": false,
         "includeAll": false,
         "current": {
-          "text": "USD",
-          "value": "USD"
+          "text": "reporting currency",
+          "value": "reporting"
         },
         "options": [],
         "hide": 0
@@ -103,10 +98,10 @@
     {
       "id": 2,
       "type": "timeseries",
-      "title": "$ticker stocks: equity and debt ($currency)",
+      "title": "$ticker stocks: equity and debt (${currency:text})",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -191,194 +186,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "total assets",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "TotalAssets"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "total liabilities",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "TotalLiabilities"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "stockholders' equity",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "StockholdersEquity"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "D",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "total debt",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "TotalDebt"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['TotalAssets', 'TotalLiabilities', 'StockholdersEquity', 'TotalDebt']) f\nJOIN (VALUES ('TotalAssets', 'total assets'), ('TotalLiabilities', 'total liabilities'), ('StockholdersEquity', 'stockholders'' equity'), ('TotalDebt', 'total debt')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ],
       "description": "Total assets, liabilities, stockholders' equity and total debt (every borrowing line, current and non-current) from the balance sheet. Market cap against book value is in the valuation row below."
@@ -386,10 +200,10 @@
     {
       "id": 3,
       "type": "timeseries",
-      "title": "$ticker flows: income and returns to shareholders ($currency, $period)",
+      "title": "$ticker flows: income and returns to shareholders (${currency:text}, $period)",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -474,264 +288,23 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "revenue",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "Revenue"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "operating income",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "OperatingIncome"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "net income",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "NetIncome"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "D",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "buybacks",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              },
-              {
-                "type": "math",
-                "params": [
-                  " * -1"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "PaymentsRelatedToRepurchasesOfCommonStock"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "E",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "dividends",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              },
-              {
-                "type": "math",
-                "params": [
-                  " * -1"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "DividendsPaid"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
     {
       "id": 4,
       "type": "timeseries",
-      "title": "$ticker stocks: cash and working capital ($currency)",
+      "title": "$ticker stocks: cash and working capital (${currency:text})",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -816,204 +389,23 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "cash",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "CashAndCashEquivalents"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "marketable securities",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "MarketableSecurities"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "receivables",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "AccountsReceivableNet"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "D",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "inventories",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "Inventories"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['CashAndCashEquivalents', 'MarketableSecurities', 'AccountsReceivableNet', 'Inventories']) f\nJOIN (VALUES ('CashAndCashEquivalents', 'cash'), ('MarketableSecurities', 'marketable securities'), ('AccountsReceivableNet', 'receivables'), ('Inventories', 'inventories')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
     {
       "id": 5,
       "type": "timeseries",
-      "title": "$ticker flows: cash ($currency, $period)",
+      "title": "$ticker flows: cash (${currency:text}, $period)",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -1098,156 +490,23 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "operating",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "NetCashProvidedByOperatingActivities"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "investing",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "NetCashUsedInInvestingActivities"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "financing",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "NetCashUsedInFinancingActivities"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
     {
       "id": 6,
       "type": "timeseries",
-      "title": "$ticker stocks: long-lived assets ($currency)",
+      "title": "$ticker stocks: long-lived assets (${currency:text})",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -1332,156 +591,23 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "property and equipment",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "PropertyAndEquipmentNet"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "goodwill",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "Goodwill"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "intangibles",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "IntangibleAssetsNet"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^pit$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['PropertyAndEquipmentNet', 'Goodwill', 'IntangibleAssetsNet']) f\nJOIN (VALUES ('PropertyAndEquipmentNet', 'property and equipment'), ('Goodwill', 'goodwill'), ('IntangibleAssetsNet', 'intangibles')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
     {
       "id": 7,
       "type": "timeseries",
-      "title": "$ticker flows: investment ($currency, $period)",
+      "title": "$ticker flows: investment (${currency:text}, $period)",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -1566,168 +692,23 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "capex",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              },
-              {
-                "type": "math",
-                "params": [
-                  " * -1"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "depreciation and amortization",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "DepreciationAndAmoritization"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "acquisitions",
-          "measurement": "reported_item_v15",
-          "policy": "financials",
-          "resultFormat": "time_series",
-          "orderByTime": "ASC",
-          "groupBy": [],
-          "select": [
-            [
-              {
-                "type": "field",
-                "params": [
-                  "value"
-                ]
-              },
-              {
-                "type": "math",
-                "params": [
-                  " * -1"
-                ]
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "ticker",
-              "operator": "=~",
-              "value": "/^$ticker$/"
-            },
-            {
-              "condition": "AND",
-              "key": "item",
-              "operator": "=",
-              "value": "AcquisitionsNetOfCashAcquired"
-            },
-            {
-              "condition": "AND",
-              "key": "period",
-              "operator": "=~",
-              "value": "/^$period$/"
-            },
-            {
-              "condition": "AND",
-              "key": "currency",
-              "operator": "=~",
-              "value": "/^$currency$/"
-            }
-          ]
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
     {
       "id": 8,
       "type": "timeseries",
-      "title": "$ticker stocks: market value and book value ($currency, log scale)",
+      "title": "$ticker stocks: market value and book value (${currency:text}, log scale)",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -1850,35 +831,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "market cap",
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"market_cap\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "book value (stockholders' equity)",
-          "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'StockholdersEquity' AND \"period\" = 'pit' AND \"currency\" =~ /^$currency$/ AND $timeFilter"
-        },
-        {
-          "refId": "C",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "price-to-book",
-          "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"price_to_book\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+          "rawSql": "SELECT date::timestamp AS \"time\", 'market cap' AS metric, market_cap AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND market_cap IS NOT NULL\nUNION ALL\nSELECT period_end::timestamp, 'book value (stockholders'' equity)', value\nFROM listing_facts('${ticker:raw}', 'pit', CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END, ARRAY['StockholdersEquity'])\nUNION ALL\nSELECT date::timestamp AS \"time\", 'price-to-book' AS metric, price_to_book AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND price_to_book IS NOT NULL\nORDER BY 1"
         }
       ],
       "description": "Market cap each trading day against book value (stockholders' equity). On a log scale the gap between them is price-to-book, also on the right axis: the market pays that multiple of the accounts. Book value records what owners put in and the company kept, at historical cost; market value prices expected future profits, including what accounting leaves off the balance sheet (brands, software, R&D) and growth."
@@ -1888,8 +847,8 @@
       "type": "timeseries",
       "title": "$ticker flows: return on equity and earnings yield (last four quarters)",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 10,
@@ -1974,24 +933,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
-          "alias": "return on equity",
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"return_on_equity\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
-          },
-          "alias": "earnings yield",
-          "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"earnings_yield\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+          "rawSql": "SELECT date::timestamp AS \"time\", 'return on equity' AS metric, return_on_equity AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND return_on_equity IS NOT NULL\nUNION ALL\nSELECT date::timestamp AS \"time\", 'earnings yield' AS metric, earnings_yield AS value FROM market\nWHERE ticker = '${ticker:raw}' AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND earnings_yield IS NOT NULL\nORDER BY 1"
         }
       ],
       "description": "Net income over the last four quarters, over average book equity (return on equity) and over market cap (earnings yield, the inverse of P/E). Price-to-book is roughly their ratio: where return on equity runs above the earnings yield, the market values the equity above book. Each day uses only quarters reported by then."
