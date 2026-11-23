@@ -20,6 +20,7 @@ use postgres::{Client, NoTls, Transaction};
 /// The schema, in order. Each runs once, recorded in `schema_migrations`.
 const MIGRATIONS: &[(&str, &str)] = &[
     ("001_schema", include_str!("../migrations/001_schema.sql")),
+    ("002_listing_written_at", include_str!("../migrations/002_listing_written_at.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
@@ -138,7 +139,13 @@ impl Store {
     /// The filings and every value they reported, for one issuer. Values
     /// without a filing (none, from the EDGAR and EDINET readers) are
     /// skipped. Returns (filings, facts) written.
-    pub fn write_facts(&mut self, issuer_id: i32, items: &[Reported]) -> Result<(usize, usize), Box<dyn Error>> {
+    /// Record that `ticker`'s company has been written in full.
+    pub fn mark_written(&mut self, ticker: &str) -> Result<(), Box<dyn Error>> {
+        self.db.execute("UPDATE listing SET written_at = now() WHERE ticker = $1", &[&ticker])?;
+        Ok(())
+    }
+
+        pub fn write_facts(&mut self, issuer_id: i32, items: &[Reported]) -> Result<(usize, usize), Box<dyn Error>> {
         // One row per key: a filing can state a value twice (two columns
         // merged to one date); the last read wins, as in the push to InfluxDB.
         let mut filings = BTreeMap::new();

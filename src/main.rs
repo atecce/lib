@@ -210,6 +210,7 @@ fn write_company(db: &mut store::Store, edgar: &edgar::Cache, edinet: &edinet::C
     let (filings, facts) = db.write_facts(issuer, items)?;
     let prices = match prices { Some(p) => db.write_prices(ticker.as_str(), p)?, None => 0 };
     let market = db.write_market(market)?;
+    db.mark_written(ticker.as_str())?;
     Ok(Totals { companies: 1, filings, facts, prices, market, ..Default::default() })
 }
 
