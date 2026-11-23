@@ -18,6 +18,9 @@
 source ~/.profile   # EDINET_API_KEY
 LIB=${LIB:-${0:A:h:h:h}}
 cd $LIB || exit 1
+# Waits for the network, and records a finished run (nightly/common.sh).
+source nightly/common.sh
+wait_for_network || exit 1
 log=edinet/nightly/log.all.$(date +%Y%m%d-%H%M%S)
 chunk=250
 fetch=./target/release/edinet-fetch
@@ -52,5 +55,7 @@ for ((i = 0; i < total; i += chunk)); do
   sleep 5
 done
 rm -f $part
+# Every company was tried: a finished run, whatever failed (retried next time).
+mark_ok pub.atec.edinet.all
 # Non-zero when a company could not be fetched, so launchd shows the failure.
 exit $failed
