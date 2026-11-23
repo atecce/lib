@@ -56,7 +56,8 @@ else
 fi
 echo "=== $name push: $(echo $push | wc -w | tr -d ' ') companies" >> $log
 if [ -n "$push" ]; then
-  ./target/release/lib ${=push} >> $log 2>&1 || exit 1
+  # InfluxDB and Postgres, one company at a time (see DATA.md).
+  ./target/release/lib --postgres ${=push} >> $log 2>&1 || exit 1
 fi
 mv $stamp.next $stamp
 # Non-zero when a fetch failed, so launchd shows the failure.
