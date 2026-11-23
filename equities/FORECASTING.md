@@ -111,6 +111,45 @@ forecasts what everyone already knows, which is already in the price.
    ecosystem. And the factor zoo: hundreds of published factors, many of them
    artifacts of testing too many hypotheses (Harvey, Liu & Zhu 2016).
 
+## Backtests, from Fama on
+
+Fama's dissertation, "The Behavior of Stock-Market Prices" (1965), tested
+the thirty Dow stocks for predictability three ways: serial correlation
+(does today's change predict tomorrow's?), runs (do rises and falls come in
+streaks?), and Sidney Alexander's filter rules (1961, 1964: buy when a price
+rises x% off a low, sell when it falls x% off a high). The correlations were
+tiny, the runs random, and the filter rules' profits went away once costs
+were counted; with Blume (1966) he went through the filter rules in detail:
+after commissions, none beat buying and holding. Alexander's profits had
+also assumed trades at exactly the filter price, when prices gap past it, as
+Mandelbrot pointed out. Before them, Cowles (1933) scored professional
+forecasters' records and found no skill.
+
+That is backtesting: simulating a strategy on history as if it had been
+traded. The classic ways a backtest flatters a strategy:
+
+1. **Look-ahead bias**: using what wasn't known yet. Statements are filed
+   weeks after the quarter and later restated; a backtest on restated
+   figures knows things nobody knew. Hence first-reported values for the
+   valuations, and `filing.filed_at` and `fact_first` in the Postgres model:
+   what the market knew on the day.
+2. **Survivorship bias**: testing only the companies still alive. **Our data
+   has it**: the universe is today's S&P 500, and EDGAR's ticker map lists
+   only current tickers. Companies that failed, were acquired or left the
+   index are missing, and a backtest without them looks too good. The fix:
+   every company that filed, by CIK (EDGAR's full index lists every filing
+   since 1993), historical index membership, and prices for delisted
+   companies.
+3. **Costs and execution**: commissions, spreads, market impact, and prices
+   that gap past an order (Alexander's mistake).
+4. **Data snooping**: try enough strategies on one history and some look
+   excellent by chance (Lo & MacKinlay 1990; White's reality check, 2000;
+   the deflated Sharpe ratio, Bailey & López de Prado 2014; Harvey, Liu &
+   Zhu 2016).
+5. **Decay after discovery**: a real anomaly is traded away once known
+   (McLean & Pontiff 2016); a backtest over years when nobody knew of it
+   overstates what it earns once everyone does.
+
 ## What this leaves for the project
 
 - **Seasonality**: for understanding and cleaning the data, not for trading.
@@ -126,6 +165,21 @@ forecasts what everyone already knows, which is already in the price.
 
 - Bachelier, L. (1900). *Théorie de la spéculation*. Annales scientifiques de
   l'École normale supérieure, 17, 21–86.
+- Cowles, A. (1933). Can stock market forecasters forecast? *Econometrica*,
+  1(3), 309–324.
+- Alexander, S. S. (1961). Price movements in speculative markets: Trends or
+  random walks. *Industrial Management Review*, 2(2), 7–26.
+- Fama, E. F. (1965). The behavior of stock-market prices. *Journal of
+  Business*, 38(1), 34–105.
+- Fama, E. F., & Blume, M. E. (1966). Filter rules and stock-market trading.
+  *Journal of Business*, 39(1), 226–241.
+- Lo, A. W., & MacKinlay, A. C. (1990). Data-snooping biases in tests of
+  financial asset pricing models. *Review of Financial Studies*, 3(3),
+  431–467.
+- White, H. (2000). A reality check for data snooping. *Econometrica*, 68(5),
+  1097–1126.
+- Bailey, D. H., & López de Prado, M. (2014). The deflated Sharpe ratio.
+  *Journal of Portfolio Management*, 40(5), 94–107.
 - Kendall, M. G. (1953). The analysis of economic time-series, part I:
   Prices. *Journal of the Royal Statistical Society A*, 116(1), 11–34.
 - Samuelson, P. A. (1965). Proof that properly anticipated prices fluctuate
