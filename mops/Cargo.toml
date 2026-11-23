@@ -1,0 +1,24 @@
+[package]
+name = "mops"
+version = "0.1.0"
+edition = "2024"
+
+# MOPS, the Market Observation Post System (公開資訊觀測站, Gōngkāi Zīxùn
+# Guāncè Zhàn), Taiwan's EDGAR, run by the Taiwan Stock Exchange, as a source:
+# each company's quarterly financial reports as MOPS renders them, cached on
+# disk under cache/, and the client that fetches them. Readers of the cache
+# (equities) depend on this crate without the `fetch` feature. See
+# equities/TAIWAN.md.
+
+[features]
+default = ["fetch"]
+fetch = ["dep:reqwest"]
+
+[dependencies]
+chrono = "0.4.44"
+reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
+
+[[bin]]
+name = "mops-fetch"
+path = "src/bin/fetch.rs"
+required-features = ["fetch"]
