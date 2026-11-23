@@ -2,7 +2,7 @@
 //! long a company's residual income lasts, against its industry's, and
 //! against what its price implied.
 //!
-//!     cargo run --release -p store --example persistence -- AAPL [--r 0.09] [--digits 3]
+//!     cargo run --release -p backtest --example persistence -- AAPL [--r 0.09] [--digits 3]
 //!
 //! For each fiscal year: residual income x = E − r·B₋₁ (net income less the
 //! cost of the equity at the start of the year); and, where Postgres has

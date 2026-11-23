@@ -5,8 +5,8 @@ anomalies, persistent residual income) run on Apple, and what they say about
 its rise and Steve Jobs's stewardship. Reproduce with
 
 ```sh
-cargo run --release -p store --example persistence -- AAPL            # r = 9%
-cargo run --release -p store --example persistence -- AAPL --r 0.07
+cargo run --release -p backtest --example persistence -- AAPL            # r = 9%
+cargo run --release -p backtest --example persistence -- AAPL --r 0.07
 ```
 
 ## What the data covers
@@ -116,7 +116,7 @@ baseline doesn't.
 
 **The market as the baseline**, as Fama and French (2000) used all firms:
 pooled over every issuer in Postgres (shell years and data errors left out,
-see `store/examples/persistence.rs`):
+see `backtest/examples/persistence.rs`):
 
 | | Pooled ω | Median company | At or above Apple's 1.12 |
 |---|---|---|---|

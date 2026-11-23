@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let once = args.iter().any(|a| a == "--once");
     let list = args.iter().find(|a| !a.starts_with("--")).cloned()
-        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../equities/sp500/all.txt").display().to_string());
+        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../sp500/all.txt").display().to_string());
     let text = std::fs::read_to_string(&list).unwrap_or_default();
     let wanted: HashSet<String> = text.lines()
         .map(|l| l.split('#').next().unwrap_or(""))

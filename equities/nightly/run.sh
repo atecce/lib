@@ -60,7 +60,7 @@ fi
 
 # Tiingo's free plan: 500 symbols a month, 50 requests an hour.
 if [ $(echo $tickers | wc -l) -le 60 ]; then
-  locked tiingo/cache ./target/release/tiingo-fetch ${=tickers} >> $log 2>&1 || fetched=1
+  locked equities/tiingo/cache ./target/release/tiingo-fetch ${=tickers} >> $log 2>&1 || fetched=1
   push=$tickers
 else
   push=$(./target/release/changed $stamp --list $list 2>>$log)

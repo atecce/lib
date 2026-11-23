@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let date = |i: usize| args.get(i).map(|d| NaiveDate::parse_from_str(d, "%Y-%m-%d")).transpose();
     let (from, to) = (date(0)?, date(1)?);
-    let list = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../equities/dow/all.txt"))?;
+    let list = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../dow/all.txt"))?;
     let tickers: Vec<&str> = list.lines().filter(|l| !l.starts_with('#')).flat_map(|l| l.split_whitespace()).collect();
     let cache = tiingo::Cache::new(tiingo::Cache::default_dir());
     let stocks: Vec<Prices> = tickers.iter()

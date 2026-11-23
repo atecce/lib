@@ -8,7 +8,7 @@ edition = "2024"
 
 [dependencies]
 chrono = "0.4.44"
-equities = { path = "../equities" }
+equities = { path = ".." }
 postgres = { version = "0.19", features = ["with-chrono-0_4"] }
 tiingo = { path = "../tiingo", default-features = false }
 

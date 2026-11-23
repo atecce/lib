@@ -289,6 +289,8 @@ name = "backtest"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "postgres",
+ "store",
  "tiingo",
 ]
 

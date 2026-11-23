@@ -11,3 +11,6 @@ edition = "2024"
 chrono = "0.4.44"
 # Daily prices, from the cache tiingo-fetch fills.
 tiingo = { path = "../tiingo", default-features = false }
+# Financials, from Postgres (examples/persistence.rs).
+postgres = { version = "0.19", features = ["with-chrono-0_4"] }
+store = { path = "../store" }

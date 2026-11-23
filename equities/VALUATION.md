@@ -570,7 +570,7 @@ over years.) Which companies form an industry is a classification:
   peers from the similarity of the product descriptions in its 10-K, redrawn
   every year. Industries this way follow the companies, which is the point
   for entrepreneurs: a new good redraws who competes with whom, and a fixed
-  code can't (see `companies/AAPL.md`, "The wrong baseline").
+  code can't (see `aapl/README.md`, "The wrong baseline").
 - **The whole market**: no classification at all, the null that assumes
   nothing about who competes with whom. Fama and French (2000) measure it
   this way.
@@ -578,9 +578,9 @@ over years.) Which companies form an industry is a classification:
   codes (TSE's 33 sectors; TWSE's industry categories), to map when those
   companies join the comparison.
 
-`store/examples/persistence.rs` groups by the first three SIC digits (the
+`backtest/examples/persistence.rs` groups by the first three SIC digits (the
 industry group; `--digits` changes it). For Apple that is computer and
-office equipment, 357; `companies/AAPL.md` is the worked example.
+office equipment, 357; `aapl/README.md` is the worked example.
 
 **The data is long enough for industries, barely for companies.** XBRL
 starts in 2009, so about 16 annual observations per company (60-odd
