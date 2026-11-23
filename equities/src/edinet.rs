@@ -189,8 +189,20 @@ pub fn read(cache: &edinet::Cache, d: &edinet::Document, ticker: Ticker) -> Resu
             }
         }
     }
+    // "2025-06-18 09:00", Japan time: the day is when the market learned of it.
+    let filed = d.submitted.as_deref().and_then(|s| s.get(..10)).and_then(|s| s.parse::<NaiveDate>().ok())
+        .ok_or("report without a submission date")?;
+    let filing = crate::item::Filed {
+        accession: d.doc_id.clone(),
+        filed,
+        source: crate::item::Source::Edinet,
+        form: d.doc_type.clone().unwrap_or_default(),
+        period_end: d.period_end,
+    };
     let mut items: Vec<Reported> = best.into_iter()
-        .map(|((item, date, p, currency), (_, val))| Reported { ticker, date, p, item, currency, val })
+        .map(|((item, date, p, currency), (_, val))| Reported {
+            ticker, date, p, item, currency, val, filing: Some(filing.clone()), derived: false,
+        })
         .collect();
     items.sort_by_key(|r| (r.date, r.item, r.p));
     Ok(items)

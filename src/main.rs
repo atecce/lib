@@ -163,6 +163,15 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
     let (mut skipped, mut missing) = (0, 0);
     for f in &filings {
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
+        // Everything read from this filing carries it.
+        let start = reported_items.len();
+        let filed = equities::item::Filed {
+            accession: f.accession.clone(),
+            filed: f.filing_date,
+            source: equities::item::Source::Edgar,
+            form: f.form.clone(),
+            period_end: Some(f.report_date),
+        };
         match cache.filing(f) {
             Ok(dir) => match equities::filing::new_reader(&dir, equity) {
                 Ok(mut r) => {
@@ -183,6 +192,9 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
                 Some(edgar::EdgarError::NotFetched(_)) => missing += 1,
                 _ => eprintln!("failed to read {}: {}", name, e),
             },
+        }
+        for it in &mut reported_items[start..] {
+            it.filing = Some(filed.clone());
         }
     }
     eprintln!("{}: read {} EDGAR filings, {} predate rendered statements{}", equity, filings.len() - skipped - missing, skipped,

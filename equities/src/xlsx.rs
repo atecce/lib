@@ -199,6 +199,8 @@ impl Reader {
                                     item,
                                     currency,
                                     val,
+                                    filing: None,
+                                    derived: false,
                                 });
                             },
                             Some((idx, was_filled, was_rank)) if !filled && (*was_filled || rank < *was_rank) => {

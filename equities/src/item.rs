@@ -356,6 +356,41 @@ pub struct Reported {
     pub item: Item,
     pub currency: crate::Currency,
     pub val: f64,
+    /// The filing it was read from, when known: what lets a store keep the
+    /// original and a later restatement side by side.
+    pub filing: Option<Filed>,
+    /// Computed rather than read (a fourth quarter as the year less nine
+    /// months, book value per share); `filing` is the one it was computed from.
+    pub derived: bool,
+}
+
+/// Where a filing came from.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
+pub enum Source {
+    Edgar,
+    Edinet,
+}
+
+impl Source {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Source::Edgar => "edgar",
+            Source::Edinet => "edinet",
+        }
+    }
+}
+
+/// A filing as filed: EDGAR's accession number or EDINET's docID, and the
+/// day the market learned of it.
+#[derive(Clone, Debug, PartialEq, Eq, Hash, serde::Serialize)]
+pub struct Filed {
+    pub accession: String,
+    pub filed: chrono::NaiveDate,
+    pub source: Source,
+    /// 10-K, 10-Q, 20-F; EDINET's docTypeCode (120, 140, 160 ...).
+    pub form: String,
+    /// The period the filing reports on.
+    pub period_end: Option<chrono::NaiveDate>,
 }
 
 #[cfg(test)]

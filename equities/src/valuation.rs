@@ -2,7 +2,9 @@
 //! reported by each day: market cap and price-to-book, and the two flows that
 //! explain it, return on equity and earnings yield:
 //!
-//!     price-to-book = return on equity / earnings yield
+//! ```text
+//! price-to-book = return on equity / earnings yield
+//! ```
 //!
 //! (profit over book equity, and profit over market cap). A company earning
 //! more on its book equity than the market's earnings yield trades above book.
@@ -156,7 +158,7 @@ mod tests {
     }
 
     fn fact(item: Item, date: &str, val: f64) -> Reported {
-        Reported { ticker: Ticker::TSLA, date: date.parse().unwrap(), p: Period::PointInTime, item, currency: Currency::USD, val }
+        Reported { ticker: Ticker::TSLA, date: date.parse().unwrap(), p: Period::PointInTime, item, currency: Currency::USD, val, filing: None, derived: false }
     }
 
     #[test]
