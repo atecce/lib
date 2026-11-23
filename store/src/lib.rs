@@ -23,6 +23,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("002_listing_written_at", include_str!("../migrations/002_listing_written_at.sql")),
     ("003_listing_facts", include_str!("../migrations/003_listing_facts.sql")),
     ("004_reporting_currency", include_str!("../migrations/004_reporting_currency.sql")),
+    ("005_ticker_case", include_str!("../migrations/005_ticker_case.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
