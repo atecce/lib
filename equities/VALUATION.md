@@ -216,6 +216,88 @@ This, not the earnings yield, is the number to compare with the Treasury
 rate: their difference is the market's implied equity risk premium for the
 company. It depends on the growth assumed, and on ROE staying where it is.
 
+## 6. Profitability and returns: ROE as a signal
+
+The residual income model (section 2) runs the other way too. Rearranged,
+it says that for a given price-to-book, the market's expected return $`r`$
+is higher where expected profitability is higher. That is the case for ROE as
+a signal of returns, as against the price-only filter rules of
+`FORECASTING.md`, which test the weak form of efficiency and fail it.
+Profitability is public, fundamental information (the semi-strong form), and
+several studies find it priced, or slow to be.
+
+**From valuation to expected returns.** Fama and French (2006) derive it from
+the dividend discount model and clean surplus. Dividing the residual income
+form of value by book value:
+
+```math
+\frac{M_t}{B_t} \;=\; \frac{\sum_{\tau=1}^{\infty} \mathbb{E}\!\left[Y_{t+\tau} - \Delta B_{t+\tau}\right] / (1+r)^{\tau}}{B_t}
+```
+
+with $`Y`$ earnings and $`\Delta B`$ the growth in book value (investment).
+Holding the others fixed, a lower price-to-book, higher expected earnings,
+or lower expected investment each imply a higher $`r`$. They find all three
+in the data: value, profitability and investment each predict returns.
+
+**Profitability, measured.** Novy-Marx (2013) finds gross profitability
+(revenue less cost of goods sold, over assets) predicts returns about as
+well as book-to-market does, and that the two work together: profitable
+firms earn more although they look expensive. "The other side of value":
+buying cheap assets and buying productive ones are complementary. Gross
+profit, high in the income statement, is less distorted by accounting
+choices than net income.
+
+**Factor models built on it.** Fama and French's five-factor model (2015)
+adds profitability (RMW, robust minus weak operating profitability) and
+investment (CMA, conservative minus aggressive) to market, size and value.
+Hou, Xue and Zhang's q-factor model (2015), from the economics of firms'
+investment decisions, uses ROE directly: an ROE factor, high minus low
+quarterly ROE. Each explains many published anomalies as exposure to
+profitability and investment.
+
+**Profitability mean-reverts.** Fama and French (2000) find profitability
+reverts toward the mean at about 38% a year, faster from below than from
+above, and changes in earnings revert too. An extreme ROE is partly a
+forecast that it will fade, so a signal should be ROE against an expected
+ROE, not ROE alone.
+
+**Earnings surprises are absorbed slowly.** Ball and Brown (1968), the
+founding paper of empirical accounting research, found prices move in the
+direction of an earnings surprise before the announcement, and keep drifting
+after it. Bernard and Thomas (1989) confirmed the drift after the
+announcement (post-earnings-announcement drift, PEAD) and found it strongest
+in small firms, consistent with prices underreacting to the news. A jump in
+ROE is in good part an earnings surprise.
+
+**What to watch for, using ROE.**
+
+1. **The denominator.** Buybacks shrink book equity, sometimes below zero:
+   Apple's ROE of 142% says more about its buybacks than its business, and
+   negative equity makes ROE meaningless. Gross profitability, return on
+   assets, or return on invested capital carry the same idea with less
+   distortion.
+2. **Leverage.** By the DuPont decomposition (section 3), ROE rises with
+   leverage, so a bank's ROE is mostly leverage. Compare within industries,
+   or use ROA.
+3. **Expected, not just observed.** "Anomalous" ROE needs a model of expected
+   ROE (its mean reversion, its industry); otherwise every growing company
+   looks anomalous. (The cross-company outlier detection of `FORECASTING.md`
+   failed for this reason.)
+4. **Known when.** ROE is known when the filing is, so a test may use only
+   what was filed by each date: `fact_first` and `filing.filed_at` in the
+   Postgres model.
+5. **Published, then arbitraged.** Anomalies weaken once published (McLean
+   and Pontiff 2016), and the many tested make multiple-testing corrections
+   necessary (`FORECASTING.md`).
+
+**How to test it here.** Each month, with only what had been filed by then,
+rank companies by ROE level, by its change over a year, and by an ROE
+changepoint (augurs) as an event; form quintile portfolios; measure the next
+month's returns and the spread between top and bottom, after costs, across
+subperiods, against the filter rules' result. It needs prices for the
+universe (Tiingo's free plan allows 500 symbols a month) and, against
+survivorship bias, the companies that no longer trade.
+
 ## References
 
 - Preinreich, G. A. D. (1938). Annual survey of economic theory: The theory of
@@ -241,6 +323,31 @@ company. It depends on the growth assumed, and on ROE staying where it is.
   implied cost of capital. *Journal of Accounting Research*, 39(1), 135–176.
 - Asness, C. S. (2003). Fight the Fed model. *Journal of Portfolio
   Management*, 30(1), 11–24.
+- Ball, R., & Brown, P. (1968). An empirical evaluation of accounting income
+  numbers. *Journal of Accounting Research*, 6(2), 159–178. Prices anticipate
+  earnings surprises and keep drifting after them.
+- Bernard, V. L., & Thomas, J. K. (1989). Post-earnings-announcement drift:
+  Delayed price response or risk premium? *Journal of Accounting Research*,
+  27 (Supplement), 1–36. The drift is underreaction, strongest in small firms.
+- Fama, E. F., & French, K. R. (2000). Forecasting profitability and
+  earnings. *Journal of Business*, 73(2), 161–175. Profitability reverts
+  toward the mean, about 38% a year.
+- Fama, E. F., & French, K. R. (2006). Profitability, investment and average
+  returns. *Journal of Financial Economics*, 82(3), 491–518. From the dividend
+  discount model: given price-to-book, higher expected profitability and lower
+  investment mean higher expected returns.
+- Novy-Marx, R. (2013). The other side of value: The gross profitability
+  premium. *Journal of Financial Economics*, 108(1), 1–28. Gross profit over
+  assets predicts returns as well as book-to-market, and with it.
+- Fama, E. F., & French, K. R. (2015). A five-factor asset pricing model.
+  *Journal of Financial Economics*, 116(1), 1–22. Market, size, value,
+  profitability (RMW) and investment (CMA).
+- Hou, K., Xue, C., & Zhang, L. (2015). Digesting anomalies: An investment
+  approach. *Review of Financial Studies*, 28(3), 650–705. The q-factor model,
+  with an ROE factor.
+- McLean, R. D., & Pontiff, J. (2016). Does academic research destroy stock
+  return predictability? *Journal of Finance*, 71(1), 5–32. Anomaly returns
+  fall by over half after publication.
 
 The attribution to Preinreich, Edwards and Bell, and Peasnell before Ohlson is
 the usual one in the accounting literature; the model is often called
