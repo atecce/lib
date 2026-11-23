@@ -37,26 +37,32 @@
         "type": "custom",
         "name": "period",
         "label": "Flows over",
-        "query": "3m,12m",
+        "query": "auto,3m,12m",
         "current": {
-          "text": "3m",
-          "value": "3m"
+          "text": "auto",
+          "value": "auto"
         },
         "multi": false,
         "includeAll": false,
         "hide": 0,
         "options": [
           {
+            "text": "auto",
+            "value": "auto",
+            "selected": true
+          },
+          {
             "text": "3m",
             "value": "3m",
-            "selected": true
+            "selected": false
           },
           {
             "text": "12m",
             "value": "12m",
             "selected": false
           }
-        ]
+        ],
+        "description": "auto: quarters where the company reports them, else years (20-F filers such as TSMC)"
       },
       {
         "type": "query",
@@ -296,7 +302,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -498,7 +504,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
@@ -700,7 +706,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', '${period:raw}', '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', CASE WHEN '${period:raw}' = 'auto' THEN flow_period('${ticker:raw}') ELSE '${period:raw}' END, '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
         }
       ]
     },
