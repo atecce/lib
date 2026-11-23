@@ -17,11 +17,14 @@ phone / browser ──HTTPS──▶ Cloudflare ──▶ Access (who is asking?
 | Address | Access rule | Then |
 |---|---|---|
 | `influx.atec.pub` | the service token `equities-app` only (headers `CF-Access-Client-Id`, `CF-Access-Client-Secret`) | InfluxDB's own token |
-| `grafana.atec.pub` | the emails in policy "family" (`root@atec.pub`), by one-time PIN: a code sent by email | signed in to Grafana as that email (below) |
+| `grafana.atec.pub` | the Access group 家人 (*jiā rén*, family), by one-time PIN: a code sent by email | signed in to Grafana as that email (below) |
 
-To let someone see Grafana, add their email to the "family" policy (Zero Trust
-→ Access → Applications → Grafana). They type their email at the login page
-and get a code; no account anywhere. They become a Grafana Viewer.
+To let someone see Grafana, add their email to the group 家人 (Zero Trust →
+Access → Access groups); the Grafana application's policy admits the group.
+They type their email at the login page and get a code; no account anywhere.
+They become a Grafana Viewer, named by their email until their name is set
+in Grafana (Administration → Users) after their first visit. (The members'
+addresses live in Cloudflare, not here: this repository is public.)
 
 ## Where things are
 
