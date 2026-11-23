@@ -420,6 +420,148 @@ year, $`E_t - r\,B_{t-1}`$, retained or paid out. Shiller's bound and Black's
 factor of two ("Noise", 1986) are both testable against them: how far
 $`M - B`$ wanders from the present value of residual income later earned.
 
+## 8. Entrepreneurial anomalies: persistent residual income
+
+Notes from 2026-11-23, after `FORECASTING.md`'s outlier scan. Run across
+companies on raw statement lines, augurs flagged 40–80% of them: what it
+found were accounting quirks (buybacks shrinking equity, acquisitions,
+write-downs) and companies that are simply different (a bank against a chip
+maker). Those are *statistical* anomalies: values far from their group or
+their own history. The anomaly an entrepreneur recognizes is an *economic*
+one, and it has a precise form in the residual income model.
+
+### Two kinds of anomaly
+
+Residual income (abnormal earnings, section 2) is what a business earns
+beyond the return its capital requires:
+
+```math
+x^a_t \;=\; E_t - r\,B_{t-1} \;=\; (\mathrm{ROE}_t - r)\,B_{t-1}
+```
+
+and market minus book is what the market expects of it, discounted:
+
+```math
+M_t - B_t \;=\; \sum_{\tau=1}^{\infty} \frac{\mathbb{E}_t\!\left[x^a_{t+\tau}\right]}{(1+r)^{\tau}}
+```
+
+An entrepreneurial anomaly is $`\mathrm{ROE} > r`$, kept up: a business
+earning more than its capital should. That it's an anomaly at all is a claim
+about competition, which says it shouldn't last.
+
+### Competition predicts decay
+
+Rivals copy, enter and undercut, so excess returns should shrink toward
+zero. Ohlson's dynamics (section 2) build that in: 
+$`x^a_{t+1} = \omega\, x^a_t + \dots`$ with $`\omega < 1`$. The evidence agrees on the direction:
+
+- **Profitability reverts.** Fama and French (2000) find it moves toward the
+  mean about 38% a year, faster when far below it.
+- **Abnormal earnings persist, partly.** Dechow, Hutton and Sloan (1999)
+  estimate $`\omega \approx 0.62`$ for US companies, varying with
+  industry, accruals and dividends.
+- **Some profits don't converge.** The persistence-of-profits literature
+  (Mueller 1986) finds a minority of firms whose excess returns stay well
+  above the norm for decades.
+
+So the economic anomaly is residual income that **decays more slowly than
+competition predicts**, or that rises when it should fall. In the model's
+terms: a company whose own $`\omega`$ is well above its industry's.
+
+### The economists of it
+
+- **Schumpeter (1911, translated 1934):** entrepreneurial profit is the
+  temporary monopoly an innovation earns until imitation erodes it, through
+  "creative destruction". Residual income is that profit; $`\omega`$ is how
+  slowly the imitators arrive.
+- **Knight (1921):** profit, as distinct from interest and from a return for
+  bearing measurable risk, rewards facing true uncertainty, which can't be
+  insured or priced in advance. Whatever excess over $`r`$ remains once risk
+  is priced is Knight's profit.
+- **Kirzner (1973):** the entrepreneur is alert to opportunities others have
+  missed, and by acting on them moves the market toward them. In a market
+  for shares, that means seeing a price that is wrong.
+- **Mauboussin and Johnson (1997):** the "competitive advantage period", how
+  long a company can keep returns above its cost of capital, is the value
+  question, and the market's price states its estimate of it.
+
+### What the price says the persistence is
+
+Two ways of reading that estimate from the dashboard's numbers, with
+$`R = 1 + r`$.
+
+**Implied decay.** In Ohlson's model with no other information
+($`\nu = 0`$), $`M - B = \frac{\omega}{R - \omega}\, x^a`$. Solved for
+$`\omega`$:
+
+```math
+\omega_{\text{implied}} \;=\; \frac{R\,(M_t - B_t)}{x^a_t + (M_t - B_t)}
+```
+
+meaningful where $`x^a_t > 0`$ and $`M_t > B_t`$. A value near 1 means the
+market prices the advantage as lasting; near 0, as gone next year.
+
+**Implied advantage period.** If residual income stays at today's level for
+$`T`$ years and then stops, $`M - B = x^a \,(1 - R^{-T}) / r`$, so
+
+```math
+T_{\text{implied}} \;=\; -\,\frac{\ln\!\left(1 - r\,(M_t - B_t)/x^a_t\right)}{\ln R}
+```
+
+and where $`r\,(M - B) \ge x^a`$ the market is pricing more than a
+perpetuity of today's excess: growth in it.
+
+### A detector
+
+The three steps, each from data already in Postgres:
+
+1. **Residual income per company and year**, $`E_t - r\,B_{t-1}`$, with
+   $`r`$ from section 5 (the risk-free rate plus a premium, or an implied
+   cost of capital). Compare within industries (SIC codes from EDGAR), since
+   leverage alone raises a bank's ROE.
+2. **Its persistence against competition's.** Estimate each company's
+   $`\omega`$ by regressing $`x^a_{t+1}/B_t`$ on $`x^a_t/B_{t-1}`$, and the
+   industry's the same way, pooled. The anomaly is a company $`\omega`$
+   well above its industry's, or a *changepoint* in residual income: an
+   advantage forming or collapsing. This is where augurs' changepoint
+   detection belongs: on the economically meaningful series, not on raw
+   statement lines.
+3. **Against the price.** Compare the realized persistence with
+   $`\omega_{\text{implied}}`$. For an investor the anomaly that pays is
+   persistence *greater than priced*: the market underrating how long a
+   moat holds. That is the profitability premium of section 6 restated
+   (Novy-Marx 2013; Fama and French 2015), and Frankel and Lee (1998) find
+   that residual income value over price, with analysts' forecasts, predicts
+   returns. The backtest: sort on 
+   $`\omega_{\text{realized}} - \omega_{\text{implied}}`$ known at each filing date, and measure the
+   returns that follow.
+
+**The data is long enough for industries, barely for companies.** XBRL
+starts in 2009, so about 16 annual observations per company (60-odd
+quarters, seasonal): a company's own $`\omega`$ is noisy, with a standard
+error around $`\sqrt{(1-\omega^2)/16}`$, about 0.2 at $`\omega = 0.6`$.
+Pooled by industry it is well determined. The √N argument of `DATA.md` again:
+breadth where length can't help.
+
+### Caveats
+
+- **Book value isn't capital.** Research, brands and software expensed as
+  incurred never reach $`B`$, so their owners show a high ROE that is partly
+  an accounting artifact (and a low one while they invest). Persistence is
+  more robust to this than the level, but not immune.
+- **Buybacks and negative equity.** Repurchases shrink $`B`$ and inflate
+  ROE; with negative equity (as at some large repurchasers) ROE is
+  meaningless and residual income must be scaled by assets or sales instead.
+- **The cost of equity is an estimate.** A wrong $`r`$ moves every
+  company's $`x^a`$ by $`\Delta r \cdot B`$; comparisons within an industry
+  and over time are less sensitive than levels.
+- **Point in time.** Each value has to be what was known then: the filing
+  date, not the period end, and the first report, not the restated one
+  (`fact_first` in Postgres).
+- **Survivorship.** Moats that held are overrepresented among today's
+  tickers; the CIK universe of tickerless filers (delisted, acquired,
+  failed) is what keeps the collapses in the sample.
+
 ## References
 
 - Preinreich, G. A. D. (1938). Annual survey of economic theory: The theory of
@@ -491,6 +633,26 @@ $`M - B`$ wanders from the present value of residual income later earned.
 - McLean, R. D., & Pontiff, J. (2016). Does academic research destroy stock
   return predictability? *Journal of Finance*, 71(1), 5–32. Anomaly returns
   fall by over half after publication.
+- Schumpeter, J. A. (1934). *The Theory of Economic Development*. Harvard
+  University Press (German original 1911). Entrepreneurial profit as the
+  temporary monopoly of innovation, eroded by imitation.
+- Knight, F. H. (1921). *Risk, Uncertainty and Profit*. Houghton Mifflin.
+  Profit as the reward for bearing uninsurable uncertainty.
+- Kirzner, I. M. (1973). *Competition and Entrepreneurship*. University of
+  Chicago Press. The entrepreneur as alert to missed opportunities.
+- Mueller, D. C. (1986). *Profits in the Long Run*. Cambridge University
+  Press. Some firms' excess profits persist for decades.
+- Mauboussin, M. J., & Johnson, P. (1997). Competitive advantage period: The
+  neglected value driver. *Financial Management*, 26(2), 67–74. How long
+  returns exceed the cost of capital, as priced.
+- Frankel, R., & Lee, C. M. C. (1998). Accounting valuation, market
+  expectation, and cross-sectional stock returns. *Journal of Accounting and
+  Economics*, 25(3), 283–319. Residual income value over price predicts
+  returns.
+- Dechow, P. M., Hutton, A. P., & Sloan, R. G. (1999). An empirical
+  assessment of the residual income valuation model. *Journal of Accounting
+  and Economics*, 26(1–3), 1–34. Abnormal earnings persist with
+  $`\omega \approx 0.62`$.
 
 The attribution to Preinreich, Edwards and Bell, and Peasnell before Ohlson is
 the usual one in the accounting literature; the model is often called
