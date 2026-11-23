@@ -1,30 +1,68 @@
 uniffi::setup_scaffolding!();
 
+/// Counts its arguments, for the array `impl_reported!` returns.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! count_items {
+    () => { 0 };
+    ($head:ident $($tail:ident)*) => { 1 + $crate::count_items!($($tail)*) };
+}
+
+/// A statement's line items as `Reported` values, each from a field or a
+/// method (a total computed from its parts). Used by the company modules.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! impl_reported {
+    ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
+        impl $name {
+            pub fn reported(&self) -> [$crate::item::Reported; $crate::count_items!($($variant)*)] {
+                [
+                    $(
+                        $crate::item::Reported {
+                            ticker: $crate::Statement::ticker(self),
+                            date: self.date,
+                            p: $crate::Statement::period(self),
+                            item: $crate::item::Item::$variant,
+                            currency: $crate::Currency::USD,
+                            val: impl_reported!(@val self, $kind $source),
+                            filing: None,
+                            derived: false,
+                        },
+                    )*
+                ]
+            }
+        }
+    };
+
+    (@val $self:ident, field $source:ident) => { $self.$source };
+    (@val $self:ident, method $source:ident) => { $self.$source() };
+}
+
+// The companies studied in depth, each in its own folder at the root of
+// equities, beside its filings and README: its statements as it presents
+// them, implementing the generic traits below.
+#[path = "../aapl/mod.rs"]
+pub mod aapl;
+#[path = "../nvda/mod.rs"]
+pub mod nvda;
+#[path = "../tsla/mod.rs"]
+pub mod tsla;
+
 pub mod item;
 pub mod xlsx;
 pub mod filing;
 pub mod edinet;
 pub mod mops;
 pub mod valuation;
-pub mod nvda;
-pub mod tsla;
 pub mod sheet_info;
 
 use std::str::FromStr;
 
 use crate::item::Item;
 use crate::item::Reported;
-use crate::nvda::BalanceSheet as NVDABalanceSheet;
-use crate::tsla::BalanceSheet as TSLABalanceSheet;
-use crate::nvda::IncomeStatement as NVDAIncomeStatement;
-use crate::tsla::IncomeStatement as TSLAIncomeStatement;
 
 use chrono::NaiveDate;
 
-macro_rules! count_items {
-    () => { 0 };
-    ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
-}
 
 /// The currency a value is reported in. Filers outside the US report in their
 /// own currency (TSMC in New Taiwan dollars), sometimes with a US dollar
@@ -243,31 +281,6 @@ pub trait Reader {
     fn process_income_statement(&mut self) -> Result<Vec<Reported>, Box<dyn std::error::Error>>;
 }
 
-macro_rules! impl_reported {
-    ($name:ident, [ $($variant:ident => $kind:ident $source:ident),* $(,)? ]) => {
-        impl $name {
-            pub fn reported(&self) -> [Reported; count_items!($($variant)*)] {
-                [
-                    $(
-                        Reported {
-                            ticker: Statement::ticker(self),
-                            date: self.date,
-                            p: self.period(),
-                            item: Item::$variant,
-                            currency: Currency::USD,
-                            val: impl_reported!(@val self, $kind $source),
-                            filing: None,
-                            derived: false,
-                        },
-                    )*
-                ]
-            }
-        }
-    };
-
-    (@val $self:ident, field $source:ident) => { $self.$source };
-    (@val $self:ident, method $source:ident) => { $self.$source() };
-}
 
 pub trait BalanceSheet {
     fn total_current_assets(&self) -> f64;
@@ -286,241 +299,6 @@ pub trait IncomeStatement {
     fn net_income(&self) -> f64;
 }
 
-pub struct CashFlowStatement {
-    pub ticker: Ticker,
-    pub date: NaiveDate,
-    pub p: Period,
-
-    pub net_income: f64,
-
-    pub stock_based_compensation_expense: f64,
-    pub depreciation_and_amoritization: f64,
-    pub deferred_income_taxes: f64,
-    pub gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net: f64,
-    pub other: f64,
-
-    pub accounts_receivable: f64,
-    pub inventories: f64,
-    pub prepaid_expenses_and_other_assets:f64,
-    pub accounts_payable: f64,
-    pub accrued_and_other_current_liabilities: f64,
-    pub other_long_term_liabilities: f64,
-
-    pub proceeds_from_maturities_of_marketable_securities: f64,
-    pub proceeds_from_sales_of_marketable_securities: f64,
-    pub proceeds_from_sales_of_non_marketable_equity_securities: f64,
-    pub purchases_of_marketable_securities: f64,
-    pub purchases_related_to_property_and_equipment_and_intangible_assets: f64,
-    pub purchases_of_non_marketable_equity_securities: f64,
-    pub acquisitions_net_of_cash_acquired: f64,
-
-    pub proceeds_related_to_employee_stock_plans: f64,
-    pub payments_related_to_repurchases_of_common_stock: f64,
-    pub payments_related_to_employee_stock_plan_taxes: f64,
-    pub dividends_paid: f64,
-    pub principal_payments_on_property_and_equipment_and_intangible_assets: f64,
-    pub repayment_of_debt: f64,
-
-    pub cash_and_cash_equivalents_at_beginning_of_period: f64,
-
-    pub cash_paid_for_income_taxes_net: f64,
-}
-
-impl Statement for CashFlowStatement {
-    fn ticker(&self) -> Ticker {
-        self.ticker
-    }
-    fn period(&self) -> Period {
-        self.p
-    }
-}
-
-impl CashFlowStatement {
-    fn net_cash_provided_by_operating_activities(&self) -> f64 {
-        self.net_income
-            + self.stock_based_compensation_expense
-            + self.depreciation_and_amoritization
-            + self.deferred_income_taxes
-            + self.gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net
-            + self.other
-
-            + self.accounts_receivable
-            + self.inventories
-            + self.prepaid_expenses_and_other_assets
-            + self.accounts_payable
-            + self.accrued_and_other_current_liabilities
-            + self.other_long_term_liabilities
-    }
-    fn net_cash_used_in_investing_activities(&self) -> f64 {
-        self.proceeds_from_maturities_of_marketable_securities
-            + self.proceeds_from_sales_of_marketable_securities
-            + self.proceeds_from_sales_of_non_marketable_equity_securities
-            + self.purchases_of_marketable_securities
-            + self.purchases_related_to_property_and_equipment_and_intangible_assets
-            + self.purchases_of_non_marketable_equity_securities
-            + self.acquisitions_net_of_cash_acquired
-    }
-    fn net_cash_used_in_financing_activities(&self) -> f64 {
-        self.proceeds_related_to_employee_stock_plans
-            + self.payments_related_to_repurchases_of_common_stock
-            + self.payments_related_to_employee_stock_plan_taxes
-            + self.dividends_paid
-            + self.principal_payments_on_property_and_equipment_and_intangible_assets
-            + self.repayment_of_debt
-    }
-    fn change_in_cash_and_cash_equivalents(&self) -> f64 {
-        self.net_cash_provided_by_operating_activities()
-            + self.net_cash_used_in_investing_activities()
-            + self.net_cash_used_in_financing_activities()
-    }
-
-//    fn cash_and_cash_equivalents_at_end_of_period(&self) -> f64 {
-//        self.change_in_cash_and_cash_equivalents() + self.cash_and_cash_equivalents_at_beginning_of_period
-//    }
-}
-
-impl_reported! {
-    CashFlowStatement,
-    [
-        NetIncome => field net_income,
-        StockBasedCompensationExpense => field stock_based_compensation_expense,
-        DepreciationAndAmoritization => field depreciation_and_amoritization,
-        DeferredIncomeTaxes => field deferred_income_taxes,
-        GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => field gains_on_non_marketable_equity_securities_and_publicly_held_equity_securities_net,
-        Other => field other,
-        AccountsReceivable => field accounts_receivable,
-        ChangeInInventories => field inventories,
-        PrepaidExpensesAndOtherAssets => field prepaid_expenses_and_other_assets,
-        ChangeInAccountsPayable => field accounts_payable,
-        ChangeInAccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        ChangeInOtherLongTermLiabilities => field other_long_term_liabilities,
-        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
-        ProceedsFromMaturitiesOfMarketableSecurities => field proceeds_from_maturities_of_marketable_securities,
-        ProceedsFromSalesOfMarketableSecurities => field proceeds_from_sales_of_marketable_securities,
-        ProceedsFromSalesOfNonMarketableEquitySecurities => field proceeds_from_sales_of_non_marketable_equity_securities,
-        PurchasesOfMarketableSecurities => field purchases_of_marketable_securities,
-        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_related_to_property_and_equipment_and_intangible_assets,
-        PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
-        AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
-        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
-        NetCashUsedInFinancingActivities => method net_cash_used_in_financing_activities,
-        ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
-        PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
-        PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
-        DividendsPaid => field dividends_paid,
-        PrincipalPaymentsOnPropertyAndEquipmentAndIntangibleAssets => field principal_payments_on_property_and_equipment_and_intangible_assets,
-        RepaymentOfDebt => field repayment_of_debt,
-        ChangeInCashAndCashEquivalents => method change_in_cash_and_cash_equivalents,
-    ]
-}
-
-impl_reported! {
-    NVDABalanceSheet,
-    [
-        CashAndCashEquivalents => field cash_and_cash_equivalents,
-        MarketableSecurities => field marketable_securities,
-        AccountsReceivableNet => field accounts_receivable_net,
-        Inventories => field inventories,
-        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
-        TotalCurrentAssets => method total_current_assets,
-        PropertyAndEquipmentNet => field property_and_equipment_net,
-        OperatingLeaseAssets => field operating_lease_assets,
-        Goodwill => field goodwill,
-        IntangibleAssetsNet => field intangible_assets_net,
-        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
-        OtherAssets => field other_assets,
-        TotalAssets => method total_assets,
-        AccountsPayable => field accounts_payable,
-        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        ShortTermDebt => field short_term_debt,
-        TotalCurrentLiabilities => method total_current_liabilities,
-        LongTermDebt => field long_term_debt,
-        LongTermOperatingLeaseLiabilities => field long_term_operating_lease_liabilities,
-        OtherLongTermLiabilities => field other_long_term_liabilities,
-        TotalLiabilities => method total_liabilities,
-    ]
-}
-
-impl_reported! {
-    TSLABalanceSheet,
-    [
-        CashAndCashEquivalents => field cash_and_cash_equivalents,
-        MarketableSecurities => field marketable_securities,
-        AccountsReceivableNet => field accounts_receivable_net,
-        Inventories => field inventories,
-        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
-        TotalCurrentAssets => method total_current_assets,
-        OperatingLeaseVehiclesNet => field operating_lease_vehicles_net,
-        SolarEnergySystemsNet => field solar_energy_systems_net,
-        PropertyAndEquipmentNet => field property_and_equipment_net,
-        OperatingLeaseAssets => field operating_lease_assets,
-        Goodwill => field goodwill,
-        DigitalAssets => field digital_assets,
-        IntangibleAssetsNet => field intangible_assets_net,
-        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
-        OtherAssets => field other_assets,
-        TotalAssets => method total_assets,
-        AccountsPayable => field accounts_payable,
-        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
-        DeferredRevenue => field deferred_revenue,
-        ShortTermDebt => field current_portion_of_debt_and_finance_leases,
-        TotalCurrentLiabilities => method total_current_liabilities,
-        DebtAndFinanceLeasesNetOfCurrentPortion => field debt_and_finance_leases_net_of_current_portion,
-        DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
-        OtherLongTermLiabilities => field other_long_term_liabilities,
-        TotalLiabilities => method total_liabilities,
-        StockholdersEquity => field stockholders_equity,
-    ]
-}
-
-impl_reported! {
-    NVDAIncomeStatement,
-    [
-        Revenue => field revenue,
-        CostOfRevenue => field cost_of_revenue,
-        GrossProfit => method gross_profit,
-        ResearchAndDevelopment => field research_and_development,
-        SalesGeneralAndAdministrative => field sales_general_and_administrative,
-        TotalOperatingExpenses => method total_operating_expenses,
-        OperatingIncome => method operating_income,
-        InterestIncome => field interest_income,
-        InterestExpense => field interest_expense,
-        OtherIncomeNet => field other_income_net,
-        TotalOtherIncomeNet => method total_other_income_net,
-        IncomeBeforeIncomeTax => method income_before_income_tax,
-        IncomeTaxExpense => field income_tax_expense,
-        NetIncome => method net_income,
-    ]
-}
-
-impl_reported! {
-    TSLAIncomeStatement,
-    [
-//        AutomotiveSalesRevenue => field automotive_sales_revenue,
-//        AutomotiveRegulatoryCredits => field automotive_regulatory_credits,
-//        AutomotiveLeasingRevenue => field automotive_leasing_revenue,
-//        EnergyGenerationAndStorageRevenue => field energy_generation_and_storage_revenue,
-//        ServicesAndOtherRevenue => field services_and_other_revenue,
-        Revenue => method total_revenues,
-//        AutomotiveSalesCost => field automotive_sales_cost_of_revenue,
-//        AutomotiveLeasingCost => field automotive_leasing_cost_of_revenue,
-//        EnergyGenerationAndStorageCost => field energy_generation_and_storage_cost_of_revenue,
-//        ServicesAndOtherCost => field services_and_other_cost_of_revenue,
-        CostOfRevenue => method total_cost_of_revenues,
-        GrossProfit => method gross_profit,
-        ResearchAndDevelopment => field research_and_development,
-        SalesGeneralAndAdministrative => field selling_general_and_administrative,
-        RestructuringAndOther => field restructuring_and_other,
-        TotalOperatingExpenses => method total_operating_expenses,
-        OperatingIncome => method operating_income,
-        InterestIncome => field interest_income,
-        InterestExpense => field interest_expense,
-        OtherIncomeNet => field other_expense_income_net,
-        IncomeBeforeIncomeTax => method income_before_income_tax,
-        IncomeTaxExpense => field provision_for_income_taxes,
-        NetIncome => method net_income,
-    ]
-}
 
 /// Share counts at the scale their statement actually uses.
 ///

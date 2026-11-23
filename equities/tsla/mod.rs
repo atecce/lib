@@ -294,3 +294,64 @@ pub const Q4_2019_BALANCE_SHEET: BalanceSheet = BalanceSheet {
 
     stockholders_equity: 6_618_000_000.0,
 };
+
+impl_reported! {
+    BalanceSheet,
+    [
+        CashAndCashEquivalents => field cash_and_cash_equivalents,
+        MarketableSecurities => field marketable_securities,
+        AccountsReceivableNet => field accounts_receivable_net,
+        Inventories => field inventories,
+        PrepaidExpensesAndOtherCurrentAssets => field prepaid_expenses_and_other_current_assets,
+        TotalCurrentAssets => method total_current_assets,
+        OperatingLeaseVehiclesNet => field operating_lease_vehicles_net,
+        SolarEnergySystemsNet => field solar_energy_systems_net,
+        PropertyAndEquipmentNet => field property_and_equipment_net,
+        OperatingLeaseAssets => field operating_lease_assets,
+        Goodwill => field goodwill,
+        DigitalAssets => field digital_assets,
+        IntangibleAssetsNet => field intangible_assets_net,
+        DeferredIncomeTaxAssets => field deferred_income_tax_assets,
+        OtherAssets => field other_assets,
+        TotalAssets => method total_assets,
+        AccountsPayable => field accounts_payable,
+        AccruedAndOtherCurrentLiabilities => field accrued_and_other_current_liabilities,
+        DeferredRevenue => field deferred_revenue,
+        ShortTermDebt => field current_portion_of_debt_and_finance_leases,
+        TotalCurrentLiabilities => method total_current_liabilities,
+        DebtAndFinanceLeasesNetOfCurrentPortion => field debt_and_finance_leases_net_of_current_portion,
+        DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
+        OtherLongTermLiabilities => field other_long_term_liabilities,
+        TotalLiabilities => method total_liabilities,
+        StockholdersEquity => field stockholders_equity,
+    ]
+}
+
+impl_reported! {
+    IncomeStatement,
+    [
+//        AutomotiveSalesRevenue => field automotive_sales_revenue,
+//        AutomotiveRegulatoryCredits => field automotive_regulatory_credits,
+//        AutomotiveLeasingRevenue => field automotive_leasing_revenue,
+//        EnergyGenerationAndStorageRevenue => field energy_generation_and_storage_revenue,
+//        ServicesAndOtherRevenue => field services_and_other_revenue,
+        Revenue => method total_revenues,
+//        AutomotiveSalesCost => field automotive_sales_cost_of_revenue,
+//        AutomotiveLeasingCost => field automotive_leasing_cost_of_revenue,
+//        EnergyGenerationAndStorageCost => field energy_generation_and_storage_cost_of_revenue,
+//        ServicesAndOtherCost => field services_and_other_cost_of_revenue,
+        CostOfRevenue => method total_cost_of_revenues,
+        GrossProfit => method gross_profit,
+        ResearchAndDevelopment => field research_and_development,
+        SalesGeneralAndAdministrative => field selling_general_and_administrative,
+        RestructuringAndOther => field restructuring_and_other,
+        TotalOperatingExpenses => method total_operating_expenses,
+        OperatingIncome => method operating_income,
+        InterestIncome => field interest_income,
+        InterestExpense => field interest_expense,
+        OtherIncomeNet => field other_expense_income_net,
+        IncomeBeforeIncomeTax => method income_before_income_tax,
+        IncomeTaxExpense => field provision_for_income_taxes,
+        NetIncome => method net_income,
+    ]
+}

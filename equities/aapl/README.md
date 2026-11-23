@@ -198,3 +198,12 @@ last forever, growing a little. But it assumed far less growth than came:
 - Southwest's (LUV) 2010–2011 values are stored unscaled (equity 6,237
   where the 10-K means $6,237 million): an EDGAR reader bug with older
   filings' scale, found by this market-wide fit.
+
+## In code
+
+`mod.rs` here is Apple's statements as it presents them (the module
+`equities::aapl`), like `nvda/` and `tsla/`: its own lines, such as vendor
+non-trade receivables, with the totals computed from their parts through the
+generic `BalanceSheet` and `IncomeStatement` traits. Its tests check the
+computed totals against the 10-Q's (fiscal Q2 2026), and that the generic
+reader reads all 34 items of the same filing identically.
