@@ -9,17 +9,23 @@ edition = "2024"
 
 [features]
 default = ["fetch"]
-fetch = ["dep:reqwest", "dep:zip"]
+fetch = ["dep:reqwest"]
 
 [dependencies]
 chrono = "0.4.44"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.150"
 reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
-zip = { version = "7.2.0", default-features = false, features = ["deflate"], optional = true }
+# Bulk submissions (fetch) and the fund data sets (read).
+zip = { version = "7.2.0", default-features = false, features = ["deflate"] }
 
 [[bin]]
 name = "fetch"
+required-features = ["fetch"]
+
+[[bin]]
+name = "edgar-funds"
+path = "src/bin/funds.rs"
 required-features = ["fetch"]
 
 [[bin]]
