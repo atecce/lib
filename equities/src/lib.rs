@@ -45,6 +45,8 @@ macro_rules! impl_reported {
 pub mod aapl;
 #[path = "../brk/mod.rs"]
 pub mod brk;
+#[path = "../gs/mod.rs"]
+pub mod gs;
 #[path = "../nvda/mod.rs"]
 pub mod nvda;
 #[path = "../tsla/mod.rs"]
@@ -120,6 +122,7 @@ impl Ticker {
     pub const TSLA: Ticker = Ticker::new("TSLA");
     pub const AAPL: Ticker = Ticker::new("AAPL");
     pub const BRK: Ticker = Ticker::new("BRK");
+    pub const GS: Ticker = Ticker::new("GS");
     pub const TSM: Ticker = Ticker::new("TSM");
     pub const KO: Ticker = Ticker::new("KO");
     pub const MCD: Ticker = Ticker::new("MCD");
