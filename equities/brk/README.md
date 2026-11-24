@@ -212,6 +212,45 @@ excess persistence came before it did.
 
 </details>
 
+## With the Treasury rate as r
+
+A fixed r = 9% charges 1981 and 2021 the same price for capital. Instead,
+`equities::treasury` holds the 10-year Treasury yield for every December
+since 1961 (FRED series GS10, from the Federal Reserve's H.15), and
+`--premium P` sets each year's r to the previous December's yield plus P:
+the rate known when the year began, plus an equity risk premium.
+
+    cargo run --release -p equities --example brk_history -- --premium 0.04
+
+With a premium of 4%, r runs from 8.2% in 1965 to 17.7% in 1982 and down to
+4.9% in 2021:
+
+| Era | r | ROE | ROE−r (was, at 9%) | P/B | Market | ω realized (was) |
+|---|---|---|---|---|---|---|
+| 1965–79 | 10.5% | 20.9% | +10.4% (+11.9) | 0.81 | +24.2% | 0.87 (0.95) |
+| 1980–98 | 12.7% | 28.2% | +15.5% (+19.2) | 1.54 | +32.8% | 0.82 (0.92) |
+| 1999–2018 | 7.6% | 9.0% | +1.4% (0.0) | 1.48 | +7.7% | 0.01 (−0.16) |
+| 2019–25 | 6.7% | 13.0% | +6.2% (+4.0) | 1.38 | +13.8% | 0.00 (−0.25) |
+
+(r by era is compounded, like the book value it is compared with.)
+
+- **The great compounding shrinks but survives.** In 1980–82 r was 14–18%,
+  and the excess in those years falls by about half. Over the era it is
+  still +15.5% a year, and the price still implied quick decay: implied ω
+  of 0.29–0.68 in 1980–82, against a realized 0.82.
+- **The years since 1999 look a little better.** At 9% the excess was nil;
+  at 2–6% Treasuries it is +1.4% a year, and +6.2% since 2019. The market
+  returned 7.7% a year in 1999–2018 against an r of 7.6%: what a fairly
+  priced stock with no lasting excess should return.
+- **Persistence still breaks in 1999.** Realized ω falls from above 0.8 to
+  about zero with either r: the excess that remains comes and goes with
+  the portfolio's marks.
+
+The premium matters less than the path. At 3.2% (the premium that makes the
+average r over 1965–2024 equal 9%) the eras' excess returns are +11.2%,
++16.3%, +2.2% and +7.0%; at 5% they are +9.4%, +14.5%, +0.4% and +5.2%. The
+other tables in this document keep r = 9%.
+
 ## Against its industry (GAAP, 2011–2025)
 
 `persistence` on Berkshire and the twelve insurers in Postgres in SIC
@@ -286,9 +325,9 @@ undiminished while held. When Berkshire sold much of its Apple stake in
 
 ## Caveats
 
-- **r = 9% for sixty years** is crude: Treasury yields ran from 4% to 15%
-  and back. A cost of equity from the Treasury rate plus a premium would
-  raise the 1980s' cost and lower the 2010s'.
+- **r = 9% for sixty years** is crude: Treasury yields ran from 1% to 14%
+  and back. [With the Treasury rate as r](#with-the-treasury-rate-as-r)
+  redoes the eras; the premium on top of it is still a guess.
 - **Book value understates Berkshire more each year**: operating businesses
   at cost, and buybacks above book since 2018.
 - **The scorecard is Berkshire's own**, restated through 1978; the 10-K
@@ -298,7 +337,6 @@ undiminished while held. When Berkshire sold much of its Apple stake in
 
 ## To do
 
-- The Treasury rate as r, year by year.
 - Buffett's operating earnings (after tax, before investment gains) from
   the 10-Ks since 2018, for a residual income free of the portfolio's
   marks.

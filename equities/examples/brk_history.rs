@@ -4,14 +4,17 @@
 //! close).
 //!
 //!     cargo run --release -p equities --example brk_history [-- R]     # R defaults to 0.09
+//!     cargo run --release -p equities --example brk_history -- --premium P
 //!
+//! With `--premium`, r moves year by year: the 10-year Treasury yield at the
+//! end of the year before (`equities::treasury`) plus P.
 //! Comprehensive ROE is the growth of book value per share (Berkshire pays
 //! no dividend), residual income per share x = B_t − (1 + r)·B_{t−1}, and the
 //! implied decay ω = R(P − B)/(x + P − B) where x > 0 and P > B. Then, by era,
 //! the averages and the persistence of excess ROE: x₊₁ on x, both over the
 //! same B₋₁.
 
-use equities::brk;
+use equities::{brk, treasury};
 
 const ERAS: [(i32, i32, &str); 4] = [
     (1965, 1979, "textile mill to insurer"),
@@ -21,7 +24,13 @@ const ERAS: [(i32, i32, &str); 4] = [
 ];
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let r: f64 = std::env::args().nth(1).map(|s| s.parse()).transpose()?.unwrap_or(0.09);
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let premium: Option<f64> = match args.iter().position(|a| a == "--premium") {
+        Some(i) => Some(args.get(i + 1).ok_or("--premium needs a value")?.parse()?),
+        None => None,
+    };
+    let fixed: f64 = if premium.is_some() { 0.0 } else { args.first().map(|s| s.parse()).transpose()?.unwrap_or(0.09) };
+    let cost = |year: i32| premium.map_or(fixed, |p| treasury::cost_of_equity(year, p).expect("a Treasury yield for every year"));
     // Without Class A prices (not yet fetched: `tiingo-fetch --full BRK-A`),
     // the book value columns alone.
     let prices = tiingo::Cache::new(tiingo::Cache::default_dir()).prices("BRK-A").unwrap_or_default();
@@ -34,29 +43,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let price = |year: i32| close(year).or_else(|| Some(relative.get(&year)? * anchor?));
 
     let book = brk::book_per_share();
-    println!("Berkshire Hathaway per Class A share, r = {:.0}%\n", r * 100.0);
-    println!("{:<5} {:>10} {:>10} {:>5} {:>7} {:>7} {:>10} {:>7} {:>8}", "year", "book", "price", "P/B", "ROE", "ROE−r", "x", "ω impl", "growth");
+    match premium {
+        Some(p) => println!("Berkshire Hathaway per Class A share, r = 10-year Treasury (prior December) + {:.1}%\n", p * 100.0),
+        None => println!("Berkshire Hathaway per Class A share, r = {:.0}%\n", fixed * 100.0),
+    }
+    println!("{:<5} {:>10} {:>10} {:>5} {:>6} {:>7} {:>7} {:>10} {:>7} {:>8}", "year", "book", "price", "P/B", "r", "ROE", "ROE−r", "x", "ω impl", "growth");
     let mut rows = Vec::new();
     for w in book.windows(2) {
         let ((_, b0), (year, b1)) = (w[0], w[1]);
         let g = b1 / b0 - 1.0;
+        let r = cost(year);
         let x = b1 - (1.0 + r) * b0;
         let p = price(year);
         let implied = p.filter(|&p| x > 0.0 && p > b1).map(|p| (1.0 + r) * (p - b1) / (x + p - b1));
-        println!("{:<5} {:>10.0} {:>10} {:>5} {:>6.1}% {:>+6.1}% {:>10.0} {:>7} {:>8}", year, b1,
+        println!("{:<5} {:>10.0} {:>10} {:>5} {:>5.1}% {:>6.1}% {:>+6.1}% {:>10.0} {:>7} {:>8}", year, b1,
             p.map(|p| format!("{:.0}", p)).unwrap_or_default(),
             p.map(|p| format!("{:.2}", p / b1)).unwrap_or_default(),
-            g * 100.0, (g - r) * 100.0, x,
+            r * 100.0, g * 100.0, (g - r) * 100.0, x,
             implied.map(|o| format!("{:.2}", o)).unwrap_or_default(),
             implied.map(|o| format!("{:+.1}%", (o - 1.0) * 100.0)).unwrap_or_default());
-        rows.push((year, b0, b1, x, p));
+        rows.push((year, b0, b1, x, p, r));
     }
 
-    println!("\n{:<40} {:>9} {:>9} {:>9} {:>9} {:>13}", "era", "ROE", "ROE−r", "P/B", "market", "persistence ω");
+    println!("\n{:<40} {:>7} {:>9} {:>9} {:>9} {:>9} {:>13}", "era", "r", "ROE", "ROE−r", "P/B", "market", "persistence ω");
     for (from, to, label) in ERAS {
         let era: Vec<_> = rows.iter().filter(|r| r.0 >= from && r.0 <= to).collect();
         let n = era.len() as f64;
         let book_growth = (era.last().unwrap().2 / era[0].1).powf(1.0 / n) - 1.0;
+        // The era's r, compounded like the book value it is compared with.
+        let r = era.iter().map(|row| 1.0 + row.5).product::<f64>().powf(1.0 / n) - 1.0;
         let pb: Vec<f64> = era.iter().filter_map(|r| r.4.map(|p| p / r.2)).collect();
         let first_price = price(from - 1);
         let last_price = era.last().unwrap().4;
@@ -67,8 +82,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let sxx: f64 = pairs.iter().map(|p| p.0 * p.0).sum();
         let omega = pairs.iter().map(|p| p.0 * p.1).sum::<f64>() / sxx;
         let pb = if pb.is_empty() { String::new() } else { format!("{:.2}", pb.iter().sum::<f64>() / pb.len() as f64) };
-        println!("{:<40} {:>8.1}% {:>+8.1}% {:>9} {:>9} {:>13.2}",
-            format!("{}–{} {}", from, to, label), book_growth * 100.0, (book_growth - r) * 100.0, pb, market, omega);
+        println!("{:<40} {:>6.1}% {:>8.1}% {:>+8.1}% {:>9} {:>9} {:>13.2}",
+            format!("{}–{} {}", from, to, label), r * 100.0, book_growth * 100.0, (book_growth - r) * 100.0, pb, market, omega);
     }
     Ok(())
 }

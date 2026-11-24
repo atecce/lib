@@ -56,6 +56,7 @@ pub mod filing;
 pub mod edinet;
 pub mod mops;
 pub mod valuation;
+pub mod treasury;
 pub mod sheet_info;
 
 use std::str::FromStr;
