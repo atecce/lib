@@ -905,6 +905,7 @@ dependencies = [
  "edgar",
  "edinet",
  "encoding_rs",
+ "fred",
  "mops",
  "regex",
  "reqwest",
@@ -994,6 +995,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "fred"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reqwest",
 ]
 
 [[package]]
@@ -1652,6 +1661,7 @@ dependencies = [
  "edgar",
  "edinet",
  "equities",
+ "fred",
  "greece",
  "mops",
  "name",

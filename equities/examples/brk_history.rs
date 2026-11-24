@@ -7,7 +7,8 @@
 //!     cargo run --release -p equities --example brk_history -- --premium P
 //!
 //! With `--premium`, r moves year by year: the 10-year Treasury yield at the
-//! end of the year before (`equities::treasury`) plus P.
+//! end of the year before (`equities::treasury`, from the FRED cache:
+//! `fred-fetch GS10`) plus P.
 //! Comprehensive ROE is the growth of book value per share (Berkshire pays
 //! no dividend), residual income per share x = B_t − (1 + r)·B_{t−1}, and the
 //! implied decay ω = R(P − B)/(x + P − B) where x > 0 and P > B. Then, by era,
@@ -30,7 +31,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None => None,
     };
     let fixed: f64 = if premium.is_some() { 0.0 } else { args.first().map(|s| s.parse()).transpose()?.unwrap_or(0.09) };
-    let cost = |year: i32| premium.map_or(fixed, |p| treasury::cost_of_equity(year, p).expect("a Treasury yield for every year"));
+    let ten_year = premium.map(|_| treasury::TenYear::load()).transpose()?;
+    let cost = |year: i32| match (premium, &ten_year) {
+        (Some(p), Some(t)) => t.cost_of_equity(year, p).expect("a Treasury yield for every year"),
+        _ => fixed,
+    };
     // Without Class A prices (not yet fetched: `tiingo-fetch --full BRK-A`),
     // the book value columns alone.
     let prices = tiingo::Cache::new(tiingo::Cache::default_dir()).prices("BRK-A").unwrap_or_default();

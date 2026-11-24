@@ -215,8 +215,9 @@ excess persistence came before it did.
 ## With the Treasury rate as r
 
 A fixed r = 9% charges 1981 and 2021 the same price for capital. Instead,
-`equities::treasury` holds the 10-year Treasury yield for every December
-since 1961 (FRED series GS10, from the Federal Reserve's H.15), and
+`equities::treasury` reads the 10-year Treasury yield for every December
+since 1953 from the FRED cache (series GS10, the Federal Reserve's H.15;
+`fred-fetch GS10`), and
 `--premium P` sets each year's r to the previous December's yield plus P:
 the rate known when the year began, plus an equity risk premium.
 
