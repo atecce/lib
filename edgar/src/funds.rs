@@ -106,7 +106,106 @@ pub struct MonthlyReturn {
     pub accession: String,
 }
 
+/// A fund's portfolio on one N-PORT report.
+#[derive(Debug, Clone)]
+pub struct Portfolio {
+    pub series_id: String,
+    pub accession: String,
+    pub report_date: NaiveDate,
+    pub net_assets: f64,
+    pub holdings: Vec<Holding>,
+}
+
+/// One position. `percent` is of net assets (negative for shorts and
+/// liabilities); `value` is in `currency`, and `value_usd` converts it at
+/// the reported exchange rate.
+#[derive(Debug, Clone)]
+pub struct Holding {
+    pub issuer: String,
+    pub title: String,
+    pub cusip: String,
+    pub value: f64,
+    pub currency: String,
+    pub value_usd: f64,
+    pub percent: f64,
+    /// N-PORT's asset category: "DBT" (debt), "EC" (common equity),
+    /// "ABS-MBS", "ABS-CBDO", "STIV" (short-term investment vehicle), ...
+    pub asset_category: String,
+    /// "CORP", "UST" (Treasury), "USGA" (agency), "USGSE" (sponsored
+    /// enterprise), "NUSS" (foreign sovereign), "RF" (registered fund), ...
+    pub issuer_type: String,
+    pub country: String,
+    pub fair_value_level: String,
+    /// Debt only.
+    pub maturity: Option<NaiveDate>,
+    pub coupon_type: Option<String>,
+    pub coupon: Option<f64>,
+}
+
 impl Cache {
+    /// The latest portfolio N-PORT reports for `series_id`, from the newest
+    /// data set on disk that has one. Reads the quarter's holdings table
+    /// (about 1 GB) as a stream.
+    pub fn portfolio(&self, series_id: &str) -> Result<Option<Portfolio>, Box<dyn Error>> {
+        for (_, path) in self.data_sets(DataSet::Nport).into_iter().rev() {
+            let mut zip = zip::ZipArchive::new(fs::File::open(&path)?)?;
+            let mut found: Option<(String, f64)> = None;
+            for row in Table::open(&mut zip, "FUND_REPORTED_INFO.tsv")? {
+                let row = row?;
+                if row.get("SERIES_ID") == Some(series_id) {
+                    let accession = row.get("ACCESSION_NUMBER").unwrap_or_default().to_string();
+                    let net = row.get("NET_ASSETS").and_then(|v| v.parse().ok()).unwrap_or(0.0);
+                    // Several reports a quarter: keep the latest (accessions sort by filing).
+                    if found.as_ref().is_none_or(|f| accession > f.0) {
+                        found = Some((accession, net));
+                    }
+                }
+            }
+            let Some((accession, net_assets)) = found else { continue };
+            let mut report_date = None;
+            for row in Table::open(&mut zip, "SUBMISSION.tsv")? {
+                let row = row?;
+                if row.get("ACCESSION_NUMBER") == Some(accession.as_str()) {
+                    report_date = row.get("REPORT_DATE").and_then(date);
+                }
+            }
+            let mut holdings = Vec::new();
+            let mut ids: HashMap<String, usize> = HashMap::new();
+            for row in Table::open(&mut zip, "FUND_REPORTED_HOLDING.tsv")? {
+                let row = row?;
+                if row.get("ACCESSION_NUMBER") != Some(accession.as_str()) {
+                    continue;
+                }
+                let s = |c: &str| row.get(c).unwrap_or_default().to_string();
+                let num = |c: &str| row.get(c).and_then(|v| v.parse::<f64>().ok());
+                let value = num("CURRENCY_VALUE").unwrap_or(0.0);
+                let rate = num("EXCHANGE_RATE").filter(|r| *r > 0.0).unwrap_or(1.0);
+                ids.insert(s("HOLDING_ID"), holdings.len());
+                holdings.push(Holding {
+                    issuer: s("ISSUER_NAME"), title: s("ISSUER_TITLE"), cusip: s("ISSUER_CUSIP"),
+                    value, currency: s("CURRENCY_CODE"), value_usd: value / rate,
+                    percent: num("PERCENTAGE").unwrap_or(0.0),
+                    asset_category: s("ASSET_CAT"), issuer_type: s("ISSUER_TYPE"),
+                    country: s("INVESTMENT_COUNTRY"), fair_value_level: s("FAIR_VALUE_LEVEL"),
+                    maturity: None, coupon_type: None, coupon: None,
+                });
+            }
+            for row in Table::open(&mut zip, "DEBT_SECURITY.tsv")? {
+                let row = row?;
+                let Some(&i) = row.get("HOLDING_ID").and_then(|id| ids.get(id)) else { continue };
+                let h = &mut holdings[i];
+                h.maturity = row.get("MATURITY_DATE").and_then(date);
+                h.coupon_type = row.get("COUPON_TYPE").filter(|c| !c.is_empty()).map(str::to_string);
+                h.coupon = row.get("ANNUALIZED_RATE").and_then(|v| v.parse().ok());
+            }
+            return Ok(Some(Portfolio {
+                series_id: series_id.to_string(), accession,
+                report_date: report_date.ok_or("report without a date")?, net_assets, holdings,
+            }));
+        }
+        Ok(None)
+    }
+
     pub fn fund_tickers_path(&self) -> PathBuf {
         self.dir().join("company_tickers_mf.json")
     }

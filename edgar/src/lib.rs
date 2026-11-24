@@ -22,7 +22,7 @@ use chrono::NaiveDate;
 use serde::Deserialize;
 
 pub mod funds;
-pub use funds::{Census, DataSet, FundClass, MonthlyReturn};
+pub use funds::{Census, DataSet, FundClass, Holding, MonthlyReturn, Portfolio};
 
 #[cfg(feature = "fetch")]
 mod client;

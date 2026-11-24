@@ -15,6 +15,11 @@
 //!    March–April 2020), where the noise of a week's trading averages out.
 //! 3. The 2021–22 turn, month by month: MINT from its peak, the curve, and
 //!    SPY from its own.
+//! 4. MINT as a signal: each time its total return falls 0.25% below its
+//!    six-month high (126 trading days; a new episode once it has recovered
+//!    to within a third of that), SPY's return over the next 3, 6 and 12
+//!    months and its worst drawdown in the next 12; then SPY's own peaks
+//!    before declines of 15% or more, to see which the signal preceded.
 
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -115,6 +120,42 @@ fn main() -> Result<(), Box<dyn Error>> {
         for (_, m) in &curve { print!(" {:>5}", at(m, end).map(|v| format!("{:.2}", v)).unwrap_or_default()); }
         println!();
     }
+
+    // 4. MINT as a signal.
+    let days: Vec<NaiveDate> = mint.keys().filter(|d| spy.contains_key(d)).copied().collect();
+    let m: Vec<f64> = days.iter().map(|d| mint[d]).collect();
+    let s: Vec<f64> = days.iter().map(|d| spy[d]).collect();
+    let forward = |i: usize, n: usize| (s[(i + n).min(s.len() - 1)] / s[i] - 1.0) * 100.0;
+    let worst = |i: usize, n: usize| {
+        let mut peak = s[i];
+        let mut w: f64 = 0.0;
+        for &v in &s[i..(i + n).min(s.len())] { peak = peak.max(v); w = w.min(v / peak - 1.0); }
+        w * 100.0
+    };
+    println!("\n4. MINT 0.25% below its six-month high (first day of each episode), and SPY after (%)\n");
+    println!("{:<12} {:>7} {:>7} {:>7} {:>9}", "date", "3m", "6m", "12m", "worst 12m");
+    let (threshold, mut active) = (0.0025, false);
+    for i in 126..days.len() {
+        let high = m[i - 126..=i].iter().cloned().fold(f64::MIN, f64::max);
+        let dd = m[i] / high - 1.0;
+        if dd < -threshold && !active {
+            active = true;
+            println!("{:<12} {:>+7.1} {:>+7.1} {:>+7.1} {:>9.1}{}", days[i], forward(i, 63), forward(i, 126), forward(i, 252), worst(i, 252),
+                if i + 252 >= days.len() { "  (less than a year since)" } else { "" });
+        }
+        if dd > -threshold / 3.0 { active = false; }
+    }
+    let n = days.len().saturating_sub(252);
+    let year: Vec<f64> = (0..n).map(|i| forward(i, 252)).collect();
+    println!("{:<12} {:>7} {:>7} {:>+7.1}   every day: {:.0}% of years negative", "all days", "", "",
+        year.iter().sum::<f64>() / n as f64, 100.0 * year.iter().filter(|r| **r < 0.0).count() as f64 / n as f64);
+    let mut peaks = Vec::new();
+    let (mut peak, mut at_peak) = (s[0], days[0]);
+    for (i, &v) in s.iter().enumerate() {
+        if v > peak { peak = v; at_peak = days[i]; }
+        if v / peak - 1.0 < -0.15 && peaks.last() != Some(&at_peak) { peaks.push(at_peak); }
+    }
+    println!("SPY's peaks before declines of 15% or more: {}", peaks.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(", "));
     Ok(())
 }
 
