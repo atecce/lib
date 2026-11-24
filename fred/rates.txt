@@ -11,7 +11,18 @@ FEDFUNDS                # effective federal funds rate, 1954–
 
 # The term structure (Treasury constant maturity, the Fed's H.15)
 GS1 GS2 GS5 GS10 GS30
-DGS10                   # 10-year, daily, 1962–
+# Daily constant maturities (H.15), each from its first day
+DGS1MO                  # 1-month, 2001–
+DGS3MO                  # 3-month, 1981–
+DGS6MO                  # 6-month, 1981–
+DGS1                    # 1-year, 1962–
+DGS2                    # 2-year, 1976–
+DGS3                    # 3-year, 1962–
+DGS5                    # 5-year, 1962–
+DGS7                    # 7-year, 1969–
+DGS10                   # 10-year, 1962–
+DGS20                   # 20-year, 1962– (none 1987–1993)
+DGS30                   # 30-year, 1977– (none 2002–2006)
 LTGOVTBD                # long-term government securities, 1925–2000
 M1333BUSM156NNBR        # long-term United States bonds, 1941–1967 (NBER)
 
