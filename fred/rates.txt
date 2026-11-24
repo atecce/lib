@@ -1,0 +1,35 @@
+# Interest rates, for `fred-fetch --list rates.txt` and `examples/rates.rs`.
+# Monthly unless noted. NBER macrohistory series (M…NNBR) end where they end.
+
+# The short rate
+M13002US35620M156NNBR   # commercial paper, New York, 1857–1971 (NBER)
+M13001USM156NNBR        # call money, 1857–1970 (NBER)
+M13009USM156NNBR        # discount rate, New York Fed, 1914–1969 (NBER)
+INTDSRUSM193N           # discount rate, 1950–2021 (IMF)
+TB3MS                   # 3-month Treasury bill, 1934–
+FEDFUNDS                # effective federal funds rate, 1954–
+
+# The term structure (Treasury constant maturity, the Fed's H.15)
+GS1 GS2 GS5 GS10 GS30
+DGS10                   # 10-year, daily, 1962–
+LTGOVTBD                # long-term government securities, 1925–2000
+M1333BUSM156NNBR        # long-term United States bonds, 1941–1967 (NBER)
+
+# Private long-term credit
+M13019USM156NNBR        # high-grade railroad bonds, 1857–1937 (Macaulay, NBER)
+M13024USM156NNBR        # high-grade railroad bonds, 1900–1963 (NBER)
+M13035USM156NNBR        # corporate bonds, highest rating, 1919–1968 (NBER)
+AAA BAA                 # Moody's seasoned Aaa and Baa corporate bonds, 1919–
+
+# Real rates, expected inflation, the term premium
+FII10                   # 10-year TIPS yield, 2003–
+T10YIEM                 # 10-year breakeven inflation, 2003–
+EXPINF10YR              # 10-year expected inflation (Cleveland Fed model), 1982–
+REAINTRATREARAT10Y      # 10-year real rate (Cleveland Fed model), 1982–
+THREEFYTP10             # 10-year term premium (Kim–Wright), daily, 1990–
+IRLTLT01USM156N         # 10-year government bond yield (OECD), 1953–
+
+# Prices, for real rates after the fact
+M04051USM324NNBR        # general price level, 1860–1939 (NBER; 1913 = 100)
+CPIAUCNS                # CPI, not seasonally adjusted, 1913–
+CPIAUCSL                # CPI, seasonally adjusted, 1947–

@@ -8,7 +8,8 @@ Details elsewhere: the relational model in `equities/store/README.md` (on branch
 ## Layers
 
 ```
-caches (edgar, edinet, mops, tiingo) the source of truth: filings and prices
+caches (edgar, edinet, mops,          the source of truth: filings, prices
+        tiingo, fred)                 and economic series
         │ readers (equities)          as downloaded; everything else rebuilds
         ▼                             from them
 Postgres (store)                      the record: relational, with each value's

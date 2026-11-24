@@ -91,6 +91,15 @@ impl Series {
             .and_then(|o| o.value)
     }
 
+    /// The mean of `year`'s observations, if it has values in at least
+    /// `min` of them (12 for a full monthly year; fewer for a series that
+    /// starts or ends mid-year).
+    pub fn year_mean(&self, year: i32, min: usize) -> Option<f64> {
+        let v: Vec<f64> = self.observations.iter()
+            .filter(|o| o.date.year() == year).filter_map(|o| o.value).collect();
+        (v.len() >= min.max(1)).then(|| v.iter().sum::<f64>() / v.len() as f64)
+    }
+
     /// The latest observation with a value.
     pub fn latest(&self) -> Option<Observation> {
         self.observations.iter().rev().find(|o| o.value.is_some()).copied()

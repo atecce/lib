@@ -216,6 +216,11 @@ This, not the earnings yield, is the number to compare with the Treasury
 rate: their difference is the market's implied equity risk premium for the
 company. It depends on the growth assumed, and on ROE staying where it is.
 
+[CAPITAL.md](CAPITAL.md) asks what $`r`$ is underneath: the rate of profit,
+the rate of interest and the cost of capital, from Marx and Böhm-Bawerk to
+Hayek, Keynes and the Cambridge controversy, and how the interest rate has
+formed, layer by layer, in FRED's data since 1857.
+
 ## 6. Profitability and returns: ROE as a signal
 
 The residual income model (section 2) runs the other way too. Rearranged,
