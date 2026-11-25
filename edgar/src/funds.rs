@@ -113,7 +113,23 @@ pub struct Portfolio {
     pub accession: String,
     pub report_date: NaiveDate,
     pub net_assets: f64,
+    /// Shareholders' purchases, reinvested distributions and redemptions in
+    /// each of the three months to the report date (oldest first), dollars.
+    pub flows: [Flow; 3],
     pub holdings: Vec<Holding>,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Flow {
+    pub sales: f64,
+    pub reinvestment: f64,
+    pub redemptions: f64,
+}
+
+impl Flow {
+    pub fn net(&self) -> f64 {
+        self.sales + self.reinvestment - self.redemptions
+    }
 }
 
 /// One position. `percent` is of net assets (negative for shorts and
@@ -323,12 +339,20 @@ impl Cache {
 /// Every portfolio for `series_id` in one N-PORT data set.
 fn read_portfolios(path: &std::path::Path, series_id: &str) -> Result<Vec<Portfolio>, Box<dyn Error>> {
     let mut zip = zip::ZipArchive::new(fs::File::open(path)?)?;
-    let mut nets: HashMap<String, f64> = HashMap::new();
+    let mut nets: HashMap<String, (f64, [Flow; 3])> = HashMap::new();
     for row in Table::open(&mut zip, "FUND_REPORTED_INFO.tsv")? {
         let row = row?;
         if row.get("SERIES_ID") == Some(series_id) {
+            let num = |c: &str| row.get(c).and_then(|v| v.parse().ok()).unwrap_or(0.0);
+            let flow = |m: usize| Flow {
+                sales: num(&format!("SALES_FLOW_MON{}", m)),
+                reinvestment: num(&format!("REINVESTMENT_FLOW_MON{}", m)),
+                // Filers differ on the sign (PIMCO's 2022 reports are
+                // negative, its 2026 ones positive): a magnitude either way.
+                redemptions: num(&format!("REDEMPTION_FLOW_MON{}", m)).abs(),
+            };
             nets.insert(row.get("ACCESSION_NUMBER").unwrap_or_default().to_string(),
-                row.get("NET_ASSETS").and_then(|v| v.parse().ok()).unwrap_or(0.0));
+                (num("NET_ASSETS"), [flow(1), flow(2), flow(3)]));
         }
     }
     if nets.is_empty() {
@@ -372,12 +396,13 @@ fn read_portfolios(path: &std::path::Path, series_id: &str) -> Result<Vec<Portfo
         h.coupon_type = row.get("COUPON_TYPE").filter(|c| !c.is_empty()).map(str::to_string);
         h.coupon = row.get("ANNUALIZED_RATE").and_then(|v| v.parse().ok());
     }
-    Ok(nets.into_iter().filter_map(|(accession, net_assets)| Some(Portfolio {
+    Ok(nets.into_iter().filter_map(|(accession, (net_assets, flows))| Some(Portfolio {
         series_id: series_id.to_string(),
         report_date: *dates.get(&accession)?,
         holdings: holdings.remove(&accession).unwrap_or_default(),
         accession,
         net_assets,
+        flows,
     })).collect())
 }
 

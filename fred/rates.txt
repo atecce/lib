@@ -44,3 +44,8 @@ IRLTLT01USM156N         # 10-year government bond yield (OECD), 1953–
 M04051USM324NNBR        # general price level, 1860–1939 (NBER; 1913 = 100)
 CPIAUCNS                # CPI, not seasonally adjusted, 1913–
 CPIAUCSL                # CPI, seasonally adjusted, 1947–
+
+# Where cash goes instead (for examples/fund_flows.rs)
+MORTGAGE30US            # 30-year fixed mortgage rate, Freddie Mac survey, weekly, 1971–
+MMMFFAQ027S             # money market funds' total financial assets ($m), quarterly, 1945– (Z.1)
+WRMFNS                  # retail money funds ($bn), weekly, 1980–
