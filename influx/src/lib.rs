@@ -29,6 +29,8 @@ pub enum InfluxError {
     NoToken,
     /// The request failed, or InfluxDB answered with an error.
     Query { message: String },
+    /// Cloudflare Access wants a sign-in: no session token, or it expired.
+    SignIn,
 }
 
 impl std::fmt::Display for InfluxError {
@@ -36,6 +38,7 @@ impl std::fmt::Display for InfluxError {
         match self {
             InfluxError::NoToken => write!(f, "INFLUXDB3_AUTH_TOKEN is not set"),
             InfluxError::Query { message } => write!(f, "{}", message),
+            InfluxError::SignIn => write!(f, "Cloudflare Access: sign in again"),
         }
     }
 }
@@ -52,6 +55,10 @@ pub struct Server {
     /// A Cloudflare Access service token, for a server behind Access.
     pub access_client_id: Option<String>,
     pub access_client_secret: Option<String>,
+    /// Or a signed-in person's Access session: the `CF_Authorization` token
+    /// Access issues after its login (an email one-time code, say). Sent as
+    /// `cf-access-token`; when it expires, queries fail with `SignIn`.
+    pub access_token: Option<String>,
 }
 
 static SERVER: RwLock<Option<Server>> = RwLock::new(None);
@@ -74,6 +81,7 @@ fn server() -> Result<Server, InfluxError> {
         token: env("INFLUXDB3_AUTH_TOKEN").ok_or(InfluxError::NoToken)?,
         access_client_id: env("CF_ACCESS_CLIENT_ID"),
         access_client_secret: env("CF_ACCESS_CLIENT_SECRET"),
+        access_token: env("CF_ACCESS_TOKEN"),
     })
 }
 
@@ -213,18 +221,28 @@ fn query(sql: &str) -> Result<Vec<Row>, InfluxError> {
         return Err(InfluxError::NoToken);
     }
     let err = |e: reqwest::Error| InfluxError::Query { message: e.without_url().to_string() };
+    // Access answers a request it won't let through with a redirect to its
+    // login page: report that, rather than follow it to HTML.
     let mut req = reqwest::blocking::Client::builder()
-        .timeout(Duration::from_secs(120)).build().map_err(err)?
+        .timeout(Duration::from_secs(120))
+        .redirect(reqwest::redirect::Policy::none())
+        .build().map_err(err)?
         .post(format!("{}/api/v3/query_sql", server.url.trim_end_matches('/')))
         .bearer_auth(&server.token);
     if let (Some(id), Some(secret)) = (&server.access_client_id, &server.access_client_secret) {
         req = req.header("CF-Access-Client-Id", id).header("CF-Access-Client-Secret", secret);
+    }
+    if let Some(token) = &server.access_token {
+        req = req.header("cf-access-token", token);
     }
     let res = req
         .header("Content-Type", "application/json")
         .body(serde_json::json!({ "db": DATABASE, "q": sql, "format": "json" }).to_string())
         .send().map_err(err)?;
     let status = res.status();
+    if status.is_redirection() || (status == reqwest::StatusCode::FORBIDDEN && server.access_token.is_some()) {
+        return Err(InfluxError::SignIn);
+    }
     let body = res.text().map_err(err)?;
     if !status.is_success() {
         return Err(InfluxError::Query { message: format!("{}: {}", status, body) });
@@ -248,7 +266,8 @@ mod tests {
         assert_eq!(literal("o'brien"), "'o''brien'");
     }
 
-    /// Against the local server: `cargo test -p influx -- --ignored`.
+    /// Against the local server: `cargo test -p influx -- --ignored
+    /// --test-threads=1` (the live tests share the configured server).
     #[test]
     #[ignore]
     fn live() {
@@ -273,7 +292,7 @@ mod tests {
     }
 
     /// Through Cloudflare Access: `source ~/.cloudflared/equities-app.env`,
-    /// then `cargo test -p influx -- --ignored`.
+    /// then `cargo test -p influx -- --ignored --test-threads=1`.
     #[test]
     #[ignore]
     fn through_access() {
@@ -283,11 +302,16 @@ mod tests {
             token: env("INFLUXDB3_AUTH_TOKEN").unwrap(),
             access_client_id: env("CF_ACCESS_CLIENT_ID"),
             access_client_secret: env("CF_ACCESS_CLIENT_SECRET"),
+            access_token: None,
         };
         configure(Some(Server { access_client_id: None, ..server.clone() }));
         assert!(tickers().is_err(), "Access let a request without its service token through");
-        configure(Some(server));
+        configure(Some(server.clone()));
         assert!(tickers().unwrap().contains(&"net".to_string()));
+        // A stale session is a sign-in, not a parse error of the login page.
+        configure(Some(Server { access_client_id: None, access_client_secret: None,
+            access_token: Some("expired".into()), ..server }));
+        assert!(matches!(tickers(), Err(InfluxError::SignIn)), "{:?}", tickers());
         configure(None);
     }
 }

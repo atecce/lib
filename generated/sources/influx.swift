@@ -586,6 +586,12 @@ public struct Server: Equatable, Hashable {
      */
     public var accessClientId: String?
     public var accessClientSecret: String?
+    /**
+     * Or a signed-in person's Access session: the `CF_Authorization` token
+     * Access issues after its login (an email one-time code, say). Sent as
+     * `cf-access-token`; when it expires, queries fail with `SignIn`.
+     */
+    public var accessToken: String?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
@@ -598,11 +604,17 @@ public struct Server: Equatable, Hashable {
          */token: String, 
         /**
          * A Cloudflare Access service token, for a server behind Access.
-         */accessClientId: String?, accessClientSecret: String?) {
+         */accessClientId: String?, accessClientSecret: String?, 
+        /**
+         * Or a signed-in person's Access session: the `CF_Authorization` token
+         * Access issues after its login (an email one-time code, say). Sent as
+         * `cf-access-token`; when it expires, queries fail with `SignIn`.
+         */accessToken: String?) {
         self.url = url
         self.token = token
         self.accessClientId = accessClientId
         self.accessClientSecret = accessClientSecret
+        self.accessToken = accessToken
     }
 
     
@@ -624,7 +636,8 @@ public struct FfiConverterTypeServer: FfiConverterRustBuffer {
                 url: FfiConverterString.read(from: &buf), 
                 token: FfiConverterString.read(from: &buf), 
                 accessClientId: FfiConverterOptionString.read(from: &buf), 
-                accessClientSecret: FfiConverterOptionString.read(from: &buf)
+                accessClientSecret: FfiConverterOptionString.read(from: &buf), 
+                accessToken: FfiConverterOptionString.read(from: &buf)
         )
     }
 
@@ -633,6 +646,7 @@ public struct FfiConverterTypeServer: FfiConverterRustBuffer {
         FfiConverterString.write(value.token, into: &buf)
         FfiConverterOptionString.write(value.accessClientId, into: &buf)
         FfiConverterOptionString.write(value.accessClientSecret, into: &buf)
+        FfiConverterOptionString.write(value.accessToken, into: &buf)
     }
 }
 
@@ -732,6 +746,10 @@ public enum InfluxError: Swift.Error, Equatable, Hashable, Foundation.LocalizedE
      */
     case Query(message: String
     )
+    /**
+     * Cloudflare Access wants a sign-in: no session token, or it expired.
+     */
+    case SignIn
 
     
 
@@ -765,6 +783,7 @@ public struct FfiConverterTypeInfluxError: FfiConverterRustBuffer {
         case 2: return .Query(
             message: try FfiConverterString.read(from: &buf)
             )
+        case 3: return .SignIn
 
          default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -785,6 +804,10 @@ public struct FfiConverterTypeInfluxError: FfiConverterRustBuffer {
             writeInt(&buf, Int32(2))
             FfiConverterString.write(message, into: &buf)
             
+        
+        case .SignIn:
+            writeInt(&buf, Int32(3))
+        
         }
     }
 }

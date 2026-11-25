@@ -1,11 +1,13 @@
 #!/bin/zsh
+# (Not in Library/: cargo swift package regenerates that folder whole.)
+#
 # Publish the Rust library for Swift apps: build bibleFFI.xcframework (iOS,
 # the iOS Simulator, macOS; release), zip it, and attach it to a GitHub
 # release of lib, tagged library-YYYYMMDD-<commit>. Apps depend on it as a
 # Swift package binary target by URL and checksum, so their builds (Xcode
 # Cloud's included) never compile Rust.
 #
-#     Library/release.sh [--no-build] [--dry-run] [--into DIR]
+#     ./release-library.sh [--no-build] [--dry-run] [--into DIR]
 #
 # --dry-run packages target/library-release/ and stops before releasing.
 #
@@ -17,7 +19,7 @@
 # Run from a clean checkout whose commit is pushed to origin: the release's
 # tag points at it.
 set -euo pipefail
-LIB=${0:A:h:h}
+LIB=${0:A:h}
 cd $LIB
 
 build=1 into="" dry=0
@@ -26,7 +28,7 @@ while (( $# )); do
     --no-build) build=0 ;;
     --dry-run) dry=1 ;;
     --into) into=${2:?--into needs a directory}; shift ;;
-    *) echo "usage: release.sh [--no-build] [--dry-run] [--into DIR]" >&2; exit 2 ;;
+    *) echo "usage: release-library.sh [--no-build] [--dry-run] [--into DIR]" >&2; exit 2 ;;
   esac
   shift
 done
@@ -74,7 +76,7 @@ url=https://github.com/atecce/lib/releases/download/$tag/bibleFFI.xcframework.zi
 
 gh release create $tag $out/bibleFFI.xcframework.zip --repo atecce/lib --target $sha \
   --title "Library $tag" \
-  --notes "bibleFFI.xcframework (iOS, iOS Simulator, macOS) built from $sha by Library/release.sh.
+  --notes "bibleFFI.xcframework (iOS, iOS Simulator, macOS) built from $sha by release-library.sh.
 
 Swift package binary target:
     .binaryTarget(name: \"bibleFFI\", url: \"$url\", checksum: \"$checksum\")"
@@ -86,7 +88,7 @@ if [[ -n $into ]]; then
   dest=${into:A}/Library
   rm -rf $dest/Sources/Library && mkdir -p $dest/Sources/Library
   cp Library/Sources/Library/*.swift $dest/Sources/Library/
-  sed -e "s|.binaryTarget(name: \"bibleFFI\", path: \"./bibleFFI.xcframework\")|.binaryTarget(\n            name: \"bibleFFI\",\n            // Library/release.sh in atecce/lib, $tag ($sha)\n            url: \"$url\",\n            checksum: \"$checksum\"\n        )|" \
+  sed -e "s|.binaryTarget(name: \"bibleFFI\", path: \"./bibleFFI.xcframework\")|.binaryTarget(\n            name: \"bibleFFI\",\n            // release-library.sh in atecce/lib, $tag ($sha)\n            url: \"$url\",\n            checksum: \"$checksum\"\n        )|" \
     Library/Package.swift > $dest/Package.swift
   grep -q "$checksum" $dest/Package.swift || { echo "could not point $dest/Package.swift at the release" >&2; exit 1 }
   echo "wrote $dest"
