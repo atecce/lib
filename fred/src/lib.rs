@@ -137,6 +137,38 @@ impl Cache {
         let csv = fs::read_to_string(&path).map_err(|_| FredError::NotFetched(path))?;
         Ok(Series::parse(id, &csv)?)
     }
+
+    /// Every series in the cache, by ID, sorted.
+    pub fn ids(&self) -> Vec<String> {
+        let mut ids: Vec<String> = fs::read_dir(&self.dir).into_iter().flatten().filter_map(|e| e.ok())
+            .filter_map(|e| e.file_name().into_string().ok()?.strip_suffix(".csv").map(str::to_string))
+            .collect();
+        ids.sort();
+        ids
+    }
+}
+
+/// A list of series (`rates.txt`): IDs separated by spaces, commas or
+/// newlines, `#` starting a comment. Each ID comes with the comment on its
+/// line when it is the line's only ID (its description, for a reader).
+pub fn read_list(path: impl AsRef<Path>) -> std::io::Result<Vec<(String, Option<String>)>> {
+    let mut out = Vec::new();
+    for line in fs::read_to_string(path)?.lines() {
+        let (ids, note) = match line.split_once('#') {
+            Some((ids, note)) => (ids, Some(note.trim().to_string()).filter(|n| !n.is_empty())),
+            None => (line, None),
+        };
+        let ids: Vec<String> = ids.split(|c: char| c == ',' || c.is_whitespace())
+            .filter(|s| !s.is_empty()).map(str::to_uppercase).collect();
+        let one = ids.len() == 1;
+        out.extend(ids.into_iter().map(|id| (id, if one { note.clone() } else { None })));
+    }
+    Ok(out)
+}
+
+/// The series list kept beside the crate, `rates.txt`.
+pub fn default_list() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("rates.txt")
 }
 
 #[cfg(test)]
@@ -150,5 +182,20 @@ mod tests {
         assert_eq!(s.month(1982, 1), None);
         assert_eq!(s.latest().unwrap().date, NaiveDate::from_ymd_opt(1981, 12, 1).unwrap());
         assert!(Series::parse("X", "h\nnot a row\n").is_err());
+    }
+
+    #[test]
+    fn reads_a_list() {
+        let dir = std::env::temp_dir().join(format!("fred-list-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let p = dir.join("list.txt");
+        fs::write(&p, "# heading\nGS10   # 10-year\ngs1 GS2\nAAA, BAA # Moody's\n").unwrap();
+        let l = read_list(&p).unwrap();
+        assert_eq!(l, vec![
+            ("GS10".to_string(), Some("10-year".to_string())),
+            ("GS1".to_string(), None), ("GS2".to_string(), None),
+            ("AAA".to_string(), None), ("BAA".to_string(), None),
+        ]);
+        fs::remove_dir_all(dir).unwrap();
     }
 }

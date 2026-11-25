@@ -179,7 +179,23 @@ lib --postgres-only AAPL TM 7203.T  # Postgres alone
 universe | store-sic
 # Residual income persistence against the industry (equities/VALUATION.md §8):
 cargo run --release -p backtest --example persistence -- AAPL
+# FRED's series, from the fred cache (fred-fetch first; daily:
+# fred/nightly/run.sh):
+store-fred                  # every cached series
+store-fred GS10 DGS3MO      # just these
 ```
+
+FRED's series are two tables beside the rest, joined to prices by date:
+
+```sql
+-- Goldman Sachs's price against the 2-year Treasury yield, 2022
+SELECT p.date, p.adj_close, o.value AS two_year
+FROM price p JOIN fred_observation o ON o.series_id = 'DGS2' AND o.date = p.date
+WHERE p.ticker = 'GS' AND p.date >= '2022-01-01';
+```
+
+(Prices are only the listings `lib` writes, the companies; funds such as
+MINT and SPY are in the tiingo cache but not yet here.)
 
 Every write is an upsert: running it again changes nothing that didn't
 change. `SAME_ISSUER` (in `src/lib.rs`) links a Tokyo company's EDINET code
