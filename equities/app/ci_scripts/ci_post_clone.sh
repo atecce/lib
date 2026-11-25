@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Xcode Cloud runs this after cloning, before building Equities.xcodeproj.
+# Xcode Cloud runs this after cloning, before building Optimates.xcodeproj.
 #
 # The app links the Rust code through ../../Library, a Swift package whose
 # Swift sources are in git but whose compiled libraries (liblib.a, inside

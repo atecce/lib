@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E0000000000000000000F001"
-               BuildableName = "Equities.app"
-               BlueprintName = "Equities"
-               ReferencedContainer = "container:Equities.xcodeproj">
+               BuildableName = "Optimates.app"
+               BlueprintName = "Optimates"
+               ReferencedContainer = "container:Optimates.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,9 +37,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E0000000000000000000F001"
-            BuildableName = "Equities.app"
-            BlueprintName = "Equities"
-            ReferencedContainer = "container:Equities.xcodeproj">
+            BuildableName = "Optimates.app"
+            BlueprintName = "Optimates"
+            ReferencedContainer = "container:Optimates.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>

@@ -28,7 +28,7 @@ id=$(xcrun simctl list devices available -j | jq -r --arg name "$device" '
 [ -n "$id" ] || { echo "no simulator named $device (xcrun simctl list devices)" >&2; exit 1 }
 
 # Build for the Simulator into ./build (git-ignored).
-xcodebuild -project Equities.xcodeproj -scheme Equities -configuration Debug \
+xcodebuild -project Optimates.xcodeproj -scheme Optimates -configuration Debug \
   -destination "platform=iOS Simulator,id=$id" -derivedDataPath build \
   -quiet build || exit 1
 
@@ -37,7 +37,7 @@ xcrun simctl boot $id 2>/dev/null
 open -a Simulator
 
 # Install the app, replacing any earlier build.
-xcrun simctl install $id build/Build/Products/Debug-iphonesimulator/Equities.app || exit 1
+xcrun simctl install $id build/Build/Products/Debug-iphonesimulator/Optimates.app || exit 1
 
 # Launch it. simctl passes variables prefixed SIMCTL_CHILD_ into the app's
 # environment with the prefix removed, so the Rust code sees

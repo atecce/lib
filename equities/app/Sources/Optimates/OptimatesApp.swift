@@ -4,7 +4,7 @@ import AppKit
 #endif
 
 @main
-struct EquitiesApp: App {
+struct OptimatesApp: App {
     init() {
         #if os(macOS)
         // Run from `swift run` there is no app bundle: make it a regular app
@@ -15,7 +15,7 @@ struct EquitiesApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("Equities") {
+        WindowGroup("Optimates") {
             #if os(macOS)
             ContentView().frame(minWidth: 900, minHeight: 600)
             #else
