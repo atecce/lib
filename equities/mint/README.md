@@ -57,6 +57,73 @@ From N-PORT for June 30, 2026 (0001410368-26-090134): 1,019 holdings from
 - **Weighted coupon 4.22%**, against 3.87% on 3-month bills and 3.98% on
   1-year Treasuries that day: the credit spread it is paid for.
 
+## How the portfolio has changed
+
+    cargo run --release -p equities --example fund_history -- MINT
+
+Every N-PORT report since September 2019, as percentages of net assets
+(fixed and floating can add to more than 100 where the fund borrows
+through repurchase agreements). *Fixed < 1y* is the fixed-rate debt
+maturing within a year; *years* is the fixed-rate debt's weighted final
+maturity; *govt* is the Treasury, agencies and sponsored enterprises;
+*securitized* is mortgage- and asset-backed debt and CLOs; *coupon* is the
+weighted coupon of all the debt, against the 3-month Treasury yield on
+the report date.
+
+| Report | Net assets ($bn) | Fixed | Floating | Fixed < 1y | Years | Corporate | Govt | Securitized | Coupon | 3-month | Holdings |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2019-09 | 12.79 | 26.8 | 70.0 | 22.0 | 1.20 | 88.2 | 7.0 | 22.2 | 2.82 | 1.88 | 806 |
+| 2019-12 | 13.71 | 24.8 | 69.8 | 11.4 | 2.75 | 82.7 | 15.0 | 21.7 | 2.52 | 1.55 | 802 |
+| 2020-03 | 11.95 | 18.4 | 77.4 | 8.6 | 4.19 | 87.7 | 11.6 | 27.4 | 2.17 | 0.11 | 786 |
+| 2020-06 | 13.88 | 15.3 | 69.2 | 6.0 | 6.16 | 78.2 | 17.8 | 26.3 | 1.26 | 0.16 | 796 |
+| 2020-12 | 14.32 | 23.2 | 69.0 | 6.3 | 5.48 | 75.3 | 18.8 | 25.3 | 1.14 | 0.09 | 788 |
+| 2021-06 | 14.02 | 21.6 | 74.0 | 5.1 | 5.12 | 81.4 | 14.4 | 27.2 | 1.13 | 0.05 | 745 |
+| 2021-09 | 14.40 | 25.2 | 68.2 | 5.8 | 4.67 | 75.6 | 17.9 | 26.4 | 1.15 | 0.04 | 715 |
+| 2021-12 | 13.68 | 29.5 | 65.7 | 8.7 | 4.67 | 80.7 | 15.8 | 26.8 | 1.29 | 0.06 | 725 |
+| 2022-03 | 13.20 | 47.2 | 64.8 | 11.0 | 3.60 | 85.8 | 26.8 | 29.6 | 1.60 | 0.52 | 758 |
+| 2022-06 | 11.78 | 31.1 | 64.0 | 10.8 | 4.16 | 82.3 | 12.5 | 29.9 | 2.20 | 1.72 | 675 |
+| 2022-09 | 11.06 | 23.2 | 61.6 | 11.5 | 4.70 | 78.5 | 9.8 | 30.2 | 2.97 | 3.33 | 643 |
+| 2022-12 | 8.79 | 20.4 | 64.8 | 10.6 | 4.87 | 87.2 | 10.8 | 33.6 | 3.71 | 4.42 | 592 |
+| 2023-03 | 8.42 | 23.4 | 60.5 | 14.0 | 4.51 | 88.3 | 4.2 | 36.9 | 4.18 | 4.85 | 636 |
+| 2023-06 | 9.26 | 23.8 | 51.2 | 15.5 | 3.40 | 88.1 | 7.1 | 30.2 | 3.92 | 5.43 | 668 |
+| 2023-12 | 10.30 | 30.5 | 57.0 | 20.4 | 2.53 | 93.3 | 3.4 | 37.9 | 4.53 | 5.40 | 691 |
+| 2024-06 | 12.04 | 38.2 | 52.8 | 26.0 | 1.94 | 94.9 | 4.8 | 32.3 | 4.44 | 5.48 | 827 |
+| 2024-12 | 11.89 | 33.8 | 55.6 | 24.6 | 1.81 | 89.6 | 7.7 | 29.8 | 4.18 | 4.37 | 833 |
+| 2025-06 | 13.33 | 25.2 | 60.6 | 14.5 | 2.43 | 80.9 | 17.4 | 37.4 | 4.06 | 4.41 | 854 |
+| 2025-12 | 14.57 | 34.5 | 59.8 | 22.0 | 2.06 | 79.8 | 17.9 | 31.7 | 3.95 | 3.67 | 922 |
+| 2026-03 | 15.98 | 33.7 | 55.5 | 20.9 | 1.94 | 80.3 | 18.1 | 29.4 | 3.70 | 3.70 | 1,023 |
+| 2026-06 | 16.43 | 60.8 | 41.0 | 29.9 | 1.88 | 77.1 | 19.9 | 27.6 | 4.22 | 3.87 | 1,019 |
+
+(The example prints all 28 reports; the table keeps two a year, plus the
+quarters around 2022.)
+
+- **Mostly floating in the zero-rate years, which is why 2022 cost it as
+  little as it did.** Two-thirds to three-quarters of the portfolio reset
+  its coupon with short rates from 2019 to 2022. The fixed-rate part was
+  small (15–30%) but long for an ultra-short fund (4–6 years of final
+  maturity, much of it amortizing mortgage-backed debt, whose final
+  maturity overstates its life); that is the part marked down in 2022.
+- **Investors left after the loss, and came back.** Net assets fell 43%,
+  from $14.6 billion in March 2021 to $8.4 billion in March 2023, the low
+  coming as the fund recovered, then rose to $16.4 billion by June 2026:
+  money arriving for the yields of 2023–25, after the losses that produced
+  them.
+- **The coupon fell below the bill rate in 2022–24 while the return beat
+  bills.** The coupon lags: bonds bought before the rise kept their low
+  coupons but were marked down below par, and returned the difference as
+  they matured (the pull to par), which is why 2023–25 beat bills by
+  0.4–0.8 points with a coupon 0.5–1.5 points under them. The coupon is not
+  the yield; N-PORT doesn't report yields per holding.
+- **Since 2023, shorter and more corporate, then back toward government.**
+  The fixed-rate maturity came down from 4.9 years (end of 2022) to under
+  2, with a quarter of the fund maturing within a year. Corporate issuers
+  peaked at 95% in mid-2024; government debt went from 3–9% in 2023–24 to
+  18–20% in 2025–26.
+- **June 2026: fixed-rate debt from 34% to 61% in a quarter**, the largest
+  shift in the record, most of it maturing within a year (30%, from 21%).
+  Floating fell to 41%, the lowest yet: the fund locking in rates for a
+  year rather than letting them reset.
+
 ## Its return against bills
 
     cargo run --release -p equities --example mint_treasuries
@@ -168,13 +235,14 @@ credit and trading noise.
   (`y/365` a day), not bills actually bought and held.
 - **One episode** makes the 2021 signal, and the threshold (0.25% off a
   six-month high) was chosen after looking at it.
-- **The portfolio is one report.** N-PORT has one a quarter from late
-  2019; how the mix moved through 2022 is the obvious next table.
+- **N-PORT starts in late 2019**: the portfolio before it (and through
+  2013's taper tantrum) would need the N-Q and N-CSR schedules of
+  investments, which aren't in the data sets.
+- **Final maturity, not duration**, for the fixed-rate debt: mortgage- and
+  asset-backed securities pay down long before it.
 
 ## To do
 
-- The portfolio over time: fixed against floating, maturity, corporate
-  against government, from every N-PORT since 2019.
 - Fund traits for the N-CSR statements (assets and liabilities, operations,
   changes in net assets), and MINT's from 2010.
 - The same comparison for the money market funds the census flags, the

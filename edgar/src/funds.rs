@@ -148,62 +148,43 @@ impl Cache {
     /// (about 1 GB) as a stream.
     pub fn portfolio(&self, series_id: &str) -> Result<Option<Portfolio>, Box<dyn Error>> {
         for (_, path) in self.data_sets(DataSet::Nport).into_iter().rev() {
-            let mut zip = zip::ZipArchive::new(fs::File::open(&path)?)?;
-            let mut found: Option<(String, f64)> = None;
-            for row in Table::open(&mut zip, "FUND_REPORTED_INFO.tsv")? {
-                let row = row?;
-                if row.get("SERIES_ID") == Some(series_id) {
-                    let accession = row.get("ACCESSION_NUMBER").unwrap_or_default().to_string();
-                    let net = row.get("NET_ASSETS").and_then(|v| v.parse().ok()).unwrap_or(0.0);
-                    // Several reports a quarter: keep the latest (accessions sort by filing).
-                    if found.as_ref().is_none_or(|f| accession > f.0) {
-                        found = Some((accession, net));
-                    }
-                }
+            let latest = read_portfolios(&path, series_id)?.into_iter()
+                .max_by(|a, b| (a.report_date, &a.accession).cmp(&(b.report_date, &b.accession)));
+            if latest.is_some() {
+                return Ok(latest);
             }
-            let Some((accession, net_assets)) = found else { continue };
-            let mut report_date = None;
-            for row in Table::open(&mut zip, "SUBMISSION.tsv")? {
-                let row = row?;
-                if row.get("ACCESSION_NUMBER") == Some(accession.as_str()) {
-                    report_date = row.get("REPORT_DATE").and_then(date);
-                }
-            }
-            let mut holdings = Vec::new();
-            let mut ids: HashMap<String, usize> = HashMap::new();
-            for row in Table::open(&mut zip, "FUND_REPORTED_HOLDING.tsv")? {
-                let row = row?;
-                if row.get("ACCESSION_NUMBER") != Some(accession.as_str()) {
-                    continue;
-                }
-                let s = |c: &str| row.get(c).unwrap_or_default().to_string();
-                let num = |c: &str| row.get(c).and_then(|v| v.parse::<f64>().ok());
-                let value = num("CURRENCY_VALUE").unwrap_or(0.0);
-                let rate = num("EXCHANGE_RATE").filter(|r| *r > 0.0).unwrap_or(1.0);
-                ids.insert(s("HOLDING_ID"), holdings.len());
-                holdings.push(Holding {
-                    issuer: s("ISSUER_NAME"), title: s("ISSUER_TITLE"), cusip: s("ISSUER_CUSIP"),
-                    value, currency: s("CURRENCY_CODE"), value_usd: value / rate,
-                    percent: num("PERCENTAGE").unwrap_or(0.0),
-                    asset_category: s("ASSET_CAT"), issuer_type: s("ISSUER_TYPE"),
-                    country: s("INVESTMENT_COUNTRY"), fair_value_level: s("FAIR_VALUE_LEVEL"),
-                    maturity: None, coupon_type: None, coupon: None,
-                });
-            }
-            for row in Table::open(&mut zip, "DEBT_SECURITY.tsv")? {
-                let row = row?;
-                let Some(&i) = row.get("HOLDING_ID").and_then(|id| ids.get(id)) else { continue };
-                let h = &mut holdings[i];
-                h.maturity = row.get("MATURITY_DATE").and_then(date);
-                h.coupon_type = row.get("COUPON_TYPE").filter(|c| !c.is_empty()).map(str::to_string);
-                h.coupon = row.get("ANNUALIZED_RATE").and_then(|v| v.parse().ok());
-            }
-            return Ok(Some(Portfolio {
-                series_id: series_id.to_string(), accession,
-                report_date: report_date.ok_or("report without a date")?, net_assets, holdings,
-            }));
         }
         Ok(None)
+    }
+
+    /// Every portfolio N-PORT reports for `series_id`, one per report date
+    /// (the latest filing where an amendment repeats one), oldest first.
+    /// Reads the quarters on eight threads.
+    pub fn portfolios(&self, series_id: &str) -> Result<Vec<Portfolio>, Box<dyn Error>> {
+        let paths: Vec<PathBuf> = self.data_sets(DataSet::Nport).into_iter().map(|(_, p)| p).collect();
+        let results: Vec<Result<Vec<Portfolio>, String>> = std::thread::scope(|scope| {
+            let handles: Vec<_> = paths.chunks(paths.len().div_ceil(8).max(1)).map(|chunk| {
+                scope.spawn(move || {
+                    let mut v = Vec::new();
+                    for path in chunk {
+                        v.extend(read_portfolios(path, series_id).map_err(|e| format!("{}: {}", path.display(), e))?);
+                    }
+                    Ok(v)
+                })
+            }).collect();
+            handles.into_iter().map(|h| h.join().unwrap_or_else(|_| Err("a reader thread panicked".into()))).collect()
+        });
+        let mut by_date: HashMap<NaiveDate, Portfolio> = HashMap::new();
+        for r in results {
+            for p in r? {
+                if by_date.get(&p.report_date).is_none_or(|q| p.accession > q.accession) {
+                    by_date.insert(p.report_date, p);
+                }
+            }
+        }
+        let mut v: Vec<Portfolio> = by_date.into_values().collect();
+        v.sort_by_key(|p| p.report_date);
+        Ok(v)
     }
 
     pub fn fund_tickers_path(&self) -> PathBuf {
@@ -337,6 +318,67 @@ impl Cache {
         v.sort_by(|a, b| (&a.class_id, a.month).cmp(&(&b.class_id, b.month)));
         Ok(v)
     }
+}
+
+/// Every portfolio for `series_id` in one N-PORT data set.
+fn read_portfolios(path: &std::path::Path, series_id: &str) -> Result<Vec<Portfolio>, Box<dyn Error>> {
+    let mut zip = zip::ZipArchive::new(fs::File::open(path)?)?;
+    let mut nets: HashMap<String, f64> = HashMap::new();
+    for row in Table::open(&mut zip, "FUND_REPORTED_INFO.tsv")? {
+        let row = row?;
+        if row.get("SERIES_ID") == Some(series_id) {
+            nets.insert(row.get("ACCESSION_NUMBER").unwrap_or_default().to_string(),
+                row.get("NET_ASSETS").and_then(|v| v.parse().ok()).unwrap_or(0.0));
+        }
+    }
+    if nets.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut dates: HashMap<String, NaiveDate> = HashMap::new();
+    for row in Table::open(&mut zip, "SUBMISSION.tsv")? {
+        let row = row?;
+        let a = row.get("ACCESSION_NUMBER").unwrap_or_default();
+        if nets.contains_key(a) {
+            if let Some(d) = row.get("REPORT_DATE").and_then(date) {
+                dates.insert(a.to_string(), d);
+            }
+        }
+    }
+    let mut holdings: HashMap<String, Vec<Holding>> = HashMap::new();
+    let mut ids: HashMap<String, (String, usize)> = HashMap::new();
+    for row in Table::open(&mut zip, "FUND_REPORTED_HOLDING.tsv")? {
+        let row = row?;
+        let Some(a) = row.get("ACCESSION_NUMBER").filter(|a| nets.contains_key(*a)) else { continue };
+        let s = |c: &str| row.get(c).unwrap_or_default().to_string();
+        let num = |c: &str| row.get(c).and_then(|v| v.parse::<f64>().ok());
+        let value = num("CURRENCY_VALUE").unwrap_or(0.0);
+        let rate = num("EXCHANGE_RATE").filter(|r| *r > 0.0).unwrap_or(1.0);
+        let list = holdings.entry(a.to_string()).or_default();
+        ids.insert(s("HOLDING_ID"), (a.to_string(), list.len()));
+        list.push(Holding {
+            issuer: s("ISSUER_NAME"), title: s("ISSUER_TITLE"), cusip: s("ISSUER_CUSIP"),
+            value, currency: s("CURRENCY_CODE"), value_usd: value / rate,
+            percent: num("PERCENTAGE").unwrap_or(0.0),
+            asset_category: s("ASSET_CAT"), issuer_type: s("ISSUER_TYPE"),
+            country: s("INVESTMENT_COUNTRY"), fair_value_level: s("FAIR_VALUE_LEVEL"),
+            maturity: None, coupon_type: None, coupon: None,
+        });
+    }
+    for row in Table::open(&mut zip, "DEBT_SECURITY.tsv")? {
+        let row = row?;
+        let Some((a, i)) = row.get("HOLDING_ID").and_then(|id| ids.get(id)) else { continue };
+        let h = &mut holdings.get_mut(a).unwrap()[*i];
+        h.maturity = row.get("MATURITY_DATE").and_then(date);
+        h.coupon_type = row.get("COUPON_TYPE").filter(|c| !c.is_empty()).map(str::to_string);
+        h.coupon = row.get("ANNUALIZED_RATE").and_then(|v| v.parse().ok());
+    }
+    Ok(nets.into_iter().filter_map(|(accession, net_assets)| Some(Portfolio {
+        series_id: series_id.to_string(),
+        report_date: *dates.get(&accession)?,
+        holdings: holdings.remove(&accession).unwrap_or_default(),
+        accession,
+        net_assets,
+    })).collect())
 }
 
 /// DERA's dates: "31-AUG-2026".
