@@ -56,8 +56,7 @@ echo "checksum $checksum"
 
 if [[ -n $into ]]; then
   dest=${into:A}/Library
-  mkdir -p $dest/Sources/Library
-  rm -f $dest/Sources/Library/*.swift
+  rm -rf $dest/Sources/Library && mkdir -p $dest/Sources/Library
   cp Library/Sources/Library/*.swift $dest/Sources/Library/
   sed -e "s|.binaryTarget(name: \"bibleFFI\", path: \"./bibleFFI.xcframework\")|.binaryTarget(\n            name: \"bibleFFI\",\n            // Library/release.sh in atecce/lib, $tag ($sha)\n            url: \"$url\",\n            checksum: \"$checksum\"\n        )|" \
     Library/Package.swift > $dest/Package.swift
