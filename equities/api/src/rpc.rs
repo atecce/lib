@@ -222,6 +222,50 @@ mod tests {
         assert_eq!(in_proto, equities::item::Item::ALL.len(), "the .proto has items equities::Item hasn't");
     }
 
+    /// The bytes both sides must agree on: the same hex is in optimates'
+    /// Tests/OptimatesTests (ContractTests), decoded and encoded by the
+    /// Swift the app compiles from this .proto. Changing either means a
+    /// change to the wire format: one the app on the phone won't read.
+    // ticker "gs", items [TotalAssets], periods [Quarter], market [Close, MarketCap]
+    pub const GOLDEN_REQUEST: &str = "0a026773 120116 1a0101 22020102";
+    // TotalAssets at a point in time in USD, 2026-03-31: 1.5e12; market cap in
+    // JPY, 1970-01-01: -2 and 1970-01-02: 0.25
+    pub const GOLDEN_RESPONSE: &str = "0a1a0a04081610051a03555344220d08bfa0011100008079efd37542 0a1f10021a034a505922091100000000000000c0220b080111000000000000d03f";
+
+    fn golden() -> (pb::DashboardRequest, pb::DashboardResponse) {
+        let request = pb::DashboardRequest {
+            ticker: "gs".into(),
+            items: vec![pb::Item::TotalAssets as i32],
+            periods: vec![pb::Period::Quarter as i32],
+            market: vec![pb::MarketField::Close as i32, pb::MarketField::MarketCap as i32],
+        };
+        let response = pb::DashboardResponse {
+            series: vec![
+                pb::Series {
+                    of: Some(pb::series::Of::Reported(pb::Reported { item: pb::Item::TotalAssets as i32, period: pb::Period::PointInTime as i32 })),
+                    currency: "USD".into(),
+                    points: vec![pb::Point { epoch_day: 20543, value: 1.5e12 }],
+                },
+                pb::Series {
+                    of: Some(pb::series::Of::Market(pb::MarketField::MarketCap as i32)),
+                    currency: "JPY".into(),
+                    points: vec![pb::Point { epoch_day: 0, value: -2.0 }, pb::Point { epoch_day: 1, value: 0.25 }],
+                },
+            ],
+        };
+        (request, response)
+    }
+
+    fn hex(bytes: &[u8]) -> String { bytes.iter().map(|b| format!("{:02x}", b)).collect() }
+
+    #[test]
+    fn golden_bytes() {
+        let (request, response) = golden();
+        let squash = |s: &str| s.replace(' ', "");
+        assert_eq!(hex(&request.encode_to_vec()), squash(GOLDEN_REQUEST), "request");
+        assert_eq!(hex(&response.encode_to_vec()), squash(GOLDEN_RESPONSE), "response");
+    }
+
     #[test]
     fn periods_and_fields_cover_the_store() {
         assert_eq!(PERIODS.map(|x| x.1), crate::PERIODS);
