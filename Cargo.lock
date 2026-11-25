@@ -985,6 +985,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "tiingo",
  "tokio",
  "tokio-postgres",
 ]

@@ -219,6 +219,35 @@ pub fn short_proceeds(short: f64, sales_newest_first: &[(f64, f64)]) -> Option<f
     (left <= 1e-6).then_some(proceeds)
 }
 
+/// The ticker positions are measured against: the portfolio's r.
+pub const BASELINE: &str = "MINT";
+
+/// What the dollars behind `held` shares would be worth had they gone into
+/// the baseline instead, on the same days: (cost, value now). The buys are
+/// (day, shares, dollars), newest first; the older ones were sold first
+/// (FIFO), so the newest are what's held. `index` is the baseline's total
+/// return level (adjusted closes) by day, oldest first; a buy is matched to
+/// the last level on or before its day. None if the buys on record don't
+/// account for every share held, or one predates the index.
+pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &[(NaiveDate, f64)]) -> Option<(f64, f64)> {
+    let now = index.last()?.1;
+    let level = |day: NaiveDate| -> Option<f64> {
+        let i = index.partition_point(|(d, _)| *d <= day);
+        (i > 0).then(|| index[i - 1].1)
+    };
+    let (mut left, mut cost, mut value) = (held, 0.0, 0.0);
+    for &(day, shares, dollars) in buys_newest_first {
+        if left <= 1e-9 { break }
+        if shares <= 0.0 { continue }
+        let take = shares.min(left);
+        let part = dollars * take / shares;
+        cost += part;
+        value += part * now / level(day)?;
+        left -= take;
+    }
+    (left <= 1e-6).then_some((cost, value))
+}
+
 async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::access::Identity>>, headers: HeaderMap, body: Bytes)
     -> Result<Response, ConnectError>
 {
@@ -260,6 +289,16 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
                        WHERE name LIKE 'sell_short%' AND quantity < 0 ORDER BY date DESC, transaction_id", &[]).await? {
         sales.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
     }
+    // Buys on record, newest first, by (account, security), and the
+    // baseline's total return level by day (Tiingo's adjusted closes).
+    let mut buys: std::collections::HashMap<(String, String), Vec<(NaiveDate, f64, f64)>> = Default::default();
+    for r in db.query("SELECT account_id, security_id, date, quantity, amount FROM portfolio_transaction
+                       WHERE name LIKE 'buy %' AND quantity > 0 AND amount > 0 ORDER BY date DESC, transaction_id", &[]).await? {
+        buys.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3), r.get(4)));
+    }
+    let index: Vec<(NaiveDate, f64)> = tiingo::Cache::new(tiingo::Cache::default_dir()).prices(BASELINE)
+        .map(|p| p.iter().filter_map(|p| Some((p.day()?, p.adj_close))).collect())
+        .unwrap_or_else(|e| { eprintln!("{}: {}", BASELINE, e); Vec::new() });
 
     let rows = db.query(
         "SELECT a.account_id, coalesce(a.institution, ''), a.name, coalesce(a.subtype, ''), coalesce(a.balance, 0),
@@ -290,20 +329,31 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
                 Some(c) => (Some(c), pb::CostSource::Institution),
                 None => (None, pb::CostSource::Unspecified),
             },
-            pb::PositionKind::Short => match sales.get(&(account_id.clone(), security_id)).and_then(|s| short_proceeds(-quantity, s)) {
+            pb::PositionKind::Short => match sales.get(&(account_id.clone(), security_id.clone())).and_then(|s| short_proceeds(-quantity, s)) {
                 Some(p) => (Some(-p), pb::CostSource::ShortSales),
                 None => (None, pb::CostSource::Unspecified),
             },
             _ => (None, pb::CostSource::Unspecified),
         };
+        let measured = match kind {
+            pb::PositionKind::Long => buys.get(&(account_id.clone(), security_id)).and_then(|b| baseline(quantity, b, &index)),
+            _ => None,
+        };
         accounts.last_mut().unwrap().1.positions.push(pb::Position {
             ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value: r.get(11),
             cost, cost_source: source as i32,
             price_epoch_day: r.get::<_, Option<NaiveDate>>(13).map(|d| (d - epoch).num_days() as i32).unwrap_or(0),
+            baseline_cost: measured.map(|m| m.0),
+            baseline_value: measured.map(|m| m.1),
         });
     }
     let synced_unix = synced(db).await?.unwrap_or(0);
-    Ok(codec.encode(&pb::HoldingsResponse { accounts: accounts.into_iter().map(|(_, a)| a).collect(), synced_unix }))
+    Ok(codec.encode(&pb::HoldingsResponse {
+        accounts: accounts.into_iter().map(|(_, a)| a).collect(),
+        synced_unix,
+        baseline: BASELINE.into(),
+        baseline_epoch_day: index.last().map(|(d, _)| (*d - epoch).num_days() as i32).unwrap_or(0),
+    }))
 }
 
 
@@ -415,6 +465,24 @@ mod tests {
         // More short than the sales on record: not known.
         assert_eq!(short_proceeds(3.0, &sales), None);
         assert_eq!(short_proceeds(1.0, &[]), None);
+    }
+
+    #[test]
+    fn the_same_dollars_in_the_baseline() {
+        let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day).unwrap();
+        // The baseline rose 2% from January to June, then 1% to now.
+        let index = [(d(2026, 1, 2), 100.0), (d(2026, 6, 1), 102.0), (d(2026, 11, 25), 103.02)];
+        // Held 3 shares: bought 2 in June ($200), 2 in January ($100), 1 sold since.
+        let buys = [(d(2026, 6, 1), 2.0, 200.0), (d(2026, 1, 5), 2.0, 100.0)];
+        let (cost, value) = baseline(3.0, &buys, &index).unwrap();
+        // June's $200 grew 1%; half of January's ($50), bought on a weekend
+        // after the 2nd's level, grew 3.02%.
+        assert!((cost - 250.0).abs() < 1e-9);
+        assert!((value - (200.0 * 1.01 + 50.0 * 1.0302)).abs() < 1e-9);
+        // More held than bought on record: not known.
+        assert_eq!(baseline(5.0, &buys, &index), None);
+        // A buy before the index starts: not known.
+        assert_eq!(baseline(1.0, &[(d(2025, 12, 1), 1.0, 10.0)], &index), None);
     }
 
     #[test]

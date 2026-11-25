@@ -18,6 +18,7 @@ prost = "0.14.6"
 reqwest = { version = "0.13.3", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.149"
+tiingo = { version = "0.1.0", path = "../tiingo", default-features = false }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time", "signal", "process"] }
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4"] }
 

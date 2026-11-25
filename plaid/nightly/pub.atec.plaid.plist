@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  The portfolio's daily sync: every Plaid connection's holdings and recent
-  investment transactions into Postgres (store-plaid), at 07:20. The app's
+  The portfolio's daily sync (run.sh), at 07:20: MINT's prices from Tiingo,
+  then every Plaid connection's holdings and recent investment transactions
+  into Postgres (store-plaid). The app's
   pull to refresh runs the same sync, through the equities API.
   Install: cp pub.atec.plaid.plist ~/Library/LaunchAgents/ &&
            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.plaid.plist
@@ -15,7 +16,8 @@
 	<string>pub.atec.plaid</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Users/atec/lib/target/release/store-plaid</string>
+		<string>/bin/zsh</string>
+		<string>/Users/atec/lib/plaid/nightly/run.sh</string>
 	</array>
 	<key>WorkingDirectory</key>
 	<string>/Users/atec/lib</string>

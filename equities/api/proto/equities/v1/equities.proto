@@ -211,6 +211,10 @@ message HoldingsResponse {
   repeated Account accounts = 1;
   // When the brokerage was last synced: seconds since 1970.
   int64 synced_unix = 2;
+  // What positions are measured against, the portfolio's r: "MINT" (PIMCO
+  // Enhanced Short Maturity, total return), and the day of its last price.
+  string baseline = 3;
+  int32 baseline_epoch_day = 4;
 }
 
 message Account {
@@ -240,6 +244,13 @@ message Position {
   CostSource cost_source = 8;
   // The day of the price: days since 1970-01-01.
   int32 price_epoch_day = 9;
+  // The baseline: the dollars that bought the shares still held, put into
+  // the baseline (HoldingsResponse.baseline) on the same days instead, and
+  // what they'd be worth now. Gain over r is (value - cost) minus
+  // (baseline_value - baseline_cost). Unset when the buys on record (Plaid's
+  // two years) don't account for every share, and for shorts, options, cash.
+  optional double baseline_cost = 10;
+  optional double baseline_value = 11;
 }
 
 enum PositionKind {
