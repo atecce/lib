@@ -629,11 +629,12 @@ mod tests {
     }
 
     /// Where the generic reader and these statements name the same item,
-    /// they agree.
+    /// they agree: the 2025 10-K (filings/000088698226000091, its summary
+    /// and statement pages) read by the EDGAR reader, against the statements
+    /// above, transcribed by hand.
     #[test]
     fn the_reader_agrees() {
-        let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../edgar/cache/886982/000088698226000091"));
-        if !path.exists() { return; }
+        let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/gs/filings/000088698226000091"));
         let mut r = crate::filing::new_reader(path, Ticker::GS).unwrap();
         let read: Vec<crate::item::Reported> = [
             crate::Reader::process_balance_sheet(&mut r).unwrap(),
@@ -648,6 +649,17 @@ mod tests {
             }
         }
         assert!(differ.is_empty(), "the reader differs: {:?}", differ);
-        assert!(agreed >= 5, "only {} items agreed", agreed);
+        // Every item both name, not some: one the reader stops reading fails.
+        assert_eq!(agreed, 8, "items agreed");
+
+        // Total net revenues, the 10-K's three years: read as Revenue
+        // (RevenuesNetOfInterestExpense; see net_revenues_are_revenue).
+        let revenue = |year| read.iter()
+            .find(|r| r.item == crate::item::Item::Revenue && r.p == crate::Period::TwelveMonths
+                && r.date == NaiveDate::from_ymd_opt(year, 12, 31).unwrap())
+            .map(|r| r.val);
+        assert_eq!(revenue(2025), Some(58_283.0 * M));
+        assert_eq!(revenue(2024), Some(53_512.0 * M));
+        assert_eq!(revenue(2023), Some(46_254.0 * M));
     }
 }
