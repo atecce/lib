@@ -381,8 +381,12 @@ same days, Jensen's alpha (1968):
 ```
 
 So "over r" answers *did this money do better than cash?*, and "over
-market" (to come) *did it do better than owning the market?*. Under r on
-a stock means that, so far, the premium it was owed hasn't been paid.
+market" *did it do better than owning the market?* (the same dollars on the
+same days in SPY, dividends included; $`\beta`$ taken as 1). Under r on
+a stock means that, so far, the premium it was owed hasn't been paid. A
+holding can be over r and under market at once: it beat cash by the equity
+premium those days paid, but not the index that would have earned it for
+nothing.
 
 ### Why MINT is the wrong r for a stock, and the right one for a portfolio
 

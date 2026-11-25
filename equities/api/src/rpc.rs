@@ -222,6 +222,17 @@ pub fn short_proceeds(short: f64, sales_newest_first: &[(f64, f64)]) -> Option<f
 /// The ticker positions are measured against: the portfolio's r.
 pub const BASELINE: &str = "MINT";
 
+/// The market, for over/under market: the S&P 500 (SPY, total return).
+pub const MARKET: &str = "SPY";
+
+/// A ticker's total return level by day (Tiingo's adjusted closes), oldest
+/// first; empty, and logged, when it isn't in the cache.
+fn total_return_index(ticker: &str) -> Vec<(NaiveDate, f64)> {
+    tiingo::Cache::new(tiingo::Cache::default_dir()).prices(ticker)
+        .map(|p| p.iter().filter_map(|p| Some((p.day()?, p.adj_close))).collect())
+        .unwrap_or_else(|e| { eprintln!("{}: {}", ticker, e); Vec::new() })
+}
+
 /// What the dollars behind `held` shares would be worth had they gone into
 /// the baseline instead, on the same days: (cost, value now). The buys are
 /// (day, shares, dollars), newest first; the older ones were sold first
@@ -324,9 +335,8 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
                        WHERE t.type = 'cash' AND t.subtype = 'dividend' AND t.amount IS NOT NULL", &[]).await? {
         paid.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
     }
-    let index: Vec<(NaiveDate, f64)> = tiingo::Cache::new(tiingo::Cache::default_dir()).prices(BASELINE)
-        .map(|p| p.iter().filter_map(|p| Some((p.day()?, p.adj_close))).collect())
-        .unwrap_or_else(|e| { eprintln!("{}: {}", BASELINE, e); Vec::new() });
+    let index = total_return_index(BASELINE);
+    let market = total_return_index(MARKET);
 
     let rows = db.query(
         "SELECT a.account_id, coalesce(a.institution, ''), a.name, coalesce(a.subtype, ''), coalesce(a.balance, 0),
@@ -371,6 +381,11 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         // The dividends that belong with the measured shares: those paid
         // since their oldest buy.
         let dividends = measured.as_ref().map(|m| paid.get(&key).map(|p| dividends_since(m.since, p)).unwrap_or(0.0));
+        // The same dollars, on the same days, in the market instead.
+        let in_market = match measured {
+            Some(_) => buys.get(&key).and_then(|b| baseline(quantity, b, &market)).map(|m| m.value),
+            None => None,
+        };
         accounts.last_mut().unwrap().1.positions.push(pb::Position {
             ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value: r.get(11),
             cost, cost_source: source as i32,
@@ -378,14 +393,18 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
             baseline_cost: measured.as_ref().map(|m| m.cost),
             baseline_value: measured.as_ref().map(|m| m.value),
             dividends,
+            market_value: in_market,
         });
     }
     let synced_unix = synced(db).await?.unwrap_or(0);
+    let last_day = |i: &[(NaiveDate, f64)]| i.last().map(|(d, _)| (*d - epoch).num_days() as i32).unwrap_or(0);
     Ok(codec.encode(&pb::HoldingsResponse {
         accounts: accounts.into_iter().map(|(_, a)| a).collect(),
         synced_unix,
         baseline: BASELINE.into(),
-        baseline_epoch_day: index.last().map(|(d, _)| (*d - epoch).num_days() as i32).unwrap_or(0),
+        baseline_epoch_day: last_day(&index),
+        market: MARKET.into(),
+        market_epoch_day: last_day(&market),
     }))
 }
 

@@ -215,6 +215,10 @@ message HoldingsResponse {
   // Enhanced Short Maturity, total return), and the day of its last price.
   string baseline = 3;
   int32 baseline_epoch_day = 4;
+  // And the market, for over/under market: "SPY" (the S&P 500, total
+  // return), and the day of its last price.
+  string market = 5;
+  int32 market_epoch_day = 6;
 }
 
 message Account {
@@ -257,6 +261,12 @@ message Position {
   // baseline_cost, the baseline's baseline_value - baseline_cost, and the
   // gain over r (under r when negative) is value + dividends - baseline_value.
   optional double dividends = 12;
+  // The same dollars as baseline_cost, on the same days, in the market
+  // (HoldingsResponse.market) instead, dividends included: what they'd be
+  // worth now. Over market (under when negative) is the position's return
+  // less the market's on the same money: with beta taken as 1, Jensen's
+  // alpha in dollars. Set with the baseline.
+  optional double market_value = 13;
 }
 
 enum PositionKind {
