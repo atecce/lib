@@ -1,5 +1,7 @@
 #!/bin/zsh
-# Nightly: push a list of companies to InfluxDB.
+# Nightly: write a list of companies to Postgres (InfluxDB was retired
+# 2026-11-25; the app reads Postgres through the equities API, Grafana reads
+# it directly).
 #
 #     run.sh LIST     e.g. equities/sp500/all.txt, equities/nikkei/all.txt
 #
@@ -68,8 +70,8 @@ fi
 echo "=== $name push: $(echo $push | wc -w | tr -d ' ') companies" >> $log
 wait_for_stores || exit 1
 if [ -n "$push" ]; then
-  # InfluxDB and Postgres, one company at a time (see DATA.md).
-  ./target/release/lib --postgres ${=push} >> $log 2>&1 || exit 1
+  # One company at a time (see DATA.md).
+  ./target/release/lib --postgres-only ${=push} >> $log 2>&1 || exit 1
 fi
 mv $stamp.next $stamp
 # For catchup.sh: the launchd job this list runs as.

@@ -17,47 +17,49 @@
         "type": "custom",
         "name": "ticker",
         "label": "Companies",
-        "query": "tsla,f,tm,7203.t,race",
+        "query": "TSLA,F,TM,7203.T,RACE",
         "multi": true,
         "includeAll": false,
         "current": {
           "text": [
-            "tsla",
-            "f",
-            "tm",
-            "race"
+            "TSLA",
+            "F",
+            "TM",
+            "7203.T",
+            "RACE"
           ],
           "value": [
-            "tsla",
-            "f",
-            "tm",
-            "race"
+            "TSLA",
+            "F",
+            "TM",
+            "7203.T",
+            "RACE"
           ]
         },
         "options": [
           {
-            "text": "tsla",
-            "value": "tsla",
+            "text": "TSLA",
+            "value": "TSLA",
             "selected": true
           },
           {
-            "text": "f",
-            "value": "f",
+            "text": "F",
+            "value": "F",
             "selected": true
           },
           {
-            "text": "tm",
-            "value": "tm",
+            "text": "TM",
+            "value": "TM",
             "selected": true
           },
           {
-            "text": "7203.t",
-            "value": "7203.t",
-            "selected": false
+            "text": "7203.T",
+            "value": "7203.T",
+            "selected": true
           },
           {
-            "text": "race",
-            "value": "race",
+            "text": "RACE",
+            "value": "RACE",
             "selected": true
           }
         ],
@@ -110,8 +112,8 @@
       "title": "Revenue",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -123,13 +125,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Revenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['Revenue']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -215,8 +217,8 @@
       "title": "Automotive revenue",
       "description": "Vehicles (and parts), from each statement's automotive segment: Tesla's \"Automotive Revenues\", Ford's \"Company excluding Ford Credit\", Toyota's \"Sales of products\".",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -228,13 +230,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'AutomotiveRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['AutomotiveRevenue']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -320,8 +322,8 @@
       "title": "Operating income",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -333,13 +335,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['OperatingIncome']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -425,8 +427,8 @@
       "title": "Net income",
       "description": "Including non-controlling interests.",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -438,13 +440,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetIncome' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['NetIncome']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -543,8 +545,8 @@
       "title": "Financial services revenue ($period)",
       "description": "Ford Credit; Toyota's financial services (金融事業, kin'yū jigyō).",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -556,13 +558,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'FinancialServicesRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['FinancialServicesRevenue']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -648,8 +650,8 @@
       "title": "Finance receivables",
       "description": "Loans and leases to buyers and dealers, current plus non-current.",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -661,13 +663,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT sum(\"value\") FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" =~ /^FinanceReceivables/ AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY time(1d), \"ticker\", \"currency\" fill(none)",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, sum(f.value) AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['FinanceReceivablesCurrent', 'FinanceReceivablesNonCurrent']) f\nGROUP BY 1, 2\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -753,8 +755,8 @@
       "title": "Vehicles on operating leases",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -766,13 +768,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'OperatingLeaseVehiclesNet' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['OperatingLeaseVehiclesNet']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -858,8 +860,8 @@
       "title": "Regulatory credits ($period)",
       "description": "Emission credits sold to other car makers (Tesla).",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -871,13 +873,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'RegulatoryCreditsRevenue' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['RegulatoryCreditsRevenue']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -976,8 +978,8 @@
       "title": "Capital expenditure",
       "description": "Purchases of property, plant and equipment, shown positive.",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -989,13 +991,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" * -1 FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, -f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1081,8 +1083,8 @@
       "title": "Research and development",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1094,13 +1096,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'ResearchAndDevelopment' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['ResearchAndDevelopment']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1186,8 +1188,8 @@
       "title": "Inventories",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1199,13 +1201,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'Inventories' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['Inventories']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1291,8 +1293,8 @@
       "title": "Operating cash flow",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1304,13 +1306,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'NetCashProvidedByOperatingActivities' AND \"period\" = '$period' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, flow_period(upper(t.ticker), '${period:raw}'), c.currency, ARRAY['NetCashProvidedByOperatingActivities']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1409,8 +1411,8 @@
       "title": "Total assets",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1422,13 +1424,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalAssets' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['TotalAssets']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1514,8 +1516,8 @@
       "title": "Stockholders' equity",
       "description": "Attributable to the parent's owners.",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1527,13 +1529,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'StockholdersEquity' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['StockholdersEquity']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1619,8 +1621,8 @@
       "title": "Cash and cash equivalents",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1632,13 +1634,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'CashAndCashEquivalents' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['CashAndCashEquivalents']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
@@ -1724,8 +1726,8 @@
       "title": "Total liabilities",
       "description": "",
       "datasource": {
-        "type": "influxdb",
-        "uid": "efm3zlbhro268a"
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
       },
       "gridPos": {
         "h": 9,
@@ -1737,13 +1739,13 @@
         {
           "refId": "A",
           "datasource": {
-            "type": "influxdb",
-            "uid": "efm3zlbhro268a"
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
           },
+          "editorMode": "code",
+          "format": "time_series",
           "rawQuery": true,
-          "resultFormat": "time_series",
-          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'TotalLiabilities' AND \"period\" = 'pit' AND (\"currency\" = 'USD' AND \"ticker\" !~ /^(tm|race)$/ OR \"currency\" = 'JPY' OR \"currency\" = 'EUR') AND $timeFilter GROUP BY \"ticker\", \"currency\"",
-          "alias": "$tag_ticker $tag_currency"
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", upper(t.ticker) || ' ' || c.currency AS metric, f.value AS value\nFROM unnest(ARRAY[${ticker:singlequote}]) AS t(ticker)\nCROSS JOIN LATERAL (SELECT reporting_currency(upper(t.ticker)) AS currency) c\nCROSS JOIN LATERAL listing_facts(t.ticker, 'pit', c.currency, ARRAY['TotalLiabilities']) f\nORDER BY 1"
         }
       ],
       "fieldConfig": {
