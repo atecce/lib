@@ -33,6 +33,7 @@ pub fn routes() -> Router<Arc<App>> {
         .route("/equities.v1.Equities/Tickers", post(tickers))
         .route("/equities.v1.Equities/Dashboard", post(dashboard))
         .route("/equities.v1.Equities/Holdings", post(holdings))
+        .route("/equities.v1.Equities/Macro", post(macro_series))
 }
 
 /// A Connect error: one of the protocol's codes, and a message.
@@ -168,6 +169,34 @@ async fn dashboard(State(app): State<Arc<App>>, headers: HeaderMap, body: Bytes)
         })
     }).collect();
     Ok(codec.encode(&pb::DashboardResponse { series }))
+}
+
+/// The most FRED series one Macro call may ask for.
+const MACRO_MAX_SERIES: usize = 64;
+
+async fn macro_series(State(app): State<Arc<App>>, headers: HeaderMap, body: Bytes) -> Result<Response, ConnectError> {
+    let codec = match Codec::of(&headers) { Ok(c) => c, Err(refusal) => return Ok(refusal) };
+    let req: pb::MacroRequest = codec.decode(&body)?;
+    if req.series.len() > MACRO_MAX_SERIES {
+        return Err(ConnectError::invalid(format!("at most {} series", MACRO_MAX_SERIES)));
+    }
+    let ids: Vec<String> = req.series.iter().map(|s| s.trim().to_uppercase()).collect();
+    let rows = app.client().await?.query(
+        "SELECT s.id, coalesce(s.title, ''), o.date, o.value
+         FROM fred_series s JOIN fred_observation o ON o.series_id = s.id
+         WHERE s.id = ANY($1) AND o.value IS NOT NULL
+         ORDER BY s.id, o.date", &[&ids]).await?;
+    let epoch = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
+    let mut series: Vec<pb::MacroSeries> = Vec::new();
+    for r in rows {
+        let id: String = r.get(0);
+        if series.last().is_none_or(|s| s.id != id) {
+            series.push(pb::MacroSeries { id, title: r.get(1), points: vec![] });
+        }
+        let date: NaiveDate = r.get(2);
+        series.last_mut().unwrap().points.push(pb::Point { epoch_day: (date - epoch).num_days() as i32, value: r.get(3) });
+    }
+    Ok(codec.encode(&pb::MacroResponse { series }))
 }
 
 /// How long a sync stays fresh: a Holdings call asking for a refresh within

@@ -22,6 +22,9 @@ service Equities {
   // Only for the owner (PORTFOLIO_OWNERS) and the Mac's service token:
   // others get permission_denied.
   rpc Holdings(HoldingsRequest) returns (HoldingsResponse);
+  // FRED series by ID (fred/rates.txt, macro.txt, realestate.txt), from
+  // Postgres: interest rates, inflation, output, money, real estate.
+  rpc Macro(MacroRequest) returns (MacroResponse);
 }
 
 message TickersRequest {}
@@ -258,4 +261,22 @@ enum CostSource {
   // The proceeds of the short sales still open (the newest ones: earlier
   // ones were covered first).
   COST_SOURCE_SHORT_SALES = 2;
+}
+
+message MacroRequest {
+  // FRED IDs: "GS10", "PCEPILFE". At most 64; unknown ones are left out of
+  // the response.
+  repeated string series = 1;
+}
+
+message MacroResponse {
+  repeated MacroSeries series = 1;
+}
+
+message MacroSeries {
+  string id = 1;
+  // The list's note: "10-year, monthly, 1953–".
+  string title = 2;
+  // In date order, in the series' own units (percent, index, $m, ...).
+  repeated Point points = 3;
 }
