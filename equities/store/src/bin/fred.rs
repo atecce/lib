@@ -4,7 +4,7 @@
 //!     store-fred                  # every series in the cache
 //!     store-fred GS10 DGS3MO      # just these
 //!
-//! Titles come from the comments in `fred/rates.txt` and `fred/macro.txt`. Applies the
+//! Titles come from the comments in `fred/rates.txt`, `macro.txt` and `realestate.txt`. Applies the
 //! migrations first, as `lib --postgres` does. Run after `fred-fetch`; only
 //! new and revised observations are written.
 

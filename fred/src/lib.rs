@@ -172,9 +172,10 @@ pub fn default_list() -> PathBuf {
 }
 
 /// Every series list kept with the crate: rates.txt (interest rates) and
-/// macro.txt (inflation, the output gap, policy, money).
+/// macro.txt (inflation, the output gap, policy, money), realestate.txt
+/// (mortgages, house prices, rents, building, ownership and credit).
 pub fn lists() -> Vec<PathBuf> {
-    ["rates.txt", "macro.txt"].iter().map(|f| Path::new(env!("CARGO_MANIFEST_DIR")).join(f)).collect()
+    ["rates.txt", "macro.txt", "realestate.txt"].iter().map(|f| Path::new(env!("CARGO_MANIFEST_DIR")).join(f)).collect()
 }
 
 #[cfg(test)]
