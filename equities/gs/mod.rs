@@ -578,7 +578,7 @@ mod tests {
     /// the usual totals). Its 2025 net revenues: $58.28 billion.
     #[test]
     fn net_revenues_are_revenue() {
-        let row = crate::filing::row_item(Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues"));
+        let row = crate::filing::row_item(crate::Ticker::GS, Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues"));
         assert_eq!(row.map(|(item, _)| item), Some(crate::item::Item::Revenue));
     }
 

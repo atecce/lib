@@ -51,6 +51,14 @@ pub mod gs;
 pub mod nvda;
 #[path = "../tsla/mod.rs"]
 pub mod tsla;
+// Companies with only their own elements so far (company.rs).
+#[path = "../tm/mod.rs"]
+pub mod tm;
+#[path = "../f/mod.rs"]
+pub mod f;
+#[path = "../gm/mod.rs"]
+pub mod gm;
+pub mod company;
 
 pub mod item;
 pub mod xlsx;

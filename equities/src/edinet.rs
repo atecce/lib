@@ -171,7 +171,7 @@ pub fn read(cache: &edinet::Cache, d: &edinet::Document, ticker: Ticker) -> Resu
         if !name.starts_with("jpcrp") { continue; }
         for fact in read_facts(&file)? {
             if fact.context.contains('_') { continue; }
-            let Some((item, rank)) = Item::from_xbrl_tag_ranked(&element_tag(&fact.element))
+            let Some((item, rank)) = crate::company::item_ranked(ticker, &element_tag(&fact.element))
                 .or_else(|| fact.label.parse::<Item>().ok().map(|i| (i, usize::MAX))) else { continue };
             let Some((date, p)) = context_period(&fact.context, kind, end) else { continue };
             let Some(val) = number(&fact.value) else { continue };

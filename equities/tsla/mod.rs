@@ -376,3 +376,21 @@ impl CFS for CashFlowStatement {
         self.net_cash_provided_by_financing_activities()
     }
 }
+
+/// The item one of Tesla's own elements reports: its depreciation and
+/// amortization, with impairment, carries its own.
+pub fn item(tag: &str) -> Option<crate::item::Item> {
+    match tag {
+        "tsla_DepreciationAmortizationAndImpairment" => Some(crate::item::Item::DepreciationAndAmoritization),
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod own_element_tests {
+    #[test]
+    fn its_own_elements() {
+        assert_eq!(super::item("tsla_DepreciationAmortizationAndImpairment"),
+                   Some(crate::item::Item::DepreciationAndAmoritization));
+    }
+}

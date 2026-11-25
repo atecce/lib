@@ -217,7 +217,7 @@ impl Reader {
             .zip(&table.tags)
             .filter(|(row, _)| !row.iter().all(|c| matches!(c, Data::Empty)))
             .map(|(row, tag)| {
-                let item = row_item(tag.as_deref(), label(row)).filter(|(i, _)| i.is_cash_flow() == cash_flow);
+                let item = row_item(self.ticker, tag.as_deref(), label(row)).filter(|(i, _)| i.is_cash_flow() == cash_flow);
                 (row.as_slice(), (tag.as_deref(), item))
             })
             .unzip();
@@ -490,13 +490,14 @@ fn is_extension(tag: &str) -> bool {
 ///
 /// Visible to the crate, so a company's module can test how its own rows
 /// read (gs).
-pub(crate) fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
+pub(crate) fn row_item(ticker: Ticker, tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
     let by_label = || label.and_then(|l| l.parse::<Item>().ok()).map(|i| (i, 0));
     match tag {
         None => by_label(),
         Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax")
             if !label.is_some_and(|l| { let l = l.to_lowercase(); l.contains("revenue") || l.contains("sales") }) => None,
-        Some(tag) => match Item::from_xbrl_tag_ranked(tag) {
+        // The company's own elements first (its module), then the shared.
+        Some(tag) => match crate::company::item_ranked(ticker, tag) {
             Some(item) => Some(item),
             None if is_extension(tag) || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
             None => None,
@@ -521,12 +522,12 @@ mod tests {
     #[test]
     fn contract_revenue_including_taxes_needs_a_revenue_label() {
         let tag = Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax");
-        assert_eq!(row_item(tag, Some("Total revenue")).map(|r| r.0), Some(Item::Revenue));
-        assert_eq!(row_item(tag, Some("Net sales")).map(|r| r.0), Some(Item::Revenue));
+        assert_eq!(row_item(Ticker::AAPL, tag, Some("Total revenue")).map(|r| r.0), Some(Item::Revenue));
+        assert_eq!(row_item(Ticker::AAPL, tag, Some("Net sales")).map(|r| r.0), Some(Item::Revenue));
         // A bank's fee income: part of its income, not its revenue.
-        assert_eq!(row_item(tag, Some("Fee and commission income")), None);
+        assert_eq!(row_item(Ticker::AAPL, tag, Some("Fee and commission income")), None);
         // Other elements don't need it.
-        assert_eq!(row_item(Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues")).map(|r| r.0),
+        assert_eq!(row_item(Ticker::GS, Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues")).map(|r| r.0),
                    Some(Item::Revenue));
     }
 
