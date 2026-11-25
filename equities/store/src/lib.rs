@@ -29,6 +29,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("008_mops", include_str!("../migrations/008_mops.sql")),
     ("009_sic", include_str!("../migrations/009_sic.sql")),
     ("010_fred", include_str!("../migrations/010_fred.sql")),
+    ("011_listing_currencies", include_str!("../migrations/011_listing_currencies.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
@@ -217,6 +218,9 @@ impl Store {
         tx.execute("INSERT INTO fact SELECT * FROM tmp_fact
                     ON CONFLICT (issuer_id, item, period, period_end, currency, accession)
                     DO UPDATE SET value = EXCLUDED.value, derived = EXCLUDED.derived", &[])?;
+        // The issuer's listings' reporting currency and flow period, which the
+        // dashboards read (migrations/011_listing_currencies.sql).
+        tx.execute("SELECT refresh_listing(ticker) FROM listing WHERE issuer_id = $1", &[&issuer_id])?;
         tx.commit()?;
         Ok((filings.len(), facts.len()))
     }
@@ -288,6 +292,7 @@ impl Store {
         tx.execute("INSERT INTO market SELECT * FROM tmp_market ON CONFLICT (ticker, date, currency) DO UPDATE SET
                     close = EXCLUDED.close, market_cap = EXCLUDED.market_cap, price_to_book = EXCLUDED.price_to_book,
                     return_on_equity = EXCLUDED.return_on_equity, earnings_yield = EXCLUDED.earnings_yield", &[])?;
+        tx.execute("SELECT refresh_listing(ticker) FROM (SELECT DISTINCT ticker FROM tmp_market) t", &[])?;
         tx.commit()?;
         Ok(rows.len())
     }
