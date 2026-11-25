@@ -16,6 +16,7 @@
 //!   and each market field, in every currency the company reports in.
 
 mod access;
+mod rpc;
 
 use std::collections::BTreeMap;
 use std::net::SocketAddr;
@@ -83,11 +84,17 @@ impl IntoResponse for ApiError {
     }
 }
 
+/// A refusal both kinds of client read: a Connect error (`code`, `message`)
+/// and the JSON routes' `error`.
+fn refuse(status: StatusCode, code: &str, message: &str) -> Response {
+    (status, Json(serde_json::json!({ "code": code, "message": message, "error": message }))).into_response()
+}
+
 /// Refuse what Cloudflare Access didn't let through.
 async fn require_access(State(app): State<Arc<App>>, headers: HeaderMap, req: Request, next: Next) -> Response {
     let Some(access) = &app.access else { return next.run(req).await };
     let Some(assertion) = headers.get("cf-access-jwt-assertion").and_then(|v| v.to_str().ok()) else {
-        return ApiError(StatusCode::UNAUTHORIZED, "no Cloudflare Access assertion".into()).into_response();
+        return refuse(StatusCode::UNAUTHORIZED, "unauthenticated", "no Cloudflare Access assertion");
     };
     match access.verify(assertion).await {
         Ok(who) => {
@@ -96,17 +103,22 @@ async fn require_access(State(app): State<Arc<App>>, headers: HeaderMap, req: Re
         }
         Err(why) => {
             eprintln!("refused {} {}: {}", req.method(), req.uri(), why);
-            ApiError(StatusCode::FORBIDDEN, "Cloudflare Access assertion not valid".into()).into_response()
+            refuse(StatusCode::FORBIDDEN, "permission_denied", "Cloudflare Access assertion not valid")
         }
     }
 }
 
-async fn tickers(State(app): State<Arc<App>>) -> Result<Json<Vec<String>>, ApiError> {
-    let rows = app.client().await?.query(
+/// The listings whose company filed in the last 400 days.
+async fn load_tickers(db: &Client) -> Result<Vec<String>, tokio_postgres::Error> {
+    let rows = db.query(
         "SELECT l.ticker FROM listing l WHERE EXISTS (
              SELECT 1 FROM filing g WHERE g.issuer_id = l.issuer_id AND g.filed_at > now() - interval '400 days')
          ORDER BY l.ticker", &[]).await?;
-    Ok(Json(rows.iter().map(|r| r.get(0)).collect()))
+    Ok(rows.iter().map(|r| r.get(0)).collect())
+}
+
+async fn tickers(State(app): State<Arc<App>>) -> Result<Json<Vec<String>>, ApiError> {
+    Ok(Json(load_tickers(&*app.client().await?).await?))
 }
 
 #[derive(Deserialize)]
@@ -140,16 +152,21 @@ fn list(s: &str) -> Vec<String> {
     s.split(',').map(str::trim).filter(|x| !x.is_empty()).map(str::to_string).collect()
 }
 
-async fn dashboard(State(app): State<Arc<App>>, Query(q): Query<DashboardQuery>) -> Result<Json<Vec<TimeSeries>>, ApiError> {
-    let (items, periods, fields) = (list(&q.items), list(&q.periods), list(&q.market));
+/// A company's dashboard: each series by (item or market field, period or
+/// `market`, currency), its points in date order. `periods` and `fields`
+/// must be among PERIODS and MARKET_FIELDS.
+type Dashboard = BTreeMap<(String, String, String), Vec<(NaiveDate, f64)>>;
+
+async fn load_dashboard(db: &Client, ticker: &str, items: &[String], periods: &[String], fields: &[String])
+    -> Result<Dashboard, ApiError>
+{
     if let Some(p) = periods.iter().find(|p| !PERIODS.contains(&p.as_str())) {
         return Err(ApiError::bad(format!("not a period: {}", p)));
     }
     if let Some(f) = fields.iter().find(|f| !MARKET_FIELDS.contains(&f.as_str())) {
         return Err(ApiError::bad(format!("not a market field: {}", f)));
     }
-    let db = app.client().await?;
-    let mut series: BTreeMap<(String, String, String), Vec<Point>> = BTreeMap::new();
+    let mut series = Dashboard::new();
 
     if !items.is_empty() && !periods.is_empty() {
         // Every currency the listing reports in (from its own regulator), each
@@ -166,31 +183,37 @@ async fn dashboard(State(app): State<Arc<App>>, Query(q): Query<DashboardQuery>)
              FROM c CROSS JOIN unnest($3::text[]) AS p(period)
              CROSS JOIN LATERAL listing_facts($1, p.period, c.currency::text, $2::text[]) lf
              ORDER BY lf.period_end",
-            &[&q.ticker, &items, &periods]).await?;
+            &[&ticker, &items, &periods]).await?;
         for r in rows {
-            series.entry((r.get(0), r.get(1), r.get(2))).or_default()
-                .push(Point { date: r.get(3), value: r.get(4) });
+            series.entry((r.get(0), r.get(1), r.get(2))).or_default().push((r.get(3), r.get(4)));
         }
     }
 
     if !fields.is_empty() {
         let rows = db.query(
             "SELECT date, currency::text, close, market_cap, price_to_book, return_on_equity, earnings_yield
-             FROM market WHERE ticker = upper($1) ORDER BY date", &[&q.ticker]).await?;
+             FROM market WHERE ticker = upper($1) ORDER BY date", &[&ticker]).await?;
         for r in rows {
             let (date, currency): (NaiveDate, String) = (r.get(0), r.get(1));
-            for f in &fields {
+            for f in fields {
                 let column = 2 + MARKET_FIELDS.iter().position(|m| m == f).unwrap();
                 if let Some(value) = r.get::<_, Option<f64>>(column) {
-                    series.entry((f.clone(), "market".into(), currency.clone())).or_default()
-                        .push(Point { date, value });
+                    series.entry((f.clone(), "market".into(), currency.clone())).or_default().push((date, value));
                 }
             }
         }
     }
+    Ok(series)
+}
 
+async fn dashboard(State(app): State<Arc<App>>, Query(q): Query<DashboardQuery>) -> Result<Json<Vec<TimeSeries>>, ApiError> {
+    let (items, periods, fields) = (list(&q.items), list(&q.periods), list(&q.market));
+    let series = load_dashboard(&*app.client().await?, &q.ticker, &items, &periods, &fields).await?;
     Ok(Json(series.into_iter()
-        .map(|((item, period, currency), points)| TimeSeries { item, period, currency, points })
+        .map(|((item, period, currency), points)| TimeSeries {
+            item, period, currency,
+            points: points.into_iter().map(|(date, value)| Point { date, value }).collect(),
+        })
         .collect()))
 }
 
@@ -220,6 +243,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let checked = Router::new()
         .route("/tickers", get(tickers))
         .route("/dashboard", get(dashboard))
+        .merge(rpc::routes())
         .layer(middleware::from_fn_with_state(app.clone(), require_access));
     let router = Router::new()
         .route("/health", get(|| async { "ok" }))

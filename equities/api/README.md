@@ -18,15 +18,42 @@ signature, issuer, the application's audience tag, expiry), so a request
 reaching it some other way is refused too, and nothing but the service
 touches Postgres.
 
+## The contract: equities.proto, over Connect
+
+`proto/equities/v1/equities.proto` is the API: its messages, and its
+`Equities` service with `Tickers` and `Dashboard`. The server's types are
+generated from it (build.rs: prost, with pbjson for JSON; protox compiles
+it, so no protoc), and so are the app's (optimates' `proto.sh`:
+swift-protobuf and connect-swift). Items, periods and market fields are
+enums, so neither side can ask for or send one the other doesn't know; a
+test checks the `.proto`'s `Item` against `equities::item::Item`.
+
+It travels as the [Connect protocol](https://connectrpc.com/docs/protocol)
+(`src/rpc.rs`): a POST of one message, protobuf or JSON, answered in kind.
+Plain HTTP, so the tunnel and Access pass it as they are:
+
+```sh
+curl -XPOST -H 'Content-Type: application/json' \
+  -d '{"ticker":"gs","items":["ITEM_REVENUE"],"periods":["PERIOD_YEAR"]}' \
+  http://127.0.0.1:8787/equities.v1.Equities/Dashboard
+```
+
+Change the `.proto` compatibly: the app on the phone was compiled against
+the old one. Add fields and values with new numbers; never renumber, reuse
+or change a type. Then `./proto.sh` in optimates.
+
 ## Endpoints
 
 | | |
 |---|---|
 | `GET /health` | `ok` (unchecked: for the tunnel) |
+| `POST /equities.v1.Equities/Tickers` | Connect: `TickersRequest` → `TickersResponse` |
+| `POST /equities.v1.Equities/Dashboard` | Connect: `DashboardRequest` → `DashboardResponse` |
 | `GET /tickers` | listings whose company filed in the last 400 days |
 | `GET /dashboard?ticker=AAPL&items=Revenue,NetIncome&periods=3m,pit&market=market_cap` | each reported item for each period, as last reported (`listing_facts`), and each market field (`close`, `market_cap`, `price_to_book`, `return_on_equity`, `earnings_yield`), in every currency the company reports in |
 
-A dashboard is a JSON array of `{item, period, currency, points: [{date,
+The GET routes are the first version, kept for app builds that still use
+them. Their dashboard is a JSON array of `{item, period, currency, points: [{date,
 value}]}`; market fields have period `market`. A whole dashboard takes
 30–80 ms.
 

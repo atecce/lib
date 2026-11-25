@@ -1,0 +1,196 @@
+// The equities API: what the Optimates app reads, served by equities-api
+// (lib, equities/api) at api.atec.pub behind Cloudflare Access, over the
+// Connect protocol (connectrpc.com): each call a POST of one message to
+// /equities.v1.Equities/<Method>, as protobuf (application/proto) or JSON
+// (application/json).
+//
+// The contract between the server (Rust, prost) and the app (Swift,
+// swift-protobuf and connect-swift): both compile from this file. Changes
+// must not break the app already on the phone: add fields and values, never
+// renumber or reuse one; a removed one's number is reserved.
+syntax = "proto3";
+
+package equities.v1;
+
+service Equities {
+  // The listings whose company filed in the last 400 days.
+  rpc Tickers(TickersRequest) returns (TickersResponse);
+  // A company's reported items and market series, in every currency it
+  // reports in.
+  rpc Dashboard(DashboardRequest) returns (DashboardResponse);
+}
+
+message TickersRequest {}
+
+message TickersResponse {
+  // Upper case, as listed: "AAPL", "7203.T".
+  repeated string tickers = 1;
+}
+
+message DashboardRequest {
+  // A ticker of Tickers; case doesn't matter.
+  string ticker = 1;
+  // Each item in each period (as last reported, restatements included).
+  repeated Item items = 2;
+  repeated Period periods = 3;
+  // Market series, each in the currency of the market.
+  repeated MarketField market = 4;
+}
+
+message DashboardResponse {
+  // One per item and period, or market field, and currency that has data;
+  // none for those that have none.
+  repeated Series series = 1;
+}
+
+message Series {
+  oneof of {
+    Reported reported = 1;
+    MarketField market = 2;
+  }
+  // ISO 4217: "USD", "JPY".
+  string currency = 3;
+  // In date order.
+  repeated Point points = 4;
+}
+
+// A reported item for a period.
+message Reported {
+  Item item = 1;
+  Period period = 2;
+}
+
+message Point {
+  // Days since 1970-01-01: a period's end, or a market day.
+  int32 epoch_day = 1;
+  double value = 2;
+}
+
+// What a reported value covers.
+enum Period {
+  PERIOD_UNSPECIFIED = 0;
+  // A flow over three months (3m).
+  PERIOD_QUARTER = 1;
+  // Six months (6m).
+  PERIOD_HALF_YEAR = 2;
+  // Nine months (9m).
+  PERIOD_NINE_MONTHS = 3;
+  // Twelve months (12m).
+  PERIOD_YEAR = 4;
+  // A stock, at the period's end (pit).
+  PERIOD_POINT_IN_TIME = 5;
+}
+
+// A series from prices: the close, and the company's value at it.
+enum MarketField {
+  MARKET_FIELD_UNSPECIFIED = 0;
+  MARKET_FIELD_CLOSE = 1;
+  MARKET_FIELD_MARKET_CAP = 2;
+  MARKET_FIELD_PRICE_TO_BOOK = 3;
+  // Over the last four quarters.
+  MARKET_FIELD_RETURN_ON_EQUITY = 4;
+  // Over the last four quarters.
+  MARKET_FIELD_EARNINGS_YIELD = 5;
+}
+
+// A line of a financial statement: equities::Item (equities/src/item.rs),
+// by the same name. New items are added at the end with the next number (a
+// test in equities-api checks the two lists agree).
+enum Item {
+  ITEM_UNSPECIFIED = 0;
+  ITEM_CASH_AND_CASH_EQUIVALENTS = 1;
+  ITEM_MARKETABLE_SECURITIES = 2;
+  ITEM_ACCOUNTS_RECEIVABLE_NET = 3;
+  ITEM_VENDOR_NON_TRADE_RECEIVABLES = 4;
+  ITEM_INVENTORIES = 5;
+  ITEM_PREPAID_EXPENSES_AND_OTHER_CURRENT_ASSETS = 6;
+  ITEM_OTHER_CURRENT_ASSETS = 7;
+  ITEM_TOTAL_CURRENT_ASSETS = 8;
+  ITEM_OPERATING_LEASE_VEHICLES_NET = 9;
+  ITEM_FINANCE_RECEIVABLES_CURRENT = 10;
+  ITEM_FINANCE_RECEIVABLES_NON_CURRENT = 11;
+  ITEM_SOLAR_ENERGY_SYSTEMS_NET = 12;
+  ITEM_PROPERTY_AND_EQUIPMENT_NET = 13;
+  ITEM_OPERATING_LEASE_ASSETS = 14;
+  ITEM_GOODWILL = 15;
+  ITEM_DIGITAL_ASSETS = 16;
+  ITEM_INTANGIBLE_ASSETS_NET = 17;
+  ITEM_DEFERRED_INCOME_TAX_ASSETS = 18;
+  ITEM_NON_MARKETABLE_EQUITY_SECURITIES = 19;
+  ITEM_OTHER_ASSETS = 20;
+  ITEM_TOTAL_NON_CURRENT_ASSETS = 21;
+  ITEM_TOTAL_ASSETS = 22;
+  ITEM_ACCOUNTS_PAYABLE = 23;
+  ITEM_ACCRUED_AND_OTHER_CURRENT_LIABILITIES = 24;
+  ITEM_DEFERRED_REVENUE = 25;
+  ITEM_SHORT_TERM_DEBT = 26;
+  ITEM_COMMERCIAL_PAPER = 27;
+  ITEM_TERM_DEBT = 28;
+  ITEM_OTHER_CURRENT_LIABILITIES = 29;
+  ITEM_TOTAL_CURRENT_LIABILITIES = 30;
+  ITEM_LONG_TERM_DEBT = 31;
+  ITEM_DEBT_AND_FINANCE_LEASES_NET_OF_CURRENT_PORTION = 32;
+  ITEM_DEFERRED_REVENUE_NET_OF_CURRENT_PORTION = 33;
+  ITEM_LONG_TERM_OPERATING_LEASE_LIABILITIES = 34;
+  ITEM_OTHER_LONG_TERM_LIABILITIES = 35;
+  ITEM_OTHER_NON_CURRENT_LIABILITIES = 36;
+  ITEM_TOTAL_NON_CURRENT_LIABILITIES = 37;
+  ITEM_TOTAL_LIABILITIES = 38;
+  ITEM_TOTAL_DEBT = 39;
+  ITEM_AUTOMOTIVE_DEBT = 40;
+  ITEM_FINANCIAL_SERVICES_DEBT = 41;
+  ITEM_STOCKHOLDERS_EQUITY = 42;
+  ITEM_AUTOMOTIVE_REVENUE = 43;
+  ITEM_FINANCIAL_SERVICES_REVENUE = 44;
+  ITEM_REGULATORY_CREDITS_REVENUE = 45;
+  ITEM_REVENUE = 46;
+  ITEM_COST_OF_REVENUE = 47;
+  ITEM_GROSS_PROFIT = 48;
+  ITEM_RESEARCH_AND_DEVELOPMENT = 49;
+  ITEM_SALES_GENERAL_AND_ADMINISTRATIVE = 50;
+  ITEM_RESTRUCTURING_AND_OTHER = 51;
+  ITEM_TOTAL_OPERATING_EXPENSES = 52;
+  ITEM_OPERATING_INCOME = 53;
+  ITEM_ORDINARY_INCOME = 54;
+  ITEM_INTEREST_INCOME = 55;
+  ITEM_INTEREST_EXPENSE = 56;
+  ITEM_OTHER_INCOME_NET = 57;
+  ITEM_TOTAL_OTHER_INCOME_NET = 58;
+  ITEM_INCOME_BEFORE_INCOME_TAX = 59;
+  ITEM_INCOME_TAX_EXPENSE = 60;
+  ITEM_NET_INCOME = 61;
+  ITEM_EARNINGS_PER_SHARE_BASIC = 62;
+  ITEM_EARNINGS_PER_SHARE_DILUTED = 63;
+  ITEM_SHARES_OUTSTANDING = 64;
+  ITEM_BOOK_VALUE_PER_SHARE = 65;
+  ITEM_WEIGHTED_AVERAGE_SHARES_BASIC = 66;
+  ITEM_WEIGHTED_AVERAGE_SHARES_DILUTED = 67;
+  ITEM_STOCK_BASED_COMPENSATION_EXPENSE = 68;
+  ITEM_DEPRECIATION_AND_AMORITIZATION = 69;
+  ITEM_DEFERRED_INCOME_TAXES = 70;
+  ITEM_GAINS_ON_NON_MARKETABLE_EQUITY_SECURITIES_AND_PUBLICLY_HELD_SECURITIES_NET = 71;
+  ITEM_OTHER = 72;
+  ITEM_ACCOUNTS_RECEIVABLE = 73;
+  ITEM_CHANGE_IN_INVENTORIES = 74;
+  ITEM_PREPAID_EXPENSES_AND_OTHER_ASSETS = 75;
+  ITEM_CHANGE_IN_ACCOUNTS_PAYABLE = 76;
+  ITEM_CHANGE_IN_ACCRUED_AND_OTHER_CURRENT_LIABILITIES = 77;
+  ITEM_CHANGE_IN_OTHER_LONG_TERM_LIABILITIES = 78;
+  ITEM_NET_CASH_PROVIDED_BY_OPERATING_ACTIVITIES = 79;
+  ITEM_PROCEEDS_FROM_MATURITIES_OF_MARKETABLE_SECURITIES = 80;
+  ITEM_PROCEEDS_FROM_SALES_OF_MARKETABLE_SECURITIES = 81;
+  ITEM_PROCEEDS_FROM_SALES_OF_NON_MARKETABLE_EQUITY_SECURITIES = 82;
+  ITEM_PURCHASES_OF_MARKETABLE_SECURITIES = 83;
+  ITEM_PURCHASES_RELATED_TO_PROPERTY_AND_EQUIPMENT_AND_INTANGIBLE_ASSETS = 84;
+  ITEM_PURCHASES_OF_NON_MARKETABLE_EQUITY_SECURITIES = 85;
+  ITEM_ACQUISITIONS_NET_OF_CASH_ACQUIRED = 86;
+  ITEM_NET_CASH_USED_IN_INVESTING_ACTIVITIES = 87;
+  ITEM_NET_CASH_USED_IN_FINANCING_ACTIVITIES = 88;
+  ITEM_PROCEEDS_RELATED_TO_EMPLOYEE_STOCK_PLANS = 89;
+  ITEM_PAYMENTS_RELATED_TO_REPURCHASES_OF_COMMON_STOCK = 90;
+  ITEM_PAYMENTS_RELATED_TO_EMPLOYEE_STOCK_PLAN_TAXES = 91;
+  ITEM_DIVIDENDS_PAID = 92;
+  ITEM_PRINCIPAL_PAYMENTS_ON_PROPERTY_AND_EQUIPMENT_AND_INTANGIBLE_ASSETS = 93;
+  ITEM_REPAYMENT_OF_DEBT = 94;
+  ITEM_CHANGE_IN_CASH_AND_CASH_EQUIVALENTS = 95;
+}
