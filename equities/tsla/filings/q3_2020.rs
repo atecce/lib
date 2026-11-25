@@ -1,16 +1,15 @@
-mod reported;
 
-use equities::Reader;
-use equities::tsla::BalanceSheet;
-use equities::tsla::IncomeStatement;
+use crate::Reader;
+use crate::tsla::BalanceSheet;
+use crate::tsla::IncomeStatement;
 
-use equities::item::Item::RestructuringAndOther;
+use crate::item::Item::RestructuringAndOther;
 
 #[test]
 fn q3_2020() {
 
     let balance_sheets = vec![
-        equities::tsla::Q4_2019_BALANCE_SHEET,
+        crate::tsla::Q4_2019_BALANCE_SHEET,
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2020, 09, 30).unwrap(),
 
@@ -48,7 +47,7 @@ fn q3_2020() {
     let income_statements = vec![
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 9, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 5_132_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -75,7 +74,7 @@ fn q3_2020() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             automotive_sales_revenue: 13_809_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -102,7 +101,7 @@ fn q3_2020() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 9, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 7_346_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -129,7 +128,7 @@ fn q3_2020() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             automotive_sales_revenue: 17_150_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -166,11 +165,11 @@ fn q3_2020() {
         .collect();
 
     let readers: Vec<Box<dyn Reader>> = vec![
-        Box::new(equities::filing::new_reader(std::path::Path::new("../edgar/cache/1318605/000156459020047486"), equities::Ticker::TSLA).unwrap()),
+        Box::new(crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020047486")), crate::Ticker::TSLA).unwrap()),
     ];
 
     for mut r in readers {
-        reported::assert(r.process_balance_sheet().unwrap(), expected_bs.clone());
-        reported::assert(r.process_income_statement().unwrap(), expected_is.clone());
+        crate::testing::assert_reported(r.process_balance_sheet().unwrap(), expected_bs.clone());
+        crate::testing::assert_reported(r.process_income_statement().unwrap(), expected_is.clone());
     }
 }

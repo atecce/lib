@@ -1,10 +1,9 @@
-mod reported;
 
-use equities::Reader;
-use equities::IncomeStatement as IS;
-use equities::tsla::BalanceSheet;
-use equities::tsla::IncomeStatement;
-use equities::tsla::CashFlowStatement;
+use crate::Reader;
+use crate::IncomeStatement as IS;
+use crate::tsla::BalanceSheet;
+use crate::tsla::IncomeStatement;
+use crate::tsla::CashFlowStatement;
 
 #[test]
 fn report() {
@@ -79,7 +78,7 @@ fn report() {
     let income_statements = vec![
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 18_831_000_000.0,
             automotive_regulatory_credits: 739_000_000.0,
@@ -106,7 +105,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             automotive_sales_revenue: 53_821_000_000.0,
             automotive_regulatory_credits: 2_071_000_000.0,
@@ -133,7 +132,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 20_359_000_000.0,
             automotive_regulatory_credits: 417_000_000.0,
@@ -160,7 +159,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             automotive_sales_revenue: 49_071_000_000.0,
             automotive_regulatory_credits: 1_451_000_000.0,
@@ -190,7 +189,7 @@ fn report() {
     let cash_flow_statements = [
         CashFlowStatement {
             date: chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             net_income: income_statements[1].net_income(),
 
@@ -234,7 +233,7 @@ fn report() {
         },
         CashFlowStatement {
             date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
-            period: equities::Period::NineMonths,
+            period: crate::Period::NineMonths,
 
             net_income: income_statements[3].net_income(),
 
@@ -278,7 +277,7 @@ fn report() {
         }
     ];
 
-    let mut r = equities::filing::new_reader(std::path::Path::new("../edgar/cache/1318605/000162828025045968"), equities::Ticker::TSLA).unwrap();
-    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
-    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
+    let mut r = crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000162828025045968")), crate::Ticker::TSLA).unwrap();
+    crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
+    crate::testing::assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }

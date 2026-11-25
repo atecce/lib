@@ -394,3 +394,7 @@ mod own_element_tests {
                    Some(crate::item::Item::DepreciationAndAmoritization));
     }
 }
+
+/// Known-answer tests: filings read, against statements transcribed by hand.
+#[cfg(test)]
+mod filings;

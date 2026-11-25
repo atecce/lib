@@ -1,9 +1,8 @@
-mod reported;
 
-use equities::nvda::CashFlowStatement;
-use equities::Reader;
-use equities::IncomeStatement as IS;
-use equities::nvda::{BalanceSheet, IncomeStatement};
+use crate::nvda::CashFlowStatement;
+use crate::Reader;
+use crate::IncomeStatement as IS;
+use crate::nvda::{BalanceSheet, IncomeStatement};
 
 #[test]
 fn report() {
@@ -61,9 +60,9 @@ fn report() {
 
     let income_statements = vec![
         IncomeStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
-            p: equities::Period::ThreeMonths,
+            p: crate::Period::ThreeMonths,
 
             revenue: 35_082_000_000.0,
             cost_of_revenue: 8_926_000_000.0,
@@ -78,9 +77,9 @@ fn report() {
             income_tax_expense: 3_007_000_000.0,
         },
         IncomeStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
-            p: equities::Period::NineMonths,
+            p: crate::Period::NineMonths,
 
             revenue: 91_166_000_000.0,
             cost_of_revenue: 22_031_000_000.0,
@@ -96,9 +95,9 @@ fn report() {
         },
 
         IncomeStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
-            p: equities::Period::ThreeMonths,
+            p: crate::Period::ThreeMonths,
 
             revenue: 57_006_000_000.0,
             cost_of_revenue: 15_157_000_000.0,
@@ -113,9 +112,9 @@ fn report() {
             income_tax_expense: 6_026_000_000.0,
         },
         IncomeStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
-            p: equities::Period::NineMonths,
+            p: crate::Period::NineMonths,
 
             revenue: 147_811_000_000.0,
             cost_of_revenue: 45_441_000_000.0,
@@ -133,9 +132,9 @@ fn report() {
 
     let cash_flow_statements = vec![
         CashFlowStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2024, 10, 27).unwrap(),
-            p: equities::Period::NineMonths,
+            p: crate::Period::NineMonths,
 
             net_income: income_statements[1].net_income(),
 
@@ -172,9 +171,9 @@ fn report() {
             cash_paid_for_income_taxes_net: 10_989_000_000.0,
         },
         CashFlowStatement {
-            ticker: equities::Ticker::NVDA,
+            ticker: crate::Ticker::NVDA,
             date: chrono::NaiveDate::from_ymd_opt(2025, 10, 26).unwrap(),
-            p: equities::Period::NineMonths,
+            p: crate::Period::NineMonths,
 
             net_income: income_statements[3].net_income(),
 
@@ -213,9 +212,9 @@ fn report() {
     ];
 
 
-    let mut r = equities::xlsx::new_reader(std::path::Path::new("nvda/2025-11-19.xlsx"), equities::Ticker::NVDA).unwrap();
+    let mut r = crate::xlsx::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/nvda/filings/2025-11-19.xlsx")), crate::Ticker::NVDA).unwrap();
 
-    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
-    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
-    reported::assert(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
+    crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
+    crate::testing::assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
+    crate::testing::assert_reported(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }

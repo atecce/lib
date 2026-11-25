@@ -59,6 +59,8 @@ pub mod f;
 #[path = "../gm/mod.rs"]
 pub mod gm;
 pub mod company;
+#[cfg(test)]
+pub(crate) mod testing;
 
 pub mod item;
 pub mod xlsx;

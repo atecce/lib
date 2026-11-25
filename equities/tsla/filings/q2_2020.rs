@@ -1,16 +1,15 @@
-mod reported;
 
-use equities::Reader;
-use equities::tsla::BalanceSheet;
-use equities::tsla::IncomeStatement;
+use crate::Reader;
+use crate::tsla::BalanceSheet;
+use crate::tsla::IncomeStatement;
 
-use equities::item::Item::RestructuringAndOther;
+use crate::item::Item::RestructuringAndOther;
 
 #[test]
 fn report() {
 
     let balance_sheets = vec![
-        equities::tsla::Q4_2019_BALANCE_SHEET,
+        crate::tsla::Q4_2019_BALANCE_SHEET,
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2020, 06, 30).unwrap(),
 
@@ -48,7 +47,7 @@ fn report() {
     let income_statements = vec![
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 6, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 5_168_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -75,7 +74,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 6, 30).unwrap(),
-            period: equities::Period::SixMonths,
+            period: crate::Period::SixMonths,
 
             automotive_sales_revenue: 8_677_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -102,7 +101,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
-            period: equities::Period::ThreeMonths,
+            period: crate::Period::ThreeMonths,
 
             automotive_sales_revenue: 4_911_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -129,7 +128,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
-            period: equities::Period::SixMonths,
+            period: crate::Period::SixMonths,
 
             automotive_sales_revenue: 9_804_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -156,13 +155,13 @@ fn report() {
         },
     ];
 
-    let mut r = equities::filing::new_reader(std::path::Path::new("../edgar/cache/1318605/000156459020033670"), equities::Ticker::TSLA).unwrap();
+    let mut r = crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020033670")), crate::Ticker::TSLA).unwrap();
 
-    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
+    crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());
-    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+    crate::testing::assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter()
         .map(|stmt| stmt.reported()).flatten()
         .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
         .collect());
