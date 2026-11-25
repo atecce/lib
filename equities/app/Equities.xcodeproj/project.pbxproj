@@ -157,7 +157,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y82E2K77P5;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Equities;
+				INFOPLIST_KEY_CFBundleDisplayName = Optimates;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Equities reads its data from InfluxDB on your Mac.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -169,7 +169,7 @@
 					"-framework",
 					Security,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = pub.atec.Equities;
+				PRODUCT_BUNDLE_IDENTIFIER = pub.atec.optimates;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
@@ -184,7 +184,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y82E2K77P5;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Equities;
+				INFOPLIST_KEY_CFBundleDisplayName = Optimates;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Equities reads its data from InfluxDB on your Mac.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -196,7 +196,7 @@
 					"-framework",
 					Security,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = pub.atec.Equities;
+				PRODUCT_BUNDLE_IDENTIFIER = pub.atec.optimates;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;

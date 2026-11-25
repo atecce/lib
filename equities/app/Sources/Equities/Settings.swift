@@ -52,7 +52,7 @@ struct ServerSettings: Equatable {
 
 /// Strings in the Keychain, this device only (not synced through iCloud).
 enum Keychain {
-    private static let service = "pub.atec.Equities"
+    private static let service = "pub.atec.optimates"
 
     private static func query(_ key: String) -> [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,

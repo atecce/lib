@@ -44,4 +44,4 @@ xcrun simctl install $id build/Build/Products/Debug-iphonesimulator/Equities.app
 # INFLUXDB3_AUTH_TOKEN just as it does on the Mac. --terminate-running-process
 # restarts the app if it was already open, so a new build takes effect.
 SIMCTL_CHILD_INFLUXDB3_AUTH_TOKEN=$INFLUXDB3_AUTH_TOKEN SIMCTL_CHILD_EQUITIES_TICKER=$EQUITIES_TICKER \
-  xcrun simctl launch --terminate-running-process $id pub.atec.Equities
+  xcrun simctl launch --terminate-running-process $id pub.atec.optimates
