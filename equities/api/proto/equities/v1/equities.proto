@@ -246,11 +246,17 @@ message Position {
   int32 price_epoch_day = 9;
   // The baseline: the dollars that bought the shares still held, put into
   // the baseline (HoldingsResponse.baseline) on the same days instead, and
-  // what they'd be worth now. Gain over r is (value - cost) minus
-  // (baseline_value - baseline_cost). Unset when the buys on record (Plaid's
-  // two years) don't account for every share, and for shorts, options, cash.
+  // what they'd be worth now (its total return, distributions included).
+  // Unset when the buys on record (Plaid's two years) don't account for
+  // every share, and for shorts, options, cash.
   optional double baseline_cost = 10;
   optional double baseline_value = 11;
+  // Cash dividends on the security in this account since the oldest of
+  // those buys: money in, positive. Set with the baseline. Both sides then
+  // count their payouts: the position's total return is value + dividends -
+  // baseline_cost, the baseline's baseline_value - baseline_cost, and the
+  // gain over r (under r when negative) is value + dividends - baseline_value.
+  optional double dividends = 12;
 }
 
 enum PositionKind {

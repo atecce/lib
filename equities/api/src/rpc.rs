@@ -229,13 +229,13 @@ pub const BASELINE: &str = "MINT";
 /// return level (adjusted closes) by day, oldest first; a buy is matched to
 /// the last level on or before its day. None if the buys on record don't
 /// account for every share held, or one predates the index.
-pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &[(NaiveDate, f64)]) -> Option<(f64, f64)> {
+pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &[(NaiveDate, f64)]) -> Option<Measured> {
     let now = index.last()?.1;
     let level = |day: NaiveDate| -> Option<f64> {
         let i = index.partition_point(|(d, _)| *d <= day);
         (i > 0).then(|| index[i - 1].1)
     };
-    let (mut left, mut cost, mut value) = (held, 0.0, 0.0);
+    let (mut left, mut cost, mut value, mut since) = (held, 0.0, 0.0, None);
     for &(day, shares, dollars) in buys_newest_first {
         if left <= 1e-9 { break }
         if shares <= 0.0 { continue }
@@ -243,9 +243,27 @@ pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &
         let part = dollars * take / shares;
         cost += part;
         value += part * now / level(day)?;
+        since = Some(day);
         left -= take;
     }
-    (left <= 1e-6).then_some((cost, value))
+    (left <= 1e-6).then_some(Measured { cost, value, since: since? })
+}
+
+/// A position measured against the baseline: what its held shares' buys
+/// cost, what those dollars would be worth in the baseline, and the day of
+/// the oldest of those buys.
+#[derive(Debug, PartialEq)]
+pub struct Measured {
+    pub cost: f64,
+    pub value: f64,
+    pub since: NaiveDate,
+}
+
+/// Dividends a position received from `since` on: cash in, positive (Plaid
+/// writes money in as a negative amount; a short pays dividends out, which
+/// count against it). `paid` is (day, amount as Plaid wrote it).
+pub fn dividends_since(since: NaiveDate, paid: &[(NaiveDate, f64)]) -> f64 {
+    paid.iter().filter(|(d, _)| *d >= since).map(|(_, amount)| -amount).sum()
 }
 
 async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::access::Identity>>, headers: HeaderMap, body: Bytes)
@@ -296,6 +314,16 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
                        WHERE name LIKE 'buy %' AND quantity > 0 AND amount > 0 ORDER BY date DESC, transaction_id", &[]).await? {
         buys.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3), r.get(4)));
     }
+    // Cash dividends, by (account, security): (day, amount as Plaid wrote it).
+    // Plaid gives a dividend no security; Robinhood's description names its
+    // ticker: "Cash dividend of $0.05 from CL - DIVIDEND".
+    let mut paid: std::collections::HashMap<(String, String), Vec<(NaiveDate, f64)>> = Default::default();
+    for r in db.query("SELECT t.account_id, s.security_id, t.date, t.amount
+                       FROM portfolio_transaction t
+                       JOIN portfolio_security s ON s.ticker = substring(t.name FROM 'from (\\S+) - DIVIDEND') AND s.type <> 'derivative'
+                       WHERE t.type = 'cash' AND t.subtype = 'dividend' AND t.amount IS NOT NULL", &[]).await? {
+        paid.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
+    }
     let index: Vec<(NaiveDate, f64)> = tiingo::Cache::new(tiingo::Cache::default_dir()).prices(BASELINE)
         .map(|p| p.iter().filter_map(|p| Some((p.day()?, p.adj_close))).collect())
         .unwrap_or_else(|e| { eprintln!("{}: {}", BASELINE, e); Vec::new() });
@@ -335,16 +363,21 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
             },
             _ => (None, pb::CostSource::Unspecified),
         };
+        let key = (account_id.clone(), security_id);
         let measured = match kind {
-            pb::PositionKind::Long => buys.get(&(account_id.clone(), security_id)).and_then(|b| baseline(quantity, b, &index)),
+            pb::PositionKind::Long => buys.get(&key).and_then(|b| baseline(quantity, b, &index)),
             _ => None,
         };
+        // The dividends that belong with the measured shares: those paid
+        // since their oldest buy.
+        let dividends = measured.as_ref().map(|m| paid.get(&key).map(|p| dividends_since(m.since, p)).unwrap_or(0.0));
         accounts.last_mut().unwrap().1.positions.push(pb::Position {
             ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value: r.get(11),
             cost, cost_source: source as i32,
             price_epoch_day: r.get::<_, Option<NaiveDate>>(13).map(|d| (d - epoch).num_days() as i32).unwrap_or(0),
-            baseline_cost: measured.map(|m| m.0),
-            baseline_value: measured.map(|m| m.1),
+            baseline_cost: measured.as_ref().map(|m| m.cost),
+            baseline_value: measured.as_ref().map(|m| m.value),
+            dividends,
         });
     }
     let synced_unix = synced(db).await?.unwrap_or(0);
@@ -474,15 +507,26 @@ mod tests {
         let index = [(d(2026, 1, 2), 100.0), (d(2026, 6, 1), 102.0), (d(2026, 11, 25), 103.02)];
         // Held 3 shares: bought 2 in June ($200), 2 in January ($100), 1 sold since.
         let buys = [(d(2026, 6, 1), 2.0, 200.0), (d(2026, 1, 5), 2.0, 100.0)];
-        let (cost, value) = baseline(3.0, &buys, &index).unwrap();
+        let m = baseline(3.0, &buys, &index).unwrap();
         // June's $200 grew 1%; half of January's ($50), bought on a weekend
-        // after the 2nd's level, grew 3.02%.
-        assert!((cost - 250.0).abs() < 1e-9);
-        assert!((value - (200.0 * 1.01 + 50.0 * 1.0302)).abs() < 1e-9);
+        // after the 2nd's level, grew 3.02%. The oldest held buy: January's.
+        assert!((m.cost - 250.0).abs() < 1e-9);
+        assert!((m.value - (200.0 * 1.01 + 50.0 * 1.0302)).abs() < 1e-9);
+        assert_eq!(m.since, d(2026, 1, 5));
         // More held than bought on record: not known.
         assert_eq!(baseline(5.0, &buys, &index), None);
         // A buy before the index starts: not known.
         assert_eq!(baseline(1.0, &[(d(2025, 12, 1), 1.0, 10.0)], &index), None);
+    }
+
+    #[test]
+    fn dividends_since_the_oldest_held_buy() {
+        let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day).unwrap();
+        // Plaid writes cash in as negative: $1.57 and $1.60 received, the
+        // first before the shares held were bought; $0.35 paid out (a short).
+        let paid = [(d(2025, 12, 1), -1.57), (d(2026, 3, 1), -1.60), (d(2026, 6, 1), 0.35)];
+        assert!((dividends_since(d(2026, 1, 5), &paid) - (1.60 - 0.35)).abs() < 1e-9);
+        assert_eq!(dividends_since(d(2027, 1, 1), &paid), 0.0);
     }
 
     #[test]
