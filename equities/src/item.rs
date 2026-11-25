@@ -171,7 +171,14 @@ items! {
         FinancialServicesRevenue => ["Ford Credit", "GM Financial", "Financial services", "Financial Services", "Financing operations", "金融事業"] @ ["E02144:FinancingOperationsIFRS"],
         // Emission credits sold to other car makers.
         RegulatoryCreditsRevenue => ["Automotive regulatory credits"],
-        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "E02144:TotalNetRevenuesIFRS", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer"],
+        // The last four elements are other kinds of total: a bank's "total net
+        // revenues", contract revenue including taxes collected (only on a row
+        // that says revenue: see filing::row_item), a utility's regulated and
+        // unregulated operating revenue, and an older services total. Last, so
+        // a statement's usual total still outranks them. Which companies use
+        // them is said in their own modules (gs). Banks that show no total
+        // (net interest income and non-interest income apart) have none.
+        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "E02144:TotalNetRevenuesIFRS", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer", "RevenuesNetOfInterestExpense", "RevenueFromContractWithCustomerIncludingAssessedTax", "RegulatedAndUnregulatedOperatingRevenue", "SalesRevenueServicesNet"],
         // 売上原価 (uriage genka): cost of sales
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales", "売上原価"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales", "jpigp_cor:CostOfSalesIFRS", "jppfs_cor:CostOfSales"],
 
@@ -417,5 +424,14 @@ mod tests {
         assert_eq!(Item::from_xbrl_tag("nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets"),
             Some(Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets));
         assert_eq!(Item::from_xbrl_tag("tsla_Revenues"), None);
+        for tag in ["us-gaap_RevenuesNetOfInterestExpense", "us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax",
+                    "us-gaap_RegulatedAndUnregulatedOperatingRevenue", "us-gaap_SalesRevenueServicesNet"] {
+            assert_eq!(Item::from_xbrl_tag(tag), Some(Item::Revenue), "{}", tag);
+        }
+        // Ranked after the usual totals, so those still win.
+        let rank = |t: &str| Item::from_xbrl_tag_ranked(t).unwrap().1;
+        assert!(rank("us-gaap_Revenues") < rank("us-gaap_RevenuesNetOfInterestExpense"));
+        assert!(rank("us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax")
+            < rank("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax"));
     }
 }

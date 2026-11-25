@@ -482,10 +482,20 @@ fn is_extension(tag: &str) -> bool {
 /// are both "Marketable securities"). An unmapped us-gaap element reports
 /// nothing we track. Company extension elements and dimension rows (segment
 /// axes and members) fall back to the label.
-fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
+///
+/// One element needs its label too: contract revenue including taxes
+/// collected is some companies' "Total revenue" but a bank's "Fee and
+/// commission income", a part of its income. It reports revenue only on a
+/// row that says revenue or sales.
+///
+/// Visible to the crate, so a company's module can test how its own rows
+/// read (gs).
+pub(crate) fn row_item(tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
     let by_label = || label.and_then(|l| l.parse::<Item>().ok()).map(|i| (i, 0));
     match tag {
         None => by_label(),
+        Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax")
+            if !label.is_some_and(|l| { let l = l.to_lowercase(); l.contains("revenue") || l.contains("sales") }) => None,
         Some(tag) => match Item::from_xbrl_tag_ranked(tag) {
             Some(item) => Some(item),
             None if is_extension(tag) || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
@@ -507,6 +517,18 @@ impl R for Reader {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn contract_revenue_including_taxes_needs_a_revenue_label() {
+        let tag = Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax");
+        assert_eq!(row_item(tag, Some("Total revenue")).map(|r| r.0), Some(Item::Revenue));
+        assert_eq!(row_item(tag, Some("Net sales")).map(|r| r.0), Some(Item::Revenue));
+        // A bank's fee income: part of its income, not its revenue.
+        assert_eq!(row_item(tag, Some("Fee and commission income")), None);
+        // Other elements don't need it.
+        assert_eq!(row_item(Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues")).map(|r| r.0),
+                   Some(Item::Revenue));
+    }
 
     #[test]
     fn amounts() {

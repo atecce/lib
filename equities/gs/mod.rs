@@ -571,6 +571,17 @@ pub const CASH_FLOW_STATEMENT_2025: CashFlowStatement = CashFlowStatement {
 mod tests {
     use super::*;
 
+    /// Goldman's top line is "Total net revenues", tagged
+    /// `RevenuesNetOfInterestExpense` (not `Revenues`): a bank's revenues are
+    /// its interest income net of interest expense, plus its fees and
+    /// trading. It reads as Revenue (item.rs lists the element last, after
+    /// the usual totals). Its 2025 net revenues: $58.28 billion.
+    #[test]
+    fn net_revenues_are_revenue() {
+        let row = crate::filing::row_item(Some("us-gaap_RevenuesNetOfInterestExpense"), Some("Total net revenues"));
+        assert_eq!(row.map(|(item, _)| item), Some(crate::item::Item::Revenue));
+    }
+
     /// The computed totals equal the 10-K's printed ones.
     #[test]
     fn statements_match_the_filing() {
