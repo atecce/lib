@@ -46,6 +46,10 @@ struct App {
     /// over it; the app's few requests need no pool.)
     db: Mutex<Option<Arc<Client>>>,
     access: Option<Arc<Access>>,
+    /// Who may see the portfolio (Holdings): their emails, PORTFOLIO_OWNERS.
+    portfolio_owners: Vec<String>,
+    /// The sync (store-plaid), run when Holdings asks for fresh data.
+    store_plaid: String,
 }
 
 impl App {
@@ -91,7 +95,7 @@ fn refuse(status: StatusCode, code: &str, message: &str) -> Response {
 }
 
 /// Refuse what Cloudflare Access didn't let through.
-async fn require_access(State(app): State<Arc<App>>, headers: HeaderMap, req: Request, next: Next) -> Response {
+async fn require_access(State(app): State<Arc<App>>, headers: HeaderMap, mut req: Request, next: Next) -> Response {
     let Some(access) = &app.access else { return next.run(req).await };
     let Some(assertion) = headers.get("cf-access-jwt-assertion").and_then(|v| v.to_str().ok()) else {
         return refuse(StatusCode::UNAUTHORIZED, "unauthenticated", "no Cloudflare Access assertion");
@@ -99,6 +103,8 @@ async fn require_access(State(app): State<Arc<App>>, headers: HeaderMap, req: Re
     match access.verify(assertion).await {
         Ok(who) => {
             eprintln!("{} {} ({})", req.method(), req.uri().path(), who);
+            // For the handlers that care who asks (Holdings).
+            req.extensions_mut().insert(who);
             next.run(req).await
         }
         Err(why) => {
@@ -238,6 +244,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         store_url: env("STORE_URL").unwrap_or_else(|| "host=localhost dbname=financials".into()),
         db: Mutex::new(None),
         access,
+        // PORTFOLIO_OWNERS (comma-separated), else ~/.plaid/owners (one a
+        // line): emails, kept out of the repository.
+        portfolio_owners: env("PORTFOLIO_OWNERS")
+            .or_else(|| std::fs::read_to_string(format!("{}/.plaid/owners", std::env::var("HOME").unwrap_or_default())).ok())
+            .map(|v| v.split([',', '\n']).map(|e| e.trim().to_lowercase()).filter(|e| !e.is_empty() && !e.starts_with('#')).collect())
+            .unwrap_or_default(),
+        store_plaid: env("STORE_PLAID").unwrap_or_else(|| "/Users/atec/lib/target/release/store-plaid".into()),
     });
 
     let checked = Router::new()

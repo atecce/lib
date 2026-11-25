@@ -12,6 +12,8 @@ equities = { path = ".." }
 postgres = { version = "0.19", features = ["with-chrono-0_4"] }
 tiingo = { path = "../tiingo", default-features = false }
 fred = { path = "../../fred", default-features = false }
+plaid = { path = "../../plaid" }
+serde_json = "1.0.149"
 
 [[bin]]
 name = "store-progress"
@@ -24,3 +26,7 @@ path = "src/bin/sic.rs"
 [[bin]]
 name = "store-fred"
 path = "src/bin/fred.rs"
+
+[[bin]]
+name = "store-plaid"
+path = "src/bin/plaid.rs"

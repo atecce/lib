@@ -18,6 +18,10 @@ service Equities {
   // A company's reported items and market series, in every currency it
   // reports in.
   rpc Dashboard(DashboardRequest) returns (DashboardResponse);
+  // The owner's brokerage accounts (Plaid): holdings and unrealized gains.
+  // Only for the owner (PORTFOLIO_OWNERS) and the Mac's service token:
+  // others get permission_denied.
+  rpc Holdings(HoldingsRequest) returns (HoldingsResponse);
 }
 
 message TickersRequest {}
@@ -193,4 +197,65 @@ enum Item {
   ITEM_PRINCIPAL_PAYMENTS_ON_PROPERTY_AND_EQUIPMENT_AND_INTANGIBLE_ASSETS = 93;
   ITEM_REPAYMENT_OF_DEBT = 94;
   ITEM_CHANGE_IN_CASH_AND_CASH_EQUIVALENTS = 95;
+}
+
+message HoldingsRequest {
+  // Sync with the brokerage first, unless that was in the last 15 minutes.
+  bool refresh = 1;
+}
+
+message HoldingsResponse {
+  repeated Account accounts = 1;
+  // When the brokerage was last synced: seconds since 1970.
+  int64 synced_unix = 2;
+}
+
+message Account {
+  string institution = 1;
+  string name = 2;
+  // As the institution says: "ira", "brokerage", "crypto exchange".
+  string subtype = 3;
+  // What the account is worth, as the institution reports it.
+  double balance = 4;
+  repeated Position positions = 5;
+}
+
+message Position {
+  string ticker = 1;
+  string name = 2;
+  PositionKind kind = 3;
+  // Negative for a short.
+  double quantity = 4;
+  // Per share; per contract (x100) for an option.
+  double price = 5;
+  // quantity x price: negative for a short or a margin debit.
+  double value = 6;
+  // What the position cost, so value - cost is its unrealized gain; for a
+  // short, minus what the short sales brought in. Unset when not known, and
+  // for options and cash.
+  optional double cost = 7;
+  CostSource cost_source = 8;
+  // The day of the price: days since 1970-01-01.
+  int32 price_epoch_day = 9;
+}
+
+enum PositionKind {
+  POSITION_KIND_UNSPECIFIED = 0;
+  // Shares, funds, crypto held.
+  POSITION_KIND_LONG = 1;
+  // Shares sold short.
+  POSITION_KIND_SHORT = 2;
+  // An option contract, long or short: its value only, for now.
+  POSITION_KIND_OPTION = 3;
+  // Cash; negative for a margin debit.
+  POSITION_KIND_CASH = 4;
+}
+
+enum CostSource {
+  COST_SOURCE_UNSPECIFIED = 0;
+  // The institution's cost basis.
+  COST_SOURCE_INSTITUTION = 1;
+  // The proceeds of the short sales still open (the newest ones: earlier
+  // ones were covered first).
+  COST_SOURCE_SHORT_SALES = 2;
 }

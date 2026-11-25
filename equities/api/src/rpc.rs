@@ -10,6 +10,7 @@ use std::sync::Arc;
 
 use axum::body::Bytes;
 use axum::extract::State;
+use axum::Extension;
 use axum::http::{header, HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
@@ -31,6 +32,7 @@ pub fn routes() -> Router<Arc<App>> {
     Router::new()
         .route("/equities.v1.Equities/Tickers", post(tickers))
         .route("/equities.v1.Equities/Dashboard", post(dashboard))
+        .route("/equities.v1.Equities/Holdings", post(holdings))
 }
 
 /// A Connect error: one of the protocol's codes, and a message.
@@ -168,6 +170,114 @@ async fn dashboard(State(app): State<Arc<App>>, headers: HeaderMap, body: Bytes)
     Ok(codec.encode(&pb::DashboardResponse { series }))
 }
 
+/// How long a sync stays fresh: a Holdings call asking for a refresh within
+/// it reads what's stored.
+const SYNC_FRESH_SECONDS: i64 = 15 * 60;
+
+/// What a short of `short` shares brought in: its newest short sales, as
+/// (shares, proceeds), newest first. The older ones were covered first
+/// (FIFO), so the newest are what's still open. None if the sales on record
+/// (Plaid's two years) don't add up to the position.
+pub fn short_proceeds(short: f64, sales_newest_first: &[(f64, f64)]) -> Option<f64> {
+    let (mut left, mut proceeds) = (short, 0.0);
+    for &(shares, amount) in sales_newest_first {
+        if left <= 1e-9 { break }
+        if shares <= 0.0 { continue }
+        let take = shares.min(left);
+        proceeds += amount * take / shares;
+        left -= take;
+    }
+    (left <= 1e-6).then_some(proceeds)
+}
+
+async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::access::Identity>>, headers: HeaderMap, body: Bytes)
+    -> Result<Response, ConnectError>
+{
+    let codec = match Codec::of(&headers) { Ok(c) => c, Err(refusal) => return Ok(refusal) };
+    let req: pb::HoldingsRequest = codec.decode(&body)?;
+    // The family may read the dashboards; the portfolio is the owner's.
+    if app.access.is_some() {
+        let allowed = match who.as_deref() {
+            Some(crate::access::Identity::Person(email)) => app.portfolio_owners.contains(&email.to_lowercase()),
+            Some(crate::access::Identity::ServiceToken(_)) => true,
+            None => false,
+        };
+        if !allowed {
+            return Err(ConnectError::new("permission_denied", "the portfolio is its owner's"));
+        }
+    }
+    let db = app.client().await?;
+    let synced = |db: Arc<tokio_postgres::Client>| async move {
+        db.query_one("SELECT extract(epoch FROM max(synced_at))::bigint FROM portfolio_sync", &[]).await
+            .map(|r| r.get::<_, Option<i64>>(0))
+    };
+    if req.refresh {
+        let last = synced(db.clone()).await?.unwrap_or(0);
+        let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64;
+        if now - last > SYNC_FRESH_SECONDS {
+            let run = tokio::process::Command::new(&app.store_plaid).kill_on_drop(true).output();
+            match tokio::time::timeout(std::time::Duration::from_secs(90), run).await {
+                Ok(Ok(out)) if out.status.success() => {}
+                Ok(Ok(out)) => eprintln!("store-plaid: {}", String::from_utf8_lossy(&out.stderr).trim()),
+                Ok(Err(e)) => eprintln!("store-plaid: {}", e),
+                Err(_) => eprintln!("store-plaid: over 90 s, stopped"),
+            }
+        }
+    }
+
+    // Short sales still on record, newest first, by (account, security).
+    let mut sales: std::collections::HashMap<(String, String), Vec<(f64, f64)>> = Default::default();
+    for r in db.query("SELECT account_id, security_id, -quantity, -amount FROM portfolio_transaction
+                       WHERE name LIKE 'sell_short%' AND quantity < 0 ORDER BY date DESC, transaction_id", &[]).await? {
+        sales.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
+    }
+
+    let rows = db.query(
+        "SELECT a.account_id, coalesce(a.institution, ''), a.name, coalesce(a.subtype, ''), coalesce(a.balance, 0),
+                s.security_id, coalesce(s.ticker, ''), coalesce(s.name, ''), coalesce(s.type, ''),
+                h.quantity, coalesce(h.price, 0), coalesce(h.value, h.quantity * h.price, 0), h.cost_basis, h.price_as_of
+         FROM portfolio_holding h JOIN portfolio_account a USING (account_id) JOIN portfolio_security s USING (security_id)
+         WHERE h.as_of = (SELECT max(as_of) FROM portfolio_holding)
+         ORDER BY a.balance DESC NULLS LAST, a.account_id, abs(coalesce(h.value, 0)) DESC", &[]).await?;
+    let epoch = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
+    let mut accounts: Vec<(String, pb::Account)> = Vec::new();
+    for r in rows {
+        let account_id: String = r.get(0);
+        if accounts.last().is_none_or(|(id, _)| *id != account_id) {
+            accounts.push((account_id.clone(), pb::Account {
+                institution: r.get(1), name: r.get(2), subtype: r.get(3), balance: r.get(4), positions: vec![],
+            }));
+        }
+        let (security_id, kind_name): (String, String) = (r.get(5), r.get(8));
+        let quantity: f64 = r.get(9);
+        let kind = match kind_name.as_str() {
+            "derivative" => pb::PositionKind::Option,
+            "cash" => pb::PositionKind::Cash,
+            _ if quantity < 0.0 => pb::PositionKind::Short,
+            _ => pb::PositionKind::Long,
+        };
+        let (cost, source) = match kind {
+            pb::PositionKind::Long => match r.get::<_, Option<f64>>(12) {
+                Some(c) => (Some(c), pb::CostSource::Institution),
+                None => (None, pb::CostSource::Unspecified),
+            },
+            pb::PositionKind::Short => match sales.get(&(account_id.clone(), security_id)).and_then(|s| short_proceeds(-quantity, s)) {
+                Some(p) => (Some(-p), pb::CostSource::ShortSales),
+                None => (None, pb::CostSource::Unspecified),
+            },
+            _ => (None, pb::CostSource::Unspecified),
+        };
+        accounts.last_mut().unwrap().1.positions.push(pb::Position {
+            ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value: r.get(11),
+            cost, cost_source: source as i32,
+            price_epoch_day: r.get::<_, Option<NaiveDate>>(13).map(|d| (d - epoch).num_days() as i32).unwrap_or(0),
+        });
+    }
+    let synced_unix = synced(db).await?.unwrap_or(0);
+    Ok(codec.encode(&pb::HoldingsResponse { accounts: accounts.into_iter().map(|(_, a)| a).collect(), synced_unix }))
+}
+
+
 /// `TotalAssets` → `TOTAL_ASSETS`, the .proto's spelling.
 pub fn screaming(camel: &str) -> String {
     let mut s = String::new();
@@ -264,6 +374,18 @@ mod tests {
         let squash = |s: &str| s.replace(' ', "");
         assert_eq!(hex(&request.encode_to_vec()), squash(GOLDEN_REQUEST), "request");
         assert_eq!(hex(&response.encode_to_vec()), squash(GOLDEN_RESPONSE), "response");
+    }
+
+    #[test]
+    fn shorts_cost_what_their_newest_sales_brought_in() {
+        // Shorted 1 share at 60, covered, shorted 1 at 50; short 1 now.
+        let sales = [(1.0, 50.0), (1.0, 60.0)];
+        assert_eq!(short_proceeds(1.0, &sales), Some(50.0));
+        assert_eq!(short_proceeds(2.0, &sales), Some(110.0));
+        assert_eq!(short_proceeds(1.5, &sales), Some(80.0));
+        // More short than the sales on record: not known.
+        assert_eq!(short_proceeds(3.0, &sales), None);
+        assert_eq!(short_proceeds(1.0, &[]), None);
     }
 
     #[test]
