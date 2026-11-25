@@ -171,6 +171,12 @@ pub fn default_list() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("rates.txt")
 }
 
+/// Every series list kept with the crate: rates.txt (interest rates) and
+/// macro.txt (inflation, the output gap, policy, money).
+pub fn lists() -> Vec<PathBuf> {
+    ["rates.txt", "macro.txt"].iter().map(|f| Path::new(env!("CARGO_MANIFEST_DIR")).join(f)).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
