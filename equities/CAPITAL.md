@@ -402,6 +402,65 @@ But as the opportunity cost of the money actually in the account, MINT is
 the honest one: it is where the money waits between uses, at the rate it
 actually earned.
 
+### How equities came to carry a premium
+
+For most of the history of American securities the respectable holding was
+the bond, above all the railroad bond; shares were for insiders and
+speculators. *The Great Gatsby* (1925) catches the mood: Nick Carraway comes
+East in 1922 to learn "the bond business", because "everybody I knew was in
+the bond business".
+
+The argument for shares came first from Edgar Lawrence Smith's *Common
+Stocks as Long Term Investments* (1924), which set out to show that bonds
+were the better investment and found the opposite, from 1866 on. His reason
+was retained earnings: a company pays out part of its profit and reinvests
+the rest, so its shares compound beyond their dividends, while a bond's
+coupon is fixed. Keynes, reviewing it (1925), singled out exactly this, the
+compound interest of retained earnings. The book became a text of the
+1920s boom, and of Irving Fisher's "permanently high plateau" days before
+the crash.
+
+Graham and Dodd's *Security Analysis* (1934) was the reaction, not the
+beginning: written after the crash, it asks for a margin of safety and
+earnings power proven over years, and still treats a sound bond as the
+default; Graham's *Intelligent Investor* (1949) keeps a quarter to three
+quarters in stocks, never all. Equities were accepted after the war, in the
+"cult of the equity" of the 1950s (George Ross Goobey moving the Imperial
+Tobacco pension fund into shares), and the moment can be dated: in 1958–59
+dividend yields fell below bond yields for the first time, the reverse
+yield gap. Until then a share had to out-yield a bond to pay for its risk;
+from then the market priced Smith's point, that a share's earnings grow and
+a bond's coupons don't. Miller and Modigliani (1961) gave it its theory:
+paying out earnings or retaining them doesn't change a company's value,
+only the form of the return, which is why the residual income model above
+can value a company from its book and earnings whatever its dividends.
+
+Mehra and Prescott (1985) then measured what this had paid, about six
+points a year over bills since 1889, and showed the standard model of
+consumption could justify a third of a point; Weil (1989) added that the
+same model, made to fit the premium, predicts a risk-free rate far above
+the one observed.
+
+### Why long bonds lag a money-market fund
+
+The premium is what equities pay for the risk bonds don't carry, so bonds
+are meant to earn less. Over shorter spans a bond fund's return is
+
+    return ≈ the yield it started at − duration × the change in yields
+
+From August 2024 to November 2026 the 30-year Treasury yield rose from
+4.15% to 5.30%: a long corporate fund (duration 12–13 years) lost about 14%
+in price over those two and a quarter years, against about 12% earned in
+interest. A fund
+of duration half a year, like MINT, barely feels a change in yields, and in
+2022–24 the curve was inverted (the 3-month bill at 5.2% against the
+30-year at 4.2%), so the longer bond also paid less. Over a holding period
+about its duration, a bond fund's return converges to the yield it was
+bought at, since the losses on price are reinvested at the higher yields;
+and long bonds' place in a portfolio has been as a hedge, rising when
+stocks fall, as they did from 2000 to 2021. When inflation moves both, as
+in 2022, they fall together and the hedge is gone.
+
 ### The puzzle, and the tails
 
 Mehra and Prescott's puzzle is that six points of premium need an aversion
@@ -512,14 +571,19 @@ above).
   Theory of Capital*.
 - Damodaran, A. Equity risk premiums: determinants, estimation and
   implications (updated annually). NYU Stern.
+- Fitzgerald, F. S. (1925). *The Great Gatsby*. Scribner.
 - Fisher, I. (1896). *Appreciation and Interest*. (1930). *The Theory of
   Interest*.
 - Gordon, M. J. (1959). Dividends, earnings, and stock prices. *Review of
   Economics and Statistics* 41(2).
+- Graham, B. (1949). *The Intelligent Investor*. Harper.
+- Graham, B., and D. L. Dodd (1934). *Security Analysis*. Whittlesey House.
 - Hayek, F. A. (1931). *Prices and Production*. (1941). *The Pure Theory
   of Capital*.
 - Jensen, M. C. (1968). The performance of mutual funds in the period
   1945–1964. *Journal of Finance* 23(2).
+- Keynes, J. M. (1925). An American study of shares versus bonds as
+  permanent investments. *The Nation and Athenaeum*, 2 May.
 - Keynes, J. M. (1936). *The General Theory of Employment, Interest and
   Money*, chapters 13–17.
 - Kim, D. H., and J. H. Wright (2005). An arbitrage-free three-factor term
@@ -547,10 +611,13 @@ above).
   equilibrium under conditions of risk. *Journal of Finance* 19(3).
 - Sraffa, P. (1932). Dr. Hayek on money and capital. *Economic Journal*
   42(165). (1960). *Production of Commodities by Means of Commodities*.
+- Smith, E. L. (1924). *Common Stocks as Long Term Investments*. Macmillan.
 - Summers, L. H. (2014). U.S. economic prospects: secular stagnation,
   hysteresis, and the zero lower bound. *Business Economics* 49(2).
 - Taleb, N. N. (2020). *Statistical Consequences of Fat Tails*. STEM
   Academic Press.
+- Weil, P. (1989). The equity premium puzzle and the risk-free rate
+  puzzle. *Journal of Monetary Economics* 24(3).
 - Wicksell, K. (1898). *Interest and Prices*.
 
 Data: FRED, Federal Reserve Bank of St. Louis; series as listed in
