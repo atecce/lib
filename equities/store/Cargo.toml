@@ -7,6 +7,7 @@ edition = "2024"
 # sources. See README.md.
 
 [dependencies]
+csv = "1"
 chrono = "0.4.44"
 equities = { path = ".." }
 postgres = { version = "0.19", features = ["with-chrono-0_4"] }
@@ -32,6 +33,10 @@ path = "src/bin/fred.rs"
 [[bin]]
 name = "store-plaid"
 path = "src/bin/plaid.rs"
+
+[[bin]]
+name = "store-robinhood"
+path = "src/bin/robinhood.rs"
 
 [[bin]]
 name = "store-rstar"

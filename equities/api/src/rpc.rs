@@ -303,6 +303,13 @@ pub fn xirr(flows: &[(NaiveDate, f64)]) -> Option<f64> {
     Some(r)
 }
 
+/// The ratio that turns shares bought on `day` into today's shares: the
+/// product of the splits (day, new shares per old) after that day. A buy on
+/// a split's day is already in the new shares.
+pub fn split_factor(day: NaiveDate, splits: &[(NaiveDate, f64)]) -> f64 {
+    splits.iter().filter(|(d, _)| *d > day).map(|(_, r)| r).product()
+}
+
 /// Rates for less than a year aren't annualized (the GIPS standard): a
 /// week's move, compounded over a year, is noise made enormous.
 const ANNUALIZE_AFTER_DAYS: i64 = 365;
@@ -357,10 +364,21 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
     }
     // Buys on record, newest first, by (account, security), and the
     // baseline's total return level by day (Tiingo's adjusted closes).
+    // Splits (from the Robinhood reports; Plaid has none): a buy's shares
+    // are in today's shares once multiplied by the ratios of the splits
+    // after it.
+    let mut splits: std::collections::HashMap<(String, String), Vec<(NaiveDate, f64)>> = Default::default();
+    for r in db.query("SELECT account_id, security_id, date, quantity FROM portfolio_transaction
+                       WHERE type = 'split' AND quantity > 0", &[]).await? {
+        splits.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
+    }
     let mut buys: std::collections::HashMap<(String, String), Vec<(NaiveDate, f64, f64)>> = Default::default();
     for r in db.query("SELECT account_id, security_id, date, quantity, amount FROM portfolio_transaction
                        WHERE name LIKE 'buy %' AND quantity > 0 AND amount > 0 ORDER BY date DESC, transaction_id", &[]).await? {
-        buys.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3), r.get(4)));
+        let key: (String, String) = (r.get(0), r.get(1));
+        let day: NaiveDate = r.get(2);
+        let shares = r.get::<_, f64>(3) * splits.get(&key).map(|s| split_factor(day, s)).unwrap_or(1.0);
+        buys.entry(key).or_default().push((day, shares, r.get(4)));
     }
     // Cash dividends, by (account, security): (day, amount as Plaid wrote it).
     // Plaid gives a dividend no security; Robinhood's description names its
@@ -617,6 +635,16 @@ mod tests {
         assert_eq!(baseline(5.0, &buys, &index), None);
         // A buy before the index starts: not known.
         assert_eq!(baseline(1.0, &[(d(2025, 12, 1), 1.0, 10.0)], &index), None);
+    }
+
+    #[test]
+    fn splits_after_a_buy_scale_its_shares() {
+        let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day).unwrap();
+        let splits = [(d(2020, 8, 31), 5.0), (d(2022, 8, 25), 3.0)];
+        assert_eq!(split_factor(d(2020, 1, 2), &splits), 15.0);
+        assert_eq!(split_factor(d(2021, 1, 4), &splits), 3.0);
+        // On the day: already new shares.
+        assert_eq!(split_factor(d(2022, 8, 25), &splits), 1.0);
     }
 
     #[test]
