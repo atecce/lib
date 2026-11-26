@@ -219,6 +219,13 @@ message HoldingsResponse {
   // return), and the day of its last price.
   string market = 5;
   int32 market_epoch_day = 6;
+  // The portfolio's annual rates (XIRR, money-weighted; CAPITAL.md "Rates
+  // of return"), over the positions held a year or more: yours, dividends
+  // in; MINT's and the market's on the same dollars and days. The premium
+  // on r is annual_return - baseline_annual. Unset when not solvable.
+  optional double annual_return = 7;
+  optional double baseline_annual = 8;
+  optional double market_annual = 9;
 }
 
 message Account {
@@ -229,6 +236,10 @@ message Account {
   // What the account is worth, as the institution reports it.
   double balance = 4;
   repeated Position positions = 5;
+  // The account's annual rates, as HoldingsResponse's.
+  optional double annual_return = 6;
+  optional double baseline_annual = 7;
+  optional double market_annual = 8;
 }
 
 message Position {
@@ -267,6 +278,11 @@ message Position {
   // less the market's on the same money: with beta taken as 1, Jensen's
   // alpha in dollars. Set with the baseline.
   optional double market_value = 13;
+  // The position's annual rates, as HoldingsResponse's: set only when its
+  // oldest held buy is a year old or more (shorter rates aren't annualized).
+  optional double annual_return = 14;
+  optional double baseline_annual = 15;
+  optional double market_annual = 16;
 }
 
 enum PositionKind {

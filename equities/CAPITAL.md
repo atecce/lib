@@ -416,6 +416,92 @@ ensemble's, by about half the variance. On these readings the premium is not
 a free lunch but rent for carrying ruin risk, and an implied premium of one
 point is a market that has stopped charging much for it.
 
+## Rates of return: IRR and XIRR
+
+"Over r" in dollars says how much; a premium on r is a rate, and to compare
+a position's return with r it must be a rate per year, like r itself.
+
+### Holding-period return
+
+One sum invested at time 0, worth V at time T (in years), with dividends D:
+
+    R = (V + D − C) / C,        annualized: (1 + R)^(1/T) − 1
+
+This is enough for one purchase. It fails as soon as money goes in at
+different times: a position bought in three lots, over three years, has no
+single T.
+
+### IRR: the rate that prices all the flows at once
+
+Write every flow as a signed amount c_t, money in negative and money out
+(or held, at today's value) positive. The internal rate of return is the r
+at which they are worth nothing net:
+
+    NPV(r) = Σ_t c_t / (1 + r)^t = 0
+
+With one flow in and one out it is the annualized holding-period return
+above. With many, it is the single constant rate at which the money, each
+dollar from the day it went in, would have grown into what came out. Since
+the investor chose when to put money in, the IRR is *money-weighted*: a
+lucky large purchase before a rise counts for more than a small one. That
+is the right measure of what happened to the investor's dollars; the
+*time-weighted* return (chaining each period's return, ignoring the size of
+the flows) is the right measure of a manager who doesn't control them, and
+is what an index or a fund reports.
+
+### XIRR: irregular dates
+
+IRR as usually written assumes evenly spaced periods. Real flows come on
+any day, so XIRR (the spreadsheet name; the same idea) measures time in
+years from the first flow:
+
+    Σ_i c_i / (1 + r)^(t_i) = 0,        t_i = (d_i − d_0) / 365
+
+There is no closed form. The function is solved numerically by Newton's
+method,
+
+    r_{n+1} = r_n − NPV(r_n) / NPV′(r_n),
+    NPV′(r) = Σ_i −t_i c_i / (1 + r)^(t_i + 1)
+
+starting from 10%. Newton's method converges fast near the root but can
+shoot past it, so the solver (`xirr` in `equities/api/src/rpc.rs`) keeps a
+bracket [lo, hi] where NPV changes sign, starting at (−99.99%, +1000%), and
+bisects whenever a Newton step would leave it. Without a sign change (money
+only going in, say) there is no rate, and none is reported. With flows that
+change sign more than once there can be more than one root (Descartes' rule
+of signs); a portfolio's flows (buys, then dividends and a final value) change
+sign once, so the root is unique.
+
+### The premium on r
+
+For each position held a year or more the API solves three XIRRs, on the
+same buy dates and amounts:
+
+- **yours:** the buys in, the dividends out on the days they were paid, and
+  today's value out;
+- **r's:** the buys in, and what the same dollars on the same days would be
+  worth in MINT today;
+- **the market's:** the same, in SPY.
+
+The premium on r is yours minus r's, in points per year; over the market,
+yours minus the market's. Because the flows are the same, the comparison is
+of the asset alone: the timing was the investor's in both. Accounts and the
+whole portfolio pool their positions' flows and solve once, which weights
+each position by its dollars and its time.
+
+Rates for less than a year are not annualized, following the GIPS
+standard: three weeks' 2% move compounds to 40% a year, which says
+nothing. Those positions show their dollars only.
+
+The limits: the baselines are total-return prices (dividends reinvested),
+while the position's dividends are counted as cash out on the day paid, not
+reinvested: equivalent for the IRR, which already assumes flows earn the
+rate itself. A position's cost basis can include more than its buys (wash
+sales, exercised options), so the buys are scaled up to the brokerage's cost:
+the extra dollars are assumed to have gone in when the shares did. And an
+IRR is not a forecast: it is the rate the past paid, on one path (Peters,
+above).
+
 ## References
 
 - Asness, C. S. (2003). Fight the Fed model. *Journal of Portfolio

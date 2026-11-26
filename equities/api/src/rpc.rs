@@ -246,7 +246,7 @@ pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &
         let i = index.partition_point(|(d, _)| *d <= day);
         (i > 0).then(|| index[i - 1].1)
     };
-    let (mut left, mut cost, mut value, mut since) = (held, 0.0, 0.0, None);
+    let (mut left, mut cost, mut value, mut since, mut lots) = (held, 0.0, 0.0, None, Vec::new());
     for &(day, shares, dollars) in buys_newest_first {
         if left <= 1e-9 { break }
         if shares <= 0.0 { continue }
@@ -255,20 +255,57 @@ pub fn baseline(held: f64, buys_newest_first: &[(NaiveDate, f64, f64)], index: &
         cost += part;
         value += part * now / level(day)?;
         since = Some(day);
+        lots.push((day, part));
         left -= take;
     }
-    (left <= 1e-6).then_some(Measured { cost, value, since: since? })
+    (left <= 1e-6).then_some(Measured { cost, value, since: since?, lots })
 }
 
 /// A position measured against the baseline: what its held shares' buys
-/// cost, what those dollars would be worth in the baseline, and the day of
-/// the oldest of those buys.
+/// cost, what those dollars would be worth in the baseline, the day of the
+/// oldest of those buys, and the buys themselves (day, dollars): the dated
+/// flows an annual rate is solved from (xirr).
 #[derive(Debug, PartialEq)]
 pub struct Measured {
     pub cost: f64,
     pub value: f64,
     pub since: NaiveDate,
+    pub lots: Vec<(NaiveDate, f64)>,
 }
+
+/// XIRR: the annual rate r at which dated cash flows are worth nothing net,
+///
+///   Σ c_i / (1 + r)^(t_i) = 0,   t_i = (day_i − first day) / 365,
+///
+/// money in negative, money out (or held, at its value) positive. The
+/// money-weighted return of flows at irregular dates (CAPITAL.md, "Rates of
+/// return"). Newton's method from 10%, kept inside a bracket where the sum
+/// changes sign and bisecting when a step would leave it. None when the
+/// flows don't change sign, or no rate in (−99.99%, +1000%) solves them.
+pub fn xirr(flows: &[(NaiveDate, f64)]) -> Option<f64> {
+    let first = flows.iter().map(|f| f.0).min()?;
+    let years: Vec<(f64, f64)> = flows.iter().map(|&(d, c)| ((d - first).num_days() as f64 / 365.0, c)).collect();
+    let npv = |r: f64| years.iter().map(|&(t, c)| c / (1.0 + r).powf(t)).sum::<f64>();
+    let slope = |r: f64| years.iter().map(|&(t, c)| -t * c / (1.0 + r).powf(t + 1.0)).sum::<f64>();
+    let scale: f64 = years.iter().map(|(_, c)| c.abs()).sum();
+    let (mut lo, mut hi) = (-0.9999, 10.0);
+    let (f_lo, f_hi) = (npv(lo), npv(hi));
+    if !(f_lo.is_finite() && f_hi.is_finite()) || f_lo.signum() == f_hi.signum() { return None }
+    let mut r = 0.1_f64.clamp(lo, hi);
+    for _ in 0..200 {
+        let f = npv(r);
+        if f.abs() <= 1e-10 * scale { return Some(r) }
+        if f.signum() == f_lo.signum() { lo = r } else { hi = r }
+        let next = r - f / slope(r);
+        r = if next.is_finite() && next > lo && next < hi { next } else { (lo + hi) / 2.0 };
+        if hi - lo < 1e-12 { return Some(r) }
+    }
+    Some(r)
+}
+
+/// Rates for less than a year aren't annualized (the GIPS standard): a
+/// week's move, compounded over a year, is noise made enormous.
+const ANNUALIZE_AFTER_DAYS: i64 = 365;
 
 /// Dividends a position received from `since` on: cash in, positive (Plaid
 /// writes money in as a negative amount; a short pays dividends out, which
@@ -347,11 +384,17 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
          ORDER BY a.balance DESC NULLS LAST, a.account_id, abs(coalesce(h.value, 0)) DESC", &[]).await?;
     let epoch = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
     let mut accounts: Vec<(String, pb::Account)> = Vec::new();
+    // Dated flows (yours, MINT's, the market's), pooled by account and in all.
+    type Flows = (Vec<(NaiveDate, f64)>, Vec<(NaiveDate, f64)>, Vec<(NaiveDate, f64)>);
+    let mut pooled: std::collections::HashMap<String, Flows> = Default::default();
+    let mut total: Flows = Default::default();
+    let today = chrono::Local::now().date_naive();
     for r in rows {
         let account_id: String = r.get(0);
         if accounts.last().is_none_or(|(id, _)| *id != account_id) {
             accounts.push((account_id.clone(), pb::Account {
                 institution: r.get(1), name: r.get(2), subtype: r.get(3), balance: r.get(4), positions: vec![],
+                annual_return: None, baseline_annual: None, market_annual: None,
             }));
         }
         let (security_id, kind_name): (String, String) = (r.get(5), r.get(8));
@@ -386,15 +429,50 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
             Some(_) => buys.get(&key).and_then(|b| baseline(quantity, b, &market)).map(|m| m.value),
             None => None,
         };
+        let value: f64 = r.get(11);
+
+        // Annual rates (xirr), for positions held a year or more: the buys
+        // (scaled to the brokerage's cost, which holds every dollar the
+        // position took), its dividends on their days, and today's value;
+        // MINT's and the market's the same buys, ending in what they'd be
+        // worth. Pooled by account and in all, for their rates too.
+        let mut rates = (None, None, None);
+        if let (Some(m), Some(c)) = (measured.as_ref(), cost) {
+            if (today - m.since).num_days() >= ANNUALIZE_AFTER_DAYS && m.cost > 0.0 {
+                let k = c / m.cost;
+                let buys_in: Vec<(NaiveDate, f64)> = m.lots.iter().map(|&(d, x)| (d, -x * k)).collect();
+                let divs: Vec<(NaiveDate, f64)> = paid.get(&key).into_iter().flatten()
+                    .filter(|(d, _)| *d >= m.since).map(|&(d, a)| (d, -a)).collect();
+                let own = [buys_in.clone(), divs, vec![(today, value)]].concat();
+                let base = [buys_in.clone(), vec![(today, m.value * k)]].concat();
+                let mkt = in_market.map(|v| [buys_in.clone(), vec![(today, v * k)]].concat());
+                rates = (xirr(&own), xirr(&base), mkt.as_deref().and_then(xirr));
+                let pool = pooled.entry(account_id.clone()).or_default();
+                for p in [&mut *pool, &mut total] {
+                    p.0.extend(&own);
+                    p.1.extend(&base);
+                    if let Some(f) = &mkt { p.2.extend(f) }
+                }
+            }
+        }
         accounts.last_mut().unwrap().1.positions.push(pb::Position {
-            ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value: r.get(11),
+            ticker: r.get(6), name: r.get(7), kind: kind as i32, quantity, price: r.get(10), value,
             cost, cost_source: source as i32,
             price_epoch_day: r.get::<_, Option<NaiveDate>>(13).map(|d| (d - epoch).num_days() as i32).unwrap_or(0),
             baseline_cost: measured.as_ref().map(|m| m.cost),
             baseline_value: measured.as_ref().map(|m| m.value),
             dividends,
             market_value: in_market,
+            annual_return: rates.0,
+            baseline_annual: rates.1,
+            market_annual: rates.2,
         });
+    }
+    // Each account's rates, and the portfolio's, from their pooled flows.
+    for (id, account) in accounts.iter_mut() {
+        if let Some((own, base, mkt)) = pooled.get(id.as_str()) {
+            (account.annual_return, account.baseline_annual, account.market_annual) = (xirr(own), xirr(base), xirr(mkt));
+        }
     }
     let synced_unix = synced(db).await?.unwrap_or(0);
     let last_day = |i: &[(NaiveDate, f64)]| i.last().map(|(d, _)| (*d - epoch).num_days() as i32).unwrap_or(0);
@@ -405,6 +483,9 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         baseline_epoch_day: last_day(&index),
         market: MARKET.into(),
         market_epoch_day: last_day(&market),
+        annual_return: xirr(&total.0),
+        baseline_annual: xirr(&total.1),
+        market_annual: xirr(&total.2),
     }))
 }
 
@@ -536,6 +617,22 @@ mod tests {
         assert_eq!(baseline(5.0, &buys, &index), None);
         // A buy before the index starts: not known.
         assert_eq!(baseline(1.0, &[(d(2025, 12, 1), 1.0, 10.0)], &index), None);
+    }
+
+    #[test]
+    fn xirr_solves_known_rates() {
+        let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day).unwrap();
+        let close = |a: Option<f64>, b: f64| a.is_some_and(|a| (a - b).abs() < 1e-6);
+        // $100 in, $110 out a year (365 days) later: 10%.
+        assert!(close(xirr(&[(d(2025, 1, 1), -100.0), (d(2026, 1, 1), 110.0)]), 0.10));
+        // $100 in twice, a year apart, $231 out a year after the second:
+        // 100 x 1.1^2 + 100 x 1.1 = 231, so 10%.
+        assert!(close(xirr(&[(d(2023, 1, 1), -100.0), (d(2024, 1, 1), -100.0), (d(2024, 12, 31), 231.0)]), 0.10));
+        // A loss: $100 in, $80 out a year later: -20%.
+        assert!(close(xirr(&[(d(2025, 1, 1), -100.0), (d(2026, 1, 1), 80.0)]), -0.20));
+        // No sign change: no rate.
+        assert_eq!(xirr(&[(d(2025, 1, 1), -100.0), (d(2026, 1, 1), -10.0)]), None);
+        assert_eq!(xirr(&[]), None);
     }
 
     #[test]
