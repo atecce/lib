@@ -10,7 +10,7 @@
 //! more on its book equity than the market's earnings yield trades above book.
 //!
 //! Each day uses only what was public then: the shares on the latest cover
-//! page dated on or before it, and equity as first reported. Between a split
+//! page filed on or before it (or dated, when its filing isn't known), and equity as first reported. Between a split
 //! and the next cover page, the cover's count is multiplied by the split, so
 //! the count matches the price.
 
@@ -60,6 +60,13 @@ pub fn depositary_ratios(ticker: Ticker) -> &'static [(&'static str, f64)] {
         "TSM" => &[("1900-01-01", 5.0)],
         _ => &[],
     }
+}
+
+/// The day a figure became public: its filing's date when known, else the
+/// date it is as of. A 20-F's cover counts the shares on December 31 but
+/// is filed in April; a quarter's balance sheet is filed weeks after it.
+fn known(r: &Reported) -> NaiveDate {
+    r.filing.as_ref().map_or(r.date, |f| f.filed.max(r.date))
 }
 
 /// First-reported values of a point-in-time item, by date, oldest first.
@@ -117,12 +124,12 @@ pub fn market(ticker: Ticker, prices: &[tiingo::Price], items: &[Reported]) -> V
         let Some(day) = p.day() else { continue };
         // A new cover page replaces the count and the splits since the last.
         let mut changed = false;
-        while cover + 1 < shares.len() && shares[cover + 1].date <= day {
+        while cover + 1 < shares.len() && known(shares[cover + 1]) <= day {
             cover += 1;
             changed = true;
         }
         if changed { splits = 1.0; }
-        let Some(s) = shares.get(cover).filter(|s| s.date <= day) else { continue };
+        let Some(s) = shares.get(cover).filter(|s| known(s) <= day) else { continue };
         if p.split_factor > 0.0 && p.split_factor != 1.0 && day > s.date {
             splits *= p.split_factor;
         }
@@ -185,5 +192,27 @@ mod tests {
         let caps: Vec<f64> = m.iter().map(|m| m.market_cap).collect();
         assert_eq!(caps, [900_000.0, 900_000.0, 990_000.0]);
         assert_eq!(m[0].price_to_book, Some(30.0));
+    }
+
+    /// A cover dated December 31 but filed in April (a 20-F's) counts
+    /// from April: until then the year before's cover, and its book.
+    #[test]
+    fn a_cover_counts_from_its_filing() {
+        let filed = |date: &str, on: &str| Reported {
+            filing: Some(crate::item::Filed { accession: on.into(), filed: on.parse().unwrap(), source: crate::item::Source::Edgar,
+                                              form: "20-F".into(), period_end: Some(date.parse().unwrap()) }),
+            ..fact(Item::SharesOutstanding, date, 0.0)
+        };
+        let items = [
+            Reported { item: Item::StockholdersEquity, val: 10_000.0, ..filed("2023-12-31", "2024-04-18") },
+            Reported { val: 100.0, ..filed("2023-12-31", "2024-04-18") },
+            Reported { item: Item::StockholdersEquity, val: 20_000.0, ..filed("2024-12-31", "2025-04-17") },
+            Reported { val: 100.0, ..filed("2024-12-31", "2025-04-17") },
+        ];
+        let prices = [price("2025-02-03", 1_000.0, 1.0), price("2025-04-17", 1_000.0, 1.0)];
+        let m = market(Ticker::TSLA, &prices, &items);
+        let pb: Vec<Option<f64>> = m.iter().map(|m| m.price_to_book).collect();
+        // February: 2023's book; from the filing day, 2024's.
+        assert_eq!(pb, [Some(10.0), Some(5.0)]);
     }
 }

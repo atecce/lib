@@ -45,7 +45,8 @@ fn mean_rate(end: NaiveDate, months: u32, twd_per_usd: &[(NaiveDate, f64)]) -> O
 /// - stockholders' equity, each quarter end's TWD balance at that day's rate;
 /// - net income, each quarter (and year) in TWD at the period's mean rate;
 /// - shares outstanding on each of those quarter ends: the latest 20-F cover
-///   count dated on or before it (the count was public; only repeated).
+///   count dated on or before it, public with that quarter's report (its
+///   filing), since the valuation counts a cover from its filing.
 pub fn in_dollars(items: &[Reported], twd_per_usd: &[(NaiveDate, f64)]) -> Vec<Reported> {
     let tsm = Ticker::TSM;
     let mine = |i: &&Reported| (i.ticker == tsm || i.ticker == TAIPEI) && i.currency == Currency::TWD;
@@ -67,11 +68,13 @@ pub fn in_dollars(items: &[Reported], twd_per_usd: &[(NaiveDate, f64)]) -> Vec<R
         .filter(|i| i.ticker == tsm && i.item == Item::SharesOutstanding && i.p == Period::PointInTime)
         .collect();
     covers.sort_by_key(|c| c.date);
-    let quarter_ends: Vec<NaiveDate> = out.iter().filter(|r| r.item == Item::StockholdersEquity).map(|r| r.date).collect();
-    for day in quarter_ends {
+    // Each repeated count is public with that quarter's report: its filing.
+    let quarter_ends: Vec<(NaiveDate, Option<crate::item::Filed>)> = out.iter()
+        .filter(|r| r.item == Item::StockholdersEquity).map(|r| (r.date, r.filing.clone())).collect();
+    for (day, filing) in quarter_ends {
         if covers.iter().any(|c| c.date == day) { continue }
         if let Some(c) = covers.iter().rev().find(|c| c.date < day) {
-            out.push(Reported { date: day, derived: true, ..(*c).clone() });
+            out.push(Reported { date: day, filing, derived: true, ..(*c).clone() });
         }
     }
     out
