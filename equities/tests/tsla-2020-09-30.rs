@@ -40,6 +40,8 @@ fn q3_2020() {
             debt_and_finance_leases_net_of_current_portion: 10_559_000_000.0,
             deferred_revenue_net_of_current_portion: 1_233_000_000.0,
             other_long_term_liabilities: 3_049_000_000.0,
+
+            stockholders_equity: 16_031_000_000.0,
         },
     ];
 
@@ -164,8 +166,6 @@ fn q3_2020() {
         .collect();
 
     let readers: Vec<Box<dyn Reader>> = vec![
-        Box::new(equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200930-gen.pdf"), equities::Ticker::TSLA).unwrap()),
-        Box::new(equities::xlsx::new_reader(std::path::Path::new("tsla/2020-09-30_10Q.xlsx"), equities::Ticker::TSLA).unwrap()),
         Box::new(equities::filing::new_reader(std::path::Path::new("edgar/1318605/000156459020047486"), equities::Ticker::TSLA).unwrap()),
     ];
 

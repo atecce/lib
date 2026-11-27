@@ -103,7 +103,9 @@ pub fn cash_flow_statement(reports: &[Report]) -> Option<&Report> {
 
 pub fn income_statement(reports: &[Report]) -> Option<&Report> {
     let is_income = |n: &str| {
-        n.contains("statement") && (n.contains("operations") || n.contains("income") || n.contains("earnings"))
+        // Sysco titles it "Consolidated Results of Operations", without "statement".
+        (n.contains("statement") && (n.contains("operations") || n.contains("income") || n.contains("earnings"))
+            || n.starts_with("consolidated results of operations"))
             && !n.contains("cash flow") && !n.contains("equity") && !n.contains("stockholders")
     };
     find_report(reports, |n| is_income(n) && !n.contains("comprehensive"))
@@ -252,7 +254,9 @@ impl Reader {
             .unzip();
         drop_segment_rows(&rows, &mut items);
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
-        crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])
+        let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
+        crate::calibrate_shares(&mut reported);
+        Ok(reported)
     }
 
     /// 10-Qs only report cash flows year to date (3, 6, 9 months); see

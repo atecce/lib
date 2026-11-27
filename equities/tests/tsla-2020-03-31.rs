@@ -40,6 +40,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 10_666_000_000.0,
             deferred_revenue_net_of_current_portion: 1_199_000_000.0,
             other_long_term_liabilities: 2_667_000_000.0,
+
+            stockholders_equity: 9_173_000_000.0,
         },
     ];
 
@@ -100,7 +102,7 @@ fn report() {
         },
     ];
 
-    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200331-gen_0.pdf"), equities::Ticker::TSLA).unwrap();
+    let mut r = equities::filing::new_reader(std::path::Path::new("edgar/1318605/000156459020019931"), equities::Ticker::TSLA).unwrap();
 
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()

@@ -35,6 +35,8 @@ pub struct BalanceSheet {
     pub debt_and_finance_leases_net_of_current_portion: f64,
     pub deferred_revenue_net_of_current_portion: f64,
     pub other_long_term_liabilities: f64,
+
+    pub stockholders_equity: f64,
 }
 
 impl Statement for BalanceSheet {
@@ -289,4 +291,6 @@ pub const Q4_2019_BALANCE_SHEET: BalanceSheet = BalanceSheet {
     debt_and_finance_leases_net_of_current_portion: 11_634_000_000.0,
     deferred_revenue_net_of_current_portion: 1_207_000_000.0,
     other_long_term_liabilities: 2_691_000_000.0,
+
+    stockholders_equity: 6_618_000_000.0,
 };

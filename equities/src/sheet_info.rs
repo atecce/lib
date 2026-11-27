@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::error::Error;
 
-use crate::date::{parse_date_str, parse_date_across_cells, parse_date_across_lines};
 use crate::{Currency, Period};
 
 static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
@@ -23,6 +22,8 @@ pub struct SheetInfo {
     pub dates_and_periods: HashMap<usize, (NaiveDate, Period)>,
     pub labels: usize,
     pub multiplier: f64,
+    /// Scale of share counts, which headers state separately from dollars.
+    pub share_multiplier: f64,
     pub sheet_type: SheetType,
     /// Currency of each date column whose header names one ("Dec. 31, 2025
     /// TWD ($)"); columns without one are in US dollars.
@@ -46,6 +47,36 @@ fn scale(s: &str) -> Option<f64> {
     else { None }
 }
 
+static SHARE_SCALE: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"shares? (?:data )?in (millions|thousands|billions)").unwrap()
+});
+
+fn named_scale(s: &str) -> Option<f64> {
+    if s.contains("billions") { Some(1_000_000_000.0) }
+    else if s.contains("millions") { Some(1_000_000.0) }
+    else if s.contains("thousands") { Some(1_000.0) }
+    else { None }
+}
+
+/// The scale of share counts stated in a header cell. EDGAR writes it in
+/// two styles:
+///   "shares in Thousands, $ in Millions": each unit's scale is named, and
+///     shares not named ("$ in Millions") are in units;
+///   "In Millions, except Per Share data": one scale for everything but
+///     per-share amounts, so share counts are in millions too, unless they
+///     are excepted as well ("except Share data", "except Share data in
+///     Thousands").
+fn share_scale(s: &str) -> Option<f64> {
+    let s = s.to_lowercase();
+    if let Some(c) = SHARE_SCALE.captures(&s) { return named_scale(&c[1]); }
+    if s.contains("except share") || s.contains("except shares") { return Some(1.0); }
+    if s.contains("$ in ") { return Some(1.0); }
+    if s.contains(" in millions") || s.contains(" in thousands") || s.contains(" in billions")
+        || s.starts_with("in millions") || s.starts_with("in thousands") { return named_scale(&s); }
+    if s.contains("usd ($)") || s.contains("(usd $)") { return Some(1.0); }
+    None
+}
+
 /// A header cell naming a period ("8 Months Ended", "52 Weeks Ended"), as
 /// opposed to a date or a title.
 fn is_period_heading(s: &str) -> bool {
@@ -53,10 +84,33 @@ fn is_period_heading(s: &str) -> bool {
         && (s.contains("ended") || s.contains("months") || s.contains("weeks"))
 }
 
+/// A header date: "Oct. 26, 2025", "October 26 2025", "10/26/2025", "2025-10-26".
+fn parse_date_str(s: &str) -> Option<NaiveDate> {
+    let s = s.trim().replace(",", "");
+    let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
+    formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())
+}
+
+/// A date split over two rows, "October 26," above the year (NVDA's own
+/// spreadsheets).
+fn parse_date_across_cells(s: &str, next_cell: Option<&Data>) -> Option<NaiveDate> {
+    if s.trim().ends_with(',') || s.trim().split_whitespace().count() >= 2 {
+        if let Some(year) = next_cell.and_then(|c| match c {
+            Data::Float(f) => Some(*f as i32),
+            Data::Int(i) => Some(*i as i32),
+            _ => None,
+        }).filter(|&y| y > 1900 && y < 2100) {
+            return parse_date_str(&format!("{} {}", s, year))
+        }
+    }
+    None
+}
+
 pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetInfo, Box<dyn Error>> {
 
     let mut is_10k = false;
     let mut multiplier = 0.0;
+    let mut share_multiplier: Option<f64> = None;
 
     let mut col0_count = 0;
     let mut col1_count = 0;
@@ -114,7 +168,13 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                         is_10k = true;
                     }
 
-                    if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
+                    // Scales are stated in the header. Row labels mention units
+                    // too ("Weighted average shares (in thousands)"), which must
+                    // not rescale the dollars.
+                    if first_date_row.is_none_or(|d| r <= d) {
+                        if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
+                        if share_multiplier.is_none() { share_multiplier = share_scale(&s); }
+                    }
 
                     if let Some(date) = parse_date_str(&s).or_else(|| parse_date_across_cells(&s, rows.get(r+1).and_then(|next| next.get(c)))) {
                         first_date_row.get_or_insert(r);
@@ -212,72 +272,33 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         dates_and_periods: dates_and_periods,
         labels: labels,
         multiplier: multiplier,
+        share_multiplier: share_multiplier.unwrap_or(1.0),
         sheet_type: sheet_type,
         currencies: currencies,
     })
 }
 
-pub fn new_sheet_info_from_pdf(rows: &Vec<Vec<Option<String>>>, sheet_type: SheetType) -> Result<SheetInfo, Box<dyn Error>> {
+#[cfg(test)]
+mod tests {
+    use super::{scale, share_scale};
 
-    let mut is_10k = false;
-    let mut multiplier = 0.0;
-
-    let mut periods = HashMap::new();
-
-    let mut dates_and_periods = HashMap::new();
-    for (r, row) in rows.iter().enumerate() {
-
-        for (c, cell) in row.iter().enumerate() {
-            if let Some(s) = cell {
-                let s = s.to_lowercase();
-
-                if let Ok(p) = s.parse::<Period>() {
-                    periods.insert(c, p);
-                }
-
-                if s.contains("form type: 10-k") || s.contains("12 months ended") {
-                    is_10k = true;
-                }
-
-                if let Some(m) = scale(&s) { if m != 1.0 || multiplier == 0.0 { multiplier = m; } }
-
-                let next_line_opt = rows.get(r + 1)
-                    .and_then(|next_row| next_row.get(c))
-                    .and_then(|cell| cell.as_ref())
-                    .map(|s| s.as_str());
-
-                if let Some(date) = parse_date_str(&s).or_else(|| {
-                    let next_line = next_line_opt?; // Converts Result to Option
-                    parse_date_across_lines(&s, next_line).ok()
-                }) {
-
-                    match sheet_type {
-                        SheetType::BalanceSheet => {
-                            dates_and_periods.entry(c).or_insert((date, Period::PointInTime));
-                        },
-                        _ => {
-                            let mut p = None;
-                            for offset in (0..=c).rev().take(4) {
-                                if let Some(detected_p) = periods.get(&offset) {
-                                    p = Some(*detected_p);
-                                    break;
-                                }
-                            }
-                            dates_and_periods.entry(c).or_insert((date, p.unwrap_or(if is_10k { Period::TwelveMonths } else { Period::ThreeMonths })));
-                        },
-                    }
-                }
-            }
+    #[test]
+    fn share_scales() {
+        // (header, dollar scale, share scale), from EDGAR's statement pages
+        let cases = [
+            ("Consolidated Statements of Income - USD ($) shares in Millions, $ in Millions", 1e6, 1e6),
+            ("Consolidated Statements of Income - USD ($) shares in Thousands, $ in Millions", 1e6, 1e3),
+            ("Consolidated Statements of Income - USD ($) $ in Millions", 1e6, 1.0),
+            ("Income Statement (USD $) In Millions, except Per Share data, unless otherwise specified", 1e6, 1e6),
+            ("Income Statement (USD $) In Millions, except Share data in Thousands, unless otherwise specified", 1e6, 1e3),
+            ("Income Statement (USD $) In Thousands, except Share data, unless otherwise specified", 1e3, 1.0),
+            ("Income Statement (USD $) Share data in Thousands, except Per Share data", 1.0, 1e3),
+            ("Income Statement (USD $)", 1.0, 1.0),
+        ];
+        for (header, dollars, shares) in cases {
+            let h = header.to_lowercase();
+            assert_eq!(scale(&h), Some(dollars), "{}", header);
+            assert_eq!(share_scale(&h), Some(shares), "{}", header);
         }
     }
-
-    if dates_and_periods.is_empty() { return Err("no dates found".into()); }
-
-    Ok(SheetInfo {
-        dates_and_periods: dates_and_periods,
-        labels: 0,
-        multiplier: multiplier,
-        sheet_type: sheet_type,
-        currencies: HashMap::new(),
-    })
 }

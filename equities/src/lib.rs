@@ -1,9 +1,7 @@
 uniffi::setup_scaffolding!();
 
-pub mod date;
 pub mod item;
 pub mod xlsx;
-pub mod pdf;
 pub mod filing;
 pub mod edgar;
 pub mod nvda;
@@ -467,6 +465,7 @@ impl_reported! {
         DeferredRevenueNetOfCurrentPortion => field deferred_revenue_net_of_current_portion,
         OtherLongTermLiabilities => field other_long_term_liabilities,
         TotalLiabilities => method total_liabilities,
+        StockholdersEquity => field stockholders_equity,
     ]
 }
 
@@ -519,6 +518,48 @@ impl_reported! {
     ]
 }
 
+/// Share counts at the scale their statement actually uses.
+///
+/// Headers often misstate it: McDonald's pages say only "$ in Millions"
+/// over share counts in millions, Berkshire's "In Millions" over counts in
+/// units. But basic EPS times basic weighted shares is net income (to within
+/// noncontrolling interests and rounding), in every column. Where that
+/// product is consistently off by a power of 1,000, the shares are rescaled
+/// by it. Columns with EPS under 10 cents are too coarse to tell.
+pub(crate) fn calibrate_shares(items: &mut [Reported]) {
+    use std::collections::HashMap;
+    use crate::item::Unit;
+
+    let mut columns: HashMap<(NaiveDate, Period, Currency), [Option<f64>; 3]> = HashMap::new();
+    for it in items.iter() {
+        let slot = match it.item {
+            Item::NetIncome => 0,
+            Item::EarningsPerShareBasic => 1,
+            Item::WeightedAverageSharesBasic => 2,
+            _ => continue,
+        };
+        columns.entry((it.date, it.p, it.currency)).or_default()[slot] = Some(it.val);
+    }
+
+    let mut powers = Vec::new();
+    for [ni, eps, shares] in columns.into_values() {
+        let (Some(ni), Some(eps), Some(shares)) = (ni, eps, shares) else { continue };
+        if eps.abs() < 0.10 || shares <= 0.0 { continue; }
+        let ratio = ni / (eps * shares);
+        if ratio <= 0.0 { continue; }
+        let power = (ratio.log10() / 3.0).round() as i32;
+        if (ratio / 1000f64.powi(power) - 1.0).abs() < 0.25 {
+            powers.push(power);
+        }
+    }
+    let Some(&power) = powers.first() else { return };
+    if power == 0 || powers.iter().any(|&p| p != power) { return; }
+    let factor = 1000f64.powi(power);
+    for it in items.iter_mut().filter(|it| it.item.unit() == Unit::Shares) {
+        it.val *= factor;
+    }
+}
+
 /// Fill in three-month values that were not reported, from year-to-date
 /// totals: Q2 = 6m - 3m, Q3 = 9m - 6m, Q4 = 12m - 9m, where the shorter
 /// total ends about a quarter earlier (75 to 125 days: PepsiCo's fourth
@@ -543,23 +584,34 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
         _ => None,
     };
 
-    let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), f64> = HashMap::new();
+    // Derived values with the period they came from: a fiscal year change can
+    // derive the same quarter twice (ADM's 2012 transition reports both July-
+    // December and the calendar year), and the shorter period wins.
+    let mut derived: HashMap<(Ticker, Item, Currency, NaiveDate), (Period, f64)> = HashMap::new();
     for (&(ticker, item, currency, p, date), &total) in &latest {
         let Some(prev_p) = previous(p) else { continue };
+        // A year's average share count or EPS minus nine months' is no quarter's.
+        if item.unit() != crate::item::Unit::Money { continue; }
         if latest.contains_key(&(ticker, item, currency, Period::ThreeMonths, date)) {
             continue;
         }
-        let prev = latest.iter().find(|((t, i, c, pp, d), _)| {
-            *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())
-        });
+        // Where two earlier periods fall in the window (a fiscal year change,
+        // as ADM's in 2012), the one nearest a quarter back, so the result does
+        // not depend on the map's iteration order.
+        let prev = latest.iter()
+            .filter(|((t, i, c, pp, d), _)| {
+                *t == ticker && *i == item && *c == currency && *pp == prev_p && (75..=125).contains(&(date - *d).num_days())
+            })
+            .min_by_key(|((_, _, _, _, d), _)| ((date - *d).num_days().abs_diff(91), *d));
         if let Some((_, prev_total)) = prev {
-            derived.insert((ticker, item, currency, date), total - prev_total);
+            let entry = derived.entry((ticker, item, currency, date)).or_insert((p, total - prev_total));
+            if p < entry.0 { *entry = (p, total - prev_total); }
         }
     }
 
     let mut derived: Vec<_> = derived.into_iter().collect();
     derived.sort_by_key(|((t, i, c, d), _)| (t.to_string(), *i, *c, *d));
-    items.extend(derived.into_iter().map(|((ticker, item, currency, date), val)| Reported {
+    items.extend(derived.into_iter().map(|((ticker, item, currency, date), (_, val))| Reported {
         ticker, date, p: Period::ThreeMonths, item, currency, val,
     }));
 }

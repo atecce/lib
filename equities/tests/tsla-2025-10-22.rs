@@ -39,6 +39,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 5_757_000_000.0,
             deferred_revenue_net_of_current_portion: 3_317_000_000.0,
             other_long_term_liabilities: 10_495_000_000.0,
+
+            stockholders_equity: 72_913_000_000.0,
         },
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2025, 9, 30).unwrap(),
@@ -69,6 +71,8 @@ fn report() {
             debt_and_finance_leases_net_of_current_portion: 5_778_000_000.0,
             deferred_revenue_net_of_current_portion: 3_746_000_000.0,
             other_long_term_liabilities: 12_205_000_000.0,
+
+            stockholders_equity: 79_970_000_000.0,
         },
     ];
 
@@ -274,7 +278,7 @@ fn report() {
         }
     ];
 
-    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-20250930-gen.pdf"), equities::Ticker::TSLA).unwrap();
+    let mut r = equities::filing::new_reader(std::path::Path::new("edgar/1318605/000162828025045968"), equities::Ticker::TSLA).unwrap();
     reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
     reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }

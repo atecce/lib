@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 79] = [
+            pub const ALL: [$item; 84] = [
                 $($item::$variant,)*
             ];
 
@@ -58,6 +58,13 @@ macro_rules! items {
             }
         }
     };
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Unit {
+    Money,
+    Shares,
+    PerShare,
 }
 
 impl Display for Item {
@@ -112,6 +119,9 @@ items! {
         TotalNonCurrentLiabilities => ["Total non-current liabilities"] @ ["LiabilitiesNoncurrent", "ifrs-full_NoncurrentLiabilities"],
 
         TotalLiabilities => ["Total liabilities", "Total Liabilities"] @ ["Liabilities", "ifrs-full_Liabilities"],
+        // Book value: the parent's equity first, total equity where that is all
+        // a company reports.
+        StockholdersEquity @ ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "ifrs-full_EquityAttributableToOwnersOfParent", "ifrs-full_Equity"],
 
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales"],
@@ -143,6 +153,13 @@ items! {
 
         IncomeTaxExpense => ["Income tax expense", "Provision for income taxes", "Provision for (benefit from) income taxes", "Income Tax Expense"] @ ["IncomeTaxExpenseBenefit", "ifrs-full_IncomeTaxExpenseContinuingOperations"],
         NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss"] @ ["ProfitLoss", "NetIncomeLoss", "ifrs-full_ProfitLoss"],
+
+        // Per share and share counts, for valuation (market cap, P/E). Read
+        // by tag only: their labels ("Basic", "Diluted") say nothing alone.
+        EarningsPerShareBasic @ ["EarningsPerShareBasic", "EarningsPerShareBasicAndDiluted", "ifrs-full_BasicEarningsLossPerShare"],
+        EarningsPerShareDiluted @ ["EarningsPerShareDiluted", "ifrs-full_DilutedEarningsLossPerShare"],
+        WeightedAverageSharesBasic @ ["WeightedAverageNumberOfSharesOutstandingBasic", "WeightedAverageNumberOfShareOutstandingBasicAndDiluted"],
+        WeightedAverageSharesDiluted @ ["WeightedAverageNumberOfDilutedSharesOutstanding"],
 
         StockBasedCompensationExpense => ["Stock-based compensation expense"] @ ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense", "ifrs-full_AdjustmentsForSharebasedPayments"],
         DepreciationAndAmoritization => ["Depreciation and amortization"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"],
@@ -189,6 +206,18 @@ impl Item {
             .filter(|(_, i)| *i == item)
             .position(|(t, _)| *t == name)?;
         Some((item, rank))
+    }
+
+    /// What the item's values count: money in the column's currency, shares,
+    /// or money per share. Each is scaled differently ("shares in Thousands,
+    /// $ in Millions"), and only money adds up across periods.
+    pub fn unit(&self) -> Unit {
+        use Item::*;
+        match self {
+            EarningsPerShareBasic | EarningsPerShareDiluted => Unit::PerShare,
+            WeightedAverageSharesBasic | WeightedAverageSharesDiluted => Unit::Shares,
+            _ => Unit::Money,
+        }
     }
 
     /// Items reported on the cash flow statement. Some share labels or
