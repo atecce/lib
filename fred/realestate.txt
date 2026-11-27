@@ -29,6 +29,8 @@ RRVRUSQ156N             # rental vacancy rate, quarterly, 1956–
 DRSFRMACBS              # delinquency rate on single-family mortgages, commercial banks, quarterly, 1991–
 MDOAH                   # mortgage debt outstanding, all holders ($m), quarterly, 1949–2019 (discontinued: see HHMSDODNS)
 HHMSDODNS               # households' home mortgages ($m), quarterly, 1945– (Z.1)
+ASTMA                   # all mortgages, every sector: homes, apartments, commercial, farm ($m), quarterly, 1945– (Z.1)
+GDP                     # nominal GDP ($bn, annual rate), quarterly, 1947–: to scale the debt
 TDSP                    # household debt service, % of disposable income, quarterly, 1980–
 
 # Real estate as capital
