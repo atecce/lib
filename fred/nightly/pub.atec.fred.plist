@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Morning FRED fetch and load into Postgres (fred/nightly/run.sh), at 07:10,
+  or on wake if the Mac was asleep then. For a checkout elsewhere,
+  substitute its path:
+  Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.fred.plist > ~/Library/LaunchAgents/pub.atec.fred.plist &&
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.fred.plist
+  Run now: launchctl kickstart gui/$(id -u)/pub.atec.fred
+  Remove:  launchctl bootout gui/$(id -u)/pub.atec.fred && rm ~/Library/LaunchAgents/pub.atec.fred.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>pub.atec.fred</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/caffeinate</string>
+		<string>-ims</string>
+		<string>/Users/atec/lib/fred/nightly/run.sh</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/atec/lib</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>7</integer>
+		<key>Minute</key>
+		<integer>10</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/atec/lib/fred/nightly/launchd.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/atec/lib/fred/nightly/launchd.log</string>
+	<key>SoftResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>4096</integer>
+	</dict>
+</dict>
+</plist>

@@ -28,6 +28,8 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("007_flow_period_fallback", include_str!("../migrations/007_flow_period_fallback.sql")),
     ("008_mops", include_str!("../migrations/008_mops.sql")),
     ("009_sic", include_str!("../migrations/009_sic.sql")),
+    ("010_fred", include_str!("../migrations/010_fred.sql")),
+    ("011_listing_currencies", include_str!("../migrations/011_listing_currencies.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
@@ -216,6 +218,9 @@ impl Store {
         tx.execute("INSERT INTO fact SELECT * FROM tmp_fact
                     ON CONFLICT (issuer_id, item, period, period_end, currency, accession)
                     DO UPDATE SET value = EXCLUDED.value, derived = EXCLUDED.derived", &[])?;
+        // The issuer's listings' reporting currency and flow period, which the
+        // dashboards read (migrations/011_listing_currencies.sql).
+        tx.execute("SELECT refresh_listing(ticker) FROM listing WHERE issuer_id = $1", &[&issuer_id])?;
         tx.commit()?;
         Ok((filings.len(), facts.len()))
     }
@@ -240,6 +245,34 @@ impl Store {
         Ok(days.len())
     }
 
+    /// A FRED series, as the fred cache holds it, with a description from
+    /// the series list (`title`, kept when `None`). Observations are
+    /// inserted or updated, never deleted: a revision replaces a value.
+    /// Returns how many observations were written.
+    pub fn write_fred(&mut self, series: &fred::Series, title: Option<&str>) -> Result<usize, Box<dyn Error>> {
+        let mut buf = Vec::new();
+        for o in &series.observations {
+            let v = o.value.filter(|x| x.is_finite()).map_or("\\N".to_string(), |x| format!("{:e}", x));
+            writeln!(buf, "{}\t{}\t{}", series.id, o.date, v)?;
+        }
+        let first = series.observations.first().map(|o| o.date);
+        let last = series.observations.last().map(|o| o.date);
+        let n = series.observations.len() as i32;
+        let mut tx = self.db.transaction()?;
+        tx.execute("INSERT INTO fred_series (id, title, first_date, last_date, observations) VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (id) DO UPDATE SET title = COALESCE(EXCLUDED.title, fred_series.title),
+                    first_date = EXCLUDED.first_date, last_date = EXCLUDED.last_date,
+                    observations = EXCLUDED.observations, loaded_at = now()",
+            &[&series.id, &title, &first, &last, &n])?;
+        copy(&mut tx, "CREATE TEMP TABLE tmp_fred (LIKE fred_observation) ON COMMIT DROP",
+            "COPY tmp_fred (series_id, date, value) FROM STDIN", &buf)?;
+        let written = tx.execute("INSERT INTO fred_observation SELECT * FROM tmp_fred
+                    ON CONFLICT (series_id, date) DO UPDATE SET value = EXCLUDED.value
+                    WHERE fred_observation.value IS DISTINCT FROM EXCLUDED.value", &[])?;
+        tx.commit()?;
+        Ok(written as usize)
+    }
+
     /// Daily market values, as `equities::valuation::market` computed them.
     pub fn write_market(&mut self, days: &[Market]) -> Result<usize, Box<dyn Error>> {
         let opt = |v: Option<f64>| v.filter(|x| x.is_finite()).map_or("\\N".to_string(), |x| format!("{:e}", x));
@@ -259,6 +292,7 @@ impl Store {
         tx.execute("INSERT INTO market SELECT * FROM tmp_market ON CONFLICT (ticker, date, currency) DO UPDATE SET
                     close = EXCLUDED.close, market_cap = EXCLUDED.market_cap, price_to_book = EXCLUDED.price_to_book,
                     return_on_equity = EXCLUDED.return_on_equity, earnings_yield = EXCLUDED.earnings_yield", &[])?;
+        tx.execute("SELECT refresh_listing(ticker) FROM (SELECT DISTINCT ticker FROM tmp_market) t", &[])?;
         tx.commit()?;
         Ok(rows.len())
     }

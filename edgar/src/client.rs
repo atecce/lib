@@ -41,6 +41,7 @@ const SUBMISSIONS_MAX_AGE: Duration = Duration::from_secs(20 * 3600);
 const TICKERS_MAX_AGE: Duration = Duration::from_secs(7 * 24 * 3600);
 
 const TICKERS_URL: &str = "https://www.sec.gov/files/company_tickers.json";
+const FUND_TICKERS_URL: &str = "https://www.sec.gov/files/company_tickers_mf.json";
 const BULK_URL: &str = "https://www.sec.gov/Archives/edgar/daily-index/bulkdata/submissions.zip";
 
 pub struct Client {
@@ -265,6 +266,47 @@ impl Client {
             }
         }
         Ok(dir)
+    }
+}
+
+/// Funds (see `crate::funds`).
+impl Client {
+    /// The fund ticker map, fetched again once a week.
+    pub fn fetch_fund_tickers(&self) -> Result<(), Box<dyn Error>> {
+        self.refresh(FUND_TICKERS_URL, &self.cache.fund_tickers_path(), Some(TICKERS_MAX_AGE))
+    }
+
+    /// The quarters the SEC lists for `set`, oldest first, each with the URL
+    /// of its zip: usually "2026q3_nport.zip", but a republished quarter is
+    /// "2024q1_ncen_0.zip" (the suffixed one wins where both are listed).
+    pub fn data_set_quarters(&self, set: crate::DataSet) -> Result<Vec<(String, String)>, Box<dyn Error>> {
+        let page = self.get(&set.page_url())?.error_for_status()?.text()?;
+        let mut quarters: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
+        for href in page.split('"').filter(|s| s.starts_with("/files/dera/") && s.ends_with(".zip")) {
+            let file = href.rsplit('/').next().unwrap_or_default();
+            let Some((quarter, rest)) = file.split_once('_') else { continue };
+            if quarter.len() != 6 || quarter.as_bytes()[4] != b'q' || !rest.starts_with(set.name()) {
+                continue;
+            }
+            let url = format!("https://www.sec.gov{}", href);
+            if quarters.get(quarter).is_none_or(|u| u.len() < url.len()) {
+                quarters.insert(quarter.to_string(), url);
+            }
+        }
+        Ok(quarters.into_iter().collect())
+    }
+
+    /// Download `set`'s zip for `quarter` from `url` unless it is on disk (a quarter's
+    /// set is final once published) or `force`. Returns whether it was
+    /// downloaded.
+    pub fn fetch_data_set(&self, set: crate::DataSet, quarter: &str, url: &str, force: bool) -> Result<bool, Box<dyn Error>> {
+        let path = self.cache.data_set_path(set, quarter);
+        if path.exists() && !force {
+            return Ok(false);
+        }
+        fs::create_dir_all(self.cache.data_set_dir(set))?;
+        self.download(url, &path)?;
+        Ok(true)
     }
 }
 

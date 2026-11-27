@@ -21,6 +21,9 @@ use std::path::{Path, PathBuf};
 use chrono::NaiveDate;
 use serde::Deserialize;
 
+pub mod funds;
+pub use funds::{Census, DataSet, Flow, FundClass, Holding, MonthlyReturn, Portfolio};
+
 #[cfg(feature = "fetch")]
 mod client;
 #[cfg(feature = "fetch")]

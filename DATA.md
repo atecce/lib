@@ -25,7 +25,9 @@ Postgres (store)                      the record: relational, with each value's
 - **Postgres** (`financials` on localhost:5432) is the system of record:
   issuers and listings, filings with their filing dates, facts in every
   version (`fact_first`: what the market knew then; `fact_latest`: with
-  restatements), prices, market values. Row-oriented, indexed: right for
+  restatements), prices, market values, and FRED's economic series
+  (`fred_series`, `fred_observation`: interest rates since 1857, loaded by
+  `store-fred`). Row-oriented, indexed: right for
   "everything about AAPL's 2019 10-K", and for joins.
 - **Columnar analysis** for "every stock's return on every day": DuckDB
   (below), over Postgres to begin with, over Parquet files once the data is

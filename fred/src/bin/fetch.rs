@@ -19,10 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             "--force" => force = true,
             "--list" => {
                 let file = args.next().ok_or("--list needs a file")?;
-                for line in std::fs::read_to_string(&file)?.lines() {
-                    let line = line.split('#').next().unwrap_or("");
-                    ids.extend(line.split(|c: char| c == ',' || c.is_whitespace()).filter(|s| !s.is_empty()).map(str::to_uppercase));
-                }
+                ids.extend(fred::read_list(&file)?.into_iter().map(|(id, _)| id));
             },
             a if a.starts_with("--") => return Err(format!("unknown option {}", a).into()),
             id => ids.push(id.to_uppercase()),
