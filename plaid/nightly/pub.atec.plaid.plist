@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The portfolio's daily sync (run.sh), at 07:20: MINT's prices from Tiingo,
+  then every Plaid connection's holdings and recent investment transactions
+  into Postgres (store-plaid). The app's
+  pull to refresh runs the same sync, through the equities API.
+  Install: cp pub.atec.plaid.plist ~/Library/LaunchAgents/ &&
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.plaid.plist
+  Run now: launchctl kickstart gui/$(id -u)/pub.atec.plaid
+  Remove:  launchctl bootout gui/$(id -u)/pub.atec.plaid && rm ~/Library/LaunchAgents/pub.atec.plaid.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>pub.atec.plaid</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/zsh</string>
+		<string>/Users/atec/lib/plaid/nightly/run.sh</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/atec/lib</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>7</integer>
+		<key>Minute</key>
+		<integer>20</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/atec/lib/plaid/nightly/plaid.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/atec/lib/plaid/nightly/plaid.log</string>
+</dict>
+</plist>

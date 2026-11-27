@@ -17,6 +17,8 @@ use equities::item::{Item, Reported, Unit};
 use equities::valuation::Market;
 use postgres::{Client, NoTls, Transaction};
 
+pub mod portfolio;
+
 /// The schema, in order. Each runs once, recorded in `schema_migrations`.
 const MIGRATIONS: &[(&str, &str)] = &[
     ("001_schema", include_str!("../migrations/001_schema.sql")),
@@ -30,6 +32,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("009_sic", include_str!("../migrations/009_sic.sql")),
     ("010_fred", include_str!("../migrations/010_fred.sql")),
     ("011_listing_currencies", include_str!("../migrations/011_listing_currencies.sql")),
+    ("012_portfolio", include_str!("../migrations/012_portfolio.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.

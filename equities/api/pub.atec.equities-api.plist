@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The equities API (README.md), always running, restarted if it stops, for
+  cloudflared to forward api.atec.pub to. ACCESS_AUD is the Access
+  application's audience tag (not a secret: it names the application).
+  Install: cp pub.atec.equities-api.plist ~/Library/LaunchAgents/ &&
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities-api.plist
+  Restart: launchctl kickstart -k gui/$(id -u)/pub.atec.equities-api
+  Remove:  launchctl bootout gui/$(id -u)/pub.atec.equities-api && rm ~/Library/LaunchAgents/pub.atec.equities-api.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>pub.atec.equities-api</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/atec/lib/target/release/equities-api</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ACCESS_TEAM</key>
+		<string>steep-snow-0aca</string>
+		<key>ACCESS_AUD</key>
+		<string>b798c58631c33377be4cf7518f1b6d98d9cf710a22a3ec1e611341feba13c13f</string>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/atec/lib</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/atec/lib/equities/api/api.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/atec/lib/equities/api/api.log</string>
+</dict>
+</plist>

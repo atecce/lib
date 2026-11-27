@@ -4,7 +4,7 @@
 //!     store-fred                  # every series in the cache
 //!     store-fred GS10 DGS3MO      # just these
 //!
-//! Titles come from the comments in `fred/rates.txt`. Applies the
+//! Titles come from the comments in `fred/rates.txt`, `macro.txt` and `realestate.txt`. Applies the
 //! migrations first, as `lib --postgres` does. Run after `fred-fetch`; only
 //! new and revised observations are written.
 
@@ -13,9 +13,11 @@ use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let cache = fred::Cache::new(fred::Cache::default_dir());
-    let titles: HashMap<String, String> = fred::read_list(fred::default_list())
-        .map(|l| l.into_iter().filter_map(|(id, note)| Some((id, note?))).collect())
-        .unwrap_or_default();
+    let titles: HashMap<String, String> = fred::lists().iter()
+        .filter_map(|list| fred::read_list(list).ok())
+        .flatten()
+        .filter_map(|(id, note)| Some((id, note?)))
+        .collect();
     let mut ids: Vec<String> = std::env::args().skip(1).map(|a| a.to_uppercase()).collect();
     if ids.is_empty() {
         ids = cache.ids();

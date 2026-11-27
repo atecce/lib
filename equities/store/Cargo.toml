@@ -12,6 +12,10 @@ equities = { path = ".." }
 postgres = { version = "0.19", features = ["with-chrono-0_4"] }
 tiingo = { path = "../tiingo", default-features = false }
 fred = { path = "../../fred", default-features = false }
+plaid = { path = "../../plaid" }
+serde_json = "1.0.149"
+calamine = "0.38.0"
+reqwest = { version = "0.13.4", features = ["blocking"] }
 
 [[bin]]
 name = "store-progress"
@@ -24,3 +28,11 @@ path = "src/bin/sic.rs"
 [[bin]]
 name = "store-fred"
 path = "src/bin/fred.rs"
+
+[[bin]]
+name = "store-plaid"
+path = "src/bin/plaid.rs"
+
+[[bin]]
+name = "store-rstar"
+path = "src/bin/rstar.rs"

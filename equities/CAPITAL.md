@@ -184,8 +184,9 @@ and Prescott (1985) found that stocks had out-earned short-term
 government debt by about six points a year, 1889–1978 (a real 7.0%
 against 0.8%), far more than any reasonable aversion to risk explains: the
 *equity premium puzzle*. In this repository's residual income work,
-Berkshire's `--premium 0.04` lumps the term premium and the equity premium
-together on top of the 10-year yield (which already holds the first three).
+Berkshire's `--premium 0.04` is the equity premium, on top of the 10-year
+yield, which already holds the first three layers (a company's equity has no
+credit spread of its own: its risk is all in the premium).
 
 ## The data: how the rate has formed, 1857–2025
 
@@ -274,14 +275,165 @@ Marx is right that surplus profit is competed away unless it is a rent,
 then $`\omega`$ near 1 means a waterfall, and the question for Apple or
 Berkshire is what theirs is.
 
+## The equity premium, and the portfolio's two r's
+
+The Optimates app measures each holding against MINT, an ultrashort bond
+fund: "over r" or "under r" (Portfolio). That is one of two rates a
+shareholder has a claim to call $`r`$, and the equity premium is most of
+the distance between them.
+
+### Two r's
+
+The **rate on cash**, what money earns waiting: bills, or MINT, which is
+bills plus a little short credit, less a fee.
+
+```math
+r_{\text{cash}} \;\approx\; \rho_{\text{short}} + \pi^e_{\text{short}} \;(+\,\sigma_{\text{short}} - \text{fee})
+```
+
+The **cost of equity**, what a share must be expected to earn to be worth
+its price: the five layers above, built on the long yield.
+
+```math
+k \;=\; \underbrace{\rho + \pi^e + \tau}_{y_{10}} \;+\; \epsilon
+```
+
+The distance between them is the term premium (roughly; $`y_{10}`$ also
+moves with the expected path of short rates) and the equity premium:
+
+```math
+k - r_{\text{cash}} \;\approx\; (y_{10} - r_{\text{bill}}) + \epsilon
+```
+
+On 25 November 2026: bills 4.37%, MINT's total return over the last twelve
+months 4.20% (its fee and spread roughly cancel), the 10-year Treasury
+4.92%, and the Kim–Wright term premium 0.89%. Cash is $`r_{\text{cash}}`$ ≈
+4.2–4.4%; a share's $`k`$ is 4.9% plus $`\epsilon`$.
+
+### Two equity premia
+
+Measured against bills or against bonds:
+
+```math
+\text{ERP}_{\text{bill}} = \mathbb{E}[R_m] - r_{\text{bill}},
+\qquad
+\text{ERP}_{\text{bond}} = \mathbb{E}[R_m] - y_{10},
+\qquad
+\text{ERP}_{\text{bill}} \approx \text{ERP}_{\text{bond}} + \tau
+```
+
+The first is the CAPM's (Sharpe, 1964): a one-period model whose riskless
+asset is a bill. The second is the valuer's (Damodaran's): a stock is a
+long-duration claim, so it is discounted at a long rate. Mehra and Prescott's
+six points (1889–1978) are the first kind.
+
+### The premium implied by prices
+
+Gordon's model (1959) prices a share as its next dividend over the
+difference between its cost of equity and its growth, $`P = D_1/(k - g)`$,
+so $`k = D_1/P + g`$. With retention $`b`$ and the return on reinvested
+earnings equal to $`k`$ (Miller and Modigliani, 1961), growth is $`g = bk`$
+and $`D_1 = (1-b)E_1`$, and the cost of equity is simply the earnings yield:
+
+```math
+k = \frac{(1-b)E_1}{P} + bk \;\;\Longrightarrow\;\; k = \frac{E_1}{P}
+```
+
+Earnings grow with the price level, so $`E/P`$ is a **real** return, and
+the implied premium compares it with a real bond:
+
+```math
+\epsilon_{\text{real}} \;\approx\; \frac{E}{P} - y^{\text{TIPS}}_{10}
+```
+
+For the 39 large US companies in this repository's `market` table (27.8
+trillion dollars of market value), the cap-weighted earnings yield on 24
+November 2026 was 4.02%; the 10-year TIPS yield, 2.78% (October). The
+implied real premium: about **1.2 points**, against the six of history. On
+these companies (they are the largest, and grow faster than the assumption
+$`\text{ROE} = k`$ allows, which understates them) the market prices in
+little reward for owning the residual claim.
+
+The **Fed model** compares $`E/P`$ with the *nominal* 10-year yield: 4.02%
+against 4.92%, a premium of −0.9. Asness (2003) calls this an error: a real
+yield set against a nominal one. It is the money illusion Modigliani and Cohn
+(1979) said depressed stocks in the inflation of the 1970s.
+
+### What "over r" measures
+
+For a holding, the app reports the realized excess return over cash, in
+dollars, on the money behind the shares still held, from each buy to today,
+dividends on both sides:
+
+```math
+x_i \;=\; R_i - r_{\text{MINT}}
+```
+
+The CAPM's expectation of it is not zero but the holding's share of the
+equity premium: $`\mathbb{E}[x_i] = \beta_i\,\text{ERP}_{\text{bill}}`$. A
+stock with $`\beta = 1`$, held a year, is *expected* to be over r by
+something like four to six percent of its cost, for bearing the market's
+risk, without any skill at all. Skill is what's left over the market on the
+same days, Jensen's alpha (1968):
+
+```math
+\alpha_i \;=\; x_i - \beta_i\,(R_m - r_{\text{MINT}})
+```
+
+So "over r" answers *did this money do better than cash?*, and "over
+market" *did it do better than owning the market?* (the same dollars on the
+same days in SPY, dividends included; $`\beta`$ taken as 1). Under r on
+a stock means that, so far, the premium it was owed hasn't been paid. A
+holding can be over r and under market at once: it beat cash by the equity
+premium those days paid, but not the index that would have earned it for
+nothing.
+
+### Why MINT is the wrong r for a stock, and the right one for a portfolio
+
+MINT's duration is about half a year; a stock's, at a 4% earnings yield,
+something like $`1/(k-g)`$ ≈ 25 years. Measured against MINT, a stock's
+excess return carries the term premium and every move in long rates as well
+as the equity premium: in a year when long rates fall, long assets beat cash
+whether or not their businesses did well. As a hurdle for *valuing* a
+business, $`r_{\text{cash}}`$ is too low by $`\tau + \epsilon`$; the residual
+income work uses $`k`$ on the 10-year.
+
+But as the opportunity cost of the money actually in the account, MINT is
+the honest one: it is where the money waits between uses, at the rate it
+actually earned.
+
+### The puzzle, and the tails
+
+Mehra and Prescott's puzzle is that six points of premium need an aversion
+to risk far beyond what people show in other choices. One answer is that the
+premium pays for rare disasters (Rietz, 1988; Barro, 2006): a small chance
+of losing half of everything, which a sample without such a disaster never
+shows. Taleb's is that the tails are fat, so the sample average of a
+premium is a poor estimate of its expectation (Taleb, 2020), and Peters
+(2019) adds that an investor lives one path through time, not the average of
+many: the premium that compounds for one shareholder is less than the
+ensemble's, by about half the variance. On these readings the premium is not
+a free lunch but rent for carrying ruin risk, and an implied premium of one
+point is a market that has stopped charging much for it.
+
 ## References
 
+- Asness, C. S. (2003). Fight the Fed model. *Journal of Portfolio
+  Management* 30(1).
+- Barro, R. J. (2006). Rare disasters and asset markets in the twentieth
+  century. *Quarterly Journal of Economics* 121(3).
 - Böhm-Bawerk, E. von (1884, 1889). *Capital and Interest*; *The Positive
   Theory of Capital*.
+- Damodaran, A. Equity risk premiums: determinants, estimation and
+  implications (updated annually). NYU Stern.
 - Fisher, I. (1896). *Appreciation and Interest*. (1930). *The Theory of
   Interest*.
+- Gordon, M. J. (1959). Dividends, earnings, and stock prices. *Review of
+  Economics and Statistics* 41(2).
 - Hayek, F. A. (1931). *Prices and Production*. (1941). *The Pure Theory
   of Capital*.
+- Jensen, M. C. (1968). The performance of mutual funds in the period
+  1945–1964. *Journal of Finance* 23(2).
 - Keynes, J. M. (1936). *The General Theory of Employment, Interest and
   Money*, chapters 13–17.
 - Kim, D. H., and J. H. Wright (2005). An arbitrage-free three-factor term
@@ -292,7 +444,15 @@ Berkshire is what theirs is.
 - Marx, K. (1867, 1894). *Capital*, volumes I and III (Parts II, V, VI).
 - Mehra, R., and E. C. Prescott (1985). The equity premium: a puzzle.
   *Journal of Monetary Economics* 15(2).
+- Miller, M. H., and F. Modigliani (1961). Dividend policy, growth, and
+  the valuation of shares. *Journal of Business* 34(4).
 - Mises, L. von (1949). *Human Action*, chapter XIX.
+- Modigliani, F., and R. A. Cohn (1979). Inflation, rational valuation
+  and the market. *Financial Analysts Journal* 35(2).
+- Peters, O. (2019). The ergodicity problem in economics. *Nature
+  Physics* 15.
+- Rietz, T. A. (1988). The equity risk premium: a solution. *Journal of
+  Monetary Economics* 22(1).
 - Robinson, J. (1953–54). The production function and the theory of
   capital. *Review of Economic Studies* 21(2).
 - Samuelson, P. A. (1966). A summing up. *Quarterly Journal of Economics*
@@ -303,6 +463,8 @@ Berkshire is what theirs is.
   42(165). (1960). *Production of Commodities by Means of Commodities*.
 - Summers, L. H. (2014). U.S. economic prospects: secular stagnation,
   hysteresis, and the zero lower bound. *Business Economics* 49(2).
+- Taleb, N. N. (2020). *Statistical Consequences of Fat Tails*. STEM
+  Academic Press.
 - Wicksell, K. (1898). *Interest and Prices*.
 
 Data: FRED, Federal Reserve Bank of St. Louis; series as listed in

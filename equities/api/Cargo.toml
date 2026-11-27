@@ -1,0 +1,36 @@
+[package]
+name = "equities-api"
+version = "0.1.0"
+edition = "2024"
+
+# What the Optimates app reads (tickers, a company's dashboard), from
+# Postgres, for whoever Cloudflare Access let through: it checks Access's
+# signed assertion on every request and holds the database credentials
+# itself, so the app's only credential is its Access sign-in. See README.md.
+
+[dependencies]
+axum = "0.8"
+bytes = "1.12.2"
+chrono = { version = "0.4.44", features = ["serde"] }
+jsonwebtoken = "9"
+pbjson = "0.9.0"
+prost = "0.14.6"
+reqwest = { version = "0.13.3", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.149"
+tiingo = { version = "0.1.0", path = "../tiingo", default-features = false }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time", "signal", "process"] }
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4"] }
+
+[[bin]]
+name = "equities-api"
+path = "src/main.rs"
+
+[build-dependencies]
+pbjson-build = "0.9.0"
+prost = "0.14.6"
+prost-build = "0.14.6"
+protox = "0.10.0"
+
+[dev-dependencies]
+equities = { path = ".." }

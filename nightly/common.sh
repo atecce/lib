@@ -20,8 +20,7 @@ wait_for_network() {
 
 # The stores the push writes: Postgres, and InfluxDB until it's retired.
 wait_for_stores() {
-  wait_for "/opt/homebrew/opt/postgresql@17/bin/pg_isready -q" 600 &&
-  wait_for "curl -s -f -m 5 -o /dev/null http://localhost:8181/health -H 'Authorization: Bearer $INFLUXDB3_AUTH_TOKEN'" 600
+  wait_for "/opt/homebrew/opt/postgresql@17/bin/pg_isready -q" 600
 }
 
 # Record a successful run of job $1 (its launchd label), for catchup.sh.
