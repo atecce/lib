@@ -109,8 +109,24 @@ fn main() -> Result<(), Box<dyn Error>> {
         items.append(&mut book);
 
         // Daily market values, if the tiingo cache has the ticker's prices.
+        // What the company's module adds for its valuation (TSMC's quarters
+        // in dollars), ahead of what it reported.
+        // A sibling listing's reports too, when the module names one (TSM:
+        // TSMC's Taipei listing, for its quarters).
+        let mut sibling = Vec::new();
+        if let Some(other) = equities::company::valued_with(equity) {
+            let read = if is_mops(other) { read_mops(&taiwan, other, &mut sibling) }
+                       else if is_edinet(other) { read_edinet(&japan, other, &mut sibling) }
+                       else { read_edgar(&cache, other, &mut sibling) };
+            if let Err(e) = read { eprintln!("{}: {}", other, e) }
+            equities::merge_nearby_dates(&mut sibling);
+            equities::derive_quarters(&mut sibling);
+            sibling.extend(items.iter().cloned());
+        }
+        let valued: Vec<_> = equities::company::valuation_items(equity, if sibling.is_empty() { &items } else { &sibling })
+            .into_iter().chain(items.iter().cloned()).collect();
         let company_prices = prices.prices(equity.as_str()).ok();
-        let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &items)).unwrap_or_default();
+        let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &valued)).unwrap_or_default();
         if let Some(last) = market.last() {
             eprintln!("{}: market cap {:.1}B on {}{}{}{}", equity, last.market_cap / 1e9, last.date,
                 last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default(),

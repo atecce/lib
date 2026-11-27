@@ -34,3 +34,6 @@ WALCL                   # Fed's total assets ($m), weekly, 2002–
 M2SL                    # M2 ($bn), 1959–
 M2V                     # velocity of M2, quarterly, 1959–
 BOGMBASE                # monetary base ($m), 1959–
+
+# Exchange rates: for companies reporting in another currency
+DEXTAUS                 # Taiwan dollars per US dollar, daily, 1983–

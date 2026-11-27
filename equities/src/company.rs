@@ -3,7 +3,7 @@
 //! by a stateless function in the company's module. The shared lists in
 //! item.rs hold only the elements anyone may use.
 
-use crate::item::Item;
+use crate::item::{Item, Reported};
 use crate::Ticker;
 
 /// The item a company's own element reports, as its module says.
@@ -27,6 +27,35 @@ pub fn item_ranked(ticker: Ticker, tag: &str) -> Option<(Item, usize)> {
     match item(ticker, tag) {
         Some(item) => Some((item, 0)),
         None => Item::from_xbrl_tag_ranked(tag),
+    }
+}
+
+/// Another listing of the same company whose reports a listing's valuation
+/// also reads: TSM's, TSMC's Taipei listing (its quarters, in TWD).
+pub fn valued_with(ticker: Ticker) -> Option<Ticker> {
+    match ticker.as_str() {
+        "TSM" => Some(crate::tsm::TAIPEI),
+        _ => None,
+    }
+}
+
+/// Figures a company's valuation needs beyond what it reported in the form
+/// the generic valuation reads (crate::valuation::market), from its module;
+/// put ahead of the reported items, so on a day both have, these are read.
+/// Not facts: for valuation only.
+pub fn valuation_items(ticker: Ticker, items: &[Reported]) -> Vec<Reported> {
+    match ticker.as_str() {
+        "TSM" => match fred::Cache::new(fred::Cache::default_dir()).series("DEXTAUS") {
+            Ok(s) => {
+                let rates: Vec<_> = s.observations.iter().filter_map(|o| Some((o.date, o.value?))).collect();
+                crate::tsm::in_dollars(items, &rates)
+            }
+            Err(e) => {
+                eprintln!("TSM: no Taiwan dollar rate ({}): valued from its 20-Fs alone", e);
+                Vec::new()
+            }
+        },
+        _ => Vec::new(),
     }
 }
 
