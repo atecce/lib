@@ -541,6 +541,11 @@ same buy dates and amounts:
 - **r's:** the buys in, and what the same dollars on the same days would be
   worth in MINT today;
 - **the market's:** the same, in SPY.
+- **r10's:** the buys in, each compounding at the 10-year Treasury yield of
+  its own day (DGS10) to today: what a ten-year note bought then and held
+  would pay, with no price risk. Short r is the hurdle of cash; r10 is the
+  long-run hurdle a stock, a long-lived claim, had to clear, and over it is
+  the equity premium earned.
 
 The premium on r is yours minus r's, in points per year; over the market,
 yours minus the market's. Because the flows are the same, the comparison is

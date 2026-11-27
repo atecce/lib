@@ -310,6 +310,19 @@ pub fn split_factor(day: NaiveDate, splits: &[(NaiveDate, f64)]) -> f64 {
     splits.iter().filter(|(d, _)| *d > day).map(|(_, r)| r).product()
 }
 
+/// What dollars bought on each lot's day (day, dollars) would be worth
+/// on `today` compounding at the 10-year yield of that day (`ten`: day,
+/// percent): r10, the rate a ten-year note bought then and held to maturity
+/// would have paid, with no price risk. None without a yield within ten
+/// days before a lot.
+pub fn locked_in(lots: &[(NaiveDate, f64)], ten: &[(NaiveDate, f64)], today: NaiveDate) -> Option<f64> {
+    lots.iter().map(|&(day, dollars)| {
+        let i = ten.partition_point(|(d, _)| *d <= day);
+        let (d, y) = *ten.get(i.checked_sub(1)?)?;
+        ((day - d).num_days() <= 10).then(|| dollars * (1.0 + y / 100.0).powf((today - day).num_days() as f64 / 365.0))
+    }).sum()
+}
+
 /// Rates for less than a year aren't annualized (the GIPS standard): a
 /// week's move, compounded over a year, is noise made enormous.
 const ANNUALIZE_AFTER_DAYS: i64 = 365;
@@ -391,6 +404,10 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         paid.entry((r.get(0), r.get(1))).or_default().push((r.get(2), r.get(3)));
     }
     let index = total_return_index(BASELINE);
+    // The 10-year Treasury yield by day (FRED's DGS10, percent): r10, the
+    // rate a buy could have locked in for ten years on its day.
+    let ten: Vec<(NaiveDate, f64)> = db.query("SELECT date, value FROM fred_observation WHERE series_id = 'DGS10' AND value IS NOT NULL ORDER BY date", &[]).await?
+        .iter().map(|r| (r.get(0), r.get(1))).collect();
     let market = total_return_index(MARKET);
 
     let rows = db.query(
@@ -406,13 +423,15 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
     type Flows = (Vec<(NaiveDate, f64)>, Vec<(NaiveDate, f64)>, Vec<(NaiveDate, f64)>);
     let mut pooled: std::collections::HashMap<String, Flows> = Default::default();
     let mut total: Flows = Default::default();
+    let mut pooled10: std::collections::HashMap<String, Vec<(NaiveDate, f64)>> = Default::default();
+    let mut total10: Vec<(NaiveDate, f64)> = Vec::new();
     let today = chrono::Local::now().date_naive();
     for r in rows {
         let account_id: String = r.get(0);
         if accounts.last().is_none_or(|(id, _)| *id != account_id) {
             accounts.push((account_id.clone(), pb::Account {
                 institution: r.get(1), name: r.get(2), subtype: r.get(3), balance: r.get(4), positions: vec![],
-                annual_return: None, baseline_annual: None, market_annual: None,
+                annual_return: None, baseline_annual: None, market_annual: None, r10_annual: None,
             }));
         }
         let (security_id, kind_name): (String, String) = (r.get(5), r.get(8));
@@ -454,6 +473,8 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         // position took), its dividends on their days, and today's value;
         // MINT's and the market's the same buys, ending in what they'd be
         // worth. Pooled by account and in all, for their rates too.
+        let r10_value = measured.as_ref().and_then(|m| locked_in(&m.lots, &ten, today));
+        let mut r10_annual = None;
         let mut rates = (None, None, None);
         if let (Some(m), Some(c)) = (measured.as_ref(), cost) {
             if (today - m.since).num_days() >= ANNUALIZE_AFTER_DAYS && m.cost > 0.0 {
@@ -465,6 +486,12 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
                 let base = [buys_in.clone(), vec![(today, m.value * k)]].concat();
                 let mkt = in_market.map(|v| [buys_in.clone(), vec![(today, v * k)]].concat());
                 rates = (xirr(&own), xirr(&base), mkt.as_deref().and_then(xirr));
+                if let Some(v) = r10_value {
+                    let flows = [buys_in.clone(), vec![(today, v * k)]].concat();
+                    r10_annual = xirr(&flows);
+                    pooled10.entry(account_id.clone()).or_default().extend(&flows);
+                    total10.extend(&flows);
+                }
                 let pool = pooled.entry(account_id.clone()).or_default();
                 for p in [&mut *pool, &mut total] {
                     p.0.extend(&own);
@@ -484,6 +511,8 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
             annual_return: rates.0,
             baseline_annual: rates.1,
             market_annual: rates.2,
+            r10_value,
+            r10_annual,
         });
     }
     // Each account's rates, and the portfolio's, from their pooled flows.
@@ -491,6 +520,7 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         if let Some((own, base, mkt)) = pooled.get(id.as_str()) {
             (account.annual_return, account.baseline_annual, account.market_annual) = (xirr(own), xirr(base), xirr(mkt));
         }
+        account.r10_annual = pooled10.get(id.as_str()).and_then(|f| xirr(f));
     }
     let synced_unix = synced(db).await?.unwrap_or(0);
     let last_day = |i: &[(NaiveDate, f64)]| i.last().map(|(d, _)| (*d - epoch).num_days() as i32).unwrap_or(0);
@@ -504,6 +534,7 @@ async fn holdings(State(app): State<Arc<App>>, who: Option<Extension<crate::acce
         annual_return: xirr(&total.0),
         baseline_annual: xirr(&total.1),
         market_annual: xirr(&total.2),
+        r10_annual: xirr(&total10),
     }))
 }
 
@@ -645,6 +676,20 @@ mod tests {
         assert_eq!(split_factor(d(2021, 1, 4), &splits), 3.0);
         // On the day: already new shares.
         assert_eq!(split_factor(d(2022, 8, 25), &splits), 1.0);
+    }
+
+    #[test]
+    fn r10_compounds_each_lot_at_its_days_yield() {
+        let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day).unwrap();
+        let ten = [(d(2024, 1, 2), 4.0), (d(2025, 1, 2), 5.0)];
+        // $100 at 4% for a year (365 days), $100 at 5% for none.
+        let v = locked_in(&[(d(2024, 1, 2), 100.0), (d(2025, 1, 2), 100.0)], &ten, d(2025, 1, 1)).unwrap();
+        assert!((v - (104.0 + 100.0 * 1.05f64.powf(-1.0 / 365.0))).abs() < 1e-9);
+        // No yield near the day: none.
+        assert_eq!(locked_in(&[(d(2023, 1, 2), 100.0)], &ten, d(2025, 1, 1)), None);
+        // Its XIRR is the yield itself.
+        let r = xirr(&[(d(2024, 1, 2), -100.0), (d(2025, 1, 1), locked_in(&[(d(2024, 1, 2), 100.0)], &ten, d(2025, 1, 1)).unwrap())]).unwrap();
+        assert!((r - 0.04).abs() < 1e-9);
     }
 
     #[test]

@@ -226,6 +226,9 @@ message HoldingsResponse {
   optional double annual_return = 7;
   optional double baseline_annual = 8;
   optional double market_annual = 9;
+  // The annual rate of r10, the 10-year Treasury yield locked in on each
+  // buy day (CAPITAL.md, "The premium on r"): the long-run hurdle.
+  optional double r10_annual = 10;
 }
 
 message Account {
@@ -240,6 +243,7 @@ message Account {
   optional double annual_return = 6;
   optional double baseline_annual = 7;
   optional double market_annual = 8;
+  optional double r10_annual = 9;
 }
 
 message Position {
@@ -283,6 +287,10 @@ message Position {
   optional double annual_return = 14;
   optional double baseline_annual = 15;
   optional double market_annual = 16;
+  // What the same dollars would be worth at the 10-year yield of each buy
+  // day (r10), as baseline_value is in MINT; and its annual rate.
+  optional double r10_value = 17;
+  optional double r10_annual = 18;
 }
 
 enum PositionKind {
