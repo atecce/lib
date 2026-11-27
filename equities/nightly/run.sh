@@ -19,6 +19,8 @@ source ~/.profile
 # ($LIB/equities/nightly/run.sh).
 LIB=${LIB:-${0:A:h:h:h}}
 cd $LIB || exit 1
+# Waits for what the job needs, and records success (nightly/common.sh).
+source nightly/common.sh
 list=${1:?usage: run.sh LIST}
 name=${${list:h}:t}   # equities/nikkei/all.txt -> nikkei
 log=equities/nightly/log.$name.$(date +%Y%m%d-%H%M%S)
@@ -39,6 +41,7 @@ locked() {
   return $s
 }
 
+wait_for_network || exit 1
 tickers=$(grep -v '^#' $list | tr -s ' \t,' '\n' | grep .)
 fetched=0
 tokyo=$(echo $tickers | grep -iE '\.T$')
@@ -55,9 +58,16 @@ else
   push=$(./target/release/changed $stamp --list $list 2>>$log)
 fi
 echo "=== $name push: $(echo $push | wc -w | tr -d ' ') companies" >> $log
+wait_for_stores || exit 1
 if [ -n "$push" ]; then
-  ./target/release/lib ${=push} >> $log 2>&1 || exit 1
+  # InfluxDB and Postgres, one company at a time (see DATA.md).
+  ./target/release/lib --postgres ${=push} >> $log 2>&1 || exit 1
 fi
 mv $stamp.next $stamp
+# For catchup.sh: the launchd job this list runs as.
+case $name in
+  sp500) mark_ok pub.atec.equities.nightly ;;
+  *) mark_ok pub.atec.equities.$name ;;
+esac
 # Non-zero when a fetch failed, so launchd shows the failure.
 exit $fetched

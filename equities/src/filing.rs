@@ -279,7 +279,7 @@ impl Reader {
             }
         }
         let (date, val) = total.ok_or("no shares outstanding on the cover page")?;
-        Ok(vec![Reported { ticker: self.ticker, date, p: crate::Period::PointInTime, item: Item::SharesOutstanding, currency: crate::Currency::USD, val }])
+        Ok(vec![Reported { ticker: self.ticker, date, p: crate::Period::PointInTime, item: Item::SharesOutstanding, currency: crate::Currency::USD, val, filing: None, derived: false }])
     }
 
     /// 10-Qs only report cash flows year to date (3, 6, 9 months); see
@@ -449,7 +449,7 @@ fn total_debt(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], info: &cr
     }
     let make = |item: Item, col: usize, v: f64| {
         let (date, p) = info.dates_and_periods[&col];
-        Reported { ticker, date, p, item, currency: info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD), val: v * info.multiplier }
+        Reported { ticker, date, p, item, currency: info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD), val: v * info.multiplier, filing: None, derived: false }
     };
     let mut totals: HashMap<usize, f64> = HashMap::new();
     let mut out = Vec::new();

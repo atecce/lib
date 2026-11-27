@@ -255,6 +255,8 @@ macro_rules! impl_reported {
                             item: Item::$variant,
                             currency: Currency::USD,
                             val: impl_reported!(@val self, $kind $source),
+                            filing: None,
+                            derived: false,
                         },
                     )*
                 ]
@@ -574,8 +576,11 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
     use std::collections::HashMap;
 
     let mut latest: HashMap<(Ticker, Item, Currency, Period, NaiveDate), f64> = HashMap::new();
+    // The filing each latest value came from: a derived quarter's is its total's.
+    let mut filing_of: HashMap<(Ticker, Item, Currency, Period, NaiveDate), Option<crate::item::Filed>> = HashMap::new();
     for it in items.iter() {
         latest.insert((it.ticker, it.item, it.currency, it.p, it.date), it.val);
+        filing_of.insert((it.ticker, it.item, it.currency, it.p, it.date), it.filing.clone());
     }
 
     let previous = |p: Period| match p {
@@ -612,8 +617,10 @@ pub fn derive_quarters(items: &mut Vec<Reported>) {
 
     let mut derived: Vec<_> = derived.into_iter().collect();
     derived.sort_by_key(|((t, i, c, d), _)| (t.to_string(), *i, *c, *d));
-    items.extend(derived.into_iter().map(|((ticker, item, currency, date), (_, val))| Reported {
+    items.extend(derived.into_iter().map(|((ticker, item, currency, date), (p, val))| Reported {
         ticker, date, p: Period::ThreeMonths, item, currency, val,
+        filing: filing_of.get(&(ticker, item, currency, p, date)).cloned().flatten(),
+        derived: true,
     }));
 }
 
@@ -727,7 +734,7 @@ pub fn book_value_per_share(items: &[Reported]) -> Vec<Reported> {
                 let Some(e) = equity.iter().rev().find(|e| e.currency == currency && e.date <= shares.date) else { continue };
                 // A balance sheet more than a year old is not this cover's.
                 if (shares.date - e.date).num_days() > 400 { continue; }
-                out.push(Reported { ticker, date: shares.date, p: Period::PointInTime, item: BookValuePerShare, currency, val: e.val / shares.val });
+                out.push(Reported { ticker, date: shares.date, p: Period::PointInTime, item: BookValuePerShare, currency, val: e.val / shares.val, filing: shares.filing.clone(), derived: true });
             }
         }
     }

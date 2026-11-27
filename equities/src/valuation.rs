@@ -2,7 +2,9 @@
 //! reported by each day: market cap and price-to-book, and the two flows that
 //! explain it, return on equity and earnings yield:
 //!
-//!     price-to-book = return on equity / earnings yield
+//! ```text
+//! price-to-book = return on equity / earnings yield
+//! ```
 //!
 //! (profit over book equity, and profit over market cap). A company earning
 //! more on its book equity than the market's earnings yield trades above book.
@@ -43,15 +45,20 @@ pub struct Market {
 /// 2023-10-01, then 3; TSMC's (TSM) 5. Checked against each price series
 /// around the split.
 fn shares_per_listed(ticker: Ticker, date: NaiveDate) -> f64 {
-    let before = |y, m, d| date < NaiveDate::from_ymd_opt(y, m, d).unwrap();
+    depositary_ratios(ticker).iter().rev()
+        .find(|(from, _)| from.parse::<NaiveDate>().is_ok_and(|f| f <= date))
+        .map_or(1.0, |(_, n)| *n)
+}
+
+/// How many of the company's shares one listed share represents, from each
+/// date it changed: empty for an ordinary listing (always 1). TSMC's have
+/// always been 5 common shares.
+pub fn depositary_ratios(ticker: Ticker) -> &'static [(&'static str, f64)] {
     match ticker.as_str() {
-        "TM" if before(2021, 10, 1) => 2.0,
-        "TM" => 10.0,
-        "HMC" if before(2023, 10, 1) => 1.0,
-        "HMC" => 3.0,
-        // TSMC's have always been 5 common shares.
-        "TSM" => 5.0,
-        _ => 1.0,
+        "TM" => &[("1900-01-01", 2.0), ("2021-10-01", 10.0)],
+        "HMC" => &[("1900-01-01", 1.0), ("2023-10-01", 3.0)],
+        "TSM" => &[("1900-01-01", 5.0)],
+        _ => &[],
     }
 }
 
@@ -156,7 +163,7 @@ mod tests {
     }
 
     fn fact(item: Item, date: &str, val: f64) -> Reported {
-        Reported { ticker: Ticker::TSLA, date: date.parse().unwrap(), p: Period::PointInTime, item, currency: Currency::USD, val }
+        Reported { ticker: Ticker::TSLA, date: date.parse().unwrap(), p: Period::PointInTime, item, currency: Currency::USD, val, filing: None, derived: false }
     }
 
     #[test]

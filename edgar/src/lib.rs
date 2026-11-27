@@ -173,6 +173,11 @@ impl Cache {
         entries.flatten().any(|e| e.metadata().is_ok_and(|m| m.is_dir() && m.modified().is_ok_and(|t| t > since)))
     }
 
+    /// The company's name and where its shares trade, from its filing list.
+    pub fn company(&self, cik: u64) -> Result<Company, Box<dyn Error>> {
+        read_json(&self.company_dir(cik).join("submissions.json"))
+    }
+
     /// The company's Central Index Key, from the SEC's ticker map.
     /// `ticker` can also be a CIK, written `CIK1018724`: a company without a
     /// ticker (acquired, bankrupt, delisted, or never listed), which the
@@ -247,6 +252,18 @@ fn find_cik(map: &TickerMap, ticker: &str) -> Option<u64> {
     let mut ciks = map.values().filter(|e| e.ticker.to_uppercase().starts_with(&prefix)).map(|e| e.cik_str);
     let first = ciks.next()?;
     ciks.all(|c| c == first).then_some(first)
+}
+
+/// A company as its EDGAR filing list describes it.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Company {
+    /// "Apple Inc."
+    pub name: String,
+    #[serde(default)]
+    pub tickers: Vec<String>,
+    /// "Nasdaq", "NYSE", one per ticker.
+    #[serde(default)]
+    pub exchanges: Vec<Option<String>>,
 }
 
 #[derive(Deserialize)]

@@ -53,8 +53,15 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
 /// the network but the push to InfluxDB.
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let dry_run = std::env::args().any(|a| a == "--dry-run");
-    let mut reported_items = Vec::new();
+    let flag = |f: &str| std::env::args().any(|a| a == f);
+    let dry_run = flag("--dry-run");
+    let dump = flag("--dump");
+    // --postgres writes to Postgres too (store crate, STORE_URL); with
+    // --postgres-only, to Postgres alone. Every version of every value, with
+    // its filing, rather than the latest only.
+    let postgres_only = flag("--postgres-only");
+    let postgres = postgres_only || flag("--postgres");
+    let influx = !postgres_only;
 
     let mut tickers = Vec::new();
     for arg in std::env::args().skip(1).filter(|a| !a.starts_with("--")) {
@@ -69,46 +76,71 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let cache = edgar::Cache::new(edgar::Cache::default_dir());
     let japan = edinet::Cache::new(edinet::Cache::default_dir());
+    let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
 
+    // One company at a time: read, derive, write, then the next, so what's
+    // written shows as it goes, an interruption loses one company, and memory
+    // stays flat however long the list. (Every step below works per ticker.)
+    // --dump and --dry-run print everything together, so they collect it.
+    let collect = dump || dry_run;
+    let mut db = if postgres && !collect { Some(open_store()?) } else { None };
+    let (mut all_items, mut all_market) = (Vec::new(), Vec::new());
+    let mut totals = Totals::default();
     for equity in tickers {
+        let mut items = Vec::new();
         // Tokyo tickers ("7203.T") come from EDINET, the rest from EDGAR.
         let read = if is_edinet(equity) {
-            read_edinet(&japan, equity, &mut reported_items)
+            read_edinet(&japan, equity, &mut items)
         } else {
-            read_edgar(&cache, equity, &mut reported_items)
+            read_edgar(&cache, equity, &mut items)
         };
         if let Err(e) = read {
             eprintln!("{}: {}", equity, e);
         }
-    }
+        if items.is_empty() {
+            continue;
+        }
+        equities::merge_nearby_dates(&mut items);
+        equities::derive_quarters(&mut items);
+        let mut book = equities::book_value_per_share(&items);
+        items.append(&mut book);
 
-    equities::merge_nearby_dates(&mut reported_items);
-    equities::derive_quarters(&mut reported_items);
-    let mut book = equities::book_value_per_share(&reported_items);
-    reported_items.append(&mut book);
-
-    // Daily market values, for tickers with prices in the tiingo cache.
-    let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
-    let mut tickers: Vec<equities::Ticker> = reported_items.iter().map(|i| i.ticker).collect();
-    tickers.sort_by_key(|t| t.as_str().to_string());
-    tickers.dedup();
-    let mut market = Vec::new();
-    for t in tickers {
-        let Ok(p) = prices.prices(t.as_str()) else { continue };
-        let mut m = equities::valuation::market(t, &p, &reported_items);
-        if let Some(last) = m.last() {
-            eprintln!("{}: market cap {:.1}B on {}{}{}{}", t, last.market_cap / 1e9, last.date,
+        // Daily market values, if the tiingo cache has the ticker's prices.
+        let company_prices = prices.prices(equity.as_str()).ok();
+        let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &items)).unwrap_or_default();
+        if let Some(last) = market.last() {
+            eprintln!("{}: market cap {:.1}B on {}{}{}{}", equity, last.market_cap / 1e9, last.date,
                 last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default(),
                 last.return_on_equity.map(|r| format!(", ROE {:.1}%", r * 100.0)).unwrap_or_default(),
                 last.earnings_yield.map(|e| format!(", earnings yield {:.1}%", e * 100.0)).unwrap_or_default());
         }
-        market.append(&mut m);
+
+        if collect {
+            all_items.append(&mut items);
+            all_market.extend(market);
+            continue;
+        }
+        if let Some(db) = db.as_mut() {
+            match write_company(db, &cache, &japan, equity, &items, company_prices.as_deref(), &market) {
+                Ok(t) => totals.add(t),
+                Err(e) => eprintln!("postgres: {}: {}", equity, e),
+            }
+        }
+        if influx {
+            let latest_items = latest(items);
+            push_to_influx(&latest_items)?;
+            totals.influx_items += latest_items.len();
+            if !market.is_empty() {
+                push_market(&market)?;
+                totals.influx_market += market.len();
+            }
+        }
     }
 
     // Every item read, one per line, sorted: for diffing the output of two versions.
-    if std::env::args().any(|a| a == "--dump") {
-        let reported_items = if std::env::args().any(|a| a == "--latest") { latest(reported_items) } else { reported_items };
-        let mut lines: Vec<String> = reported_items.iter()
+    if dump {
+        let items = if flag("--latest") { latest(all_items) } else { all_items };
+        let mut lines: Vec<String> = items.iter()
             .map(|it| format!("{}\t{}\t{}\t{}\t{}\t{}", it.ticker, it.date, it.p, it.item, it.currency, it.val))
             .collect();
         lines.sort();
@@ -116,23 +148,95 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("{}", lines.join("\n"));
         return Ok(());
     }
-
     if dry_run {
-        print_series(&reported_items, std::env::args().any(|a| a == "--cash-flow"));
+        print_series(&all_items, flag("--cash-flow"));
         return Ok(());
     }
 
-    if !reported_items.is_empty() {
-        let items = latest(reported_items);
-        push_to_influx(&items)?;
-        println!("Successfully pushed {} items to InfluxDB", items.len());
+    if postgres {
+        println!("Successfully wrote {} companies, {} filings, {} facts, {} price days, {} market days to Postgres",
+            totals.companies, totals.filings, totals.facts, totals.prices, totals.market);
     }
-    if !dry_run && !market.is_empty() {
-        push_market(&market)?;
-        println!("Successfully pushed {} market days to InfluxDB", market.len());
+    if influx {
+        println!("Successfully pushed {} items to InfluxDB", totals.influx_items);
+        println!("Successfully pushed {} market days to InfluxDB", totals.influx_market);
     }
-
     Ok(())
+}
+
+/// What a run wrote, for its summary.
+#[derive(Default)]
+struct Totals {
+    companies: usize,
+    filings: usize,
+    facts: usize,
+    prices: usize,
+    market: usize,
+    influx_items: usize,
+    influx_market: usize,
+}
+
+impl Totals {
+    fn add(&mut self, t: Totals) {
+        self.companies += t.companies;
+        self.filings += t.filings;
+        self.facts += t.facts;
+        self.prices += t.prices;
+        self.market += t.market;
+    }
+}
+
+/// Write each company read to Postgres: its issuer and listing, its filings
+/// and every value they reported, its prices and market values.
+/// The store, with its schema up to date and the items table in step with
+/// the Rust enum.
+fn open_store() -> Result<store::Store, Box<dyn Error>> {
+    let mut db = store::Store::connect(&store::default_url())?;
+    for m in db.migrate()? {
+        eprintln!("postgres: applied migration {}", m);
+    }
+    db.sync_items()?;
+    Ok(db)
+}
+
+/// One company to Postgres: issuer and listing, its filings and every
+/// version of every value, its prices and market values, each in its own
+/// transaction.
+fn write_company(db: &mut store::Store, edgar: &edgar::Cache, edinet: &edinet::Cache, ticker: equities::Ticker,
+                 items: &[equities::item::Reported], prices: Option<&[tiingo::Price]>,
+                 market: &[equities::valuation::Market]) -> Result<Totals, Box<dyn Error>> {
+    let company = company(edgar, edinet, ticker)?;
+    let issuer = db.write_company(&company)?;
+    let (filings, facts) = db.write_facts(issuer, items)?;
+    let prices = match prices { Some(p) => db.write_prices(ticker.as_str(), p)?, None => 0 };
+    let market = db.write_market(market)?;
+    db.mark_written(ticker.as_str())?;
+    Ok(Totals { companies: 1, filings, facts, prices, market, ..Default::default() })
+}
+
+/// What the caches know of a listing's issuer.
+fn company(edgar: &edgar::Cache, edinet: &edinet::Cache, t: equities::Ticker) -> Result<store::Company, Box<dyn Error>> {
+    if is_edinet(t) {
+        let last = edinet.reports(t.as_str())?.pop().ok_or("no EDINET reports")?;
+        let code = last.edinet_code.clone();
+        // The same issuer on EDGAR, through its US depositary shares.
+        let cik = code.as_deref()
+            .and_then(|c| store::SAME_ISSUER.iter().find(|(e, _)| *e == c))
+            .and_then(|(_, us)| edgar.cik(us).ok())
+            .map(|c| c as i64);
+        Ok(store::Company { ticker: t.as_str().to_string(), name: last.filer_name.clone(), cik, edinet_code: code,
+            exchange: Some("TSE".to_string()), currency: "JPY".to_string() })
+    } else {
+        let cik = edgar.cik(t.sec_symbol())?;
+        let info = edgar.company(cik).ok();
+        let exchange = info.as_ref().and_then(|i| {
+            let at = i.tickers.iter().position(|x| x.eq_ignore_ascii_case(t.sec_symbol()))?;
+            i.exchanges.get(at).cloned().flatten()
+        });
+        let edinet_code = store::SAME_ISSUER.iter().find(|(_, us)| *us == t.as_str()).map(|(e, _)| e.to_string());
+        Ok(store::Company { ticker: t.as_str().to_string(), name: info.map(|i| i.name), cik: Some(cik as i64),
+            edinet_code, exchange, currency: "USD".to_string() })
+    }
 }
 
 /// One value per (ticker, item, period, currency, date): the last one read.
@@ -163,6 +267,15 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
     let (mut skipped, mut missing) = (0, 0);
     for f in &filings {
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
+        // Everything read from this filing carries it.
+        let start = reported_items.len();
+        let filed = equities::item::Filed {
+            accession: f.accession.clone(),
+            filed: f.filing_date,
+            source: equities::item::Source::Edgar,
+            form: f.form.clone(),
+            period_end: Some(f.report_date),
+        };
         match cache.filing(f) {
             Ok(dir) => match equities::filing::new_reader(&dir, equity) {
                 Ok(mut r) => {
@@ -183,6 +296,9 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
                 Some(edgar::EdgarError::NotFetched(_)) => missing += 1,
                 _ => eprintln!("failed to read {}: {}", name, e),
             },
+        }
+        for it in &mut reported_items[start..] {
+            it.filing = Some(filed.clone());
         }
     }
     eprintln!("{}: read {} EDGAR filings, {} predate rendered statements{}", equity, filings.len() - skipped - missing, skipped,

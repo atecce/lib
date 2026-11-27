@@ -1,0 +1,17 @@
+[package]
+name = "store"
+version = "0.1.0"
+edition = "2024"
+
+# The financials in Postgres: a destination, as edgar, edinet and tiingo are
+# sources. See README.md.
+
+[dependencies]
+chrono = "0.4.44"
+equities = { path = "../equities" }
+postgres = { version = "0.19", features = ["with-chrono-0_4"] }
+tiingo = { path = "../tiingo", default-features = false }
+
+[[bin]]
+name = "store-progress"
+path = "src/bin/progress.rs"
