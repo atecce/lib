@@ -125,6 +125,19 @@ impl Reader {
         // row with a real number for the same key replaces it.
         let mut seen: std::collections::HashMap<_, (usize, bool, usize)> = std::collections::HashMap::new();
 
+        // The statement's own columns, where most line items have a number.
+        // EDGAR's pages add a column for each other date any fact on the page
+        // has (Target's Q1 cash flows: Feb. 1 and Aug. 3 beside the quarter,
+        // for a row or two); an empty cell there is not reported, not zero.
+        let numbers_in = |col: usize| rows.iter().enumerate()
+            .filter(|(r, row)| item_of(*r, row).is_some())
+            .filter(|(_, row)| matches!(row.get(col), Some(Data::Float(_)) | Some(Data::Int(_))))
+            .count();
+        let counts: std::collections::HashMap<usize, usize> = sheet_info.dates_and_periods.keys()
+            .map(|&col| (col, numbers_in(col))).collect();
+        let densest = counts.values().copied().max().unwrap_or(0);
+        let main_column = |col: usize| counts.get(&col).is_some_and(|&n| n * 2 >= densest);
+
         for (r, row) in rows.iter().enumerate() {
             {
                 if let Some((mut item, rank)) = item_of(r, row) {
@@ -143,7 +156,8 @@ impl Reader {
                             Some(Data::Float(f)) => (*f, false),
                             Some(Data::Int(i)) => (*i as f64, false),
                             // Only money: an EPS or share count left empty is unknown, not zero.
-                            Some(Data::Empty) | None if has_value && item.unit() == crate::item::Unit::Money => (0.0, true),
+                            Some(Data::Empty) | None if has_value && item.unit() == crate::item::Unit::Money
+                                && main_column(col) => (0.0, true),
                             _ => (f64::NAN, false),
                         };
 

@@ -1,6 +1,9 @@
 #!/bin/zsh
 # Nightly: bring the EDGAR cache up to date for every company with a ticker
-# (one ticker per company, from the SEC's ticker map), using EDGAR's bulk
+# (one ticker per company, from the SEC's ticker map), then every operating
+# company without one that filed reports since 2009 (by CIK, from edgar's
+# `universe`: acquired, bankrupt, delisted, never listed; the companies a
+# backtest needs to avoid survivorship bias), using EDGAR's bulk
 # submissions.zip for the filing lists.
 #
 #     all.sh
@@ -11,6 +14,8 @@
 # the SEC's limit); filings already on disk are skipped, so an interrupted run
 # resumes where it stopped, and once caught up a night is only the day's new
 # filings. launchd starts no second copy while one is still running.
+#
+# (edgar-progress counts both.)
 #
 # Companies go in chunks, each holding the cache lock only while it fetches,
 # so the other nightly jobs (S&P 500, Nikkei) get their turn in between and
@@ -30,6 +35,10 @@ map=edgar/cache/company_tickers.json
 list=edgar/nightly/companies.txt
 jq -r '[to_entries[] | {k: (.key | tonumber), c: .value.cik_str, t: .value.ticker}]
        | group_by(.c) | map(min_by(.k)) | sort_by(.k) | .[].t' $map > $list || exit 1
+# Then the companies without a ticker, most recently active first. The zip
+# is the one fetch --bulk keeps (refreshed when older than a day); on a first
+# run without it, they wait for the next night.
+./target/release/universe --operating --without-tickers --cik-only >> $list 2>>$log
 total=$(wc -l < $list | tr -d ' ')
 echo "=== $total companies, $chunk at a time" >> $log
 

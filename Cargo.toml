@@ -26,7 +26,7 @@ reqwest = { version = "0.13.3", features = ["blocking"] }
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "daemon", "edgar", "edinet", "equities", "greece", "gutenberg", "name", "scrape", "shakespeare", "tiingo"]
+members = ["backtest", "bible", "daemon", "edgar", "edinet", "equities", "greece", "gutenberg", "name", "scrape", "shakespeare", "tiingo"]
 
 # Optimize dependencies in dev/test builds (calamine, scraper, regex parse
 # whole filings in tests and examples). Workspace crates stay

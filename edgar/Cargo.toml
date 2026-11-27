@@ -21,3 +21,11 @@ zip = { version = "7.2.0", default-features = false, features = ["deflate"], opt
 [[bin]]
 name = "fetch"
 required-features = ["fetch"]
+
+[[bin]]
+name = "universe"
+required-features = ["fetch"]
+
+[[bin]]
+name = "edgar-progress"
+path = "src/bin/progress.rs"
