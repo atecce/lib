@@ -4,6 +4,8 @@ pub mod date;
 pub mod item;
 pub mod xlsx;
 pub mod pdf;
+pub mod filing;
+pub mod edgar;
 pub mod nvda;
 pub mod tsla;
 pub mod sheet_info;
@@ -24,7 +26,7 @@ macro_rules! count_items {
     ($head:ident $($tail:ident)*) => { 1 + count_items!($($tail)*) };
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize)]
 pub enum Ticker {
     NVDA,
     TSLA,
@@ -87,10 +89,11 @@ impl FromStr for Period {
         let trimmed = s.trim();
 
         let lower = trimmed.to_lowercase();
-        if lower.contains("three months") { Ok(Period::ThreeMonths) }
-        else if lower.contains("six months") { Ok(Period::SixMonths) }
-        else if lower.contains("nine months") { Ok(Period::NineMonths) }
-        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") { Ok(Period::TwelveMonths) }
+        // EDGAR's Financial_Report.xlsx writes "3 Months Ended", company reports write "Three Months Ended".
+        if lower.contains("three months") || lower.contains("3 months") { Ok(Period::ThreeMonths) }
+        else if lower.contains("six months") || lower.contains("6 months") { Ok(Period::SixMonths) }
+        else if lower.contains("nine months") || lower.contains("9 months") { Ok(Period::NineMonths) }
+        else if lower.contains("year ended") || lower.contains("annual") || lower.contains("twelve months") || lower.contains("12 months") { Ok(Period::TwelveMonths) }
         else { Err(PeriodError::InvalidPeriod) }
     }
 }
@@ -267,6 +270,7 @@ impl_reported! {
         PurchasesOfNonMarketableEquitySecurities => field purchases_of_non_marketable_equity_securities,
         AcquisitionsNetOfCashAcquired => field acquisitions_net_of_cash_acquired,
         NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        NetCashUsedInFinancingActivities => method net_cash_used_in_financing_activities,
         ProceedsRelatedToEmployeeStockPlans =>  field proceeds_related_to_employee_stock_plans,
         PaymentsRelatedToRepurchasesOfCommonStock => field payments_related_to_repurchases_of_common_stock,
         PaymentsRelatedToEmployeeStockPlanTaxes => field payments_related_to_employee_stock_plan_taxes,
@@ -382,4 +386,48 @@ impl_reported! {
         IncomeTaxExpense => field provision_for_income_taxes,
         NetIncome => method net_income,
     ]
+}
+
+/// Fill in three-month values that were not reported, from year-to-date
+/// totals: Q2 = 6m - 3m, Q3 = 9m - 6m, Q4 = 12m - 9m, where the shorter
+/// total ends about a quarter earlier. Annual reports only give twelve-month
+/// figures (so every Q4 is derived), and 10-Q cash flow statements only give
+/// year-to-date figures (so cash flow Q2-Q4 are derived). Reported
+/// three-month values are never replaced. When a value was reported more than
+/// once (restatements), the last one wins, matching how later writes
+/// overwrite earlier ones downstream.
+pub fn derive_quarters(items: &mut Vec<Reported>) {
+    use std::collections::HashMap;
+
+    let mut latest: HashMap<(Ticker, Item, Period, NaiveDate), f64> = HashMap::new();
+    for it in items.iter() {
+        latest.insert((it.ticker, it.item, it.p, it.date), it.val);
+    }
+
+    let previous = |p: Period| match p {
+        Period::SixMonths => Some(Period::ThreeMonths),
+        Period::NineMonths => Some(Period::SixMonths),
+        Period::TwelveMonths => Some(Period::NineMonths),
+        _ => None,
+    };
+
+    let mut derived: HashMap<(Ticker, Item, NaiveDate), f64> = HashMap::new();
+    for (&(ticker, item, p, date), &total) in &latest {
+        let Some(prev_p) = previous(p) else { continue };
+        if latest.contains_key(&(ticker, item, Period::ThreeMonths, date)) {
+            continue;
+        }
+        let prev = latest.iter().find(|((t, i, pp, d), _)| {
+            *t == ticker && *i == item && *pp == prev_p && (80..=100).contains(&(date - *d).num_days())
+        });
+        if let Some((_, prev_total)) = prev {
+            derived.insert((ticker, item, date), total - prev_total);
+        }
+    }
+
+    let mut derived: Vec<_> = derived.into_iter().collect();
+    derived.sort_by_key(|((t, i, d), _)| (t.to_string(), *i, *d));
+    items.extend(derived.into_iter().map(|((ticker, item, date), val)| Reported {
+        ticker, date, p: Period::ThreeMonths, item, val,
+    }));
 }

@@ -154,14 +154,23 @@ fn q3_2020() {
         },
     ];
 
-    let mut r = equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200930-gen.pdf"), equities::Ticker::TSLA).unwrap();
-
-    reported::assert(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
+    let expected_bs: Vec<_> = balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
-        .collect());
-    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+        .collect();
+    let expected_is: Vec<_> = income_statements.into_iter()
         .map(|stmt| stmt.reported()).flatten()
         .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
-        .collect());
+        .collect();
+
+    let readers: Vec<Box<dyn Reader>> = vec![
+        Box::new(equities::pdf::new_reader(std::path::Path::new("tsla/tsla-10q_20200930-gen.pdf"), equities::Ticker::TSLA).unwrap()),
+        Box::new(equities::xlsx::new_reader(std::path::Path::new("tsla/2020-09-30_10Q.xlsx"), equities::Ticker::TSLA).unwrap()),
+        Box::new(equities::filing::new_reader(std::path::Path::new("edgar/1318605/000156459020047486"), equities::Ticker::TSLA).unwrap()),
+    ];
+
+    for mut r in readers {
+        reported::assert(r.process_balance_sheet().unwrap(), expected_bs.clone());
+        reported::assert(r.process_income_statement().unwrap(), expected_is.clone());
+    }
 }
