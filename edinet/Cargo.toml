@@ -1,0 +1,25 @@
+[package]
+name = "edinet"
+version = "0.1.0"
+edition = "2024"
+
+# EDINET (Electronic Disclosure for Investors' NETwork), Japan's EDGAR, run by
+# the Financial Services Agency (金融庁, Kin'yūchō), as a source: filings cached
+# on disk under cache/, and the client that fetches them. Readers of the cache
+# (equities) depend on this crate without the `fetch` feature.
+
+[features]
+default = ["fetch"]
+fetch = ["dep:reqwest", "dep:zip"]
+
+[dependencies]
+chrono = { version = "0.4.44", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.150"
+reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
+zip = { version = "7.2.0", default-features = false, features = ["deflate"], optional = true }
+
+[[bin]]
+name = "edinet-fetch"
+path = "src/bin/fetch.rs"
+required-features = ["fetch"]

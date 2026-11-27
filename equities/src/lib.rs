@@ -3,6 +3,7 @@ uniffi::setup_scaffolding!();
 pub mod item;
 pub mod xlsx;
 pub mod filing;
+pub mod edinet;
 pub mod nvda;
 pub mod tsla;
 pub mod sheet_info;

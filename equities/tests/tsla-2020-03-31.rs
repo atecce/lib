@@ -108,7 +108,15 @@ fn report() {
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());
-    reported::assert(r.process_income_statement().unwrap(), income_statements.into_iter()
+    let income = r.process_income_statement().unwrap();
+    // "Total automotive revenues", from the statement's automotive section.
+    let mut automotive: Vec<(String, f64)> = income.iter()
+        .filter(|i| i.item == equities::item::Item::AutomotiveRevenue)
+        .map(|i| (i.date.to_string(), i.val))
+        .collect();
+    automotive.sort_by(|a, b| a.0.cmp(&b.0));
+    assert_eq!(automotive, [("2019-03-31".to_string(), 3_724_000_000.0), ("2020-03-31".to_string(), 5_132_000_000.0)]);
+    reported::assert(income, income_statements.into_iter()
         .map(|stmt| stmt.reported()).flatten()
         .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
         .collect());
