@@ -4,6 +4,7 @@ pub mod item;
 pub mod xlsx;
 pub mod filing;
 pub mod edinet;
+pub mod mops;
 pub mod valuation;
 pub mod nvda;
 pub mod tsla;

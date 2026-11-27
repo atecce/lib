@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Morning MOPS fetch, prices and push of Taiwan's largest companies (run.sh), at 06:40, after
+  the night's EDGAR fetch (edgar/nightly/all.sh), or on wake if the
+  Mac was asleep then. For a checkout elsewhere, substitute its path:
+  Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.equities.taiwan.plist > ~/Library/LaunchAgents/pub.atec.equities.taiwan.plist &&
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities.taiwan.plist
+  Run now: launchctl kickstart gui/$(id -u)/pub.atec.equities.taiwan
+  Remove:  launchctl bootout gui/$(id -u)/pub.atec.equities.taiwan && rm ~/Library/LaunchAgents/pub.atec.equities.taiwan.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>pub.atec.equities.taiwan</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/caffeinate</string>
+		<string>-ims</string>
+		<string>/Users/atec/lib/equities/nightly/run.sh</string>
+		<string>equities/taiwan/all.txt</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/atec/lib</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>6</integer>
+		<key>Minute</key>
+		<integer>40</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/atec/lib/equities/nightly/launchd.taiwan.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/atec/lib/equities/nightly/launchd.taiwan.log</string>
+	<key>SoftResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>4096</integer>
+	</dict>
+</dict>
+</plist>

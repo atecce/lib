@@ -26,6 +26,8 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ("005_ticker_case", include_str!("../migrations/005_ticker_case.sql")),
     ("006_flow_period", include_str!("../migrations/006_flow_period.sql")),
     ("007_flow_period_fallback", include_str!("../migrations/007_flow_period_fallback.sql")),
+    ("008_mops", include_str!("../migrations/008_mops.sql")),
+    ("009_sic", include_str!("../migrations/009_sic.sql")),
 ];
 
 /// `host=localhost dbname=financials` unless `STORE_URL` says otherwise.
@@ -42,6 +44,8 @@ pub struct Company {
     pub cik: Option<i64>,
     /// EDINET's code, e.g. E02144 (Toyota).
     pub edinet_code: Option<String>,
+    /// MOPS's code, e.g. 2330 (TSMC).
+    pub mops_code: Option<String>,
     pub exchange: Option<String>,
     /// The currency the shares trade in.
     pub currency: String,
@@ -52,6 +56,14 @@ pub struct Company {
 /// under on EDGAR.
 pub const SAME_ISSUER: &[(&str, &str)] = &[
     ("E02144", "TM"),    // Toyota (トヨタ自動車, Toyota Jidōsha)
+];
+
+/// MOPS codes whose companies are on EDGAR too, through US depositary shares.
+pub const SAME_ISSUER_MOPS: &[(&str, &str)] = &[
+    ("2330", "TSM"),     // TSMC (台積電, Táijīdiàn)
+    ("2303", "UMC"),     // United Microelectronics (聯電, Liándiàn)
+    ("3711", "ASX"),     // ASE Technology (日月光投控, Rìyuèguāng Tóukòng)
+    ("2412", "CHT"),     // Chunghwa Telecom (中華電信, Zhōnghuá Diànxìn)
 ];
 
 pub struct Store {
@@ -79,6 +91,18 @@ impl Store {
             applied.push(*version);
         }
         Ok(applied)
+    }
+
+    /// Set issuers' SIC industry codes, by CIK; returns how many issuers
+    /// changed. CIKs not in the database are skipped.
+    pub fn set_sic(&mut self, codes: &[(i64, String)]) -> Result<u64, Box<dyn Error>> {
+        let mut tx = self.db.transaction()?;
+        let mut changed = 0;
+        for (cik, sic) in codes {
+            changed += tx.execute("UPDATE issuer SET sic = $2 WHERE cik = $1 AND sic IS DISTINCT FROM $2", &[cik, sic])?;
+        }
+        tx.commit()?;
+        Ok(changed)
     }
 
     /// Bring the `item` table in step with `equities::item::Item`.
@@ -111,18 +135,19 @@ impl Store {
         let mut tx = self.db.transaction()?;
         let found = tx.query_opt(
             "SELECT id FROM issuer WHERE ($1::bigint IS NOT NULL AND cik = $1) OR ($2::text IS NOT NULL AND edinet_code = $2)
-             ORDER BY id LIMIT 1", &[&c.cik, &c.edinet_code])?;
+                OR ($3::text IS NOT NULL AND mops_code = $3)
+             ORDER BY id LIMIT 1", &[&c.cik, &c.edinet_code, &c.mops_code])?;
         let name = c.name.clone().unwrap_or_else(|| c.ticker.clone());
         let id: i32 = match found {
             Some(row) => {
                 let id: i32 = row.get(0);
                 tx.execute("UPDATE issuer SET cik = coalesce(cik, $2), edinet_code = coalesce(edinet_code, $3),
-                            name = CASE WHEN $4 THEN $5 ELSE name END WHERE id = $1",
-                    &[&id, &c.cik, &c.edinet_code, &c.name.is_some(), &name])?;
+                            mops_code = coalesce(mops_code, $6), name = CASE WHEN $4 THEN $5 ELSE name END WHERE id = $1",
+                    &[&id, &c.cik, &c.edinet_code, &c.name.is_some(), &name, &c.mops_code])?;
                 id
             },
-            None => tx.query_one("INSERT INTO issuer (name, cik, edinet_code) VALUES ($1, $2, $3) RETURNING id",
-                &[&name, &c.cik, &c.edinet_code])?.get(0),
+            None => tx.query_one("INSERT INTO issuer (name, cik, edinet_code, mops_code) VALUES ($1, $2, $3, $4) RETURNING id",
+                &[&name, &c.cik, &c.edinet_code, &c.mops_code])?.get(0),
         };
         tx.execute("INSERT INTO listing (ticker, issuer_id, exchange, currency) VALUES ($1, $2, $3, $4)
                     ON CONFLICT (ticker) DO UPDATE SET issuer_id = EXCLUDED.issuer_id,

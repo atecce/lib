@@ -76,6 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let cache = edgar::Cache::new(edgar::Cache::default_dir());
     let japan = edinet::Cache::new(edinet::Cache::default_dir());
+    let taiwan = mops::Cache::new(mops::Cache::default_dir());
     let prices = tiingo::Cache::new(tiingo::Cache::default_dir());
 
     // One company at a time: read, derive, write, then the next, so what's
@@ -89,7 +90,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     for equity in tickers {
         let mut items = Vec::new();
         // Tokyo tickers ("7203.T") come from EDINET, the rest from EDGAR.
-        let read = if is_edinet(equity) {
+        let read = if is_mops(equity) {
+            read_mops(&taiwan, equity, &mut items)
+        } else if is_edinet(equity) {
             read_edinet(&japan, equity, &mut items)
         } else {
             read_edgar(&cache, equity, &mut items)
@@ -216,6 +219,14 @@ fn write_company(db: &mut store::Store, edgar: &edgar::Cache, edinet: &edinet::C
 
 /// What the caches know of a listing's issuer.
 fn company(edgar: &edgar::Cache, edinet: &edinet::Cache, t: equities::Ticker) -> Result<store::Company, Box<dyn Error>> {
+    if is_mops(t) {
+        let code = mops::code(t.as_str());
+        // The same issuer on EDGAR, through its US depositary shares.
+        let cik = store::SAME_ISSUER_MOPS.iter().find(|(m, _)| *m == code)
+            .and_then(|(_, us)| edgar.cik(us).ok()).map(|c| c as i64);
+        return Ok(store::Company { ticker: t.as_str().to_string(), name: None, cik, edinet_code: None,
+            mops_code: Some(code), exchange: Some("TWSE".to_string()), currency: "TWD".to_string() });
+    }
     if is_edinet(t) {
         let last = edinet.reports(t.as_str())?.pop().ok_or("no EDINET reports")?;
         let code = last.edinet_code.clone();
@@ -225,7 +236,7 @@ fn company(edgar: &edgar::Cache, edinet: &edinet::Cache, t: equities::Ticker) ->
             .and_then(|(_, us)| edgar.cik(us).ok())
             .map(|c| c as i64);
         Ok(store::Company { ticker: t.as_str().to_string(), name: last.filer_name.clone(), cik, edinet_code: code,
-            exchange: Some("TSE".to_string()), currency: "JPY".to_string() })
+            mops_code: None, exchange: Some("TSE".to_string()), currency: "JPY".to_string() })
     } else {
         let cik = edgar.cik(t.sec_symbol())?;
         let info = edgar.company(cik).ok();
@@ -234,8 +245,9 @@ fn company(edgar: &edgar::Cache, edinet: &edinet::Cache, t: equities::Ticker) ->
             i.exchanges.get(at).cloned().flatten()
         });
         let edinet_code = store::SAME_ISSUER.iter().find(|(_, us)| *us == t.as_str()).map(|(e, _)| e.to_string());
+        let mops_code = store::SAME_ISSUER_MOPS.iter().find(|(_, us)| *us == t.as_str()).map(|(m, _)| m.to_string());
         Ok(store::Company { ticker: t.as_str().to_string(), name: info.map(|i| i.name), cik: Some(cik as i64),
-            edinet_code, exchange, currency: "USD".to_string() })
+            edinet_code, mops_code, exchange, currency: "USD".to_string() })
     }
 }
 
@@ -309,6 +321,18 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
 /// A Tokyo Stock Exchange ticker, read from EDINET.
 fn is_edinet(t: equities::Ticker) -> bool {
     t.as_str().ends_with(".T")
+}
+
+fn is_mops(t: equities::Ticker) -> bool {
+    t.as_str().ends_with(".TW")
+}
+
+fn read_mops(cache: &mops::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let (mut items, read, failed) = equities::mops::read_company(cache, equity)?;
+    eprintln!("{}: read {} MOPS reports{}", equity, read,
+        if failed > 0 { format!(", {} failed", failed) } else { String::new() });
+    reported_items.append(&mut items);
+    Ok(())
 }
 
 fn read_edinet(cache: &edinet::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {

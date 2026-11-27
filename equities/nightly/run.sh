@@ -5,7 +5,8 @@
 #
 # EDGAR is fetched for every company by edgar/nightly/all.sh (23:00), so this
 # runs in the morning, after it, and fetches only what is particular to the
-# list: Tokyo tickers (7203.T) from EDINET, and for a small list, prices.
+# list: Tokyo tickers (7203.T) from EDINET, Taipei ones (2330.TW) from MOPS,
+# and for a small list, prices.
 #
 # A large list (the S&P 500) pushes the companies whose filings changed since
 # its last push (edgar's `changed`, against the stamp file pushed.NAME),
@@ -47,6 +48,13 @@ fetched=0
 tokyo=$(echo $tickers | grep -iE '\.T$')
 if [ -n "$tokyo" ]; then
   locked edinet/cache ./target/release/edinet-fetch ${=tokyo} 2>>$log | sed 's/^/edinet new: /' >> $log
+  (( pipestatus[1] )) && fetched=1
+fi
+
+# Taipei tickers (2330.TW) from MOPS, under its own lock.
+taipei=$(echo $tickers | grep -iE '\.TW$')
+if [ -n "$taipei" ]; then
+  locked mops/cache ./target/release/mops-fetch ${=taipei} 2>>$log | sed 's/^/mops new: /' >> $log
   (( pipestatus[1] )) && fetched=1
 fi
 

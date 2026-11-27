@@ -369,6 +369,8 @@ pub struct Reported {
 pub enum Source {
     Edgar,
     Edinet,
+    /// Taiwan's Market Observation Post System.
+    Mops,
 }
 
 impl Source {
@@ -376,6 +378,7 @@ impl Source {
         match self {
             Source::Edgar => "edgar",
             Source::Edinet => "edinet",
+            Source::Mops => "mops",
         }
     }
 }

@@ -8,6 +8,7 @@ All launchd agents (per user, so they run while you're logged in).
 | `pub.atec.edinet.all` | 23:30 | fetch EDINET for every listed company (`edinet/nightly/all.sh`) | network |
 | `pub.atec.equities.nightly` | 06:00 | push the S&P 500's changed companies (`equities/nightly/run.sh`) | Postgres, InfluxDB, network |
 | `pub.atec.equities.nikkei` | 06:30 | prices and push for the Nikkei list | same |
+| `pub.atec.equities.taiwan` | 06:40 | MOPS fetch, prices and push for the Taiwan list | same |
 | `pub.atec.catchup` | at login, hourly | make up any of the above that missed a run | |
 | `pub.atec.cloudflared` | always | the tunnel to `grafana.atec.pub` (`tunnel/`) | network |
 | Postgres, InfluxDB, Grafana | always | Homebrew services (`brew services`) | |

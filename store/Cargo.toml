@@ -15,3 +15,7 @@ tiingo = { path = "../tiingo", default-features = false }
 [[bin]]
 name = "store-progress"
 path = "src/bin/progress.rs"
+
+[[bin]]
+name = "store-sic"
+path = "src/bin/sic.rs"
