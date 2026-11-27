@@ -7,9 +7,10 @@ edition = "2024"
 augurs = {version = "0.10.2", features = ["outlier"]}
 calamine = "0.35.0"
 chrono = {version = "0.4.44", features = ["serde"]}
+# Reads the EDGAR cache; fetching it is the edgar crate's job.
+edgar = { path = "../edgar", default-features = false }
 regex = "1.12.4"
 scraper = "0.26.0"
-reqwest = {version = "0.13.4", features = ["blocking", "json"]}
 serde = "1.0.228"
 serde_json = "1.0.150"
 uniffi = "0.31.1"

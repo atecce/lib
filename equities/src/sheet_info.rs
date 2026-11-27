@@ -6,10 +6,17 @@ use crate::{Currency, Period};
 static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(r"^(.*?\d{4})\s+([A-Z]{3}) \(.*$").unwrap()
 });
+
+/// A currency for the whole table, in its title: "CONSOLIDATED STATEMENT OF
+/// FINANCIAL POSITION - JPY (¥) ¥ in Millions" (Toyota since 2015), or
+/// "Consolidated Balance Sheets (JPY ¥)" (Toyota in 2014).
+static TITLE_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r" - ([A-Z]{3}) \(|\(([A-Z]{3}) [^)\w]+\)").unwrap()
+});
 use crate::item::Item;
 
 use calamine::{Data, DataType};
-use chrono::NaiveDate;
+use chrono::{Datelike, NaiveDate};
 
 #[derive(PartialEq)]
 pub enum SheetType {
@@ -121,6 +128,11 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     let mut periods: HashMap<usize, Option<Period>> = HashMap::new();
     let mut unknown_headings: HashMap<usize, String> = HashMap::new();
     let mut unknown_cols: std::collections::HashSet<usize> = std::collections::HashSet::new();
+    // "4 Months Ended" headings, and the date columns under them: a 16-week
+    // first quarter on a 52/53-week calendar (Kroger's), or a four-month stub
+    // after a merger. Told apart below by the column dates.
+    let mut four_month_heads: std::collections::HashSet<usize> = std::collections::HashSet::new();
+    let mut four_month_cols: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
     // Period headings ("Three Months Ended") with their row and column, and the
     // first row holding a date, to tell header cells from line items.
@@ -128,6 +140,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
     let mut first_date_row: Option<usize> = None;
 
     let mut currencies: HashMap<usize, Currency> = HashMap::new();
+    let mut title_currency: Option<String> = None;
     let mut skipped: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
     let mut dates_and_periods = HashMap::new();
@@ -144,6 +157,11 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         for (c, cell) in row.iter().enumerate() {
             match cell {
                 Data::String(s) => {
+                    if title_currency.is_none() && first_date_row.is_none() {
+                        title_currency = TITLE_CURRENCY.captures(s)
+                            .and_then(|c| c.get(1).or(c.get(2)))
+                            .map(|m| m.as_str().to_string());
+                    }
                     // A currency after a date: "Dec. 31, 2025 TWD ($)", possibly
                     // followed by other units ("... TWD ($) $ / shares").
                     let (s, currency) = match COLUMN_CURRENCY.captures(s) {
@@ -152,7 +170,12 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                     };
                     let s = s.to_lowercase();
 
-                    if let Ok(p) = s.parse::<Period>() {
+                    if FOUR_MONTHS.is_match(&s) && !matches!(periods.get(&c), Some(Some(_))) {
+                        periods.insert(c, Some(Period::ThreeMonths));
+                        header_periods.push((r, c, Some(Period::ThreeMonths)));
+                        unknown_headings.insert(c, s.clone());
+                        four_month_heads.insert(c);
+                    } else if let Ok(p) = s.parse::<Period>() {
                         periods.insert(c, Some(p));
                         header_periods.push((r, c, Some(p)));
                     } else if c > 0 && first_date_row.is_none_or(|d| r <= d) && is_period_heading(&s)
@@ -194,6 +217,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                                 for offset in (0..=c).rev().take(4) {
                                     if let Some(detected_p) = periods.get(&offset) {
                                         p = Some(*detected_p);
+                                        if four_month_heads.contains(&offset) { four_month_cols.insert(c); }
                                         break;
                                     }
                                 }
@@ -211,6 +235,16 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 },
                 _ => continue,
             }
+        }
+    }
+
+    // Columns without a currency of their own are in the title's, if it
+    // names one; without either, dollars. A currency we do not know leaves
+    // the table out rather than read as dollars.
+    if let Some(code) = &title_currency {
+        let cur = code.parse::<Currency>().map_err(|_| format!("currency {} not supported", code))?;
+        for c in dates_and_periods.keys() {
+            currencies.entry(*c).or_insert(cur);
         }
     }
 
@@ -245,6 +279,8 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 .all(|(g, (hc, _))| cols[g * group] <= *hc && *hc <= cols[g * group + group - 1]);
             if within {
                 for (i, c) in cols.iter().enumerate() {
+                    if four_month_heads.contains(&heads[i / group].0) { four_month_cols.insert(*c); }
+                    else { four_month_cols.remove(c); }
                     match heads[i / group].1 {
                         Some(p) => {
                             unknown_cols.remove(c);
@@ -255,6 +291,16 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
                 }
             }
         }
+    }
+
+    // A 52/53-week year ends on a weekday, rarely the last of a month; a stub
+    // period of a calendar-year company ends on a month end. Any month end
+    // among the four-month columns makes them all a stub, which is no quarter.
+    let month_end = |d: NaiveDate| d.succ_opt().is_some_and(|n| n.day() == 1);
+    if four_month_cols.iter().any(|c| dates_and_periods.get(c).is_some_and(|(d, _)| month_end(*d))) {
+        unknown_cols.extend(four_month_cols.iter().copied());
+    } else {
+        unknown_headings.retain(|c, _| !four_month_heads.contains(c));
     }
 
     if !unknown_cols.is_empty() {
@@ -280,7 +326,23 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
 
 #[cfg(test)]
 mod tests {
-    use super::{scale, share_scale};
+    use super::{new_sheet_info, scale, share_scale, Currency, Data, SheetType};
+
+    #[test]
+    fn currency_in_title() {
+        let header = [Data::String("CONSOLIDATED STATEMENT OF FINANCIAL POSITION - JPY (¥) ¥ in Millions".into()), Data::String("Mar. 31, 2026".into())];
+        let row = [Data::String("Cash and cash equivalents".into()), Data::Float(12659622.0)];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        let info = new_sheet_info(&rows, SheetType::BalanceSheet).unwrap();
+        assert_eq!(info.currencies.get(&1), Some(&Currency::JPY));
+        assert_eq!(info.multiplier, 1_000_000.0);
+        let header = [Data::String("Balance Sheet - KRW (₩) ₩ in Millions".into()), Data::String("Mar. 31, 2026".into())];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        assert!(new_sheet_info(&rows, SheetType::BalanceSheet).is_err());
+        let header = [Data::String("Consolidated Balance Sheets (JPY ¥) In Millions, unless otherwise specified".into()), Data::String("Mar. 31, 2014".into())];
+        let rows: Vec<&[Data]> = vec![&header, &row];
+        assert_eq!(new_sheet_info(&rows, SheetType::BalanceSheet).unwrap().currencies.get(&1), Some(&Currency::JPY));
+    }
 
     #[test]
     fn share_scales() {
@@ -302,3 +364,7 @@ mod tests {
         }
     }
 }
+
+static FOUR_MONTHS: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+    regex::Regex::new(r"^\s*(4|four) months? ended").unwrap()
+});

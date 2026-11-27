@@ -2,9 +2,6 @@ use std::error::Error;
 
 use equities::Reader;
 
-/// Identifies this client to the SEC, as EDGAR's fair access policy requires.
-const SEC_USER_AGENT: &str = "Alessandro Tecce root@atec.pub";
-
 /// Read when no tickers are given on the command line.
 const DEFAULT_TICKERS: [equities::Ticker; 35] = [
     equities::Ticker::NVDA,
@@ -51,6 +48,9 @@ const DEFAULT_TICKERS: [equities::Ticker; 35] = [
 
 /// Usage: lib [--dry-run [--cash-flow] | --dump [--latest]] [TICKER ...]
 /// --dump prints every value read; with --latest, only the values pushed.
+/// Filings are read from the EDGAR cache (edgar/cache), which `fetch`
+/// (the edgar crate's executable) brings up to date; nothing here touches
+/// the network but the push to InfluxDB.
 
 fn main() -> Result<(), Box<dyn Error>> {
     let dry_run = std::env::args().any(|a| a == "--dry-run");
@@ -67,10 +67,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         tickers = DEFAULT_TICKERS.to_vec();
     }
 
-    let edgar = equities::edgar::Client::new(SEC_USER_AGENT, "equities/edgar")?;
+    let cache = edgar::Cache::new(edgar::Cache::default_dir());
 
     for equity in tickers {
-        if let Err(e) = read_edgar(&edgar, equity, &mut reported_items) {
+        if let Err(e) = read_edgar(&cache, equity, &mut reported_items) {
             eprintln!("{}: {}", equity, e);
         }
     }
@@ -125,15 +125,14 @@ fn latest(items: Vec<equities::item::Reported>) -> Vec<equities::item::Reported>
 
 /// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later
 /// filing's restatement of an earlier period overwrites the original.
-fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let cik = edgar.cik(equity.sec_symbol())?;
+fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    let cik = cache.cik(equity.sec_symbol())?;
     eprintln!("{}: CIK {}", equity, cik);
-    // Foreign filers (TSMC) file annual 20-Fs instead of 10-Ks, and no 10-Qs.
-    let filings = edgar.filings(cik, &["10-Q", "10-K", "20-F"])?;
-    let mut skipped = 0;
+    let filings = cache.filings(cik, &edgar::FORMS)?;
+    let (mut skipped, mut missing) = (0, 0);
     for f in &filings {
         let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
-        match edgar.fetch_filing(f) {
+        match cache.filing(f) {
             Ok(dir) => match equities::filing::new_reader(&dir, equity) {
                 Ok(mut r) => {
                     read_statements(&mut r, &name, reported_items);
@@ -144,13 +143,15 @@ fn read_edgar(edgar: &equities::edgar::Client, equity: equities::Ticker, reporte
                 },
                 Err(e) => eprintln!("failed to read {}: {}", name, e),
             },
-            Err(e) => match e.downcast_ref::<equities::edgar::EdgarError>() {
-                Some(equities::edgar::EdgarError::NoFilingSummary) => skipped += 1,
-                _ => eprintln!("failed to fetch {}: {}", name, e),
+            Err(e) => match e.downcast_ref::<edgar::EdgarError>() {
+                Some(edgar::EdgarError::NoFilingSummary) => skipped += 1,
+                Some(edgar::EdgarError::NotFetched(_)) => missing += 1,
+                _ => eprintln!("failed to read {}: {}", name, e),
             },
         }
     }
-    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements", equity, filings.len() - skipped, skipped);
+    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements{}", equity, filings.len() - skipped - missing, skipped,
+        if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
     Ok(())
 }
 
@@ -228,7 +229,7 @@ fn push_to_influx(items: &[equities::item::Reported]) -> Result<(), Box<dyn Erro
         for item in chunk {
             let ts = item.date.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp_nanos_opt().unwrap();
             payload.push_str(&format!(
-                "reported_item_v14,ticker={},item={},period={},currency={} value={} {}\n",
+                "reported_item_v15,ticker={},item={},period={},currency={} value={} {}\n",
                 // lowercase: the Grafana dashboards query ticker = 'tsla' / 'nvda'
                 item.ticker.to_string().to_lowercase(),
                 item.item,

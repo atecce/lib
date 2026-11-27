@@ -3,7 +3,6 @@ uniffi::setup_scaffolding!();
 pub mod item;
 pub mod xlsx;
 pub mod filing;
-pub mod edgar;
 pub mod nvda;
 pub mod tsla;
 pub mod sheet_info;
@@ -60,7 +59,7 @@ impl std::fmt::Display for Currency {
 }
 
 /// A stock ticker symbol, e.g. "NVDA". Any symbol is accepted; which company
-/// it is comes from the SEC's ticker map (see `edgar::Client::cik`).
+/// it is comes from the SEC's ticker map (see `edgar::Cache::cik`).
 ///
 /// Stored inline so it stays `Copy`. The tickers this crate has code for
 /// specifically are associated constants, usable as `Ticker::NVDA`.

@@ -166,7 +166,7 @@ fn q3_2020() {
         .collect();
 
     let readers: Vec<Box<dyn Reader>> = vec![
-        Box::new(equities::filing::new_reader(std::path::Path::new("edgar/1318605/000156459020047486"), equities::Ticker::TSLA).unwrap()),
+        Box::new(equities::filing::new_reader(std::path::Path::new("../edgar/cache/1318605/000156459020047486"), equities::Ticker::TSLA).unwrap()),
     ];
 
     for mut r in readers {
