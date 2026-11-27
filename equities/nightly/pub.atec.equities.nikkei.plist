@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Nightly EDGAR fetch and InfluxDB push of the Nikkei companies on EDGAR (run.sh), at 21:30, or on wake if the
+  Morning prices and InfluxDB push of the Nikkei companies on EDGAR (run.sh), at 06:30, after
+  the night's EDGAR fetch (edgar/nightly/all.sh), or on wake if the
   Mac was asleep then. For a checkout elsewhere, substitute its path:
   Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.equities.nikkei.plist > ~/Library/LaunchAgents/pub.atec.equities.nikkei.plist &&
            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities.nikkei.plist
@@ -24,7 +25,7 @@
 	<key>StartCalendarInterval</key>
 	<dict>
 		<key>Hour</key>
-		<integer>21</integer>
+		<integer>6</integer>
 		<key>Minute</key>
 		<integer>30</integer>
 	</dict>

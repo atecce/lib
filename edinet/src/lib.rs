@@ -121,6 +121,13 @@ pub fn sec_code(ticker: &str) -> String {
     if code.len() == 4 { format!("{}0", code) } else { code }
 }
 
+/// The Tokyo ticker for a securities code: "72030" is "7203.T".
+pub fn ticker(sec_code: &str) -> String {
+    let code = sec_code.trim();
+    let code = if code.len() == 5 && code.ends_with('0') { &code[..4] } else { code };
+    format!("{}.T", code)
+}
+
 /// The cache, read only.
 #[derive(Debug, Clone)]
 pub struct Cache {
@@ -173,18 +180,37 @@ impl Cache {
     /// securities code ("72030") or EDINET code ("E02144").
     pub fn reports(&self, company: &str) -> Result<Vec<Document>, Box<dyn Error>> {
         let sec = sec_code(company);
-        let mut reports = Vec::new();
-        for day in self.days()? {
-            let list: DayList = serde_json::from_slice(&fs::read(&day)?)?;
-            reports.extend(list.results.into_iter().filter(|d| d.is_report()
-                && (d.edinet_code.as_deref() == Some(company) || d.sec_code.as_deref() == Some(sec.as_str()))));
-        }
+        let reports: Vec<Document> = self.all_reports()?.into_iter()
+            .filter(|d| d.edinet_code.as_deref() == Some(company) || d.sec_code.as_deref() == Some(sec.as_str()))
+            .collect();
         if reports.is_empty() {
             return Err(EdinetError::CompanyNotFound(company.to_string()).into());
         }
-        reports.sort_by(|a, b| a.submitted.cmp(&b.submitted));
-        reports.dedup_by(|a, b| a.doc_id == b.doc_id);
         Ok(reports)
+    }
+
+    /// Every company's reports, oldest first: one read of the day lists, for
+    /// a caller that wants many companies.
+    pub fn all_reports(&self) -> Result<Vec<Document>, Box<dyn Error>> {
+        let mut reports = Vec::new();
+        for day in self.days()? {
+            let list: DayList = serde_json::from_slice(&fs::read(&day)?)?;
+            reports.extend(list.results.into_iter().filter(Document::is_report));
+        }
+        reports.sort_by(|a, b| a.submitted.cmp(&b.submitted));
+        let mut seen = std::collections::HashSet::new();
+        reports.retain(|d| seen.insert(d.doc_id.clone()));
+        Ok(reports)
+    }
+
+    /// The Tokyo tickers of every listed company with reports (those with a
+    /// securities code), in code order. "00000" is a placeholder for a
+    /// company about to list (e.g. クラサスケミカル, Kurasasu Kemikaru, in
+    /// September 2026), not a code.
+    pub fn listed(&self) -> Result<Vec<String>, Box<dyn Error>> {
+        let codes: std::collections::BTreeSet<String> = self.all_reports()?.into_iter()
+            .filter_map(|d| d.sec_code).filter(|c| c != "00000").collect();
+        Ok(codes.iter().map(|c| ticker(c)).collect())
     }
 
     /// The CSV files of a document, if fetched.

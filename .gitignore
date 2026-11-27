@@ -3,3 +3,5 @@ gutenberg
 *.a
 # The EDGAR cache, filled by `fetch`; only test fixtures are tracked (git add -f).
 /edgar/cache/
+/edinet/cache/
+/tiingo/cache/

@@ -338,7 +338,7 @@
             "type": "influxdb",
             "uid": "efm3zlbhro268a"
           },
-          "alias": "long-term debt",
+          "alias": "total debt",
           "measurement": "reported_item_v15",
           "policy": "financials",
           "resultFormat": "time_series",
@@ -364,7 +364,7 @@
               "condition": "AND",
               "key": "item",
               "operator": "=",
-              "value": "LongTermDebt"
+              "value": "TotalDebt"
             },
             {
               "condition": "AND",
@@ -380,7 +380,8 @@
             }
           ]
         }
-      ]
+      ],
+      "description": "Total assets, liabilities, stockholders' equity and total debt (every borrowing line, current and non-current) from the balance sheet. Market cap against book value is in the valuation row below."
     },
     {
       "id": 3,
@@ -1719,6 +1720,281 @@
           ]
         }
       ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "$ticker stocks: market value and book value ($currency, log scale)",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "efm3zlbhro268a"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "price-to-book"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "x"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.scaleDistribution",
+                "value": {
+                  "type": "linear"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "market cap",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"market_cap\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "book value (stockholders' equity)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"value\" FROM \"reported_item_v15\" WHERE \"ticker\" =~ /^$ticker$/ AND \"item\" = 'StockholdersEquity' AND \"period\" = 'pit' AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "price-to-book",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"price_to_book\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+        }
+      ],
+      "description": "Market cap each trading day against book value (stockholders' equity). On a log scale the gap between them is price-to-book, also on the right axis: the market pays that multiple of the accounts. Book value records what owners put in and the company kept, at historical cost; market value prices expected future profits, including what accounting leaves off the balance sheet (brands, software, R&D) and growth."
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "$ticker flows: return on equity and earnings yield (last four quarters)",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "efm3zlbhro268a"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "return on equity",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"return_on_equity\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "efm3zlbhro268a"
+          },
+          "alias": "earnings yield",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT \"earnings_yield\" FROM \"market_v1\" WHERE \"ticker\" =~ /^$ticker$/ AND \"currency\" =~ /^$currency$/ AND $timeFilter"
+        }
+      ],
+      "description": "Net income over the last four quarters, over average book equity (return on equity) and over market cap (earnings yield, the inverse of P/E). Price-to-book is roughly their ratio: where return on equity runs above the earnings yield, the market values the equity above book. Each day uses only quarters reported by then."
     }
   ]
 }

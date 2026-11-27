@@ -13,12 +13,17 @@
 //! built) is fetched on its own.
 //!
 //! The SEC asks automated clients to send a User-Agent naming who they are
-//! and to stay under 10 requests per second.
+//! and to stay under 10 requests per second. Its pages take a third to two
+//! thirds of a second to arrive, so one request at a time manages only one
+//! or two a second: the client is shared between threads (see the `fetch`
+//! executable, which fetches several filings at once), and spaces the
+//! *starts* of its requests `MIN_INTERVAL` apart across all of them.
 
-use std::cell::{Cell, RefCell};
 use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
@@ -41,11 +46,12 @@ const BULK_URL: &str = "https://www.sec.gov/Archives/edgar/daily-index/bulkdata/
 pub struct Client {
     http: reqwest::blocking::Client,
     cache: Cache,
-    last_request: Cell<Option<Instant>>,
-    requests: Cell<usize>,
+    /// When the latest request was (or is due to be) sent.
+    last_request: Mutex<Option<Instant>>,
+    requests: AtomicUsize,
     bulk: bool,
     /// The opened `submissions.zip`, once `bulk` has needed it.
-    archive: RefCell<Option<zip::ZipArchive<fs::File>>>,
+    archive: Mutex<Option<zip::ZipArchive<fs::File>>>,
 }
 
 impl Client {
@@ -54,10 +60,10 @@ impl Client {
         Ok(Client {
             http: reqwest::blocking::Client::builder().user_agent(user_agent).build()?,
             cache,
-            last_request: Cell::new(None),
-            requests: Cell::new(0),
+            last_request: Mutex::new(None),
+            requests: AtomicUsize::new(0),
             bulk: false,
-            archive: RefCell::new(None),
+            archive: Mutex::new(None),
         })
     }
 
@@ -73,7 +79,7 @@ impl Client {
 
     /// How many requests this client has sent.
     pub fn requests(&self) -> usize {
-        self.requests.get()
+        self.requests.load(Ordering::Relaxed)
     }
 
     /// GET with the SEC's rate limit, retrying server errors (EDGAR returns
@@ -95,12 +101,19 @@ impl Client {
         }
     }
 
+    /// Wait for this request's turn: `MIN_INTERVAL` after the one before,
+    /// whichever thread sent it. Each caller books its slot under the lock
+    /// and sleeps outside it.
     fn pace(&self) {
-        if let Some(last) = self.last_request.get() {
-            sleep(MIN_INTERVAL.saturating_sub(last.elapsed()));
-        }
-        self.last_request.set(Some(Instant::now()));
-        self.requests.set(self.requests.get() + 1);
+        let slot = {
+            let mut last = self.last_request.lock().unwrap();
+            let now = Instant::now();
+            let slot = last.map_or(now, |l| (l + MIN_INTERVAL).max(now));
+            *last = Some(slot);
+            slot
+        };
+        sleep(slot.saturating_duration_since(Instant::now()));
+        self.requests.fetch_add(1, Ordering::Relaxed);
     }
 
     /// Fetch `url` into `path` unless a copy younger than `max_age` (`None`:
@@ -182,7 +195,7 @@ impl Client {
     /// `name` from `submissions.zip`, downloading the zip first when there is
     /// no copy younger than `SUBMISSIONS_MAX_AGE`.
     fn bulk_entry(&self, name: &str) -> Result<Option<Vec<u8>>, Box<dyn Error>> {
-        let mut archive = self.archive.borrow_mut();
+        let mut archive = self.archive.lock().unwrap();
         if archive.is_none() {
             let path = self.cache.dir().join("submissions.zip");
             let fresh = fs::metadata(&path).and_then(|m| m.modified()).ok()

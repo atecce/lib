@@ -10,6 +10,8 @@ chrono = {version = "0.4.44", features = ["serde"]}
 # Reads the EDGAR cache; fetching it is the edgar crate's job.
 edgar = { path = "../edgar", default-features = false }
 edinet = { path = "../edinet", default-features = false }
+# Daily prices, for market values; fetching them is tiingo's job.
+tiingo = { path = "../tiingo", default-features = false }
 regex = "1.12.4"
 scraper = "0.26.0"
 serde = "1.0.228"

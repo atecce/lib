@@ -73,7 +73,7 @@ fn named_scale(s: &str) -> Option<f64> {
 ///     per-share amounts, so share counts are in millions too, unless they
 ///     are excepted as well ("except Share data", "except Share data in
 ///     Thousands").
-fn share_scale(s: &str) -> Option<f64> {
+pub(crate) fn share_scale(s: &str) -> Option<f64> {
     let s = s.to_lowercase();
     if let Some(c) = SHARE_SCALE.captures(&s) { return named_scale(&c[1]); }
     if s.contains("except share") || s.contains("except shares") { return Some(1.0); }
@@ -92,7 +92,7 @@ fn is_period_heading(s: &str) -> bool {
 }
 
 /// A header date: "Oct. 26, 2025", "October 26 2025", "10/26/2025", "2025-10-26".
-fn parse_date_str(s: &str) -> Option<NaiveDate> {
+pub(crate) fn parse_date_str(s: &str) -> Option<NaiveDate> {
     let s = s.trim().replace(",", "");
     let formats = ["%B %d %Y", "%b %d %Y", "%m/%d/%Y", "%Y-%m-%d", "%b. %d %Y"];
     formats.iter().find_map(|fmt| NaiveDate::parse_from_str(&s, fmt).ok())

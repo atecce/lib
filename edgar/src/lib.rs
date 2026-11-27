@@ -165,6 +165,14 @@ impl Cache {
         self.company_dir(f.cik).join(f.accession_dir())
     }
 
+    /// Whether any of the company's filings got pages after `since`: a
+    /// filing's directory changes when a page is written into it. (The
+    /// filing lists, rewritten every night, are not counted.)
+    pub fn changed_since(&self, cik: u64, since: std::time::SystemTime) -> bool {
+        let Ok(entries) = fs::read_dir(self.company_dir(cik)) else { return false };
+        entries.flatten().any(|e| e.metadata().is_ok_and(|m| m.is_dir() && m.modified().is_ok_and(|t| t > since)))
+    }
+
     /// The company's Central Index Key, from the SEC's ticker map.
     pub fn cik(&self, ticker: &str) -> Result<u64, Box<dyn Error>> {
         let path = self.tickers_path();
@@ -327,4 +335,13 @@ mod tests {
         assert_eq!(find_cik(&map, "BF"), Some(14693));
         assert_eq!(find_cik(&map, "XYZQ"), None);
     }
+}
+
+/// Tickers from a list file: separated by spaces, commas or newlines, with
+/// `#` starting a comment.
+pub fn read_list(path: impl AsRef<Path>) -> std::io::Result<Vec<String>> {
+    Ok(fs::read_to_string(path)?.lines()
+        .flat_map(|line| line.split('#').next().unwrap_or("").split([' ', '\t', ','])
+            .filter(|t| !t.is_empty()).map(str::to_string).collect::<Vec<_>>())
+        .collect())
 }
