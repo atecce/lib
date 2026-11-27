@@ -1,14 +1,15 @@
 # Data: where it lives, and where it's going
 
 The plan for storing and analysing the financials, as decided on 2026-11-22.
-Details elsewhere: the relational model in `store/README.md` (on branch
+Details elsewhere: the relational model in `equities/store/README.md` (on branch
 `store` until merged), statistics and backtests in
 `equities/FORECASTING.md`, valuation in `equities/VALUATION.md`.
 
 ## Layers
 
 ```
-caches (edgar/, edinet/, tiingo/)     the source of truth: filings and prices
+caches (edgar, edinet, mops,          the source of truth: filings, prices
+        tiingo, fred)                 and economic series
         │ readers (equities)          as downloaded; everything else rebuilds
         ▼                             from them
 Postgres (store)                      the record: relational, with each value's

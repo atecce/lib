@@ -216,6 +216,11 @@ This, not the earnings yield, is the number to compare with the Treasury
 rate: their difference is the market's implied equity risk premium for the
 company. It depends on the growth assumed, and on ROE staying where it is.
 
+[CAPITAL.md](CAPITAL.md) asks what $`r`$ is underneath: the rate of profit,
+the rate of interest and the cost of capital, from Marx and Böhm-Bawerk to
+Hayek, Keynes and the Cambridge controversy, and how the interest rate has
+formed, layer by layer, in FRED's data since 1857.
+
 ## 6. Profitability and returns: ROE as a signal
 
 The residual income model (section 2) runs the other way too. Rearranged,
@@ -570,7 +575,7 @@ over years.) Which companies form an industry is a classification:
   peers from the similarity of the product descriptions in its 10-K, redrawn
   every year. Industries this way follow the companies, which is the point
   for entrepreneurs: a new good redraws who competes with whom, and a fixed
-  code can't (see `companies/AAPL.md`, "The wrong baseline").
+  code can't (see `aapl/README.md`, "The wrong baseline").
 - **The whole market**: no classification at all, the null that assumes
   nothing about who competes with whom. Fama and French (2000) measure it
   this way.
@@ -578,9 +583,9 @@ over years.) Which companies form an industry is a classification:
   codes (TSE's 33 sectors; TWSE's industry categories), to map when those
   companies join the comparison.
 
-`store/examples/persistence.rs` groups by the first three SIC digits (the
+`backtest/examples/persistence.rs` groups by the first three SIC digits (the
 industry group; `--digits` changes it). For Apple that is computer and
-office equipment, 357; `companies/AAPL.md` is the worked example.
+office equipment, 357; `aapl/README.md` is the worked example.
 
 **The data is long enough for industries, barely for companies.** XBRL
 starts in 2009, so about 16 annual observations per company (60-odd

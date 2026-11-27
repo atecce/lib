@@ -4,5 +4,10 @@ gutenberg
 # The EDGAR cache, filled by `fetch`; only test fixtures are tracked (git add -f).
 /edgar/cache/
 /edinet/cache/
-/tiingo/cache/
+/fred/cache/
+/equities/tiingo/cache/
+# Symlinks left at the old paths while jobs started before the move finish.
+/tiingo
+/store
+/backtest
 /mops/cache/
