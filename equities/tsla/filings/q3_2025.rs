@@ -280,4 +280,5 @@ fn report() {
     let mut r = crate::testing::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000162828025045968")), crate::Ticker::TSLA).unwrap();
     crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
     crate::testing::assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
+    crate::testing::assert_reported(r.process_cash_flow_statement().unwrap(), cash_flow_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());
 }

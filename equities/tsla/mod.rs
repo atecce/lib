@@ -365,6 +365,22 @@ impl_reported! {
     ]
 }
 
+/// The lines the EDGAR reader reads from a cash-flow statement, for the
+/// known-answer test (filings/q3_2025).
+impl_reported! {
+    CashFlowStatement,
+    [
+        DepreciationAndAmoritization => field depreciation_amortization_and_impairment,
+        StockBasedCompensationExpense => field stock_based_compensation,
+        ChangeInInventories => field changes_in_inventory,
+        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales,
+        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        NetCashUsedInFinancingActivities => method net_cash_provided_by_financing_activities,
+        ChangeInCashAndCashEquivalents => method net_increase_in_cash_and_cash_equivalents_and_restricted_cash,
+    ]
+}
+
 impl CFS for CashFlowStatement {
     fn net_cash_from_operating_activities(&self) -> f64 {
         self.net_cash_provided_by_operating_activities()

@@ -4,7 +4,7 @@
 
 use crate::item::Reported;
 
-pub(crate) fn assert_reported(mut actual: Vec<Reported>, expected: Vec<Reported>) {
+pub(crate) fn assert_reported(mut actual: Vec<Reported>, mut expected: Vec<Reported>) {
     // The expected statements list money items only; share counts and
     // per-share amounts are checked separately.
     // Parts of revenue (automotive, financial services) come from segment
@@ -14,6 +14,8 @@ pub(crate) fn assert_reported(mut actual: Vec<Reported>, expected: Vec<Reported>
     actual.retain(|r| r.item.unit() == crate::item::Unit::Money && r.item.part_of().is_none()
         && ![TotalDebt, AutomotiveDebt, FinancialServicesDebt].contains(&r.item));
     actual.sort_by_cached_key(|item| (item.date, item.p, item.item));
+    // The expected in the same order, whatever order a statement lists them.
+    expected.sort_by_cached_key(|item| (item.date, item.p, item.item));
 
     assert_eq!(actual.len(), expected.len(), "\nactual:\n{:#?}\n\nexpected:\n{:#?}\n", actual, expected);
 
