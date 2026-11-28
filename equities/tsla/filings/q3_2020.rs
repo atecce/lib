@@ -165,7 +165,7 @@ fn q3_2020() {
         .collect();
 
     let readers: Vec<Box<dyn Reader>> = vec![
-        Box::new(crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020047486")), crate::Ticker::TSLA).unwrap()),
+        Box::new(crate::testing::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020047486")), crate::Ticker::TSLA).unwrap()),
     ];
 
     for mut r in readers {

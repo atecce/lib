@@ -4,7 +4,7 @@ use equities::Reader;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
     let ticker: equities::Ticker = args[1].parse().map_err(|_| "unknown ticker")?;
-    let mut r = equities::filing::new_reader(std::path::Path::new(&args[2]), ticker)?;
+    let mut r = store::sources::edgar_filing(std::path::Path::new(&args[2]), ticker)?;
     let mut items = r.process_balance_sheet()?;
     items.extend(r.process_income_statement()?);
     items.sort_by_key(|i| (i.item, i.p, i.date));

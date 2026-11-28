@@ -3,12 +3,6 @@ name = "equities"
 version = "0.1.0"
 edition = "2024"
 
-# `files`: readers that open a filing from disk (filing::new_reader), for the
-# batch jobs, examples and tests. Off, equities reads only what it is given.
-[features]
-default = ["files"]
-files = []
-
 [dependencies]
 augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
 calamine = "0.35.0"

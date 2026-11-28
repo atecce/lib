@@ -28,3 +28,17 @@ pub(crate) fn assert_reported(mut actual: Vec<Reported>, expected: Vec<Reported>
         )
     }
 }
+
+/// A test's filing from its folder in the repository (tsla/filings/…):
+/// the reader with its files. Tests read fixtures; the library doesn't.
+pub(crate) fn filing_dir(dir: &std::path::Path, ticker: crate::Ticker) -> Result<crate::filing::Reader, Box<dyn std::error::Error>> {
+    let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
+    let folder = dir.to_path_buf();
+    let pages: crate::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
+    Ok(crate::filing::reader(dir.display().to_string(), &summary, ticker, pages))
+}
+
+/// A test's workbook from the repository (nvda/filings/…).
+pub(crate) fn workbook(path: &std::path::Path, ticker: crate::Ticker) -> Result<crate::xlsx::Reader, Box<dyn std::error::Error>> {
+    crate::xlsx::reader(std::fs::read(path)?, ticker)
+}

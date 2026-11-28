@@ -155,7 +155,7 @@ fn report() {
         },
     ];
 
-    let mut r = crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020033670")), crate::Ticker::TSLA).unwrap();
+    let mut r = crate::testing::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020033670")), crate::Ticker::TSLA).unwrap();
 
     crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()

@@ -45,15 +45,6 @@ pub fn reader(name: impl Into<String>, summary: &str, ticker: Ticker, pages: Pag
     Reader { name: name.into(), ticker, reports: parse_filing_summary(summary), pages, warnings: Default::default() }
 }
 
-/// A filing from a folder on disk (an EDGAR cache's accession folder, or a
-/// test's): `reader` with its files. The `files` feature (on by default).
-#[cfg(feature = "files")]
-pub fn new_reader(dir: &std::path::Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
-    let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
-    let folder = dir.to_path_buf();
-    let pages: Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
-    Ok(reader(dir.display().to_string(), &summary, ticker, pages))
-}
 
 /// Pick the first page whose name matches, skipping parenthetical pages (share
 /// counts and par values). Statements are listed before the notes, so a note

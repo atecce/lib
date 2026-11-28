@@ -325,7 +325,7 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
             period_end: Some(f.report_date),
         };
         match cache.filing(f) {
-            Ok(dir) => match equities::filing::new_reader(&dir, equity) {
+            Ok(dir) => match store::sources::edgar_filing(&dir, equity) {
                 Ok(mut r) => {
                     read_statements(&mut r, &name, reported_items);
                     match r.process_cash_flow_statement() {

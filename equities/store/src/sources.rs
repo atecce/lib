@@ -45,3 +45,17 @@ pub fn mops_company(cache: &mops::Cache, ticker: Ticker) -> Result<(Vec<Reported
     }
     Ok((items, read, failures))
 }
+
+/// An EDGAR filing from its folder (the edgar cache's accession folder):
+/// `equities::filing::reader` with its files, read as it asks for them.
+pub fn edgar_filing(dir: &std::path::Path, ticker: Ticker) -> Result<equities::filing::Reader, Box<dyn Error>> {
+    let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
+    let folder = dir.to_path_buf();
+    let pages: equities::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
+    Ok(equities::filing::reader(dir.display().to_string(), &summary, ticker, pages))
+}
+
+/// An EDGAR Financial_Report.xlsx from disk: `equities::xlsx::reader`.
+pub fn edgar_workbook(path: &std::path::Path, ticker: Ticker) -> Result<equities::xlsx::Reader, Box<dyn Error>> {
+    equities::xlsx::reader(std::fs::read(path)?, ticker)
+}

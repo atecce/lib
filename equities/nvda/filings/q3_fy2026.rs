@@ -212,7 +212,7 @@ fn report() {
     ];
 
 
-    let mut r = crate::xlsx::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/nvda/filings/2025-11-19.xlsx")), crate::Ticker::NVDA).unwrap();
+    let mut r = crate::testing::workbook(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/nvda/filings/2025-11-19.xlsx")), crate::Ticker::NVDA).unwrap();
 
     crate::testing::assert_reported(r.process_balance_sheet().unwrap(), balance_sheets.into_iter().map(|sheet| sheet.reported()).flatten().collect());
     crate::testing::assert_reported(r.process_income_statement().unwrap(), income_statements.into_iter().map(|stmt| stmt.reported()).flatten().collect());

@@ -701,7 +701,7 @@ mod tests {
     fn the_reader_agrees() {
         let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../edgar/cache/1067983/000119312526083899"));
         if !path.exists() { return; }
-        let mut r = crate::filing::new_reader(path, Ticker::BRK).unwrap();
+        let mut r = crate::testing::filing_dir(path, Ticker::BRK).unwrap();
         let read: Vec<crate::item::Reported> = [
             crate::Reader::process_balance_sheet(&mut r).unwrap(),
             crate::Reader::process_income_statement(&mut r).unwrap(),

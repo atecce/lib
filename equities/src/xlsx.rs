@@ -20,11 +20,6 @@ pub fn reader(bytes: Vec<u8>, ticker: Ticker) -> Result<Reader, Box<dyn Error>> 
     Ok(Reader { workbook: open_workbook_auto_from_rs(Cursor::new(bytes))?, ticker })
 }
 
-/// A workbook from disk: `reader` with its file. The `files` feature.
-#[cfg(feature = "files")]
-pub fn new_reader(path: &std::path::Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
-    reader(std::fs::read(path)?, ticker)
-}
 
 /// Non-empty rows of a statement sheet.
 fn statement_rows(range: &calamine::Range<Data>) -> Vec<&[Data]> {

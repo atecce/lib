@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs;
 
-use equities::xlsx::new_reader;
+use store::sources::edgar_workbook as new_reader;
 use equities::sheet_info::SheetType::BalanceSheet;
 
 fn main() -> Result<(), Box<dyn Error>>{

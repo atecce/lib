@@ -7,7 +7,7 @@ use std::io::BufWriter;
 use augurs::outlier::{MADDetector, OutlierDetector};
 
 use equities::Reader;
-use equities::xlsx::new_reader;
+use store::sources::edgar_workbook as new_reader;
 
 use chrono::NaiveDate;
 

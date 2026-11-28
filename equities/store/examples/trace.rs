@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let cik = cache.cik(equity.sec_symbol())?;
     for f in cache.filings(cik, &edgar::FORMS)? {
         let Ok(dir) = cache.filing(&f) else { continue };
-        let Ok(mut r) = equities::filing::new_reader(&dir, equity) else { continue };
+        let Ok(mut r) = store::sources::edgar_filing(&dir, equity) else { continue };
         let mut items = Vec::new();
         for read in [r.process_balance_sheet(), r.process_income_statement(), r.process_cash_flow_statement()] {
             if let Ok(mut got) = read { items.append(&mut got) }

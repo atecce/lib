@@ -101,7 +101,7 @@ fn report() {
         },
     ];
 
-    let mut r = crate::filing::new_reader(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020019931")), crate::Ticker::TSLA).unwrap();
+    let mut r = crate::testing::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020019931")), crate::Ticker::TSLA).unwrap();
 
     let balance = r.process_balance_sheet().unwrap();
     // Total debt: the current portion of debt and finance leases plus the
