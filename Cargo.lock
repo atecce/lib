@@ -970,7 +970,6 @@ dependencies = [
  "fred",
  "mops",
  "regex",
- "reqwest",
  "scraper",
  "serde",
  "serde_json",

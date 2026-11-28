@@ -1,10 +1,11 @@
 //! A data-quality scan of the reported items: series that look broken, ranked.
 //!
-//!     source ~/.profile && cargo run --release -p equities --example quality [-- TICKER ...]
+//!     cargo run --release -p store --example quality [-- TICKER ...]
 //!
 //! QUALITY_TOP sets how many series to list (default 40; 0 for all).
 //!
-//! Reads the quarterly flows (3m) and balances (pit) in USD from InfluxDB, and
+//! Reads the quarterly flows (3m) and balances (pit) in USD from Postgres
+//! (listing_facts: each value as last reported), and
 //! looks at each series (a company's item over time) three ways:
 //!
 //! - **Level shifts** (augurs changepoint detection, Bayesian online changepoint
@@ -115,30 +116,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-/// The S&P's (or the given tickers') series, in one query.
+/// Every listing's (or the given tickers') series, as last reported, in one
+/// query: listing_facts for each listing, quarterly flows and balances in USD.
 fn fetch(only: &[String]) -> Result<Vec<Series>, Box<dyn Error>> {
-    let token = std::env::var("INFLUXDB3_AUTH_TOKEN").map_err(|_| "INFLUXDB3_AUTH_TOKEN is not set")?;
-    let list = |v: &[&str]| v.iter().map(|s| format!("'{}'", s)).collect::<Vec<_>>().join(",");
-    let mut sql = format!(
-        "SELECT ticker, item, period, time, value FROM reported_item_v15 WHERE currency = 'USD' \
-         AND period IN ('3m', 'pit') AND item IN ({})", list(ITEMS));
-    if !only.is_empty() {
-        let tickers: Vec<&str> = only.iter().map(|s| s.as_str()).collect();
-        sql += &format!(" AND ticker IN ({})", list(&tickers));
-    }
-    let body = reqwest::blocking::Client::builder().timeout(std::time::Duration::from_secs(600)).build()?
-        .post("http://localhost:8181/api/v3/query_sql")
-        .bearer_auth(token)
-        .header("Content-Type", "application/json")
-        .body(serde_json::json!({ "db": "financials", "q": sql, "format": "csv" }).to_string())
-        .send()?.error_for_status()?.text()?;
-
+    let mut db = postgres::Client::connect(&store::default_url(), postgres::NoTls)?;
+    let items: Vec<String> = ITEMS.iter().map(|s| s.to_string()).collect();
+    let rows = db.query(
+        "SELECT l.ticker, f.item, p.period, f.period_end::text, f.value
+         FROM listing l CROSS JOIN (VALUES ('3m'), ('pit')) p(period)
+         CROSS JOIN LATERAL listing_facts(l.ticker, p.period, 'USD', $1) f
+         WHERE cardinality($2::text[]) = 0 OR upper(l.ticker) = ANY($2)",
+        &[&items, &only.iter().map(|t| t.to_uppercase()).collect::<Vec<_>>()])?;
     let mut by_key: BTreeMap<(String, String, String), Vec<(String, f64)>> = BTreeMap::new();
-    for line in body.lines().skip(1) {
-        let f: Vec<&str> = line.split(',').collect();
-        let [ticker, item, period, time, value] = f[..] else { continue };
-        let Ok(v) = value.parse::<f64>() else { continue };
-        by_key.entry((ticker.into(), item.into(), period.into())).or_default().push((time[..10].into(), v));
+    for r in rows {
+        by_key.entry((r.get(0), r.get(1), r.get(2))).or_default().push((r.get(3), r.get(4)));
     }
     Ok(by_key.into_iter().map(|((ticker, item, period), mut points)| {
         points.sort_by(|a, b| a.0.cmp(&b.0));
