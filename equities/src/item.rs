@@ -182,7 +182,7 @@ items! {
         // 売上原価 (uriage genka): cost of sales
         // A bank's two kinds of income; their sum is its revenue where it
         // prints no total (derive_bank_revenue).
-        NetInterestIncome => ["Net interest income", "Net Interest Income"] @ ["InterestIncomeExpenseNet"],
+        NetInterestIncome => ["Net interest income", "Net Interest Income"] @ ["InterestIncomeExpenseNet", "ifrs-full_InterestRevenueExpense"],
         NoninterestIncome => ["Total noninterest income", "Noninterest income", "Total non-interest income", "Total noninterest revenue"] @ ["NoninterestIncome"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales", "売上原価"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales", "jpigp_cor:CostOfSalesIFRS", "jppfs_cor:CostOfSales"],
 

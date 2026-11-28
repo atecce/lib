@@ -13,6 +13,7 @@ pub fn item(ticker: Ticker, tag: &str) -> Option<Item> {
         "F" => crate::f::item(tag),
         "GM" => crate::gm::item(tag),
         "NVDA" => crate::nvda::item(tag),
+        "SMFG" => crate::smfg::item(tag),
         "TSLA" => crate::tsla::item(tag),
         _ => None,
     }

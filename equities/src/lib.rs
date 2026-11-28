@@ -49,6 +49,8 @@ pub mod brk;
 pub mod gs;
 #[path = "../nvda/mod.rs"]
 pub mod nvda;
+#[path = "../smfg/mod.rs"]
+pub mod smfg;
 #[path = "../tsm/mod.rs"]
 pub mod tsm;
 #[path = "../tsla/mod.rs"]
