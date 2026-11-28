@@ -138,17 +138,19 @@ fn main() -> Result<(), Box<dyn Error>> {
             sibling.extend(items.iter().cloned());
         }
         // The FRED series its valuation needs, from the fred cache.
-        let mut series = equities::company::Series::new();
+        let mut series = equities::company::SeriesById::new();
         for id in equities::company::valuation_series(equity) {
-            match fred::Cache::new(fred::Cache::default_dir()).series(id) {
-                Ok(s) => { series.insert(id, s.observations.iter().filter_map(|o| Some((o.date, o.value?))).collect()); }
+            match store::sources::fred_series(id) {
+                Ok(s) => { series.insert(id, s); }
                 Err(e) => eprintln!("{}: no {} ({}): valued without it", equity, id, e),
             }
         }
         let valued: Vec<_> = equities::company::valuation_items(equity, if sibling.is_empty() { &items } else { &sibling }, &series)
             .into_iter().chain(items.iter().cloned()).collect();
+        // Its closes and splits, if the tiingo cache has the ticker.
         let company_prices = prices.prices(equity.as_str()).ok();
-        let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &valued)).unwrap_or_default();
+        let market = company_prices.as_deref().map(store::sources::closes_and_splits)
+            .map(|(closes, splits)| equities::valuation::market(equity, &closes, &splits, &valued)).unwrap_or_default();
         if let Some(last) = market.last() {
             eprintln!("{}: market cap {:.1}B on {}{}{}{}", equity, last.market_cap / 1e9, last.date,
                 last.price_to_book.map(|pb| format!(", price-to-book {:.2}", pb)).unwrap_or_default(),

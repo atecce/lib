@@ -1,4 +1,4 @@
-//! Market values from daily prices (the `tiingo` cache) and what filings had
+//! Market values from daily closes (the caller's: tiingo's cache) and what filings had
 //! reported by each day: market cap and price-to-book, and the two flows that
 //! explain it, return on equity and earnings yield:
 //!
@@ -17,6 +17,7 @@
 use chrono::NaiveDate;
 
 use crate::item::{Item, Reported};
+use crate::series::Series;
 use crate::{Currency, Period, Ticker};
 
 /// One trading day's values.
@@ -110,31 +111,32 @@ fn trailing_net_income(items: &[Reported], ticker: Ticker) -> Vec<(NaiveDate, f6
     out
 }
 
-/// Daily market values for `ticker`, from its prices (in dollars: Tiingo's
-/// prices are US listings) and its reported items, read in filing order.
-pub fn market(ticker: Ticker, prices: &[tiingo::Price], items: &[Reported]) -> Vec<Market> {
+/// Daily market values for `ticker`, from its closes (in dollars: US
+/// listings), its splits (the days it split, each the new shares per old)
+/// and its reported items, read in filing order.
+pub fn market(ticker: Ticker, closes: &Series, splits: &Series, items: &[Reported]) -> Vec<Market> {
     let shares = as_first_reported(items, ticker, Item::SharesOutstanding);
     let equity = as_first_reported(items, ticker, Item::StockholdersEquity);
     let income = trailing_net_income(items, ticker);
     let usd_equity = |d: NaiveDate| equity.iter().find(|e| e.currency == Currency::USD && e.date == d).map(|e| e.val);
     let mut out = Vec::new();
     let mut cover = 0;          // index into shares of the cover in effect
-    let mut splits = 1.0;       // splits since that cover
-    for p in prices {
-        let Some(day) = p.day() else { continue };
+    let mut split_since = 1.0;  // splits since that cover
+    for &(day, close) in closes.points() {
         // A new cover page replaces the count and the splits since the last.
         let mut changed = false;
         while cover + 1 < shares.len() && known(shares[cover + 1]) <= day {
             cover += 1;
             changed = true;
         }
-        if changed { splits = 1.0; }
+        if changed { split_since = 1.0; }
         let Some(s) = shares.get(cover).filter(|s| known(s) <= day) else { continue };
-        if p.split_factor > 0.0 && p.split_factor != 1.0 && day > s.date {
-            splits *= p.split_factor;
+        let factor = splits.on(day).unwrap_or(1.0);
+        if factor > 0.0 && factor != 1.0 && day > s.date {
+            split_since *= factor;
         }
-        let listed = s.val / shares_per_listed(ticker, s.date) * splits;
-        let market_cap = p.close * listed;
+        let listed = s.val / shares_per_listed(ticker, s.date) * split_since;
+        let market_cap = close * listed;
         let book = equity.iter().rev()
             .find(|e| e.currency == Currency::USD && e.date <= s.date && (s.date - e.date).num_days() <= 400);
         // The last four quarters reported by this cover's filing.
@@ -151,7 +153,7 @@ pub fn market(ticker: Ticker, prices: &[tiingo::Price], items: &[Reported]) -> V
             ticker,
             date: day,
             currency: Currency::USD,
-            close: p.close,
+            close,
             market_cap,
             price_to_book: book.filter(|b| b.val > 0.0).map(|b| market_cap / b.val),
             return_on_equity,
@@ -165,8 +167,11 @@ pub fn market(ticker: Ticker, prices: &[tiingo::Price], items: &[Reported]) -> V
 mod tests {
     use super::*;
 
-    fn price(date: &str, close: f64, split: f64) -> tiingo::Price {
-        tiingo::Price { date: format!("{}T00:00:00.000Z", date), close, adj_close: close, split_factor: split, dividend: 0.0 }
+    /// The closes and the splits of (day, close, split factor) rows.
+    fn prices(rows: &[(&str, f64, f64)]) -> (Series, Series) {
+        let day = |s: &str| s.parse::<NaiveDate>().unwrap();
+        (Series::new(rows.iter().map(|r| (day(r.0), r.1))),
+         Series::new(rows.iter().filter(|r| r.2 != 1.0).map(|r| (day(r.0), r.2))))
     }
 
     fn fact(item: Item, date: &str, val: f64) -> Reported {
@@ -182,13 +187,13 @@ mod tests {
             fact(Item::SharesOutstanding, "2022-07-15", 1_000.0),
             fact(Item::SharesOutstanding, "2022-10-15", 3_000.0),
         ];
-        let prices = [
-            price("2022-07-14", 900.0, 1.0),   // before any cover: nothing
-            price("2022-07-15", 900.0, 1.0),
-            price("2022-08-25", 300.0, 3.0),   // the split
-            price("2022-10-17", 330.0, 1.0),
+        let rows = [
+            ("2022-07-14", 900.0, 1.0),   // before any cover: nothing
+            ("2022-07-15", 900.0, 1.0),
+            ("2022-08-25", 300.0, 3.0),   // the split
+            ("2022-10-17", 330.0, 1.0),
         ];
-        let m = market(Ticker::TSLA, &prices, &items);
+        let m = { let (closes, splits) = prices(&rows); market(Ticker::TSLA, &closes, &splits, &items) };
         let caps: Vec<f64> = m.iter().map(|m| m.market_cap).collect();
         assert_eq!(caps, [900_000.0, 900_000.0, 990_000.0]);
         assert_eq!(m[0].price_to_book, Some(30.0));
@@ -209,8 +214,8 @@ mod tests {
             Reported { item: Item::StockholdersEquity, val: 20_000.0, ..filed("2024-12-31", "2025-04-17") },
             Reported { val: 100.0, ..filed("2024-12-31", "2025-04-17") },
         ];
-        let prices = [price("2025-02-03", 1_000.0, 1.0), price("2025-04-17", 1_000.0, 1.0)];
-        let m = market(Ticker::TSLA, &prices, &items);
+        let rows = [("2025-02-03", 1_000.0, 1.0), ("2025-04-17", 1_000.0, 1.0)];
+        let m = { let (closes, splits) = prices(&rows); market(Ticker::TSLA, &closes, &splits, &items) };
         let pb: Vec<Option<f64>> = m.iter().map(|m| m.price_to_book).collect();
         // February: 2023's book; from the filing day, 2024's.
         assert_eq!(pb, [Some(10.0), Some(5.0)]);

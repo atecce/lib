@@ -5,10 +5,6 @@ edition = "2024"
 
 [dependencies]
 chrono = {version = "0.4.44", features = ["serde"]}
-# FRED's series type (treasury's 10-year yield); callers read the cache.
-fred = { path = "../fred", default-features = false }
-# Tiingo's price type (valuation); callers read the cache.
-tiingo = { path = "tiingo", default-features = false }
 regex = "1.12.4"
 serde = "1.0.228"
 uniffi = "0.31.1"

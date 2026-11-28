@@ -125,3 +125,20 @@ pub fn edgar_filing(dir: &std::path::Path, ticker: Ticker) -> Result<edgar::fili
 pub fn edgar_workbook(path: &std::path::Path, ticker: Ticker) -> Result<edgar::xlsx::Reader, Box<dyn Error>> {
     edgar::xlsx::reader(std::fs::read(path)?, ticker)
 }
+
+/// A FRED series from the fred cache, as equities' Series (its days with a
+/// value).
+pub fn fred_series(id: &str) -> Result<equities::series::Series, Box<dyn Error>> {
+    let s = fred::Cache::new(fred::Cache::default_dir()).series(id)?;
+    Ok(equities::series::Series::new(s.observations.iter().filter_map(|o| Some((o.date, o.value?)))))
+}
+
+/// A ticker's daily closes, and its splits (the days it split, each the new
+/// shares per old), from its prices as the tiingo cache has them.
+pub fn closes_and_splits(prices: &[tiingo::Price]) -> (equities::series::Series, equities::series::Series) {
+    let closes = equities::series::Series::new(prices.iter().filter_map(|p| Some((p.day()?, p.close))));
+    let splits = equities::series::Series::new(prices.iter()
+        .filter(|p| p.split_factor > 0.0 && p.split_factor != 1.0)
+        .filter_map(|p| Some((p.day()?, p.split_factor))));
+    (closes, splits)
+}

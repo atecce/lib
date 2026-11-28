@@ -11,13 +11,12 @@
 pub const SERIES: &str = "GS10";
 
 pub struct TenYear {
-    series: fred::Series,
+    series: crate::series::Series,
 }
 
 impl TenYear {
-    /// From the GS10 series, as the caller read it (from the fred cache:
-    /// `fred::Cache::new(fred::Cache::default_dir()).series(SERIES)`).
-    pub fn new(series: fred::Series) -> TenYear {
+    /// From the GS10 series, as the caller read it (from the fred cache).
+    pub fn new(series: crate::series::Series) -> TenYear {
         TenYear { series }
     }
 
@@ -40,7 +39,11 @@ mod tests {
     #[test]
     fn reads_the_cached_series() {
         // The tracked fixture, compiled in: the test reads no files.
-        let t = TenYear::new(fred::Series::parse(SERIES, include_str!("../../fred/cache/GS10.csv")).unwrap());
+        let csv = include_str!("../../fred/cache/GS10.csv");
+        let t = TenYear::new(crate::series::Series::new(csv.lines().skip(1).filter_map(|l| {
+            let (d, v) = l.split_once(',')?;
+            Some((d.parse().ok()?, v.parse().ok()?))
+        })));
         assert!((t.at_end_of(1981).unwrap() - 0.1372).abs() < 1e-12);
         assert!((t.cost_of_equity(2021, 0.04).unwrap() - 0.0493).abs() < 1e-12);
         assert!((1954..=2025).all(|y| t.at_end_of(y).is_some()));

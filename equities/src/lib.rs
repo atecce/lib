@@ -64,6 +64,7 @@ pub mod f;
 pub mod gm;
 pub mod company;
 pub mod statements;
+pub mod series;
 pub mod item;
 pub mod valuation;
 pub mod treasury;

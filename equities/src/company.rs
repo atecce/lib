@@ -76,15 +76,15 @@ pub fn valued_with(ticker: Ticker) -> Option<Ticker> {
 /// `series` holds the FRED series the company's valuation needs
 /// (`valuation_series`), by ID, as (date, value), oldest first; the caller
 /// reads them. One missing: valued without it.
-pub fn valuation_items(ticker: Ticker, items: &[Reported], series: &Series) -> Vec<Reported> {
+pub fn valuation_items(ticker: Ticker, items: &[Reported], series: &SeriesById) -> Vec<Reported> {
     match ticker.as_str() {
-        "TSM" => series.get("DEXTAUS").map(|rates| crate::tsm::in_dollars(items, rates)).unwrap_or_default(),
+        "TSM" => series.get("DEXTAUS").map(|rates| crate::tsm::in_dollars(items, rates.points())).unwrap_or_default(),
         _ => Vec::new(),
     }
 }
 
-/// FRED series by ID, as (date, value), oldest first.
-pub type Series = std::collections::HashMap<&'static str, Vec<(chrono::NaiveDate, f64)>>;
+/// FRED series by ID (DEXTAUS, GS10).
+pub type SeriesById = std::collections::HashMap<&'static str, crate::series::Series>;
 
 /// The FRED series a company's valuation needs (for `valuation_items`):
 /// TSMC's, the Taiwan dollar's rate (DEXTAUS, TWD per USD).
