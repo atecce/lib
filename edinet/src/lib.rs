@@ -33,6 +33,10 @@ use std::path::{Path, PathBuf};
 use chrono::NaiveDate;
 use serde::Deserialize;
 
+/// Reading a report's CSV files into equities' items: `report::read_csv`,
+/// and `report::EdinetReport`, which implements equities' `Statements`.
+pub mod report;
+
 #[cfg(feature = "fetch")]
 mod client;
 #[cfg(feature = "fetch")]

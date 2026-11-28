@@ -7,7 +7,8 @@
 //!
 //! - `edgar::filing::EdgarFiling` (in the edgar crate, which reads its own
 //!   format): EDGAR's rendered statement pages, read as asked;
-//! - `EdinetReport`: an EDINET report's CSV files (UTF-16, one fact a line);
+//! - `edinet::report::EdinetReport` (in the edinet crate): a report's CSV
+//!   files (UTF-16, one fact a line);
 //! - `MopsReport`: a MOPS report's page (Big5 HTML).
 //!
 //! Each reads into `Reported`, every value carrying its filing. None opens a
@@ -30,31 +31,6 @@ pub trait Statements {
     fn filed(&self) -> &Filed;
     /// Every value it states, each carrying `filed`, and what was skipped.
     fn read(&mut self) -> Read;
-}
-
-/// An EDINET report: its CSV files, each (name, bytes).
-pub struct EdinetReport {
-    filed: Filed,
-    ticker: Ticker,
-    kind: crate::edinet::Kind,
-    files: Vec<(String, Vec<u8>)>,
-}
-
-impl EdinetReport {
-    pub fn new(filed: Filed, ticker: Ticker, kind: crate::edinet::Kind, files: Vec<(String, Vec<u8>)>) -> EdinetReport {
-        EdinetReport { filed, ticker, kind, files }
-    }
-}
-
-impl Statements for EdinetReport {
-    fn filed(&self) -> &Filed { &self.filed }
-
-    fn read(&mut self) -> Read {
-        match crate::edinet::read_csv(&self.filed, self.kind, self.ticker, &self.files) {
-            Ok(items) => Read { items, notes: Vec::new() },
-            Err(e) => Read { items: Vec::new(), notes: vec![format!("{}: {}", self.filed.accession, e)] },
-        }
-    }
 }
 
 /// A MOPS report: its page's bytes.

@@ -65,7 +65,6 @@ pub mod gm;
 pub mod company;
 pub mod statements;
 pub mod item;
-pub mod edinet;
 pub mod mops;
 pub mod valuation;
 pub mod treasury;

@@ -7,7 +7,8 @@ use std::error::Error;
 
 use equities::item::{Filed, Source};
 use edgar::filing::EdgarFiling;
-use equities::statements::{EdinetReport, MopsReport, Statements};
+use edinet::report::EdinetReport;
+use equities::statements::{MopsReport, Statements};
 use equities::Ticker;
 
 /// A company's filings in a source's cache, ready to read, and what isn't.
@@ -59,7 +60,7 @@ fn edgar_statements(dir: &std::path::Path, filed: Filed, ticker: Ticker) -> Resu
 pub fn edinet(cache: &edinet::Cache, ticker: Ticker) -> Result<Company, Box<dyn Error>> {
     let mut company = Company::default();
     for d in &cache.reports(ticker.as_str())? {
-        let Some(kind) = d.doc_type.as_deref().and_then(|t| equities::edinet::kind(t, d.description.as_deref())) else {
+        let Some(kind) = d.doc_type.as_deref().and_then(|t| edinet::report::kind(t, d.description.as_deref())) else {
             company.without_statements += 1;
             continue;
         };

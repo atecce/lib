@@ -27,8 +27,8 @@ use std::error::Error;
 
 use chrono::{Months, NaiveDate};
 
-use crate::item::{Filed, Item, Reported, Unit};
-use crate::{Currency, Period, Ticker};
+use equities::item::{Filed, Item, Reported, Unit};
+use equities::{Currency, Period, Ticker};
 
 /// One fact: element, label, context, unit and value.
 struct Fact {
@@ -172,8 +172,8 @@ pub fn read_csv(filed: &Filed, kind: Kind, ticker: Ticker, files: &[(String, Vec
         if !name.starts_with("jpcrp") { continue; }
         for fact in read_facts(bytes)? {
             if fact.context.contains('_') { continue; }
-            let Some((item, rank)) = crate::company::item_ranked(ticker, &element_tag(&fact.element))
-                .or_else(|| crate::company::label_item(ticker, &fact.label).map(|i| (i, usize::MAX))) else { continue };
+            let Some((item, rank)) = equities::company::item_ranked(ticker, &element_tag(&fact.element))
+                .or_else(|| equities::company::label_item(ticker, &fact.label).map(|i| (i, usize::MAX))) else { continue };
             let Some((date, p)) = context_period(&fact.context, kind, end) else { continue };
             let Some(val) = number(&fact.value) else { continue };
             // Units: "JPY", "JPYPerShares", "shares", and others for foreign
@@ -198,6 +198,32 @@ pub fn read_csv(filed: &Filed, kind: Kind, ticker: Ticker, files: &[(String, Vec
         .collect();
     items.sort_by_key(|r| (r.date, r.item, r.p));
     Ok(items)
+}
+
+/// An EDINET report: its CSV files, each (name, bytes), read as `Statements`
+/// (equities' interface for every source's filings).
+pub struct EdinetReport {
+    filed: Filed,
+    ticker: Ticker,
+    kind: Kind,
+    files: Vec<(String, Vec<u8>)>,
+}
+
+impl EdinetReport {
+    pub fn new(filed: Filed, ticker: Ticker, kind: Kind, files: Vec<(String, Vec<u8>)>) -> EdinetReport {
+        EdinetReport { filed, ticker, kind, files }
+    }
+}
+
+impl equities::statements::Statements for EdinetReport {
+    fn filed(&self) -> &Filed { &self.filed }
+
+    fn read(&mut self) -> equities::statements::Read {
+        match read_csv(&self.filed, self.kind, self.ticker, &self.files) {
+            Ok(items) => equities::statements::Read { items, notes: Vec::new() },
+            Err(e) => equities::statements::Read { items: Vec::new(), notes: vec![format!("{}: {}", self.filed.accession, e)] },
+        }
+    }
 }
 
 #[cfg(test)]
