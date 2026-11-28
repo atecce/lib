@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 95] = [
+            pub const ALL: [$item; 97] = [
                 $($item::$variant,)*
             ];
 
@@ -180,6 +180,10 @@ items! {
         // (net interest income and non-interest income apart) have none.
         Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer", "RevenuesNetOfInterestExpense", "RevenueFromContractWithCustomerIncludingAssessedTax", "RegulatedAndUnregulatedOperatingRevenue", "SalesRevenueServicesNet"],
         // 売上原価 (uriage genka): cost of sales
+        // A bank's two kinds of income; their sum is its revenue where it
+        // prints no total (derive_bank_revenue).
+        NetInterestIncome => ["Net interest income", "Net Interest Income"] @ ["InterestIncomeExpenseNet"],
+        NoninterestIncome => ["Total noninterest income", "Noninterest income", "Total non-interest income", "Total noninterest revenue"] @ ["NoninterestIncome"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales", "売上原価"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales", "jpigp_cor:CostOfSalesIFRS", "jppfs_cor:CostOfSales"],
 
 //        AutomotiveSalesRevenue => ["Automotive sales"],

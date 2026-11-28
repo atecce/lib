@@ -568,3 +568,57 @@ pub fn book_value_per_share(items: &[Reported]) -> Vec<Reported> {
     }
     out
 }
+
+/// A bank's revenue, where it prints no total: net interest income plus
+/// noninterest income, for each period that has both and no Revenue (in
+/// the same currency), marked derived, from the filing of its net interest
+/// income. Banks that state a total (net revenues) keep theirs.
+pub fn derive_bank_revenue(items: &mut Vec<crate::item::Reported>) {
+    use crate::item::Reported;
+    use std::collections::HashMap;
+    let key = |r: &Reported| (r.ticker, r.date, r.p, r.currency);
+    let has_revenue: std::collections::HashSet<_> = items.iter().filter(|r| r.item == Item::Revenue).map(key).collect();
+    let mut nii: HashMap<_, &Reported> = HashMap::new();
+    let mut non: HashMap<_, f64> = HashMap::new();
+    for r in items.iter() {
+        match r.item {
+            Item::NetInterestIncome => { nii.entry(key(r)).or_insert(r); }
+            Item::NoninterestIncome => { non.entry(key(r)).or_insert(r.val); }
+            _ => {}
+        }
+    }
+    let derived: Vec<Reported> = nii.iter()
+        .filter(|(k, _)| !has_revenue.contains(*k))
+        .filter_map(|(k, n)| non.get(k).map(|o| Reported { item: Item::Revenue, val: n.val + o, derived: true, ..(*n).clone() }))
+        .collect();
+    items.extend(derived);
+}
+
+#[cfg(test)]
+mod bank_revenue_tests {
+    use crate::item::{Item, Reported};
+    use crate::{Currency, Period, Ticker};
+
+    fn r(item: Item, date: &str, val: f64) -> Reported {
+        Reported { ticker: Ticker::new("BANK"), date: date.parse().unwrap(), p: Period::ThreeMonths, item,
+                   currency: Currency::USD, val, filing: None, derived: false }
+    }
+
+    /// Invented: a quarter with both incomes and no total gets their sum; a
+    /// quarter with a total keeps it; one income alone gives nothing.
+    #[test]
+    fn revenue_is_the_two_incomes_where_no_total_is_printed() {
+        let mut items = vec![
+            r(Item::NetInterestIncome, "2025-03-31", 300.0), r(Item::NoninterestIncome, "2025-03-31", 200.0),
+            r(Item::NetInterestIncome, "2025-06-30", 310.0), r(Item::NoninterestIncome, "2025-06-30", 190.0),
+            r(Item::Revenue, "2025-06-30", 480.0),
+            r(Item::NetInterestIncome, "2025-09-30", 320.0),
+        ];
+        super::derive_bank_revenue(&mut items);
+        let revenue: Vec<(String, f64, bool)> = items.iter().filter(|i| i.item == Item::Revenue)
+            .map(|i| (i.date.to_string(), i.val, i.derived)).collect();
+        assert_eq!(revenue.len(), 2);
+        assert!(revenue.contains(&("2025-03-31".into(), 500.0, true)));
+        assert!(revenue.contains(&("2025-06-30".into(), 480.0, false)));
+    }
+}
