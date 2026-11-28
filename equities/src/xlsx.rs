@@ -1,7 +1,5 @@
 use std::error::Error;
-use std::fs::File;
-use std::io::BufReader;
-use std::path::Path;
+use std::io::Cursor;
 
 use crate::Ticker;
 use crate::Reader as R;
@@ -9,18 +7,23 @@ use crate::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetInfo, SheetType};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 
-use calamine::{open_workbook_auto, Data, DataType, Reader as CalamineReader, Sheets};
+use calamine::{open_workbook_auto_from_rs, Data, DataType, Reader as CalamineReader, Sheets};
 
 pub struct Reader {
-    workbook: Sheets<BufReader<File>>,
+    workbook: Sheets<Cursor<Vec<u8>>>,
     ticker: Ticker,
 }
 
-pub fn new_reader(path: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
-    Ok(Reader {
-        workbook: open_workbook_auto(path)?,
-        ticker,
-    })
+/// A workbook from its bytes (an EDGAR Financial_Report.xlsx), as the
+/// caller read them: no files.
+pub fn reader(bytes: Vec<u8>, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
+    Ok(Reader { workbook: open_workbook_auto_from_rs(Cursor::new(bytes))?, ticker })
+}
+
+/// A workbook from disk: `reader` with its file. The `files` feature.
+#[cfg(feature = "files")]
+pub fn new_reader(path: &std::path::Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
+    reader(std::fs::read(path)?, ticker)
 }
 
 /// Non-empty rows of a statement sheet.
