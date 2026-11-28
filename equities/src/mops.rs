@@ -51,6 +51,11 @@ const LABELS: &[(&str, Item, usize)] = &[
     ("歸屬於母公司業主之權益合計", Item::StockholdersEquity, 0),      // guīshǔ yú mǔgōngsī yèzhǔ zhī quányì héjì
     // 綜合損益表 (statement of comprehensive income)
     ("營業收入合計", Item::Revenue, 0),                               // yíngyè shōurù héjì
+    // A financial holding company's (金融控股, jīnróng kònggǔ): its net
+    // revenue, net interest revenue and net revenue other than interest.
+    ("淨收益", Item::Revenue, 1),                                     // jìng shōuyì
+    ("利息淨收益", Item::NetInterestIncome, 0),                       // lìxī jìng shōuyì
+    ("利息以外淨收益", Item::NoninterestIncome, 0),                   // lìxī yǐwài jìng shōuyì
     ("營業成本合計", Item::CostOfRevenue, 0),                         // yíngyè chéngběn héjì
     ("營業毛利（毛損）淨額", Item::GrossProfit, 0),                   // yíngyè máolì (máosǔn) jìng'é
     ("營業毛利（毛損）", Item::GrossProfit, 1),
