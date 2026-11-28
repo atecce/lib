@@ -30,6 +30,16 @@ pub fn item_ranked(ticker: Ticker, tag: &str) -> Option<(Item, usize)> {
     }
 }
 
+/// A company's corrections to what its filings say, where a filing is
+/// wrong (Toyota's 2019 20-F, a digit short of its share count): each in
+/// its module, applied to the items as read, before anything is derived.
+pub fn correct(ticker: Ticker, items: &mut [Reported]) {
+    match ticker.as_str() {
+        "TM" => crate::tm::correct(items),
+        _ => {}
+    }
+}
+
 /// Another listing of the same company whose reports a listing's valuation
 /// also reads: TSM's, TSMC's Taipei listing (its quarters, in TWD).
 pub fn valued_with(ticker: Ticker) -> Option<Ticker> {

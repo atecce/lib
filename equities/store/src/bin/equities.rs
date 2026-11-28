@@ -115,6 +115,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         if items.is_empty() {
             continue;
         }
+        equities::company::correct(equity, &mut items);
         equities::merge_nearby_dates(&mut items);
         equities::derive_quarters(&mut items);
         let mut book = equities::book_value_per_share(&items);
