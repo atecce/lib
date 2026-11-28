@@ -1,0 +1,56 @@
+# Interest rates, for `fred-fetch --list rates.txt` and `examples/rates.rs`.
+# Monthly unless noted. NBER macrohistory series (M…NNBR) end where they end.
+
+# The short rate
+M13002US35620M156NNBR   # commercial paper, New York, 1857–1971 (NBER)
+M13001USM156NNBR        # call money, 1857–1970 (NBER)
+M13009USM156NNBR        # discount rate, New York Fed, 1914–1969 (NBER)
+INTDSRUSM193N           # discount rate, 1950–2021 (IMF)
+TB3MS                   # 3-month Treasury bill, 1934–
+FEDFUNDS                # effective federal funds rate, 1954–
+
+# The term structure (Treasury constant maturity, the Fed's H.15)
+GS1                     # 1-year, monthly, 1953–
+GS2                     # 2-year, monthly, 1976–
+GS5                     # 5-year, monthly, 1953–
+GS10                    # 10-year, monthly, 1953–
+GS30                    # 30-year, monthly, 1977–
+# Daily constant maturities (H.15), each from its first day
+DGS1MO                  # 1-month, 2001–
+DGS3MO                  # 3-month, 1981–
+DGS6MO                  # 6-month, 1981–
+DGS1                    # 1-year, 1962–
+DGS2                    # 2-year, 1976–
+DGS3                    # 3-year, 1962–
+DGS5                    # 5-year, 1962–
+DGS7                    # 7-year, 1969–
+DGS10                   # 10-year, 1962–
+DGS20                   # 20-year, 1962– (none 1987–1993)
+DGS30                   # 30-year, 1977– (none 2002–2006)
+LTGOVTBD                # long-term government securities, 1925–2000
+M1333BUSM156NNBR        # long-term United States bonds, 1941–1967 (NBER)
+
+# Private long-term credit
+M13019USM156NNBR        # high-grade railroad bonds, 1857–1937 (Macaulay, NBER)
+M13024USM156NNBR        # high-grade railroad bonds, 1900–1963 (NBER)
+M13035USM156NNBR        # corporate bonds, highest rating, 1919–1968 (NBER)
+AAA                     # Moody's seasoned Aaa corporate bonds, 1919–
+BAA                     # Moody's seasoned Baa corporate bonds, 1919–
+
+# Real rates, expected inflation, the term premium
+FII10                   # 10-year TIPS yield, 2003–
+T10YIEM                 # 10-year breakeven inflation, 2003–
+EXPINF10YR              # 10-year expected inflation (Cleveland Fed model), 1982–
+REAINTRATREARAT10Y      # 10-year real rate (Cleveland Fed model), 1982–
+THREEFYTP10             # 10-year term premium (Kim–Wright), daily, 1990–
+IRLTLT01USM156N         # 10-year government bond yield (OECD), 1953–
+
+# Prices, for real rates after the fact
+M04051USM324NNBR        # general price level, 1860–1939 (NBER; 1913 = 100)
+CPIAUCNS                # CPI, not seasonally adjusted, 1913–
+CPIAUCSL                # CPI, seasonally adjusted, 1947–
+
+# Where cash goes instead (for examples/fund_flows.rs)
+MORTGAGE30US            # 30-year fixed mortgage rate, Freddie Mac survey, weekly, 1971–
+MMMFFAQ027S             # money market funds' total financial assets ($m), quarterly, 1945– (Z.1)
+WRMFNS                  # retail money funds ($bn), weekly, 1980–

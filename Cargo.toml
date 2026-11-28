@@ -9,18 +9,17 @@ name = "lib"
 
 [dependencies]
 bible = { path = "bible" }
-csv = "1.3.1"
 daemon = { path = "daemon" }
-equities = { path = "equities" }
 greece = { path = "greece" }
 name = { path = "name" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.149"
 uniffi = { version = "0.31", features = ["cli"] }
-calamine = "0.34.0"
-chrono = "0.4.44"
-reqwest = { version = "0.13.3", features = ["blocking"] }
 
 [workspace]
 resolver = "3" # TODO(atec): why 3
-members = ["bible", "daemon", "equities", "greece", "gutenberg", "name", "scrape", "shakespeare"]
+members = ["bible", "daemon", "edgar", "edinet", "equities", "equities/api", "equities/backtest", "equities/store", "equities/tiingo", "fred", "greece", "gutenberg", "mops", "name", "plaid", "scrape", "shakespeare"]
+
+# Optimize dependencies in dev/test builds (calamine, scraper, regex parse
+# whole filings in tests and examples). Workspace crates stay
+# at opt-level 0, so incremental builds remain fast.
+[profile.dev.package."*"]
+opt-level = 3

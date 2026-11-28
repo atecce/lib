@@ -1,0 +1,37 @@
+# Real estate and the mortgage market, for `fred-fetch --list realestate.txt`.
+# Monthly unless noted. (MORTGAGE30US, the 30-year rate, is in rates.txt.)
+
+# Mortgage rates
+MORTGAGE15US            # 15-year fixed mortgage rate, Freddie Mac survey, weekly, 1991–
+MORTGAGE30US            # 30-year fixed (also in rates.txt), weekly, 1971–
+OBMMIJUMBO30YF          # 30-year fixed jumbo (Optimal Blue), daily, 2017–
+
+# Prices
+CSUSHPINSA              # S&P CoreLogic Case-Shiller US national home price index, 1987–
+CSUSHPISA               # the same, seasonally adjusted
+USSTHPI                 # FHFA all-transactions house price index, quarterly, 1975–
+MSPUS                   # median sales price of houses sold, quarterly, 1963–
+ASPUS                   # average sales price of houses sold, quarterly, 1963–
+
+# Rents: shelter in the CPI (what housing costs to live in)
+CUSR0000SEHA            # CPI rent of primary residence, 1981–
+CUSR0000SEHC            # CPI owners' equivalent rent, 1983–
+
+# Activity
+HOUST                   # housing starts (thousands, annual rate), 1959–
+PERMIT                  # building permits (thousands, annual rate), 1960–
+HSN1F                   # new one-family houses sold (thousands, annual rate), 1963–
+MSACSR                  # months' supply of new houses, 1963–
+
+# Ownership and credit
+RHORUSQ156N             # homeownership rate, quarterly, 1965–
+RRVRUSQ156N             # rental vacancy rate, quarterly, 1956–
+DRSFRMACBS              # delinquency rate on single-family mortgages, commercial banks, quarterly, 1991–
+MDOAH                   # mortgage debt outstanding, all holders ($m), quarterly, 1949–2019 (discontinued: see HHMSDODNS)
+HHMSDODNS               # households' home mortgages ($m), quarterly, 1945– (Z.1)
+ASTMA                   # all mortgages, every sector: homes, apartments, commercial, farm ($m), quarterly, 1945– (Z.1)
+GDP                     # nominal GDP ($bn, annual rate), quarterly, 1947–: to scale the debt
+TDSP                    # household debt service, % of disposable income, quarterly, 1980–
+
+# Real estate as capital
+BOGZ1FL155035015Q       # households' real estate at market value ($m), quarterly, 1945– (Z.1)

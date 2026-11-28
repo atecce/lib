@@ -1,0 +1,24 @@
+[package]
+name = "tiingo"
+version = "0.1.0"
+edition = "2024"
+
+# Tiingo's end-of-day prices as a source: daily closes cached on disk under
+# cache/, and the client that fetches them. Licensed for personal, internal
+# use only: the data is not to be displayed or shared with anyone else.
+# Readers of the cache (equities) depend on this crate without `fetch`.
+
+[features]
+default = ["fetch"]
+fetch = ["dep:reqwest"]
+
+[dependencies]
+chrono = { version = "0.4.44", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.150"
+reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
+
+[[bin]]
+name = "tiingo-fetch"
+path = "src/bin/fetch.rs"
+required-features = ["fetch"]

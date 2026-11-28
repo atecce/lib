@@ -1,0 +1,21 @@
+[package]
+name = "plaid"
+version = "0.1.0"
+edition = "2024"
+
+# Plaid as a source: brokerage holdings and investment transactions, read-only,
+# through Plaid's API (Investments). Keys and access tokens live in ~/.plaid,
+# never in the repository. See README.md.
+
+[dependencies]
+reqwest = { version = "0.13.4", features = ["blocking", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.149"
+
+[[bin]]
+name = "plaid-link"
+path = "src/bin/link.rs"
+
+[[bin]]
+name = "plaid-holdings"
+path = "src/bin/holdings.rs"

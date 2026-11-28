@@ -1,0 +1,22 @@
+[package]
+name = "fred"
+version = "0.1.0"
+edition = "2024"
+
+# FRED (Federal Reserve Economic Data, St. Louis Fed) as a source: economic
+# series, cached on disk under cache/, and the client that fetches them.
+# Readers of the cache (equities) depend on this crate without the `fetch`
+# feature, so they never touch the network.
+
+[features]
+default = ["fetch"]
+fetch = ["dep:reqwest"]
+
+[dependencies]
+chrono = "0.4.44"
+reqwest = { version = "0.13.4", features = ["blocking"], optional = true }
+
+[[bin]]
+name = "fred-fetch"
+path = "src/bin/fetch.rs"
+required-features = ["fetch"]

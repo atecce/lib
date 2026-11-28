@@ -1,0 +1,16 @@
+[package]
+name = "backtest"
+version = "0.1.0"
+edition = "2024"
+
+# Tests of trading strategies on history, starting where the efficient market
+# hypothesis did: Fama's tests of the random walk (1965) and Alexander's
+# filter rules (Fama & Blume 1966). See equities/FORECASTING.md.
+
+[dependencies]
+chrono = "0.4.44"
+# Daily prices, from the cache tiingo-fetch fills.
+tiingo = { path = "../tiingo", default-features = false }
+# Financials, from Postgres (examples/persistence.rs).
+postgres = { version = "0.19", features = ["with-chrono-0_4"] }
+store = { path = "../store" }

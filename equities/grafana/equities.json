@@ -1,0 +1,956 @@
+{
+  "uid": "equities-financials",
+  "title": "equities",
+  "schemaVersion": 39,
+  "editable": true,
+  "timezone": "utc",
+  "graphTooltip": 0,
+  "time": {
+    "from": "2010-01-01T00:00:00.000Z",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "ticker",
+        "label": "Ticker",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "financials-postgres"
+        },
+        "query": "SELECT ticker FROM listing ORDER BY ticker",
+        "definition": "SELECT ticker FROM listing ORDER BY ticker",
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": false,
+        "current": {
+          "text": "AAPL",
+          "value": "AAPL"
+        },
+        "options": [],
+        "hide": 0,
+        "allowCustomValue": false
+      },
+      {
+        "type": "custom",
+        "name": "period",
+        "label": "Flows over",
+        "query": "quarters\\, else years : auto,quarters : 3m,years : 12m",
+        "current": {
+          "text": "quarters, else years",
+          "value": "auto"
+        },
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "options": [
+          {
+            "text": "quarters, else years",
+            "value": "auto",
+            "selected": true
+          },
+          {
+            "text": "quarters",
+            "value": "3m",
+            "selected": false
+          },
+          {
+            "text": "years",
+            "value": "12m",
+            "selected": false
+          }
+        ],
+        "description": "Quarters where the company reports them, else years (20-F filers such as TSMC report annually)."
+      },
+      {
+        "type": "query",
+        "name": "currency",
+        "label": "Currency",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "financials-postgres"
+        },
+        "query": "SELECT __text, __value FROM (\nSELECT 'reporting currency' AS __text, 'reporting' AS __value, 0 AS n\nUNION ALL\nSELECT f.currency, f.currency, count(*) FROM fact f JOIN listing l USING (issuer_id)\nWHERE upper(l.ticker) IN (SELECT upper(t) FROM unnest(ARRAY[${ticker}]) t) GROUP BY f.currency\n) x\nORDER BY n = 0 DESC, n DESC",
+        "definition": "SELECT __text, __value FROM (\nSELECT 'reporting currency' AS __text, 'reporting' AS __value, 0 AS n\nUNION ALL\nSELECT f.currency, f.currency, count(*) FROM fact f JOIN listing l USING (issuer_id)\nWHERE upper(l.ticker) IN (SELECT upper(t) FROM unnest(ARRAY[${ticker}]) t) GROUP BY f.currency\n) x\nORDER BY n = 0 DESC, n DESC",
+        "refresh": 1,
+        "sort": 0,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "reporting currency",
+          "value": "reporting"
+        },
+        "options": [],
+        "hide": 0,
+        "allowCustomValue": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "$ticker",
+      "repeat": "ticker",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "$ticker stocks: equity and debt (${currency:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['TotalAssets', 'TotalLiabilities', 'StockholdersEquity', 'TotalDebt']) f\nJOIN (VALUES ('TotalAssets', 'total assets'), ('TotalLiabilities', 'total liabilities'), ('StockholdersEquity', 'stockholders'' equity'), ('TotalDebt', 'total debt')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ],
+      "description": "Total assets, liabilities, stockholders' equity and total debt (every borrowing line, current and non-current) from the balance sheet. Market cap against book value is in the valuation row below."
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "$ticker flows: income and returns to shareholders (${currency:text}, ${period:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['Revenue', 'OperatingIncome', 'NetIncome', 'PaymentsRelatedToRepurchasesOfCommonStock', 'DividendsPaid']) f\nJOIN (VALUES ('Revenue', 'revenue'), ('OperatingIncome', 'operating income'), ('NetIncome', 'net income'), ('PaymentsRelatedToRepurchasesOfCommonStock', 'buybacks'), ('DividendsPaid', 'dividends')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "$ticker stocks: cash and working capital (${currency:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['CashAndCashEquivalents', 'MarketableSecurities', 'AccountsReceivableNet', 'Inventories']) f\nJOIN (VALUES ('CashAndCashEquivalents', 'cash'), ('MarketableSecurities', 'marketable securities'), ('AccountsReceivableNet', 'receivables'), ('Inventories', 'inventories')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "$ticker flows: cash (${currency:text}, ${period:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['NetCashProvidedByOperatingActivities', 'NetCashUsedInInvestingActivities', 'NetCashUsedInFinancingActivities']) f\nJOIN (VALUES ('NetCashProvidedByOperatingActivities', 'operating'), ('NetCashUsedInInvestingActivities', 'investing'), ('NetCashUsedInFinancingActivities', 'financing')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "$ticker stocks: long-lived assets (${currency:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', 'pit', '${currency:raw}', ARRAY['PropertyAndEquipmentNet', 'Goodwill', 'IntangibleAssetsNet']) f\nJOIN (VALUES ('PropertyAndEquipmentNet', 'property and equipment'), ('Goodwill', 'goodwill'), ('IntangibleAssetsNet', 'intangibles')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "$ticker flows: investment (${currency:text}, ${period:text})",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT f.period_end::timestamp AS \"time\", m.label AS metric, f.value\nFROM listing_facts('${ticker:raw}', flow_period('${ticker:raw}', '${period:raw}'), '${currency:raw}', ARRAY['PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'DepreciationAndAmoritization', 'AcquisitionsNetOfCashAcquired']) f\nJOIN (VALUES ('PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets', 'capex'), ('DepreciationAndAmoritization', 'depreciation and amortization'), ('AcquisitionsNetOfCashAcquired', 'acquisitions')) AS m(item, label) USING (item)\nORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "$ticker stocks: market value and book value (${currency:text}, log scale)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "price-to-book"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "x"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.scaleDistribution",
+                "value": {
+                  "type": "linear"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT date::timestamp AS \"time\", 'market cap' AS metric, market_cap AS value FROM market\nWHERE ticker = upper('${ticker:raw}') AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND market_cap IS NOT NULL\nUNION ALL\nSELECT period_end::timestamp, 'book value (stockholders'' equity)', value\nFROM listing_facts('${ticker:raw}', 'pit', CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END, ARRAY['StockholdersEquity'])\nUNION ALL\nSELECT date::timestamp AS \"time\", 'price-to-book' AS metric, price_to_book AS value FROM market\nWHERE ticker = upper('${ticker:raw}') AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND price_to_book IS NOT NULL\nORDER BY 1"
+        }
+      ],
+      "description": "Market cap each trading day against book value (stockholders' equity). On a log scale the gap between them is price-to-book, also on the right axis: the market pays that multiple of the accounts. Book value records what owners put in and the company kept, at historical cost; market value prices expected future profits, including what accounting leaves off the balance sheet (brands, software, R&D) and growth."
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "$ticker flows: return on equity and earnings yield (last four quarters)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "financials-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 80,
+                "color": "red"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "financials-postgres"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT date::timestamp AS \"time\", 'return on equity' AS metric, return_on_equity AS value FROM market\nWHERE ticker = upper('${ticker:raw}') AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND return_on_equity IS NOT NULL\nUNION ALL\nSELECT date::timestamp AS \"time\", 'earnings yield' AS metric, earnings_yield AS value FROM market\nWHERE ticker = upper('${ticker:raw}') AND currency = CASE WHEN '${currency:raw}' = 'reporting' THEN coalesce(market_currency('${ticker:raw}'), reporting_currency('${ticker:raw}')) ELSE '${currency:raw}' END AND earnings_yield IS NOT NULL\nORDER BY 1"
+        }
+      ],
+      "description": "Net income over the last four quarters, over average book equity (return on equity) and over market cap (earnings yield, the inverse of P/E). Price-to-book is roughly their ratio: where return on equity runs above the earnings yield, the market values the equity above book. Each day uses only quarters reported by then."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+[package]
+name = "store"
+version = "0.1.0"
+edition = "2024"
+
+# The financials in Postgres: a destination, as edgar, edinet and tiingo are
+# sources. See README.md.
+
+[dependencies]
+edgar = { path = "../../edgar", default-features = false }
+edinet = { path = "../../edinet", default-features = false }
+mops = { path = "../../mops", default-features = false }
+csv = "1"
+chrono = "0.4.44"
+equities = { path = ".." }
+postgres = { version = "0.19", features = ["with-chrono-0_4"] }
+tiingo = { path = "../tiingo", default-features = false }
+fred = { path = "../../fred", default-features = false }
+plaid = { path = "../../plaid" }
+serde_json = "1.0.149"
+calamine = "0.38.0"
+reqwest = { version = "0.13.4", features = ["blocking"] }
+
+[[bin]]
+name = "store-progress"
+path = "src/bin/progress.rs"
+
+[[bin]]
+name = "store-sic"
+path = "src/bin/sic.rs"
+
+[[bin]]
+name = "store-fred"
+path = "src/bin/fred.rs"
+
+[[bin]]
+name = "store-plaid"
+path = "src/bin/plaid.rs"
+
+[[bin]]
+name = "store-robinhood"
+path = "src/bin/robinhood.rs"
+
+[[bin]]
+name = "store-equities"
+path = "src/bin/equities.rs"
+
+[[bin]]
+name = "store-rstar"
+path = "src/bin/rstar.rs"
+
+# The examples only (augurs: outliers in a series read from a workbook).
+[dev-dependencies]
+augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
+regex = "1.12.4"

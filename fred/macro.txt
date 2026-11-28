@@ -1,0 +1,39 @@
+# Macro: π, the output gap, policy and money, for `fred-fetch --list macro.txt`;
+# with rates.txt, what Fisher, Wicksell, Taylor and Woodford need. Monthly
+# unless noted. (r*, Laubach–Williams, is the New York Fed's, not FRED's.)
+
+# Inflation: prices (with CPIAUCSL and CPIAUCNS in rates.txt)
+PCEPI                   # PCE price index, 1959– (the Fed's 2% is measured on this)
+PCEPILFE                # core PCE, excluding food and energy, 1959–
+CPILFESL                # core CPI, 1957–
+GDPDEF                  # GDP deflator, quarterly, 1947–
+PPIACO                  # producer prices, all commodities, 1913–
+
+# Inflation expected (with T10YIEM and EXPINF10YR in rates.txt)
+MICH                    # University of Michigan, 1-year ahead, households, 1978–
+EXPINF1YR               # 1-year expected inflation (Cleveland Fed model), 1982–
+T5YIEM                  # 5-year breakeven inflation, 2003–
+T5YIFRM                 # 5-year, 5-year forward inflation expectation, 2003–
+
+# Real rates, market (with FII10 in rates.txt)
+FII5                    # 5-year TIPS yield, 2003–
+
+# Output and its gap: Taylor's other term
+GDPC1                   # real GDP, quarterly, 1947–
+GDPPOT                  # real potential GDP (CBO), quarterly, 1949–
+UNRATE                  # unemployment rate, 1948–
+NROU                    # natural rate of unemployment, long-term (CBO), quarterly, 1949–
+
+# Policy
+DFEDTARU                # federal funds target, upper limit, daily, 2008–
+DFEDTARL                # federal funds target, lower limit, daily, 2008–
+DFEDTAR                 # federal funds target, daily, 1982–2008
+WALCL                   # Fed's total assets ($m), weekly, 2002–
+
+# Money: Fisher's M and V
+M2SL                    # M2 ($bn), 1959–
+M2V                     # velocity of M2, quarterly, 1959–
+BOGMBASE                # monetary base ($m), 1959–
+
+# Exchange rates: for companies reporting in another currency
+DEXTAUS                 # Taiwan dollars per US dollar, daily, 1983–

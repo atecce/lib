@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Morning InfluxDB push of the S&P 500 companies with new filings (run.sh), at 06:00, after
+  the night's EDGAR fetch (edgar/nightly/all.sh), or on wake if the
+  Mac was asleep then. For a checkout elsewhere, substitute its path:
+  Install: sed "s|/Users/atec/lib|$LIB|g" pub.atec.equities.nightly.plist > ~/Library/LaunchAgents/pub.atec.equities.nightly.plist &&
+           launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/pub.atec.equities.nightly.plist
+  Run now: launchctl kickstart gui/$(id -u)/pub.atec.equities.nightly
+  Remove:  launchctl bootout gui/$(id -u)/pub.atec.equities.nightly && rm ~/Library/LaunchAgents/pub.atec.equities.nightly.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>pub.atec.equities.nightly</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/caffeinate</string>
+		<string>-ims</string>
+		<string>/Users/atec/lib/equities/nightly/run.sh</string>
+		<string>equities/sp500/all.txt</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/atec/lib</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>6</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/atec/lib/equities/nightly/launchd.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/atec/lib/equities/nightly/launchd.log</string>
+	<key>SoftResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>4096</integer>
+	</dict>
+</dict>
+</plist>
