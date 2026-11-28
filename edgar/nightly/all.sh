@@ -8,7 +8,8 @@
 #
 #     all.sh
 #
-# Fetch only: equities/nightly/run.sh pushes to InfluxDB in the morning.
+# Fetch only, into edgar/cache: no database. equities/nightly/run.sh reads
+# the cache in the morning for its lists and writes Postgres.
 #
 # The first run fills the cache over a few days (about two million requests at
 # the SEC's limit); filings already on disk are skipped, so an interrupted run
