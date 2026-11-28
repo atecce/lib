@@ -71,6 +71,8 @@ fn report() {
             other_expense_income_net: -41_000_000.0,
 
             provision_for_income_taxes: 19_000_000.0,
+
+            net_income_attributable_to_noncontrolling_interests: 19_000_000.0,
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 6, 30).unwrap(),
@@ -98,6 +100,8 @@ fn report() {
             other_expense_income_net: -15_000_000.0,
 
             provision_for_income_taxes: 42_000_000.0,
+
+            net_income_attributable_to_noncontrolling_interests: 53_000_000.0,
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
@@ -125,6 +129,8 @@ fn report() {
             other_expense_income_net: -15_000_000.0,
 
             provision_for_income_taxes: 21_000_000.0,
+
+            net_income_attributable_to_noncontrolling_interests: 25_000_000.0,
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 6, 30).unwrap(),
@@ -152,6 +158,8 @@ fn report() {
             other_expense_income_net: -69_000_000.0,
 
             provision_for_income_taxes: 23_000_000.0,
+
+            net_income_attributable_to_noncontrolling_interests: 77_000_000.0,
         },
     ];
 

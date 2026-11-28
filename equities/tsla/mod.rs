@@ -115,6 +115,9 @@ pub struct IncomeStatement {
     pub other_expense_income_net: f64,
 
     pub provision_for_income_taxes: f64,
+    /// Net income of minority holders in subsidiaries (and redeemable
+    /// ones), which the parent's net income excludes.
+    pub net_income_attributable_to_noncontrolling_interests: f64,
 }
 
 impl Statement for IncomeStatement {
@@ -135,6 +138,13 @@ impl IS for IncomeStatement {
     }
     fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.provision_for_income_taxes
+    }
+}
+
+impl IncomeStatement {
+    /// The parent's: net income less the minority holders' share.
+    fn net_income_attributable_to_common_stockholders(&self) -> f64 {
+        IS::net_income(self) - self.net_income_attributable_to_noncontrolling_interests
     }
 }
 
@@ -361,7 +371,8 @@ impl_reported! {
         OtherIncomeNet => field other_expense_income_net,
         IncomeBeforeIncomeTax => method income_before_income_tax,
         IncomeTaxExpense => field provision_for_income_taxes,
-        NetIncome => method net_income,
+        ProfitLoss => method net_income,
+        NetIncome => method net_income_attributable_to_common_stockholders,
     ]
 }
 

@@ -55,8 +55,10 @@ mod filings {
         // Each business's debt, short-term and long-term.
         assert_eq!(get(Item::AutomotiveDebt, Period::PointInTime), Some((656.0 + 15_591.0) * M));
         assert_eq!(get(Item::FinancialServicesDebt, Period::PointInTime), Some((35_012.0 + 79_018.0) * M));
-        // Including minority interests ("Net income (loss)", ProfitLoss).
-        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(2_780.0 * M));
+        // The parent's ("attributable to stockholders", NetIncomeLoss), and
+        // the consolidated figure.
+        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(2_697.0 * M));
+        assert_eq!(get(Item::ProfitLoss, Period::TwelveMonths), Some(2_780.0 * M));
         assert_eq!(get(Item::EarningsPerShareDiluted, Period::TwelveMonths), Some(3.27));
     }
 }

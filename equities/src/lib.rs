@@ -624,3 +624,18 @@ mod bank_revenue_tests {
         assert!(revenue.contains(&("2025-06-30".into(), 480.0, false)));
     }
 }
+
+/// Net income where a filing states only the consolidated figure
+/// (ProfitLoss, minority interests included) and not the parent's: that
+/// figure, marked derived, so return on equity and earnings yield still
+/// have one. Where the parent's is stated, it stands.
+pub fn derive_net_income(items: &mut Vec<crate::item::Reported>) {
+    let key = |r: &crate::item::Reported| (r.ticker, r.date, r.p, r.currency);
+    let have: std::collections::HashSet<_> = items.iter().filter(|r| r.item == Item::NetIncome).map(key).collect();
+    let mut seen = std::collections::HashSet::new();
+    let derived: Vec<_> = items.iter()
+        .filter(|r| r.item == Item::ProfitLoss && !have.contains(&key(r)) && seen.insert(key(r)))
+        .map(|r| crate::item::Reported { item: Item::NetIncome, derived: true, ..r.clone() })
+        .collect();
+    items.extend(derived);
+}

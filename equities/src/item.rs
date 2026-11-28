@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 97] = [
+            pub const ALL: [$item; 98] = [
                 $($item::$variant,)*
             ];
 
@@ -225,7 +225,16 @@ items! {
         // 当期利益 (tōki rieki): profit for the period
         // 当期純利益 (tōki jun rieki): net income for the period
         // 親会社株主に帰属する当期純利益 (oyagaisha kabunushi ni kizoku suru tōki jun rieki): net income attributable to owners of the parent
-        NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss", "当期利益", "当期純利益", "親会社株主に帰属する当期純利益"] @ ["ProfitLoss", "NetIncomeLoss", "ifrs-full_ProfitLoss", "jpigp_cor:ProfitLossIFRS", "jppfs_cor:ProfitLoss", "jpigp_cor:ProfitLossAttributableToOwnersOfParentIFRS", "jppfs_cor:ProfitLossAttributableToOwnersOfParent"],
+        // Net income as the standards define it: the parent's (us-gaap
+        // NetIncomeLoss, IFRS's attributable to owners of the parent), what
+        // EPS and return on equity are about. Available to common
+        // stockholders (after preferred dividends) only where that isn't
+        // tagged; the consolidated figure (ProfitLoss, below) where neither
+        // is (derive_net_income).
+        NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss", "親会社株主に帰属する当期純利益"] @ ["NetIncomeLoss", "ifrs-full_ProfitLossAttributableToOwnersOfParent", "jpigp_cor:ProfitLossAttributableToOwnersOfParentIFRS", "jppfs_cor:ProfitLossAttributableToOwnersOfParent", "NetIncomeLossAvailableToCommonStockholdersBasic"],
+        // 当期利益 (tōki rieki), 当期純利益: profit for the period, all owners.
+        // The consolidated figure, minority interests included.
+        ProfitLoss => ["当期利益", "当期純利益"] @ ["ProfitLoss", "ifrs-full_ProfitLoss", "jpigp_cor:ProfitLossIFRS", "jppfs_cor:ProfitLoss"],
 
         // Per share and share counts, for valuation (market cap, P/E). Read
         // by tag only: their labels ("Basic", "Diluted") say nothing alone.

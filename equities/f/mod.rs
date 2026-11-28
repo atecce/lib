@@ -65,9 +65,11 @@ mod filings {
         // up to the total.
         assert_eq!(get(Item::AutomotiveRevenue, Period::TwelveMonths), Some(173_996.0 * M));
         assert_eq!(get(Item::FinancialServicesRevenue, Period::TwelveMonths), Some(13_271.0 * M));
-        // Net loss including minority interests ("Net income/(loss)",
-        // ProfitLoss: the shared rank's first), and per share.
-        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(-8_162.0 * M));
+        // Net loss: the parent's ("attributable to Ford Motor Company",
+        // tagged available to common stockholders, Ford having no
+        // NetIncomeLoss), and the consolidated figure; and per share.
+        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(-8_182.0 * M));
+        assert_eq!(get(Item::ProfitLoss, Period::TwelveMonths), Some(-8_162.0 * M));
         assert_eq!(get(Item::EarningsPerShareDiluted, Period::TwelveMonths), Some(-2.06));
     }
 }

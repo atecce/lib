@@ -119,6 +119,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         equities::merge_nearby_dates(&mut items);
         equities::derive_quarters(&mut items);
         equities::derive_bank_revenue(&mut items);
+        equities::derive_net_income(&mut items);
         let mut book = equities::book_value_per_share(&items);
         items.append(&mut book);
 

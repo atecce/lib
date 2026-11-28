@@ -522,7 +522,8 @@ impl_reported! {
         InterestExpense => method interest_expense,
         IncomeBeforeIncomeTax => method income_before_income_tax,
         IncomeTaxExpense => field income_tax_expense,
-        NetIncome => method net_income,
+        ProfitLoss => method net_income,
+        NetIncome => method net_earnings_attributable_to_berkshire,
     ]
 }
 

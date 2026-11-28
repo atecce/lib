@@ -93,7 +93,10 @@ mod filings {
             .find(|r| r.item == item && r.p == p && r.date == year_end && r.currency == Currency::JPY).map(|r| r.val);
         assert_eq!(get(Item::Revenue, Period::TwelveMonths), Some(50_684_952.0 * M));
         assert_eq!(get(Item::OperatingIncome, Period::TwelveMonths), Some(3_766_216.0 * M));
-        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(3_985_761.0 * M));
+        // The parent's ("attributable to Toyota Motor Corporation"), and the
+        // consolidated figure.
+        assert_eq!(get(Item::NetIncome, Period::TwelveMonths), Some(3_848_098.0 * M));
+        assert_eq!(get(Item::ProfitLoss, Period::TwelveMonths), Some(3_985_761.0 * M));
         assert_eq!(get(Item::TotalAssets, Period::PointInTime), Some(105_522_331.0 * M));
         assert_eq!(get(Item::TotalLiabilities, Period::PointInTime), Some(64_502_263.0 * M));
         // Its own elements: receivables of its lending arm, and its leases.
