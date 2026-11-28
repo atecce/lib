@@ -52,3 +52,4 @@ path = "src/bin/rstar.rs"
 # The examples only (augurs: outliers in a series read from a workbook).
 [dev-dependencies]
 augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
+regex = "1.12.4"

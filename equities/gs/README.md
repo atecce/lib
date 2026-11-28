@@ -54,8 +54,8 @@ a tax benefit from the change of form.
 
 ## Residual income per share
 
-    cargo run --release -p equities --example gs_history            # r = 9%
-    cargo run --release -p equities --example gs_history -- --premium 0.04
+    cargo run --release -p store --example gs_history            # r = 9%
+    cargo run --release -p store --example gs_history -- --premium 0.04
 
 Per common share, so preferred stock is left out: ROE is diluted EPS over
 opening book value per common share, and residual income is

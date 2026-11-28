@@ -2,7 +2,7 @@
 //! figures in `equities::aapl::BEFORE_XBRL` and the Tiingo price history:
 //! the same columns as `backtest`'s persistence example prints from 2011.
 //!
-//!     cargo run --release -p equities --example aapl_history [-- R]     # R defaults to 0.09
+//!     cargo run --release -p store --example aapl_history [-- R]     # R defaults to 0.09
 
 use equities::aapl::BEFORE_XBRL;
 

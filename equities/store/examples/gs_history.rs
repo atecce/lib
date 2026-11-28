@@ -1,8 +1,8 @@
 //! Goldman Sachs's residual income per common share, fiscal 2000–2025, from
 //! `equities::gs` (the 10-Ks) and its prices (Tiingo, from the May 1999 IPO).
 //!
-//!     cargo run --release -p equities --example gs_history [-- R]     # R defaults to 0.09
-//!     cargo run --release -p equities --example gs_history -- --premium P
+//!     cargo run --release -p store --example gs_history [-- R]     # R defaults to 0.09
+//!     cargo run --release -p store --example gs_history -- --premium P
 //!
 //! With `--premium`, r is the 10-year Treasury yield at the end of the year
 //! before (`equities::treasury`, from the FRED cache) plus P.

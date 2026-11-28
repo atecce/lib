@@ -1,7 +1,7 @@
 //! A fund's portfolio from its latest N-PORT report on disk:
 //!
 //!     edgar-funds
-//!     cargo run --release -p equities --example fund_holdings -- MINT [--top 20]
+//!     cargo run --release -p store --example fund_holdings -- MINT [--top 20]
 //!
 //! Net assets and the report date; the portfolio by asset category, issuer
 //! type and country (percent of net assets); for debt, the coupon type and,

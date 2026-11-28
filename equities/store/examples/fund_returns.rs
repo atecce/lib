@@ -2,7 +2,7 @@
 //! calendar year, against 3-month Treasury bills (FRED, TB3MS):
 //!
 //!     edgar-funds && fred-fetch TB3MS
-//!     cargo run --release -p equities --example fund_returns -- MINT EWT EWJ
+//!     cargo run --release -p store --example fund_returns -- MINT EWT EWJ
 //!
 //! For each ticker, the N-CEN census first (ETF? index fund? its tracking
 //! difference), then a row per year: the fund's return, the bills', and the

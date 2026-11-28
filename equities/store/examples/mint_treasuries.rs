@@ -2,7 +2,7 @@
 //! Treasury curve, from its launch in November 2009:
 //!
 //!     fred-fetch --list fred/rates.txt && tiingo-fetch --full MINT SPY
-//!     cargo run --release -p equities --example mint_treasuries
+//!     cargo run --release -p store --example mint_treasuries
 //!
 //! 1. By year: MINT's total return (Tiingo's adjusted closes, distributions
 //!    reinvested) against rolling 1- and 3-month bills (each day accruing

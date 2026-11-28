@@ -2,7 +2,7 @@
 //! quarter, from late 2019):
 //!
 //!     edgar-funds && fred-fetch DGS3MO
-//!     cargo run --release -p equities --example fund_history -- MINT
+//!     cargo run --release -p store --example fund_history -- MINT
 //!
 //! Per report: net assets; fixed- and floating-rate debt; the fixed-rate
 //! debt maturing within a year and its weighted maturity; corporate and

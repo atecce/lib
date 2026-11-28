@@ -3491,6 +3491,7 @@ dependencies = [
  "mops",
  "plaid",
  "postgres",
+ "regex",
  "reqwest",
  "serde_json",
  "tiingo",

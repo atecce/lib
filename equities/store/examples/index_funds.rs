@@ -1,7 +1,7 @@
 //! Every index fund in the N-CEN census (each series' latest filing), with
 //! its share classes' tickers:
 //!
-//!     cargo run --release -p equities --example index_funds [-- --etf] [--tickers]
+//!     cargo run --release -p store --example index_funds [-- --etf] [--tickers]
 //!
 //! `--etf` keeps only exchange-traded funds. `--tickers` prints just the
 //! tickers, one per line, for `tiingo-fetch --list`. Otherwise a summary,

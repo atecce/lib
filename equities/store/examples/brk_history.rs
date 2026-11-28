@@ -3,8 +3,8 @@
 //! (Tiingo; before them, the scorecard's market changes scaled to the 2018
 //! close).
 //!
-//!     cargo run --release -p equities --example brk_history [-- R]     # R defaults to 0.09
-//!     cargo run --release -p equities --example brk_history -- --premium P
+//!     cargo run --release -p store --example brk_history [-- R]     # R defaults to 0.09
+//!     cargo run --release -p store --example brk_history -- --premium P
 //!
 //! With `--premium`, r moves year by year: the 10-year Treasury yield at the
 //! end of the year before (`equities::treasury`, from the FRED cache:

@@ -3,7 +3,7 @@
 //! have done:
 //!
 //!     edgar-funds && fred-fetch MORTGAGE30US DGS3MO MMMFFAQ027S WRMFNS
-//!     cargo run --release -p equities --example fund_flows -- MINT
+//!     cargo run --release -p store --example fund_flows -- MINT
 //!
 //! Per quarter: the fund's net flow and net assets ($bn); the 30-year
 //! mortgage rate (Freddie Mac's survey, the quarter's average) and the

@@ -66,6 +66,9 @@ pub(crate) mod testing;
 
 pub mod item;
 pub mod xlsx;
+/// The calamine `equities` reads workbooks with, for tools that read its
+/// cells (store's examples): one version, whatever else a caller links.
+pub use calamine;
 pub mod filing;
 pub mod edinet;
 pub mod mops;

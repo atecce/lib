@@ -5,7 +5,7 @@
 //! Usage: tag_survey <edgar cache dir>
 use std::collections::BTreeMap;
 
-use calamine::DataType;
+use equities::calamine::DataType;
 use equities::filing;
 use equities::item::Item;
 
