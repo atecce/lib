@@ -432,23 +432,6 @@ checksum = "776dfebd015e2d8732c684a2c71003674ccb49457b539b9e82151ba38e96dd7c"
 
 [[package]]
 name = "calamine"
-version = "0.34.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20ae05a4e39297eecf9a994210d27501318c37a9318201f8e11050add82bb6f0"
-dependencies = [
- "atoi_simd 0.17.0",
- "byteorder",
- "codepage",
- "encoding_rs",
- "fast-float2",
- "log",
- "quick-xml 0.39.4",
- "serde",
- "zip 7.2.0",
-]
-
-[[package]]
-name = "calamine"
 version = "0.35.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8822fe6253ca47aa5ad9a3be09f6fe7cd20c6a74e41b0aa42e8f4e3d523508df"
@@ -1794,22 +1777,9 @@ name = "lib"
 version = "0.1.0"
 dependencies = [
  "bible",
- "calamine 0.34.0",
- "chrono",
- "csv",
  "daemon",
- "edgar",
- "edinet",
- "equities",
- "fred",
  "greece",
- "mops",
  "name",
- "reqwest",
- "serde",
- "serde_json",
- "store",
- "tiingo",
  "uniffi",
 ]
 
@@ -3514,8 +3484,11 @@ dependencies = [
  "calamine 0.38.0",
  "chrono",
  "csv",
+ "edgar",
+ "edinet",
  "equities",
  "fred",
+ "mops",
  "plaid",
  "postgres",
  "reqwest",

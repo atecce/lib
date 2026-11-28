@@ -173,8 +173,8 @@ ORDER BY ticker, date DESC;
 createdb financials
 # Write companies to it (migrations run on connect; STORE_URL overrides
 # host=localhost dbname=financials):
-lib --postgres AAPL TM 7203.T       # Postgres and InfluxDB
-lib --postgres-only AAPL TM 7203.T  # Postgres alone
+store-equities --postgres-only AAPL TM 7203.T   # read, derive, value, write
+store-equities --dry-run AAPL                   # the series, printed, nothing written
 # Each issuer's SIC industry code, from EDGAR's list of filers:
 universe | store-sic
 # Residual income persistence against the industry (equities/VALUATION.md §8):

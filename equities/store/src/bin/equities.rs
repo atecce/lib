@@ -1,3 +1,15 @@
+//! The equities batch job: each company's filings (EDGAR, EDINET, MOPS
+//! caches) and prices (tiingo) read, passed through `equities` (items,
+//! derived quarters, valuation), and written to Postgres, one company at a
+//! time. Run nightly by equities/nightly/run.sh and by equities/sp500/run.sh.
+//!
+//!     store-equities --postgres-only AAPL TM 7203.T
+//!     store-equities --dry-run AAPL
+//!
+//! It was the root package's src/main.rs; it lives with the other jobs that
+//! read a source and write Postgres (store-fred, store-plaid, ...), so the
+//! root crate is a library and equities needs none of the IO.
+
 use std::error::Error;
 
 use equities::Reader;

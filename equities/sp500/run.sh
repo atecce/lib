@@ -26,7 +26,7 @@ while true; do
   echo "=== $src batch: $(echo $batch | tr '\n' ' ')" | tee -a $S/progress.log
   log=$S/log.$(date +%Y%m%d-%H%M%S)
   # fetch brings the EDGAR cache up to date; lib reads it and pushes.
-  if ./target/release/fetch $(echo $batch) > $log 2>&1 && ./target/release/lib $(echo $batch) >> $log 2>&1; then
+  if ./target/release/fetch $(echo $batch) > $log 2>&1 && ./target/release/store-equities $(echo $batch) >> $log 2>&1; then
     echo $batch >> $S/done_tickers.txt
     echo "    ok: $(tail -1 $log)" | tee -a $S/progress.log
   else
