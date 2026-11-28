@@ -35,12 +35,14 @@ pub struct Reader {
     ticker: Ticker,
     reports: Vec<Report>,
     pages: Pages,
+    /// What the reader left out and why, for the caller to report.
+    warnings: std::cell::RefCell<Vec<String>>,
 }
 
 /// A filing from its index (FilingSummary.xml's text) and its pages: no
 /// files, no network; `pages` is the caller's.
 pub fn reader(name: impl Into<String>, summary: &str, ticker: Ticker, pages: Pages) -> Reader {
-    Reader { name: name.into(), ticker, reports: parse_filing_summary(summary), pages }
+    Reader { name: name.into(), ticker, reports: parse_filing_summary(summary), pages, warnings: Default::default() }
 }
 
 /// A filing from a folder on disk (an EDGAR cache's accession folder, or a
@@ -218,6 +220,12 @@ impl Reader {
         &self.reports
     }
 
+    /// What reading left out so far (columns under headings with no known
+    /// period), for the caller to report: the reader prints nothing.
+    pub fn warnings(&self) -> Vec<String> {
+        self.warnings.borrow().clone()
+    }
+
     /// Read one statement page. Each row's item comes from its XBRL element
     /// (see `row_item`); the statement only reports items that belong on it.
     fn process(&self, report: Option<&Report>, sheet_type: SheetType, what: &str) -> Result<Vec<Reported>, Box<dyn Error>> {
@@ -235,6 +243,10 @@ impl Reader {
         drop_segment_rows(&rows, &tags, &mut items);
         let balance_sheet = sheet_type == SheetType::BalanceSheet;
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
+        if !sheet_info.skipped.is_empty() {
+            self.warnings.borrow_mut().push(format!("{} ({}): skipped columns under unrecognized period heading(s) {:?}",
+                report.file, what, sheet_info.skipped));
+        }
         let mut debt = if balance_sheet { total_debt(self.ticker, &rows, &tags, &sheet_info) } else { Vec::new() };
         let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
         reported.append(&mut debt);

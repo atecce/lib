@@ -35,6 +35,10 @@ pub struct SheetInfo {
     /// Currency of each date column whose header names one ("Dec. 31, 2025
     /// TWD ($)"); columns without one are in US dollars.
     pub currencies: HashMap<usize, Currency>,
+    /// Columns left out because their heading names no period the reader
+    /// knows: the headings, for the caller to report (the reader prints
+    /// nothing).
+    pub skipped: Vec<String>,
 }
 
 /// The dollar scale stated in a header cell. EDGAR headers name the share and
@@ -303,11 +307,12 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         unknown_headings.retain(|c, _| !four_month_heads.contains(c));
     }
 
+    let mut skipped_headings = Vec::new();
     if !unknown_cols.is_empty() {
         let mut headings: Vec<&str> = unknown_headings.values().map(String::as_str).collect();
         headings.sort();
         headings.dedup();
-        eprintln!("skipping {} column(s) under unrecognized period heading(s) {:?}", unknown_cols.len(), headings);
+        skipped_headings = headings.iter().map(|h| h.to_string()).collect();
         dates_and_periods.retain(|c, _| !unknown_cols.contains(c));
         if dates_and_periods.is_empty() { return Err("no columns with a recognized period".into()); }
     }
@@ -321,6 +326,7 @@ pub fn new_sheet_info(rows: &[&[Data]], sheet_type: SheetType) -> Result<SheetIn
         share_multiplier: share_multiplier.unwrap_or(1.0),
         sheet_type: sheet_type,
         currencies: currencies,
+        skipped: skipped_headings,
     })
 }
 

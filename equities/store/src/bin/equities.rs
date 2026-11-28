@@ -336,6 +336,7 @@ fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &m
                     if let Ok(mut ret) = r.process_cover() {
                         reported_items.append(&mut ret);
                     }
+                    for w in r.warnings() { eprintln!("{}: {}", name, w) }
                 },
                 Err(e) => eprintln!("failed to read {}: {}", name, e),
             },
