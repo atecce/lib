@@ -422,6 +422,3 @@ mod own_element_tests {
     }
 }
 
-/// Known-answer tests: filings read, against statements transcribed by hand.
-#[cfg(test)]
-mod filings;

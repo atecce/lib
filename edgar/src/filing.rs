@@ -18,12 +18,12 @@ use calamine::Data;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
-use crate::item::{Item, Reported};
+use equities::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetType};
-use crate::Reader as R;
-use crate::Ticker;
+use equities::Reader as R;
+use equities::Ticker;
 
-pub use edgar::{parse_filing_summary, Report};
+pub use crate::{parse_filing_summary, Report};
 
 /// A page's text by its file name (`R2.htm`), from wherever the caller keeps
 /// the filing: the reader asks only for the pages it reads.
@@ -241,7 +241,7 @@ impl Reader {
         let mut debt = if balance_sheet { total_debt(self.ticker, &rows, &tags, &sheet_info) } else { Vec::new() };
         let mut reported = crate::xlsx::Reader::reported_items_with(self.ticker, &rows, sheet_info, |r, _| items[r])?;
         reported.append(&mut debt);
-        crate::calibrate_shares(&mut reported);
+        equities::calibrate_shares(&mut reported);
         Ok(reported)
     }
 
@@ -293,7 +293,7 @@ impl Reader {
             }
         }
         let (date, val) = total.ok_or("no shares outstanding on the cover page")?;
-        Ok(vec![Reported { ticker: self.ticker, date, p: crate::Period::PointInTime, item: Item::SharesOutstanding, currency: crate::Currency::USD, val, filing: None, derived: false }])
+        Ok(vec![Reported { ticker: self.ticker, date, p: equities::Period::PointInTime, item: Item::SharesOutstanding, currency: equities::Currency::USD, val, filing: None, derived: false }])
     }
 
     /// 10-Qs only report cash flows year to date (3, 6, 9 months); see
@@ -334,7 +334,7 @@ fn drop_segment_rows(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], it
             current = Some(r);
             // "[Member]", or "[member]" (Honda).
             let member = l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim();
-            if let Some(item) = crate::company::label_item(ticker, l).or_else(|| crate::company::label_item(ticker, member)) {
+            if let Some(item) = equities::company::label_item(ticker, l).or_else(|| equities::company::label_item(ticker, member)) {
                 member_items.insert(r, item);
             }
         }
@@ -463,7 +463,7 @@ fn total_debt(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], info: &cr
     }
     let make = |item: Item, col: usize, v: f64| {
         let (date, p) = info.dates_and_periods[&col];
-        Reported { ticker, date, p, item, currency: info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD), val: v * info.multiplier, filing: None, derived: false }
+        Reported { ticker, date, p, item, currency: info.currencies.get(&col).copied().unwrap_or(equities::Currency::USD), val: v * info.multiplier, filing: None, derived: false }
     };
     let mut totals: HashMap<usize, f64> = HashMap::new();
     let mut out = Vec::new();
@@ -472,7 +472,7 @@ fn total_debt(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], info: &cr
         // A car maker's automotive or lending section, by the item its
         // member names (as for revenue).
         let part = s.map(|l| l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim())
-            .and_then(|m| crate::company::label_item(ticker, m));
+            .and_then(|m| equities::company::label_item(ticker, m));
         match part {
             Some(Item::AutomotiveRevenue) => out.push(make(Item::AutomotiveDebt, *col, *v)),
             Some(Item::FinancialServicesRevenue) => out.push(make(Item::FinancialServicesDebt, *col, *v)),
@@ -504,14 +504,14 @@ fn is_extension(tag: &str) -> bool {
 ///
 /// Visible to the crate, so a company's module can test how its own rows
 /// read (gs).
-pub(crate) fn row_item(ticker: Ticker, tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
-    let by_label = || label.and_then(|l| crate::company::label_item(ticker, l)).map(|i| (i, 0));
+pub fn row_item(ticker: Ticker, tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
+    let by_label = || label.and_then(|l| equities::company::label_item(ticker, l)).map(|i| (i, 0));
     match tag {
         None => by_label(),
         Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax")
             if !label.is_some_and(|l| { let l = l.to_lowercase(); l.contains("revenue") || l.contains("sales") }) => None,
         // The company's own elements first (its module), then the shared.
-        Some(tag) => match crate::company::item_ranked(ticker, tag) {
+        Some(tag) => match equities::company::item_ranked(ticker, tag) {
             Some(item) => Some(item),
             None if is_extension(tag) || tag.ends_with("Axis") || tag.ends_with("Member") => by_label(),
             None => None,
@@ -573,5 +573,48 @@ mod tests {
     fn hidden_xbrl_tags() {
         let html = r#"<table class="report"><tr><td>Cash</td><td class="nump"><a>$ 19,478</a><span style="display:none;white-space:normal;">us-gaap_Cash</span><span></span></td></tr></table>"#;
         assert_eq!(table_rows(html).unwrap()[0], vec![Data::String("Cash".into()), Data::Float(19478.0)]);
+    }
+}
+
+/// An EDGAR filing: its index and the pages it lists, read as `Statements`
+/// (equities' interface for every source's filings).
+pub struct EdgarFiling {
+    filed: equities::item::Filed,
+    reader: Reader,
+}
+
+impl EdgarFiling {
+    /// `summary`: FilingSummary.xml's text; `pages`: a page's text by file
+    /// name, as the reader asks for it.
+    pub fn new(filed: equities::item::Filed, ticker: Ticker, summary: &str, pages: Pages) -> EdgarFiling {
+        let name = format!("{} {} {} ({})", ticker, filed.form, filed.period_end.map(|d| d.to_string()).unwrap_or_default(), filed.accession);
+        EdgarFiling { reader: reader(name, summary, ticker, pages), filed }
+    }
+}
+
+impl equities::statements::Statements for EdgarFiling {
+    fn filed(&self) -> &equities::item::Filed { &self.filed }
+
+    fn read(&mut self) -> equities::statements::Read {
+        let mut read = equities::statements::Read::default();
+        let parts: [(&str, Result<Vec<Reported>, Box<dyn Error>>); 3] = [
+            ("balance sheet", self.reader.process_balance_sheet()),
+            ("income statement", self.reader.process_income_statement()),
+            ("cash flow statement", self.reader.process_cash_flow_statement()),
+        ];
+        for (what, got) in parts {
+            match got {
+                Ok(mut items) => read.items.append(&mut items),
+                Err(e) => read.notes.push(format!("no {}: {}", what, e)),
+            }
+        }
+        // Older filings' cover pages may not be fetched: nothing to note.
+        if let Ok(mut items) = self.reader.process_cover() { read.items.append(&mut items) }
+        read.notes.extend(self.reader.warnings());
+        // Everything read from this filing carries it.
+        for it in &mut read.items {
+            if it.filing.is_none() { it.filing = Some(self.filed.clone()) }
+        }
+        read
     }
 }

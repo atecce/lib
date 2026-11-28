@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::error::Error;
 
-use crate::{Currency, Period};
+use equities::{Currency, Period};
 
 static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(r"^(.*?\d{4})\s+([A-Z]{3}) \(.*$").unwrap()
@@ -13,7 +13,7 @@ static COLUMN_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock:
 static TITLE_CURRENCY: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
     regex::Regex::new(r" - ([A-Z]{3}) \(|\(([A-Z]{3}) [^)\w]+\)").unwrap()
 });
-use crate::item::Item;
+use equities::item::Item;
 
 use calamine::{Data, DataType};
 use chrono::{Datelike, NaiveDate};

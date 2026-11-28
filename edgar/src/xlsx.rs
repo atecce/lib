@@ -1,9 +1,9 @@
 use std::error::Error;
 use std::io::Cursor;
 
-use crate::Ticker;
-use crate::Reader as R;
-use crate::item::{Item, Reported};
+use equities::Ticker;
+use equities::Reader as R;
+use equities::item::{Item, Reported};
 use crate::sheet_info::{new_sheet_info, SheetInfo, SheetType};
 use crate::sheet_info::SheetType::{BalanceSheet, IncomeStatement, CashFlowStatement};
 
@@ -102,7 +102,7 @@ impl Reader {
     pub(crate) fn reported_items(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
         let labels = sheet_info.labels;
         Self::reported_items_with(ticker, rows, sheet_info, |_, row| {
-            row.get(labels).and_then(|c| c.get_string()).and_then(|label| crate::company::label_item(ticker, label)).map(|i| (i, 0))
+            row.get(labels).and_then(|c| c.get_string()).and_then(|label| equities::company::label_item(ticker, label)).map(|i| (i, 0))
         })
     }
 
@@ -154,7 +154,7 @@ impl Reader {
                             Some(Data::Float(f)) => (*f, false),
                             Some(Data::Int(i)) => (*i as f64, false),
                             // Only money: an EPS or share count left empty is unknown, not zero.
-                            Some(Data::Empty) | None if has_value && item.unit() == crate::item::Unit::Money
+                            Some(Data::Empty) | None if has_value && item.unit() == equities::item::Unit::Money
                                 && main_column(col) => (0.0, true),
                             _ => (f64::NAN, false),
                         };
@@ -162,17 +162,17 @@ impl Reader {
                         match sheet_info.sheet_type {
                             crate::sheet_info::SheetType::CashFlowStatement => {
                                 match item {
-                                    crate::Item::Inventories => {
-                                        item = crate::Item::ChangeInInventories;
+                                    equities::item::Item::Inventories => {
+                                        item = equities::item::Item::ChangeInInventories;
                                     },
-                                    crate::Item::AccountsPayable => {
-                                        item = crate::Item::ChangeInAccountsPayable;
+                                    equities::item::Item::AccountsPayable => {
+                                        item = equities::item::Item::ChangeInAccountsPayable;
                                     },
-                                    crate::Item::AccruedAndOtherCurrentLiabilities => {
-                                        item = crate::Item::ChangeInAccruedAndOtherCurrentLiabilities;
+                                    equities::item::Item::AccruedAndOtherCurrentLiabilities => {
+                                        item = equities::item::Item::ChangeInAccruedAndOtherCurrentLiabilities;
                                     },
-                                    crate::Item::OtherLongTermLiabilities => {
-                                        item = crate::Item::ChangeInOtherLongTermLiabilities;
+                                    equities::item::Item::OtherLongTermLiabilities => {
+                                        item = equities::item::Item::ChangeInOtherLongTermLiabilities;
                                     },
                                     _ => (),
                                 }
@@ -182,11 +182,11 @@ impl Reader {
 
                         if val.is_nan() { continue; }
                         let val = val * match item.unit() {
-                            crate::item::Unit::Money => sheet_info.multiplier,
-                            crate::item::Unit::Shares => sheet_info.share_multiplier,
-                            crate::item::Unit::PerShare => 1.0,
+                            equities::item::Unit::Money => sheet_info.multiplier,
+                            equities::item::Unit::Shares => sheet_info.share_multiplier,
+                            equities::item::Unit::PerShare => 1.0,
                         };
-                        let currency = sheet_info.currencies.get(&col).copied().unwrap_or(crate::Currency::USD);
+                        let currency = sheet_info.currencies.get(&col).copied().unwrap_or(equities::Currency::USD);
                         match seen.get_mut(&(item, *date, *period, currency)) {
                             None => {
                                 seen.insert((item, *date, *period, currency), (reported_items.len(), filled, rank));

@@ -64,20 +64,11 @@ pub mod f;
 pub mod gm;
 pub mod company;
 pub mod statements;
-#[cfg(test)]
-pub(crate) mod testing;
-
 pub mod item;
-pub mod xlsx;
-/// The calamine `equities` reads workbooks with, for tools that read its
-/// cells (store's examples): one version, whatever else a caller links.
-pub use calamine;
-pub mod filing;
 pub mod edinet;
 pub mod mops;
 pub mod valuation;
 pub mod treasury;
-pub mod sheet_info;
 
 use std::str::FromStr;
 
@@ -360,7 +351,7 @@ pub trait CashFlowStatement {
 /// noncontrolling interests and rounding), in every column. Where that
 /// product is consistently off by a power of 1,000, the shares are rescaled
 /// by it. Columns with EPS under 10 cents are too coarse to tell.
-pub(crate) fn calibrate_shares(items: &mut [Reported]) {
+pub fn calibrate_shares(items: &mut [Reported]) {
     use std::collections::HashMap;
     use crate::item::Unit;
 

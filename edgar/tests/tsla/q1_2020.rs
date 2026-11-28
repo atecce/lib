@@ -1,15 +1,15 @@
 
-use crate::Reader;
-use crate::tsla::BalanceSheet;
-use crate::tsla::IncomeStatement;
+use equities::Reader;
+use equities::tsla::BalanceSheet;
+use equities::tsla::IncomeStatement;
 
-use crate::item::Item::RestructuringAndOther;
+use equities::item::Item::RestructuringAndOther;
 
 #[test]
 fn report() {
 
     let balance_sheets = vec![
-        crate::tsla::Q4_2019_BALANCE_SHEET,
+        equities::tsla::Q4_2019_BALANCE_SHEET,
         BalanceSheet {
             date: chrono::NaiveDate::from_ymd_opt(2020, 03, 31).unwrap(),
 
@@ -47,7 +47,7 @@ fn report() {
     let income_statements = vec![
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2019, 3, 31).unwrap(),
-            period: crate::Period::ThreeMonths,
+            period: equities::Period::ThreeMonths,
 
             automotive_sales_revenue: 3_509_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -76,7 +76,7 @@ fn report() {
         },
         IncomeStatement {
             date: chrono::NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-            period: crate::Period::ThreeMonths,
+            period: equities::Period::ThreeMonths,
 
             automotive_sales_revenue: 4_893_000_000.0,
             automotive_regulatory_credits: 0.0,
@@ -105,30 +105,30 @@ fn report() {
         },
     ];
 
-    let mut r = crate::testing::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tsla/filings/000156459020019931")), crate::Ticker::TSLA).unwrap();
+    let mut r = crate::common::filing_dir(std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/filings/tsla/000156459020019931")), equities::Ticker::TSLA).unwrap();
 
     let balance = r.process_balance_sheet().unwrap();
     // Total debt: the current portion of debt and finance leases plus the
     // rest (3,217 + 10,666 and 1,785 + 11,634, in millions).
     let mut debt: Vec<(String, f64)> = balance.iter()
-        .filter(|i| i.item == crate::item::Item::TotalDebt)
+        .filter(|i| i.item == equities::item::Item::TotalDebt)
         .map(|i| (i.date.to_string(), i.val))
         .collect();
     debt.sort_by(|a, b| a.0.cmp(&b.0));
     assert_eq!(debt, [("2019-12-31".to_string(), 13_419_000_000.0), ("2020-03-31".to_string(), 13_883_000_000.0)]);
-    crate::testing::assert_reported(balance, balance_sheets.into_iter()
+    crate::common::assert_reported(balance, balance_sheets.into_iter()
         .map(|sheet| sheet.reported()).flatten()
         .filter(|report| report.val != 0.0)
         .collect());
     let income = r.process_income_statement().unwrap();
     // "Total automotive revenues", from the statement's automotive section.
     let mut automotive: Vec<(String, f64)> = income.iter()
-        .filter(|i| i.item == crate::item::Item::AutomotiveRevenue)
+        .filter(|i| i.item == equities::item::Item::AutomotiveRevenue)
         .map(|i| (i.date.to_string(), i.val))
         .collect();
     automotive.sort_by(|a, b| a.0.cmp(&b.0));
     assert_eq!(automotive, [("2019-03-31".to_string(), 3_724_000_000.0), ("2020-03-31".to_string(), 5_132_000_000.0)]);
-    crate::testing::assert_reported(income, income_statements.into_iter()
+    crate::common::assert_reported(income, income_statements.into_iter()
         .map(|stmt| stmt.reported()).flatten()
         .filter(|report| report.val != 0.0 || report.item == RestructuringAndOther)
         .collect());

@@ -2,4 +2,7 @@
 //! (filed 19 November 2025), read from the filing's spreadsheet and checked
 //! line by line against the statements transcribed by hand.
 
+mod common;
+
+#[path = "nvda/q3_fy2026.rs"]
 mod q3_fy2026;

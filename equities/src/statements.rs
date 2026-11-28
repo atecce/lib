@@ -5,8 +5,8 @@
 //! plain data, `Filed`, the same for every source. What differs is the
 //! format of its contents, so that is what implements `Statements`:
 //!
-//! - `EdgarFiling`: EDGAR's rendered statement pages (FilingSummary.xml and
-//!   the R pages it lists), read as the reader asks for them;
+//! - `edgar::filing::EdgarFiling` (in the edgar crate, which reads its own
+//!   format): EDGAR's rendered statement pages, read as asked;
 //! - `EdinetReport`: an EDINET report's CSV files (UTF-16, one fact a line);
 //! - `MopsReport`: a MOPS report's page (Big5 HTML).
 //!
@@ -30,53 +30,6 @@ pub trait Statements {
     fn filed(&self) -> &Filed;
     /// Every value it states, each carrying `filed`, and what was skipped.
     fn read(&mut self) -> Read;
-}
-
-/// Stamps each item with the filing, where the reader didn't.
-fn stamp(items: &mut [Reported], filed: &Filed) {
-    for it in items {
-        if it.filing.is_none() { it.filing = Some(filed.clone()) }
-    }
-}
-
-/// An EDGAR filing: its index and the pages it lists.
-pub struct EdgarFiling {
-    filed: Filed,
-    reader: crate::filing::Reader,
-}
-
-impl EdgarFiling {
-    /// `summary`: FilingSummary.xml's text; `pages`: a page's text by file
-    /// name, as the reader asks for it.
-    pub fn new(filed: Filed, ticker: Ticker, summary: &str, pages: crate::filing::Pages) -> EdgarFiling {
-        let name = format!("{} {} {} ({})", ticker, filed.form, filed.period_end.map(|d| d.to_string()).unwrap_or_default(), filed.accession);
-        EdgarFiling { reader: crate::filing::reader(name, summary, ticker, pages), filed }
-    }
-}
-
-impl Statements for EdgarFiling {
-    fn filed(&self) -> &Filed { &self.filed }
-
-    fn read(&mut self) -> Read {
-        use crate::Reader;
-        let mut read = Read::default();
-        let parts: [(&str, Result<Vec<Reported>, Box<dyn std::error::Error>>); 3] = [
-            ("balance sheet", self.reader.process_balance_sheet()),
-            ("income statement", self.reader.process_income_statement()),
-            ("cash flow statement", self.reader.process_cash_flow_statement()),
-        ];
-        for (what, got) in parts {
-            match got {
-                Ok(mut items) => read.items.append(&mut items),
-                Err(e) => read.notes.push(format!("no {}: {}", what, e)),
-            }
-        }
-        // Older filings' cover pages may not be fetched: nothing to note.
-        if let Ok(mut items) = self.reader.process_cover() { read.items.append(&mut items) }
-        read.notes.extend(self.reader.warnings());
-        stamp(&mut read.items, &self.filed);
-        read
-    }
 }
 
 /// An EDINET report: its CSV files, each (name, bytes).

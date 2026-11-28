@@ -47,15 +47,27 @@ since 2009). A filing never changes once filed: a correction is a new filing
 with its own accession number, so an accession's pages are fixed, and new
 reports only add folders.
 
-The few filings in git are test inputs, beside the tests that read them, and
-only the pages those read: `equities/tsla/filings/<accession>/` (four 10-Qs:
-FilingSummary.xml, R2, R4 and sometimes R8), and one annual report each in
-`equities/gs/filings/`, `f/filings/`, `gm/filings/` and `tm/filings/`
-(the statements each test reads, 300-700 KB a filing). Their tests
-check what the reader reads against figures transcribed by hand from the
-statements (Tesla's, every line; the others, the totals and each company's
-own elements and section names), and with the pages in git they run anywhere, a fresh checkout or a
-cloud build, without the SEC.
+The few filings in git are the reader's test inputs, in
+`tests/filings/<ticker>/<accession>/`, and only the pages the tests read
+(FilingSummary.xml and the statements: 100-700 KB a filing): Tesla's four
+10-Qs, Nvidia's workbook, and one report each for Apple, Berkshire, Ford,
+GM, Goldman and Toyota. The tests, `tests/<ticker>.rs`, check what the
+reader reads against figures transcribed by hand from the statements
+(Tesla's, every line; the others, the totals and each company's own
+elements and section names); the transcriptions themselves are claims
+about the companies, in their equities modules (equities::tsla, ::gs ...).
+With the pages in git the tests run anywhere, a fresh checkout or a cloud
+build, without the SEC.
+
+## Reading: from pages to items
+
+`filing` reads a filing's statement pages (`sheet_info` their headers:
+dates, periods, scale, currency; `xlsx` the older Financial_Report.xlsx),
+mapping each row to an `equities::item::Item` by its XBRL element (asking
+the company's module first: equities::company), and `filing::EdgarFiling`
+implements `equities::statements::Statements`. The format is EDGAR's, so
+it lives here; the vocabulary is the accounting's, so it lives in
+equities, which depends on no source crate.
 
 ## Executables
 

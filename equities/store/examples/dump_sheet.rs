@@ -1,4 +1,4 @@
-use equities::calamine::{open_workbook_auto, Reader};
+use edgar::calamine::{open_workbook_auto, Reader};
 use std::env;
 
 /// Usage: dump_sheet <file> <sheet-name-prefix>

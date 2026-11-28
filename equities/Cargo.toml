@@ -7,8 +7,6 @@ edition = "2024"
 augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
 calamine = "0.35.0"
 chrono = {version = "0.4.44", features = ["serde"]}
-# Reads the EDGAR cache; fetching it is the edgar crate's job.
-edgar = { path = "../edgar", default-features = false }
 # Reads the FRED cache (Treasury yields); fetching it is the fred crate's job.
 fred = { path = "../fred", default-features = false }
 # Big5, the encoding MOPS serves Taiwan's reports in.

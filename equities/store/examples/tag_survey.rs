@@ -5,8 +5,8 @@
 //! Usage: tag_survey <edgar cache dir>
 use std::collections::BTreeMap;
 
-use equities::calamine::DataType;
-use equities::filing;
+use edgar::calamine::DataType;
+use edgar::filing;
 use equities::item::Item;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

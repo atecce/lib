@@ -918,8 +918,12 @@ checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
 name = "edgar"
 version = "0.1.0"
 dependencies = [
+ "calamine 0.35.0",
  "chrono",
+ "equities",
+ "regex",
  "reqwest",
+ "scraper",
  "serde",
  "serde_json",
  "zip 7.2.0",
@@ -964,7 +968,6 @@ dependencies = [
  "augurs",
  "calamine 0.35.0",
  "chrono",
- "edgar",
  "encoding_rs",
  "fred",
  "regex",

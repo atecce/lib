@@ -10,9 +10,10 @@
 //! cache/<cik>/<accession>/R2.htm …     the statement pages
 //! ```
 //!
-//! `Cache` reads this and never touches the network; it is all a reader of
-//! filings (`equities`) needs. With the `fetch` feature, `Client` downloads
-//! into it, and the `fetch` executable runs the client over a list of tickers.
+//! `Cache` reads this and never touches the network. With the `fetch`
+//! feature, `Client` downloads into it, and the `fetch` executable runs the
+//! client over a list of tickers. `filing` reads a filing's statements into
+//! equities' items (`filing::EdgarFiling` implements equities' `Statements`).
 //! README.md explains the statement pages (R2.htm …) and what is in git.
 
 use std::error::Error;
@@ -23,6 +24,15 @@ use chrono::NaiveDate;
 use serde::Deserialize;
 
 pub mod funds;
+/// Reading a filing's statements: the rendered pages (filing), their
+/// tables' headers (sheet_info), and the older Financial_Report.xlsx (xlsx),
+/// into equities' items: `filing::EdgarFiling` implements
+/// `equities::statements::Statements`.
+pub mod filing;
+pub mod sheet_info;
+pub mod xlsx;
+/// The calamine the workbook reader uses, for tools reading its cells.
+pub use calamine;
 pub use funds::{Census, DataSet, Flow, FundClass, Holding, MonthlyReturn, Portfolio};
 
 #[cfg(feature = "fetch")]

@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fs;
 
 use store::sources::edgar_workbook as new_reader;
-use equities::sheet_info::SheetType::BalanceSheet;
+use edgar::sheet_info::SheetType::BalanceSheet;
 
 fn main() -> Result<(), Box<dyn Error>>{
     for path in fs::read_dir("nvda")?

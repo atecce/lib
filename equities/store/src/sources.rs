@@ -6,7 +6,8 @@
 use std::error::Error;
 
 use equities::item::{Filed, Source};
-use equities::statements::{EdgarFiling, EdinetReport, MopsReport, Statements};
+use edgar::filing::EdgarFiling;
+use equities::statements::{EdinetReport, MopsReport, Statements};
 use equities::Ticker;
 
 /// A company's filings in a source's cache, ready to read, and what isn't.
@@ -50,7 +51,7 @@ pub fn edgar(cache: &edgar::Cache, ticker: Ticker) -> Result<Company, Box<dyn Er
 fn edgar_statements(dir: &std::path::Path, filed: Filed, ticker: Ticker) -> Result<EdgarFiling, Box<dyn Error>> {
     let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
     let folder = dir.to_path_buf();
-    let pages: equities::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
+    let pages: edgar::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
     Ok(EdgarFiling::new(filed, ticker, &summary, pages))
 }
 
@@ -111,14 +112,14 @@ pub fn mops(cache: &mops::Cache, ticker: Ticker) -> Result<Company, Box<dyn Erro
 
 /// An EDGAR filing from its folder, as the reader alone, for tools that
 /// read one statement at a time (dump_filing, trace).
-pub fn edgar_filing(dir: &std::path::Path, ticker: Ticker) -> Result<equities::filing::Reader, Box<dyn Error>> {
+pub fn edgar_filing(dir: &std::path::Path, ticker: Ticker) -> Result<edgar::filing::Reader, Box<dyn Error>> {
     let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
     let folder = dir.to_path_buf();
-    let pages: equities::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
-    Ok(equities::filing::reader(dir.display().to_string(), &summary, ticker, pages))
+    let pages: edgar::filing::Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
+    Ok(edgar::filing::reader(dir.display().to_string(), &summary, ticker, pages))
 }
 
-/// An EDGAR Financial_Report.xlsx from disk: `equities::xlsx::reader`.
-pub fn edgar_workbook(path: &std::path::Path, ticker: Ticker) -> Result<equities::xlsx::Reader, Box<dyn Error>> {
-    equities::xlsx::reader(std::fs::read(path)?, ticker)
+/// An EDGAR Financial_Report.xlsx from disk: `edgar::xlsx::reader`.
+pub fn edgar_workbook(path: &std::path::Path, ticker: Ticker) -> Result<edgar::xlsx::Reader, Box<dyn Error>> {
+    edgar::xlsx::reader(std::fs::read(path)?, ticker)
 }

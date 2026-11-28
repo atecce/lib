@@ -1,4 +1,4 @@
-use equities::calamine::{open_workbook_auto, Reader};
+use edgar::calamine::{open_workbook_auto, Reader};
 use std::env;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
