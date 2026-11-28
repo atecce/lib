@@ -93,8 +93,8 @@ items! {
 
         OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]", "Equipment on operating leases"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent"],
         // A car maker's lending arm: loans and leases to buyers and dealers
-        // (Ford Credit; Toyota's 金融事業, kin'yū jigyō, financial services).
-        FinanceReceivablesCurrent => ["Ford Credit finance receivables, net"] @ ["NotesAndLoansReceivableNetCurrent"],
+        // (金融事業, kin'yū jigyō, financial services, in Japanese filings).
+        FinanceReceivablesCurrent @ ["NotesAndLoansReceivableNetCurrent"],
         FinanceReceivablesNonCurrent @ ["NotesAndLoansReceivableNetNoncurrent"],
         SolarEnergySystemsNet => ["Solar energy systems, net", "Solar Energy Systems [Member]"],
 
@@ -151,9 +151,8 @@ items! {
         // Borrowings on the face of the balance sheet, current and
         // non-current, summed (see `filing::total_debt`).
         TotalDebt,
-        // A car maker's debt by business, where its balance sheet splits it:
-        // Ford's "Company excluding Ford Credit" and "Ford Credit", GM's
-        // "Automotive" and "GM Financial".
+        // A car maker's debt by business, where its balance sheet splits it
+        // into its vehicles and its lending arm (sections named as for revenue).
         AutomotiveDebt,
         FinancialServicesDebt,
         StockholdersEquity => ["親会社の所有者に帰属する持分", "純資産合計"] @ ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "ifrs-full_EquityAttributableToOwnersOfParent", "ifrs-full_Equity", "jpigp_cor:EquityAttributableToOwnersOfParentIFRS", "jpigp_cor:EquityIFRS", "jppfs_cor:NetAssets"],
@@ -163,12 +162,12 @@ items! {
         // 営業収益 (eigyō shūeki): operating revenue: banks, brokers, utilities
         // Parts of revenue, from a statement's segment sections (see
         // `Item::part_of`): a car maker's vehicles against its lending arm.
-        // Sections are named by member: Tesla's "Automotive Revenues", Ford's
-        // "Company excluding Ford Credit", GM's "Automotive", Toyota's "Sales
-        // of products" (製品売上, seihin uriage).
-        AutomotiveRevenue => ["Automotive Revenues", "Total automotive revenues", "Company excluding Ford Credit", "Automotive", "Sales of products"],
+        // Sections are named by member ("Automotive Revenues", "Automotive");
+        // a name that is one company's own (its lending arm's) is its
+        // module's `label` (company::label_item).
+        AutomotiveRevenue => ["Automotive Revenues", "Total automotive revenues", "Automotive"],
         // 金融事業 (kin'yū jigyō): financial services.
-        FinancialServicesRevenue => ["Ford Credit", "GM Financial", "Financial services", "Financial Services", "Financing operations", "金融事業"],
+        FinancialServicesRevenue => ["Financial services", "Financial Services", "金融事業"],
         // Emission credits sold to other car makers.
         RegulatoryCreditsRevenue => ["Automotive regulatory credits"],
         // The last four elements are other kinds of total: a bank's "total net

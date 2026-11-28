@@ -19,6 +19,24 @@ pub fn item(ticker: Ticker, tag: &str) -> Option<Item> {
     }
 }
 
+/// The item a company's own name for a section or row reports (Ford's
+/// "Ford Credit", GM's "GM Financial", Toyota's "Financing operations"),
+/// as its module says.
+pub fn label(ticker: Ticker, label: &str) -> Option<Item> {
+    match ticker.as_str() {
+        "F" => crate::f::label(label),
+        "GM" => crate::gm::label(label),
+        "TM" => crate::tm::label(label),
+        _ => None,
+    }
+}
+
+/// The item a label reports in `ticker`'s filings: the company's own names
+/// first, then the shared labels.
+pub fn label_item(ticker: Ticker, l: &str) -> Option<Item> {
+    label(ticker, l).or_else(|| l.parse::<Item>().ok())
+}
+
 /// The item an element reports in `ticker`'s filings, and its rank among
 /// that item's elements (as `Item::from_xbrl_tag_ranked`): the company's own
 /// elements first, and first in rank, since they are the company's own word
@@ -80,6 +98,18 @@ pub fn valuation_series(ticker: Ticker) -> &'static [&'static str] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_companys_own_names_are_its_own() {
+        assert_eq!(label_item(Ticker::new("F"), "Ford Credit"), Some(Item::FinancialServicesRevenue));
+        assert_eq!(label_item(Ticker::new("GM"), "GM Financial"), Some(Item::FinancialServicesRevenue));
+        assert_eq!(label_item(Ticker::new("TM"), "Sales of products"), Some(Item::AutomotiveRevenue));
+        // Another company's name means nothing elsewhere.
+        assert_eq!(label_item(Ticker::new("GM"), "Ford Credit"), None);
+        assert_eq!(label_item(Ticker::new("AAPL"), "Sales of products"), None);
+        // The shared names read the same for everyone.
+        assert_eq!(label_item(Ticker::new("GM"), "Automotive"), Some(Item::AutomotiveRevenue));
+    }
 
     #[test]
     fn a_companys_own_elements_are_its_own() {

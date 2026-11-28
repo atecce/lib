@@ -11,6 +11,15 @@ pub fn item(tag: &str) -> Option<Item> {
     }
 }
 
+/// What GM calls its own sections and rows (its lending arm, its
+/// vehicles), which the shared labels don't name: the item each reports.
+pub fn label(label: &str) -> Option<Item> {
+    match label {
+        "GM Financial" => Some(Item::FinancialServicesRevenue),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

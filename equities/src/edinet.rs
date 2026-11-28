@@ -170,7 +170,7 @@ pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)
         for fact in read_facts(bytes)? {
             if fact.context.contains('_') { continue; }
             let Some((item, rank)) = crate::company::item_ranked(ticker, &element_tag(&fact.element))
-                .or_else(|| fact.label.parse::<Item>().ok().map(|i| (i, usize::MAX))) else { continue };
+                .or_else(|| crate::company::label_item(ticker, &fact.label).map(|i| (i, usize::MAX))) else { continue };
             let Some((date, p)) = context_period(&fact.context, kind, end) else { continue };
             let Some(val) = number(&fact.value) else { continue };
             // Units: "JPY", "JPYPerShares", "shares", and others for foreign

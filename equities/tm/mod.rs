@@ -35,6 +35,16 @@ pub fn correct(items: &mut [Reported]) {
     }
 }
 
+/// What Toyota calls its own sections and rows (its lending arm, its
+/// vehicles), which the shared labels don't name: the item each reports.
+pub fn label(label: &str) -> Option<Item> {
+    match label {
+        "Sales of products" => Some(Item::AutomotiveRevenue),
+        "Financing operations" => Some(Item::FinancialServicesRevenue),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

@@ -11,6 +11,17 @@ pub fn item(tag: &str) -> Option<Item> {
     }
 }
 
+/// What Ford calls its own sections and rows (its lending arm, its
+/// vehicles), which the shared labels don't name: the item each reports.
+pub fn label(label: &str) -> Option<Item> {
+    match label {
+        "Company excluding Ford Credit" => Some(Item::AutomotiveRevenue),
+        "Ford Credit" => Some(Item::FinancialServicesRevenue),
+        "Ford Credit finance receivables, net" => Some(Item::FinanceReceivablesCurrent),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

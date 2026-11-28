@@ -231,7 +231,7 @@ impl Reader {
                 (row.as_slice(), (tag.as_deref(), item))
             })
             .unzip();
-        drop_segment_rows(&rows, &tags, &mut items);
+        drop_segment_rows(self.ticker, &rows, &tags, &mut items);
         let balance_sheet = sheet_type == SheetType::BalanceSheet;
         let sheet_info = new_sheet_info(&rows, sheet_type)?;
         if !sheet_info.skipped.is_empty() {
@@ -323,7 +323,7 @@ fn label<'a>(row: &'a [Data]) -> Option<&'a str> {
 /// element is the axis ("srt_ProductOrServiceAxis", labeled with the member,
 /// "Automotive Revenues"). Where the member names a part of an item
 /// (`Item::part_of`), only that item's rows report the part.
-fn drop_segment_rows(rows: &[&[Data]], tags: &[Option<&str>], items: &mut [Option<(Item, usize)>]) {
+fn drop_segment_rows(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], items: &mut [Option<(Item, usize)>]) {
     use std::collections::{HashMap, HashSet};
     let mut segment: Vec<Option<usize>> = Vec::with_capacity(rows.len());
     let mut member_items: HashMap<usize, Item> = HashMap::new();
@@ -334,7 +334,7 @@ fn drop_segment_rows(rows: &[&[Data]], tags: &[Option<&str>], items: &mut [Optio
             current = Some(r);
             // "[Member]", or "[member]" (Honda).
             let member = l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim();
-            if let Ok(item) = l.parse::<Item>().or_else(|_| member.parse::<Item>()) {
+            if let Some(item) = crate::company::label_item(ticker, l).or_else(|| crate::company::label_item(ticker, member)) {
                 member_items.insert(r, item);
             }
         }
@@ -472,7 +472,7 @@ fn total_debt(ticker: Ticker, rows: &[&[Data]], tags: &[Option<&str>], info: &cr
         // A car maker's automotive or lending section, by the item its
         // member names (as for revenue).
         let part = s.map(|l| l.strip_suffix("[Member]").or_else(|| l.strip_suffix("[member]")).unwrap_or(l).trim())
-            .and_then(|m| m.parse::<Item>().ok());
+            .and_then(|m| crate::company::label_item(ticker, m));
         match part {
             Some(Item::AutomotiveRevenue) => out.push(make(Item::AutomotiveDebt, *col, *v)),
             Some(Item::FinancialServicesRevenue) => out.push(make(Item::FinancialServicesDebt, *col, *v)),
@@ -505,7 +505,7 @@ fn is_extension(tag: &str) -> bool {
 /// Visible to the crate, so a company's module can test how its own rows
 /// read (gs).
 pub(crate) fn row_item(ticker: Ticker, tag: Option<&str>, label: Option<&str>) -> Option<(Item, usize)> {
-    let by_label = || label.and_then(|l| l.parse::<Item>().ok()).map(|i| (i, 0));
+    let by_label = || label.and_then(|l| crate::company::label_item(ticker, l)).map(|i| (i, 0));
     match tag {
         None => by_label(),
         Some("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax")

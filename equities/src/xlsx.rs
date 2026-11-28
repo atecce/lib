@@ -102,7 +102,7 @@ impl Reader {
     pub(crate) fn reported_items(ticker: Ticker, rows: &[&[Data]], sheet_info: SheetInfo) -> Result<Vec<Reported>, Box<dyn Error>> {
         let labels = sheet_info.labels;
         Self::reported_items_with(ticker, rows, sheet_info, |_, row| {
-            row.get(labels).and_then(|c| c.get_string()).and_then(|label| label.parse::<Item>().ok()).map(|i| (i, 0))
+            row.get(labels).and_then(|c| c.get_string()).and_then(|label| crate::company::label_item(ticker, label)).map(|i| (i, 0))
         })
     }
 
