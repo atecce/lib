@@ -12,8 +12,6 @@
 //! pages it names, e.g. `edgar/cache/<cik>/<accession>/` (see the `edgar` crate).
 
 use std::error::Error;
-use std::fs;
-use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
 use calamine::Data;
@@ -27,19 +25,32 @@ use crate::Ticker;
 
 pub use edgar::{parse_filing_summary, Report};
 
+/// A page's text by its file name (`R2.htm`), from wherever the caller keeps
+/// the filing: the reader asks only for the pages it reads.
+pub type Pages = Box<dyn Fn(&str) -> Result<String, Box<dyn Error>>>;
+
 pub struct Reader {
-    dir: PathBuf,
+    /// What the filing is called in messages (its folder, its accession).
+    name: String,
     ticker: Ticker,
     reports: Vec<Report>,
+    pages: Pages,
 }
 
-pub fn new_reader(dir: &Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
-    let summary = fs::read_to_string(dir.join("FilingSummary.xml"))?;
-    Ok(Reader {
-        dir: dir.to_path_buf(),
-        ticker,
-        reports: parse_filing_summary(&summary),
-    })
+/// A filing from its index (FilingSummary.xml's text) and its pages: no
+/// files, no network; `pages` is the caller's.
+pub fn reader(name: impl Into<String>, summary: &str, ticker: Ticker, pages: Pages) -> Reader {
+    Reader { name: name.into(), ticker, reports: parse_filing_summary(summary), pages }
+}
+
+/// A filing from a folder on disk (an EDGAR cache's accession folder, or a
+/// test's): `reader` with its files. The `files` feature (on by default).
+#[cfg(feature = "files")]
+pub fn new_reader(dir: &std::path::Path, ticker: Ticker) -> Result<Reader, Box<dyn Error>> {
+    let summary = std::fs::read_to_string(dir.join("FilingSummary.xml"))?;
+    let folder = dir.to_path_buf();
+    let pages: Pages = Box::new(move |file| Ok(std::fs::read_to_string(folder.join(file))?));
+    Ok(reader(dir.display().to_string(), &summary, ticker, pages))
 }
 
 /// Pick the first page whose name matches, skipping parenthetical pages (share
@@ -210,8 +221,8 @@ impl Reader {
     /// Read one statement page. Each row's item comes from its XBRL element
     /// (see `row_item`); the statement only reports items that belong on it.
     fn process(&self, report: Option<&Report>, sheet_type: SheetType, what: &str) -> Result<Vec<Reported>, Box<dyn Error>> {
-        let report = report.ok_or_else(|| format!("{} not found in {:?}", what, self.dir))?;
-        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
+        let report = report.ok_or_else(|| format!("{} not found in {}", what, self.name))?;
+        let table = table(&(self.pages)(&report.file)?)?;
         let cash_flow = sheet_type == SheetType::CashFlowStatement;
         let (rows, (tags, mut items)): (Vec<&[Data]>, (Vec<Option<&str>>, Vec<Option<(Item, usize)>>)) = table.rows.iter()
             .zip(&table.tags)
@@ -240,7 +251,7 @@ impl Reader {
         let report = self.reports.iter()
             .find(|r| r.category.as_deref() == Some("Cover") || r.kind.as_deref() == Some("Document"))
             .ok_or("no cover page")?;
-        let table = table(&fs::read_to_string(self.dir.join(&report.file))?)?;
+        let table = table(&(self.pages)(&report.file)?)?;
         // The header's dates by column ("Oct. 15, 2026", or "Mar. 31, 2026
         // shares" in a 20-F), and its share scale ("shares in Millions").
         let mut dates = std::collections::HashMap::new();
