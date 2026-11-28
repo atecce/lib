@@ -25,7 +25,7 @@ use std::collections::HashMap;
 use chrono::NaiveDate;
 use scraper::{Html, Selector};
 
-use crate::item::{Filed, Item, Reported, Source, Unit};
+use crate::item::{Filed, Item, Reported, Unit};
 use crate::{Currency, Period, Ticker};
 
 /// Chinese label (the part before any English) → item, and a rank: where two
@@ -89,17 +89,10 @@ const SUMS: &[(&str, Item)] = &[
 ];
 
 /// A report's items from its file's bytes (Big5 HTML), as the caller read
-/// them: no files.
-pub fn read_bytes(report: &mops::Report, ticker: Ticker, bytes: &[u8]) -> Vec<Reported> {
+/// them: no files. `filed` is the report (its id, period end, due date).
+pub fn read_bytes(filed: &Filed, ticker: Ticker, bytes: &[u8]) -> Vec<Reported> {
     let (text, _, _) = encoding_rs::BIG5.decode(bytes);
-    let filed = Filed {
-        accession: report.id(),
-        filed: report.due(),
-        source: Source::Mops,
-        form: if report.quarter == 4 { "annual".into() } else { format!("Q{}", report.quarter) },
-        period_end: Some(report.period_end()),
-    };
-    read_html(&text, ticker, &filed)
+    read_html(&text, ticker, filed)
 }
 
 /// The items in a report's HTML (decoded).
@@ -208,11 +201,11 @@ fn column(header: &str) -> Option<(NaiveDate, Period)> {
     // A quarter: 2017年第2季.
     if let Some((y, rest)) = h.split_once("年第") {
         let q = num(rest.strip_suffix('季')?)?;
-        return Some((mops::quarter_end(y.parse().ok()?, q), Period::ThreeMonths));
+        return Some((quarter_end(y.parse().ok()?, q), Period::ThreeMonths));
     }
     // A year: 2017年度.
     if let Some(y) = h.strip_suffix("年度") {
-        return Some((mops::quarter_end(y.parse().ok()?, 4), Period::TwelveMonths));
+        return Some((quarter_end(y.parse().ok()?, 4), Period::TwelveMonths));
     }
     // A date: 2025年6月30日 (followed in the new layout by 2025/6/30).
     let (y, rest) = h.split_once('年')?;
@@ -225,6 +218,13 @@ fn column(header: &str) -> Option<(NaiveDate, Period)> {
 }
 
 use chrono::Datelike;
+
+/// The last day of a calendar quarter (Taiwan's fiscal years are calendar
+/// years).
+fn quarter_end(year: i32, quarter: u32) -> NaiveDate {
+    let (m, d) = match quarter { 1 => (3, 31), 2 => (6, 30), 3 => (9, 30), _ => (12, 31) };
+    NaiveDate::from_ymd_opt(year, m, d).unwrap()
+}
 
 #[cfg(test)]
 mod tests {

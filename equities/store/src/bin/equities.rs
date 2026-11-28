@@ -12,7 +12,6 @@
 
 use std::error::Error;
 
-use equities::Reader;
 
 /// Read when no tickers are given on the command line.
 const DEFAULT_TICKERS: [equities::Ticker; 35] = [
@@ -311,50 +310,33 @@ fn latest(items: Vec<equities::item::Reported>) -> Vec<equities::item::Reported>
 
 /// Every 10-Q and 10-K the company filed with EDGAR, oldest first, so a later
 /// filing's restatement of an earlier period overwrites the original.
-fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let cik = cache.cik(equity.sec_symbol())?;
-    eprintln!("{}: CIK {}", equity, cik);
-    let filings = cache.filings(cik, &edgar::FORMS)?;
-    let (mut skipped, mut missing) = (0, 0);
-    for f in &filings {
-        let name = format!("{} {} {} ({})", equity, f.form, f.report_date, f.accession);
-        // Everything read from this filing carries it.
-        let start = reported_items.len();
-        let filed = equities::item::Filed {
-            accession: f.accession.clone(),
-            filed: f.filing_date,
-            source: equities::item::Source::Edgar,
-            form: f.form.clone(),
-            period_end: Some(f.report_date),
-        };
-        match cache.filing(f) {
-            Ok(dir) => match store::sources::edgar_filing(&dir, equity) {
-                Ok(mut r) => {
-                    read_statements(&mut r, &name, reported_items);
-                    match r.process_cash_flow_statement() {
-                        Ok(mut ret) => reported_items.append(&mut ret),
-                        Err(e) => eprintln!("failed to process cash flow statement for {}; {}", name, e),
-                    }
-                    // Older filings' cover pages may not be fetched yet.
-                    if let Ok(mut ret) = r.process_cover() {
-                        reported_items.append(&mut ret);
-                    }
-                    for w in r.warnings() { eprintln!("{}: {}", name, w) }
-                },
-                Err(e) => eprintln!("failed to read {}: {}", name, e),
-            },
-            Err(e) => match e.downcast_ref::<edgar::EdgarError>() {
-                Some(edgar::EdgarError::NoFilingSummary) => skipped += 1,
-                Some(edgar::EdgarError::NotFetched(_)) => missing += 1,
-                _ => eprintln!("failed to read {}: {}", name, e),
-            },
+/// Every filing of a company the source has, read through `Statements`,
+/// with what was left out reported.
+fn read_company(equity: equities::Ticker, source: &str, company: store::sources::Company, reported_items: &mut Vec<equities::item::Reported>) {
+    let (mut read, mut unread) = (0, 0);
+    for mut filing in company.filings {
+        let got = filing.read();
+        let f = filing.filed();
+        for note in &got.notes {
+            eprintln!("{} {} {} ({}): {}", equity, f.form, f.period_end.map(|d| d.to_string()).unwrap_or_default(), f.accession, note);
         }
-        for it in &mut reported_items[start..] {
-            it.filing = Some(filed.clone());
-        }
+        // Nothing read and a reason why: a failure, not a report read.
+        if got.items.is_empty() && !got.notes.is_empty() { unread += 1 } else { read += 1 }
+        reported_items.extend(got.items);
     }
-    eprintln!("{}: read {} EDGAR filings, {} predate rendered statements{}", equity, filings.len() - skipped - missing, skipped,
-        if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
+    for failure in &company.failures { eprintln!("failed to read {}", failure) }
+    let mut also = Vec::new();
+    if company.without_statements > 0 { also.push(format!("{} without statements to read", company.without_statements)) }
+    if company.not_fetched > 0 { also.push(format!("{} not fetched yet", company.not_fetched)) }
+    let failed = company.failures.len() + unread;
+    if failed > 0 { also.push(format!("{} failed", failed)) }
+    eprintln!("{}: read {} {} reports{}", equity, read, source,
+        if also.is_empty() { String::new() } else { format!(", {}", also.join(", ")) });
+}
+
+fn read_edgar(cache: &edgar::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
+    eprintln!("{}: CIK {}", equity, cache.cik(equity.sec_symbol())?);
+    read_company(equity, "EDGAR", store::sources::edgar(cache, equity)?, reported_items);
     Ok(())
 }
 
@@ -368,32 +350,13 @@ fn is_mops(t: equities::Ticker) -> bool {
 }
 
 fn read_mops(cache: &mops::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let (mut items, read, failures) = store::sources::mops_company(cache, equity)?;
-    for f in &failures { eprintln!("{}", f) }
-    eprintln!("{}: read {} MOPS reports{}", equity, read,
-        if !failures.is_empty() { format!(", {} failed", failures.len()) } else { String::new() });
-    reported_items.append(&mut items);
+    read_company(equity, "MOPS", store::sources::mops(cache, equity)?, reported_items);
     Ok(())
 }
 
 fn read_edinet(cache: &edinet::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let (mut items, read, missing, failures) = store::sources::edinet_company(cache, equity)?;
-    for f in &failures { eprintln!("failed to read {}", f) }
-    eprintln!("{}: read {} EDINET reports{}", equity, read,
-        if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
-    reported_items.append(&mut items);
+    read_company(equity, "EDINET", store::sources::edinet(cache, equity)?, reported_items);
     Ok(())
-}
-
-fn read_statements(r: &mut impl Reader, name: &str, reported_items: &mut Vec<equities::item::Reported>) {
-    match r.process_balance_sheet() {
-        Ok(mut ret) => reported_items.append(&mut ret),
-        Err(e) => eprintln!("failed to process balance sheet for {}; {}", name, e),
-    }
-    match r.process_income_statement() {
-        Ok(mut ret) => reported_items.append(&mut ret),
-        Err(e) => eprintln!("failed to process income statement for {}; {}", name, e),
-    }
 }
 
 /// Print the series charted in Grafana, one row per (ticker, date), to check

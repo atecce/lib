@@ -11,9 +11,7 @@ chrono = {version = "0.4.44", features = ["serde"]}
 edgar = { path = "../edgar", default-features = false }
 # Reads the FRED cache (Treasury yields); fetching it is the fred crate's job.
 fred = { path = "../fred", default-features = false }
-edinet = { path = "../edinet", default-features = false }
-# Taiwan's reports; and Big5, the encoding MOPS serves them in.
-mops = { path = "../mops", default-features = false }
+# Big5, the encoding MOPS serves Taiwan's reports in.
 encoding_rs = "0.8"
 # Daily prices, for market values; fetching them is tiingo's job.
 tiingo = { path = "tiingo", default-features = false }

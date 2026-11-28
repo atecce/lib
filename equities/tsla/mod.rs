@@ -376,8 +376,8 @@ impl_reported! {
     ]
 }
 
-/// The lines the EDGAR reader reads from a cash-flow statement, for the
-/// known-answer test (filings/q3_2025).
+// The lines the EDGAR reader reads from a cash-flow statement, for the
+// known-answer test (filings/q3_2025).
 impl_reported! {
     CashFlowStatement,
     [

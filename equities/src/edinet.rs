@@ -27,7 +27,7 @@ use std::error::Error;
 
 use chrono::{Months, NaiveDate};
 
-use crate::item::{Item, Reported, Unit};
+use crate::item::{Filed, Item, Reported, Unit};
 use crate::{Currency, Period, Ticker};
 
 /// One fact: element, label, context, unit and value.
@@ -61,7 +61,7 @@ fn read_facts(bytes: &[u8]) -> Result<Vec<Fact>, Box<dyn Error>> {
 
 /// The kind of report, from its EDINET document type.
 #[derive(Clone, Copy, Debug, PartialEq)]
-enum Kind {
+pub enum Kind {
     /// 有価証券報告書 (yūka shōken hōkokusho)
     Annual,
     /// 半期報告書 (hanki hōkokusho)
@@ -70,14 +70,16 @@ enum Kind {
     Quarterly(u32),
 }
 
-fn kind(d: &edinet::Document) -> Option<Kind> {
-    match d.doc_type.as_deref()? {
+/// From EDINET's document type ("120", "140"...) and, for a quarterly
+/// report, its description, which names the quarter.
+pub fn kind(doc_type: &str, description: Option<&str>) -> Option<Kind> {
+    match doc_type {
         "120" | "130" => Some(Kind::Annual),
         "160" | "170" => Some(Kind::Semiannual),
         "140" | "150" => {
             // "四半期報告書－第120期第2四半期(…)": the 120th term, 2nd quarter
             // (dai ni shihanki). Digits may be full width.
-            let desc = d.description.as_deref()?;
+            let desc = description?;
             let q = desc.split("期第").nth(1)?.chars().next()?;
             let q = q.to_digit(10).or_else(|| ('１'..='４').position(|c| c == q).map(|i| i as u32 + 1))?;
             Some(Kind::Quarterly(q))
@@ -155,10 +157,11 @@ fn number(s: &str) -> Option<f64> {
 }
 
 /// The items one EDINET report states, for `ticker`, from its CSV files,
-/// each (file name, bytes) as the caller read them: no files.
-pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)]) -> Result<Vec<Reported>, Box<dyn Error>> {
-    let kind = kind(d).ok_or("not an annual, semiannual or quarterly report")?;
-    let end = d.period_end.ok_or("report without a period")?;
+/// each (file name, bytes) as the caller read them: no files. `filed` is
+/// the report (its period end, the day it was submitted), `kind` what
+/// report it is.
+pub fn read_csv(filed: &Filed, kind: Kind, ticker: Ticker, files: &[(String, Vec<u8>)]) -> Result<Vec<Reported>, Box<dyn Error>> {
+    let end = filed.period_end.ok_or("report without a period")?;
 
     // Several elements can report one item (an IFRS and a summary element):
     // the lowest ranked wins, as on EDGAR.
@@ -187,16 +190,7 @@ pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)
             }
         }
     }
-    // "2025-06-18 09:00", Japan time: the day is when the market learned of it.
-    let filed = d.submitted.as_deref().and_then(|s| s.get(..10)).and_then(|s| s.parse::<NaiveDate>().ok())
-        .ok_or("report without a submission date")?;
-    let filing = crate::item::Filed {
-        accession: d.doc_id.clone(),
-        filed,
-        source: crate::item::Source::Edinet,
-        form: d.doc_type.clone().unwrap_or_default(),
-        period_end: d.period_end,
-    };
+    let filing = filed.clone();
     let mut items: Vec<Reported> = best.into_iter()
         .map(|((item, date, p, currency), (_, val))| Reported {
             ticker, date, p, item, currency, val, filing: Some(filing.clone()), derived: false,
