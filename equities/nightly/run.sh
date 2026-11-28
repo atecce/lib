@@ -64,6 +64,12 @@ fi
 if [ $(echo $tickers | wc -l) -le 60 ]; then
   locked equities/tiingo/cache ./target/release/tiingo-fetch ${=tickers} >> $log 2>&1 || fetched=1
   push=$tickers
+elif [ ./target/release/store-equities -nt $stamp ]; then
+  # Rebuilt since the last run: the reader may read old filings differently
+  # (a new element, a correction), so every company is read again, not
+  # only those with new filings.
+  echo "=== $name: store-equities rebuilt since the last run: all of $list" >> $log
+  push=$tickers
 else
   push=$(./target/release/changed $stamp --list $list 2>>$log)
 fi
