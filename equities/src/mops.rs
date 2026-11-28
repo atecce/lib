@@ -21,8 +21,6 @@
 //! yuán), earnings per share in dollars. Outflows are in parentheses.
 
 use std::collections::HashMap;
-#[cfg(feature = "files")]
-use std::error::Error;
 
 use chrono::NaiveDate;
 use scraper::{Html, Selector};
@@ -84,27 +82,6 @@ const SUMS: &[(&str, Item)] = &[
     ("折舊費用", Item::DepreciationAndAmoritization),
     ("攤銷費用", Item::DepreciationAndAmoritization),
 ];
-
-/// A company's cached reports, read: (items, reports read, reports that
-/// failed to read).
-#[cfg(feature = "files")]
-pub fn read_company(cache: &mops::Cache, ticker: Ticker) -> Result<(Vec<Reported>, usize, usize), Box<dyn Error>> {
-    let mut items = Vec::new();
-    let (mut read, mut failed) = (0, 0);
-    for report in cache.reports(ticker.as_str())? {
-        match read_report(&report, ticker) {
-            Ok(mut got) => { items.append(&mut got); read += 1 },
-            Err(e) => { eprintln!("{} {}: {}", ticker, report.id(), e); failed += 1 },
-        }
-    }
-    Ok((items, read, failed))
-}
-
-/// A report from the cache: `read_bytes` with its file. The `files` feature.
-#[cfg(feature = "files")]
-pub fn read_report(report: &mops::Report, ticker: Ticker) -> Result<Vec<Reported>, Box<dyn Error>> {
-    Ok(read_bytes(report, ticker, &std::fs::read(&report.path)?))
-}
 
 /// A report's items from its file's bytes (Big5 HTML), as the caller read
 /// them: no files.

@@ -365,15 +365,17 @@ fn is_mops(t: equities::Ticker) -> bool {
 }
 
 fn read_mops(cache: &mops::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let (mut items, read, failed) = equities::mops::read_company(cache, equity)?;
+    let (mut items, read, failures) = store::sources::mops_company(cache, equity)?;
+    for f in &failures { eprintln!("{}", f) }
     eprintln!("{}: read {} MOPS reports{}", equity, read,
-        if failed > 0 { format!(", {} failed", failed) } else { String::new() });
+        if !failures.is_empty() { format!(", {} failed", failures.len()) } else { String::new() });
     reported_items.append(&mut items);
     Ok(())
 }
 
 fn read_edinet(cache: &edinet::Cache, equity: equities::Ticker, reported_items: &mut Vec<equities::item::Reported>) -> Result<(), Box<dyn Error>> {
-    let (mut items, read, missing) = equities::edinet::read_company(cache, equity)?;
+    let (mut items, read, missing, failures) = store::sources::edinet_company(cache, equity)?;
+    for f in &failures { eprintln!("failed to read {}", f) }
     eprintln!("{}: read {} EDINET reports{}", equity, read,
         if missing > 0 { format!(", {} not fetched yet", missing) } else { String::new() });
     reported_items.append(&mut items);

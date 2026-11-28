@@ -154,18 +154,6 @@ fn number(s: &str) -> Option<f64> {
     s.replace(',', "").parse::<f64>().ok()
 }
 
-/// The items one EDINET report states, for `ticker`, from the cache: `read_csv`
-/// with its files. The `files` feature.
-#[cfg(feature = "files")]
-pub fn read(cache: &edinet::Cache, d: &edinet::Document, ticker: Ticker) -> Result<Vec<Reported>, Box<dyn Error>> {
-    let mut files = Vec::new();
-    for path in cache.csv_files(d)? {
-        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("").to_string();
-        files.push((name, std::fs::read(&path)?));
-    }
-    read_csv(d, ticker, &files)
-}
-
 /// The items one EDINET report states, for `ticker`, from its CSV files,
 /// each (file name, bytes) as the caller read them: no files.
 pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)]) -> Result<Vec<Reported>, Box<dyn Error>> {
@@ -216,24 +204,6 @@ pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)
         .collect();
     items.sort_by_key(|r| (r.date, r.item, r.p));
     Ok(items)
-}
-
-/// Every report of a company in the cache, read oldest first, with how many
-/// were not fetched yet.
-#[cfg(feature = "files")]
-pub fn read_company(cache: &edinet::Cache, ticker: Ticker) -> Result<(Vec<Reported>, usize, usize), Box<dyn Error>> {
-    let reports = cache.reports(ticker.as_str())?;
-    let (mut items, mut count, mut missing) = (Vec::new(), 0, 0);
-    for d in &reports {
-        match read(cache, d, ticker) {
-            Ok(mut r) => { items.append(&mut r); count += 1; },
-            Err(e) => match e.downcast_ref::<edinet::EdinetError>() {
-                Some(edinet::EdinetError::NotFetched(_)) => missing += 1,
-                _ => eprintln!("failed to read {} {}: {}", ticker, d.doc_id, e),
-            },
-        }
-    }
-    Ok((items, count, missing))
 }
 
 #[cfg(test)]
