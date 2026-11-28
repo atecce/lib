@@ -85,4 +85,42 @@ impl Store {
         tx.commit()?;
         Ok(written)
     }
+
+    /// A Robinhood report's rows (robinhood::parse) into the account named
+    /// `account` (portfolio_account.name), before Plaid's first transaction
+    /// there: Plaid wins where both have the day. Ids are "rh:<account>:<row>",
+    /// so a report imported again rewrites its own rows. Buys and sells of a
+    /// security Plaid never named are left out: nothing held now. Returns
+    /// (written, the cutoff day, left out).
+    pub fn write_robinhood_report(&mut self, account: &str, rows: &[crate::robinhood::Row])
+        -> Result<(usize, NaiveDate, usize), Box<dyn Error>> {
+        let mut tx = self.db.transaction()?;
+        let found = tx.query("SELECT account_id FROM portfolio_account WHERE name = $1", &[&account])?;
+        let [a] = found.as_slice() else { return Err(format!("no single account named {:?}", account).into()) };
+        let account_id: String = a.get(0);
+        let cutoff: NaiveDate = tx.query_one(
+            "SELECT min(date) FROM portfolio_transaction WHERE account_id = $1 AND transaction_id NOT LIKE 'rh:%'",
+            &[&account_id])?.get::<_, Option<NaiveDate>>(0).ok_or("Plaid has no transactions in that account yet: run store-plaid")?;
+        let (mut written, mut left_out) = (0, 0);
+        // Splits on every day: Plaid has none.
+        for r in rows.iter().filter(|r| r.date < cutoff || r.kind == crate::robinhood::Kind::Split) {
+            let security: Option<String> = match r.kind {
+                crate::robinhood::Kind::Dividend => None,
+                _ => match tx.query_opt("SELECT security_id FROM portfolio_security WHERE ticker = $1 AND type <> 'derivative' LIMIT 1", &[&r.ticker])? {
+                    Some(s) => Some(s.get(0)),
+                    None => { left_out += 1; continue }
+                },
+            };
+            let (t, sub) = r.kind.plaid();
+            written += tx.execute(
+                "INSERT INTO portfolio_transaction (transaction_id, account_id, security_id, date, type, subtype, quantity, price, amount, fees, name)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NULL, $10)
+                 ON CONFLICT (transaction_id) DO UPDATE SET security_id = EXCLUDED.security_id, date = EXCLUDED.date,
+                   quantity = EXCLUDED.quantity, price = EXCLUDED.price, amount = EXCLUDED.amount, name = EXCLUDED.name",
+                &[&format!("rh:{}:{}", account_id, r.id), &account_id, &security, &r.date, &t, &sub,
+                  &r.quantity, &r.price, &r.amount, &r.name])? as usize;
+        }
+        tx.commit()?;
+        Ok((written, cutoff, left_out))
+    }
 }

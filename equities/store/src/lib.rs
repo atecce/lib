@@ -18,6 +18,8 @@ use equities::valuation::Market;
 use postgres::{Client, NoTls, Transaction};
 
 pub mod portfolio;
+pub mod robinhood;
+pub mod sources;
 
 /// The schema, in order. Each runs once, recorded in `schema_migrations`.
 const MIGRATIONS: &[(&str, &str)] = &[

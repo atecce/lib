@@ -522,7 +522,8 @@ impl_reported! {
         InterestExpense => method interest_expense,
         IncomeBeforeIncomeTax => method income_before_income_tax,
         IncomeTaxExpense => field income_tax_expense,
-        NetIncome => method net_income,
+        ProfitLoss => method net_income,
+        NetIncome => method net_earnings_attributable_to_berkshire,
     ]
 }
 
@@ -694,28 +695,6 @@ mod tests {
         assert_eq!(c.net_earnings, i.net_income());
     }
 
-    /// Where the generic reader and these statements name the same item,
-    /// they agree. (The reader's other Berkshire items are partial or
-    /// misnamed: see README.md.)
-    #[test]
-    fn the_reader_agrees() {
-        let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../edgar/cache/1067983/000119312526083899"));
-        if !path.exists() { return; }
-        let mut r = crate::filing::new_reader(path, Ticker::BRK).unwrap();
-        let read: Vec<crate::item::Reported> = [
-            crate::Reader::process_balance_sheet(&mut r).unwrap(),
-            crate::Reader::process_income_statement(&mut r).unwrap(),
-        ].concat();
-        let mine = BALANCE_SHEET_2025.reported().into_iter().chain(INCOME_STATEMENT_2025.reported());
-        let mut agreed = 0;
-        for m in mine {
-            if let Some(r) = read.iter().find(|r| r.item == m.item && r.date == m.date && r.p == m.p) {
-                assert_eq!(r.val, m.val, "{:?}", m.item);
-                agreed += 1;
-            }
-        }
-        assert!(agreed >= 6, "only {} items agreed", agreed);
-    }
 
     /// The transcribed yearly changes compound to the letter's overall gains
     /// (each change is rounded to a tenth of a percent, so to within 1%).

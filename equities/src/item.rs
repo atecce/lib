@@ -15,7 +15,7 @@ macro_rules! items {
         }
 
         impl $item {
-            pub const ALL: [$item; 95] = [
+            pub const ALL: [$item; 98] = [
                 $($item::$variant,)*
             ];
 
@@ -26,9 +26,9 @@ macro_rules! items {
                 $($($(($tag, $item::$variant),)+)?)*
             ];
 
-            /// The item an XBRL element reports, e.g. "us-gaap_Revenues" or
-            /// "nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets", as
-            /// EDGAR's statement pages write them.
+            /// The item a shared XBRL element reports, e.g. "us-gaap_Revenues"
+            /// or "ifrs-full_Revenue", as EDGAR's statement pages write them.
+            /// A company's own elements are its module's (company.rs).
             pub fn from_xbrl_tag(tag: &str) -> Option<$item> {
                 let name = tag.strip_prefix("us-gaap_").unwrap_or(tag);
                 $($($(if name == $tag { return Some($item::$variant); })+)?)*
@@ -91,11 +91,11 @@ items! {
         // 流動資産合計 (ryūdō shisan gōkei): total current assets
         TotalCurrentAssets => ["Total current assets", "Total Current Assets", "流動資産", "流動資産合計"] @ ["AssetsCurrent", "ifrs-full_CurrentAssets", "jpigp_cor:CurrentAssetsIFRS", "jppfs_cor:CurrentAssets"],
 
-        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]", "Equipment on operating leases"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent", "f_NetInvestmentInOperatingLeasesNoncurrent", "gm_OperatingLeaseRightofuseAssetNoncurrent", "tm_VehiclesAndEquipmentOnOperatingLeases"],
+        OperatingLeaseVehiclesNet => ["Operating lease vehicles, net", "Operating Lease Vehicles [Member]", "Equipment on operating leases"] @ ["PropertySubjectToOrAvailableForOperatingLeaseNet", "DeferredCostsLeasingNetNoncurrent"],
         // A car maker's lending arm: loans and leases to buyers and dealers
-        // (Ford Credit; Toyota's 金融事業, kin'yū jigyō, financial services).
-        FinanceReceivablesCurrent => ["Ford Credit finance receivables, net"] @ ["NotesAndLoansReceivableNetCurrent", "tm_CurrentReceivablesRelatedToFinancialServices"],
-        FinanceReceivablesNonCurrent @ ["NotesAndLoansReceivableNetNoncurrent", "tm_NoncurrentReceivablesRelatedToFinancialServices"],
+        // (金融事業, kin'yū jigyō, financial services, in Japanese filings).
+        FinanceReceivablesCurrent @ ["NotesAndLoansReceivableNetCurrent"],
+        FinanceReceivablesNonCurrent @ ["NotesAndLoansReceivableNetNoncurrent"],
         SolarEnergySystemsNet => ["Solar energy systems, net", "Solar Energy Systems [Member]"],
 
         // 有形固定資産 (yūkei kotei shisan): property, plant and equipment
@@ -151,9 +151,8 @@ items! {
         // Borrowings on the face of the balance sheet, current and
         // non-current, summed (see `filing::total_debt`).
         TotalDebt,
-        // A car maker's debt by business, where its balance sheet splits it:
-        // Ford's "Company excluding Ford Credit" and "Ford Credit", GM's
-        // "Automotive" and "GM Financial".
+        // A car maker's debt by business, where its balance sheet splits it
+        // into its vehicles and its lending arm (sections named as for revenue).
         AutomotiveDebt,
         FinancialServicesDebt,
         StockholdersEquity => ["親会社の所有者に帰属する持分", "純資産合計"] @ ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "ifrs-full_EquityAttributableToOwnersOfParent", "ifrs-full_Equity", "jpigp_cor:EquityAttributableToOwnersOfParentIFRS", "jpigp_cor:EquityIFRS", "jppfs_cor:NetAssets"],
@@ -163,16 +162,27 @@ items! {
         // 営業収益 (eigyō shūeki): operating revenue: banks, brokers, utilities
         // Parts of revenue, from a statement's segment sections (see
         // `Item::part_of`): a car maker's vehicles against its lending arm.
-        // Sections are named by member: Tesla's "Automotive Revenues", Ford's
-        // "Company excluding Ford Credit", GM's "Automotive", Toyota's "Sales
-        // of products" (製品売上, seihin uriage).
-        AutomotiveRevenue => ["Automotive Revenues", "Total automotive revenues", "Company excluding Ford Credit", "Automotive", "Sales of products"] @ ["E02144:SalesOfProductsIFRS"],
+        // Sections are named by member ("Automotive Revenues", "Automotive");
+        // a name that is one company's own (its lending arm's) is its
+        // module's `label` (company::label_item).
+        AutomotiveRevenue => ["Automotive Revenues", "Total automotive revenues", "Automotive"],
         // 金融事業 (kin'yū jigyō): financial services.
-        FinancialServicesRevenue => ["Ford Credit", "GM Financial", "Financial services", "Financial Services", "Financing operations", "金融事業"] @ ["E02144:FinancingOperationsIFRS"],
+        FinancialServicesRevenue => ["Financial services", "Financial Services", "金融事業"],
         // Emission credits sold to other car makers.
         RegulatoryCreditsRevenue => ["Automotive regulatory credits"],
-        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "E02144:TotalNetRevenuesIFRS", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer"],
+        // The last four elements are other kinds of total: a bank's "total net
+        // revenues", contract revenue including taxes collected (only on a row
+        // that says revenue: see filing::row_item), a utility's regulated and
+        // unregulated operating revenue, and an older services total. Last, so
+        // a statement's usual total still outranks them. Which companies use
+        // them is said in their own modules (gs). Banks that show no total
+        // (net interest income and non-interest income apart) have none.
+        Revenue => ["Revenue", "Revenues", "Total revenues", "Total Revenues", "Net sales", "Total net sales", "売上高", "売上収益", "営業収益"] @ ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "SalesRevenueGoodsNet", "ifrs-full_Revenue", "ifrs-full_RevenueFromContractsWithCustomers", "jpigp_cor:RevenueIFRS", "jpigp_cor:NetSalesIFRS", "jppfs_cor:NetSales", "jppfs_cor:OperatingRevenue1", "jppfs_cor:OperatingRevenue2", "jpcrp_cor:RevenueIFRSSummaryOfBusinessResults", "jpcrp_cor:NetSalesSummaryOfBusinessResults", "RevenueNotFromContractWithCustomer", "RevenuesNetOfInterestExpense", "RevenueFromContractWithCustomerIncludingAssessedTax", "RegulatedAndUnregulatedOperatingRevenue", "SalesRevenueServicesNet"],
         // 売上原価 (uriage genka): cost of sales
+        // A bank's two kinds of income; their sum is its revenue where it
+        // prints no total (derive_bank_revenue).
+        NetInterestIncome => ["Net interest income", "Net Interest Income"] @ ["InterestIncomeExpenseNet", "ifrs-full_InterestRevenueExpense"],
+        NoninterestIncome => ["Total noninterest income", "Noninterest income", "Total non-interest income", "Total noninterest revenue"] @ ["NoninterestIncome"],
         CostOfRevenue => ["Cost of revenue", "Cost of revenues", "Total cost of revenue", "Total cost of revenues", "Total Cost of Revenue", "Total Cost of Revenues", "Cost of sales", "Total cost of sales", "売上原価"] @ ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "ifrs-full_CostOfSales", "jpigp_cor:CostOfSalesIFRS", "jppfs_cor:CostOfSales"],
 
 //        AutomotiveSalesRevenue => ["Automotive sales"],
@@ -215,7 +225,16 @@ items! {
         // 当期利益 (tōki rieki): profit for the period
         // 当期純利益 (tōki jun rieki): net income for the period
         // 親会社株主に帰属する当期純利益 (oyagaisha kabunushi ni kizoku suru tōki jun rieki): net income attributable to owners of the parent
-        NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss", "当期利益", "当期純利益", "親会社株主に帰属する当期純利益"] @ ["ProfitLoss", "NetIncomeLoss", "ifrs-full_ProfitLoss", "jpigp_cor:ProfitLossIFRS", "jppfs_cor:ProfitLoss", "jpigp_cor:ProfitLossAttributableToOwnersOfParentIFRS", "jppfs_cor:ProfitLossAttributableToOwnersOfParent"],
+        // Net income as the standards define it: the parent's (us-gaap
+        // NetIncomeLoss, IFRS's attributable to owners of the parent), what
+        // EPS and return on equity are about. Available to common
+        // stockholders (after preferred dividends) only where that isn't
+        // tagged; the consolidated figure (ProfitLoss, below) where neither
+        // is (derive_net_income).
+        NetIncome => ["Net income", "Net income (loss)", "Net (loss) income", "Net loss", "親会社株主に帰属する当期純利益"] @ ["NetIncomeLoss", "ifrs-full_ProfitLossAttributableToOwnersOfParent", "jpigp_cor:ProfitLossAttributableToOwnersOfParentIFRS", "jppfs_cor:ProfitLossAttributableToOwnersOfParent", "NetIncomeLossAvailableToCommonStockholdersBasic"],
+        // 当期利益 (tōki rieki), 当期純利益: profit for the period, all owners.
+        // The consolidated figure, minority interests included.
+        ProfitLoss => ["当期利益", "当期純利益"] @ ["ProfitLoss", "ifrs-full_ProfitLoss", "jpigp_cor:ProfitLossIFRS", "jppfs_cor:ProfitLoss"],
 
         // Per share and share counts, for valuation (market cap, P/E). Read
         // by tag only: their labels ("Basic", "Diluted") say nothing alone.
@@ -236,7 +255,7 @@ items! {
         StockBasedCompensationExpense => ["Stock-based compensation expense"] @ ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense", "ifrs-full_AdjustmentsForSharebasedPayments"],
         // 減価償却費及び償却費 (genka shōkyakuhi oyobi shōkyakuhi): depreciation and amortization
         // 減価償却費 (genka shōkyakuhi): depreciation
-        DepreciationAndAmoritization => ["Depreciation and amortization", "減価償却費及び償却費", "減価償却費"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization", "tsla_DepreciationAmortizationAndImpairment", "jpigp_cor:DepreciationAndAmortizationOpeCFIFRS", "jppfs_cor:DepreciationAndAmortizationOpeCF"],
+        DepreciationAndAmoritization => ["Depreciation and amortization", "減価償却費及び償却費", "減価償却費"] @ ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization", "jpigp_cor:DepreciationAndAmortizationOpeCFIFRS", "jppfs_cor:DepreciationAndAmortizationOpeCF"],
         DeferredIncomeTaxes => ["Deferred income taxes"],
         GainsOnNonMarketableEquitySecuritiesAndPubliclyHeldSecuritiesNet => ["securities, net"],
         Other,
@@ -253,7 +272,7 @@ items! {
         ProceedsFromSalesOfNonMarketableEquitySecurities => ["Proceeds from sales of non-marketable equity securities"],
         PurchasesOfMarketableSecurities => ["Purchases of marketable securities"],
         // 有形固定資産の取得による支出 (yūkei kotei shisan no shutoku ni yoru shishutsu): purchase of property, plant and equipment
-        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => ["Purchases related to property and equipment and intangible assets", "有形固定資産の取得による支出"] @ ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets", "nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets", "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities", "jpigp_cor:PurchaseOfPropertyPlantAndEquipmentInvCFIFRS", "jppfs_cor:PurchaseOfPropertyPlantAndEquipmentInvCF"],
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => ["Purchases related to property and equipment and intangible assets", "有形固定資産の取得による支出"] @ ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets", "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities", "jpigp_cor:PurchaseOfPropertyPlantAndEquipmentInvCFIFRS", "jppfs_cor:PurchaseOfPropertyPlantAndEquipmentInvCF"],
         PurchasesOfNonMarketableEquitySecurities => ["Purchases of non-marketable equity securities"],
         AcquisitionsNetOfCashAcquired => ["Acquisitions, net of cash acquired"] @ ["PaymentsToAcquireBusinessesNetOfCashAcquired", "PaymentsToAcquireBusinessesAndInterestInAffiliates", "PaymentsToAcquireBusinessesGross"],
         // 投資活動によるキャッシュ・フロー (tōshi katsudō ni yoru kyasshu furō): cash flows from investing activities
@@ -414,8 +433,17 @@ mod tests {
     fn tags() {
         assert_eq!(Item::from_xbrl_tag("us-gaap_Revenues"), Some(Item::Revenue));
         assert_eq!(Item::from_xbrl_tag("us-gaap_RevenuesAbstract"), None);
-        assert_eq!(Item::from_xbrl_tag("nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets"),
-            Some(Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets));
+        // A company's own element isn't in the shared lists (company.rs).
+        assert_eq!(Item::from_xbrl_tag("nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets"), None);
         assert_eq!(Item::from_xbrl_tag("tsla_Revenues"), None);
+        for tag in ["us-gaap_RevenuesNetOfInterestExpense", "us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax",
+                    "us-gaap_RegulatedAndUnregulatedOperatingRevenue", "us-gaap_SalesRevenueServicesNet"] {
+            assert_eq!(Item::from_xbrl_tag(tag), Some(Item::Revenue), "{}", tag);
+        }
+        // Ranked after the usual totals, so those still win.
+        let rank = |t: &str| Item::from_xbrl_tag_ranked(t).unwrap().1;
+        assert!(rank("us-gaap_Revenues") < rank("us-gaap_RevenuesNetOfInterestExpense"));
+        assert!(rank("us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax")
+            < rank("us-gaap_RevenueFromContractWithCustomerIncludingAssessedTax"));
     }
 }

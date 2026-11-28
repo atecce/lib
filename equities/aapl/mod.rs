@@ -266,28 +266,6 @@ mod tests {
         assert_eq!(i.net_income(), 29_578_000_000.0);
     }
 
-    /// The generic reader, on the same filing, agrees with the hand-written
-    /// statement, item by item.
-    #[test]
-    fn the_reader_agrees() {
-        let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../edgar/cache/320193/000032019326000013"));
-        if !path.exists() { return; }
-        let mut r = crate::filing::new_reader(path, Ticker::AAPL).unwrap();
-        let read: Vec<crate::item::Reported> = [
-            crate::Reader::process_balance_sheet(&mut r).unwrap(),
-            crate::Reader::process_income_statement(&mut r).unwrap(),
-        ].concat();
-        let mine = Q2_2026_BALANCE_SHEET.reported().into_iter().chain(Q2_2026_INCOME_STATEMENT.reported());
-        let mut agreed = 0;
-        for m in mine {
-            let found = read.iter().find(|r| r.item == m.item && r.date == m.date && r.p == m.p);
-            match found {
-                Some(r) => { assert_eq!(r.val, m.val, "{:?}", m.item); agreed += 1; },
-                None => eprintln!("the reader has no {:?} for {}", m.item, m.date),
-            }
-        }
-        assert!(agreed >= 30, "only {} items agreed", agreed);
-    }
 }
 
 /// A fiscal year from a 10-K filed before XBRL: what the 10-K itself said,

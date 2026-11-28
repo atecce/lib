@@ -128,7 +128,17 @@ impl Client {
             .header("Authorization", format!("Token {}", self.key))
             .send()
             .and_then(|r| r.error_for_status())?;
-        let new: Vec<Price> = serde_json::from_slice(&res.bytes()?)?;
+        let body = res.bytes()?;
+        // Refusals come back as 200 with {"detail": "..."} (the monthly
+        // symbol limit): say what Tiingo said, not that it isn't prices.
+        let new: Vec<Price> = match serde_json::from_slice(&body) {
+            Ok(prices) => prices,
+            Err(e) => match serde_json::from_slice::<serde_json::Value>(&body).ok()
+                .and_then(|v| v.get("detail").and_then(|d| d.as_str()).map(String::from)) {
+                Some(detail) => return Err(format!("Tiingo: {}", detail).into()),
+                None => return Err(e.into()),
+            },
+        };
         let added = new.iter().filter(|p| p.day().is_some_and(|d| last.is_none_or(|l| d > l))).count();
         prices.extend(new.into_iter().filter(|p| p.day().is_some_and(|d| last.is_none_or(|l| d > l))));
         let path = self.cache.dir().join(format!("{}.json", sym));

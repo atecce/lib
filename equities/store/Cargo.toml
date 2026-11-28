@@ -7,6 +7,10 @@ edition = "2024"
 # sources. See README.md.
 
 [dependencies]
+edgar = { path = "../../edgar", default-features = false }
+edinet = { path = "../../edinet", default-features = false }
+mops = { path = "../../mops", default-features = false }
+csv = "1"
 chrono = "0.4.44"
 equities = { path = ".." }
 postgres = { version = "0.19", features = ["with-chrono-0_4"] }
@@ -34,5 +38,18 @@ name = "store-plaid"
 path = "src/bin/plaid.rs"
 
 [[bin]]
+name = "store-robinhood"
+path = "src/bin/robinhood.rs"
+
+[[bin]]
+name = "store-equities"
+path = "src/bin/equities.rs"
+
+[[bin]]
 name = "store-rstar"
 path = "src/bin/rstar.rs"
+
+# The examples only (augurs: outliers in a series read from a workbook).
+[dev-dependencies]
+augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
+regex = "1.12.4"

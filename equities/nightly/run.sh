@@ -64,6 +64,12 @@ fi
 if [ $(echo $tickers | wc -l) -le 60 ]; then
   locked equities/tiingo/cache ./target/release/tiingo-fetch ${=tickers} >> $log 2>&1 || fetched=1
   push=$tickers
+elif [ ./target/release/store-equities -nt $stamp ]; then
+  # Rebuilt since the last run: the reader may read old filings differently
+  # (a new element, a correction), so every company is read again, not
+  # only those with new filings.
+  echo "=== $name: store-equities rebuilt since the last run: all of $list" >> $log
+  push=$tickers
 else
   push=$(./target/release/changed $stamp --list $list 2>>$log)
 fi
@@ -71,7 +77,7 @@ echo "=== $name push: $(echo $push | wc -w | tr -d ' ') companies" >> $log
 wait_for_stores || exit 1
 if [ -n "$push" ]; then
   # One company at a time (see DATA.md).
-  ./target/release/lib --postgres-only ${=push} >> $log 2>&1 || exit 1
+  ./target/release/store-equities --postgres-only ${=push} >> $log 2>&1 || exit 1
 fi
 mv $stamp.next $stamp
 # For catchup.sh: the launchd job this list runs as.

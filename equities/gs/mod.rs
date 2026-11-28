@@ -571,6 +571,7 @@ pub const CASH_FLOW_STATEMENT_2025: CashFlowStatement = CashFlowStatement {
 mod tests {
     use super::*;
 
+
     /// The computed totals equal the 10-K's printed ones.
     #[test]
     fn statements_match_the_filing() {
@@ -617,26 +618,4 @@ mod tests {
         assert!(per_outstanding > reported && per_outstanding / reported < 1.05, "{}", per_outstanding);
     }
 
-    /// Where the generic reader and these statements name the same item,
-    /// they agree.
-    #[test]
-    fn the_reader_agrees() {
-        let path = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../edgar/cache/886982/000088698226000091"));
-        if !path.exists() { return; }
-        let mut r = crate::filing::new_reader(path, Ticker::GS).unwrap();
-        let read: Vec<crate::item::Reported> = [
-            crate::Reader::process_balance_sheet(&mut r).unwrap(),
-            crate::Reader::process_income_statement(&mut r).unwrap(),
-        ].concat();
-        let mine = BALANCE_SHEET_2025.reported().into_iter().chain(INCOME_STATEMENT_2025.reported());
-        let mut agreed = 0;
-        let mut differ = Vec::new();
-        for m in mine {
-            if let Some(r) = read.iter().find(|r| r.item == m.item && r.date == m.date && r.p == m.p) {
-                if r.val == m.val { agreed += 1 } else { differ.push((m.item, r.val, m.val)) }
-            }
-        }
-        assert!(differ.is_empty(), "the reader differs: {:?}", differ);
-        assert!(agreed >= 5, "only {} items agreed", agreed);
-    }
 }

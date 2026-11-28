@@ -1,0 +1,1364 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FilingSummary>
+  <Version>3.25.4</Version>
+  <ProcessingTime/>
+  <ReportFormat>html</ReportFormat>
+  <ContextCount>717</ContextCount>
+  <ElementCount>706</ElementCount>
+  <EntityCount>1</EntityCount>
+  <FootnotesReported>false</FootnotesReported>
+  <SegmentCount>191</SegmentCount>
+  <ScenarioCount>0</ScenarioCount>
+  <TuplesReported>false</TuplesReported>
+  <UnitCount>11</UnitCount>
+  <MyReports>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R1.htm</HtmlFileName>
+      <LongName>0000001 - Document - Cover Page</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CoverPage</Role>
+      <ShortName>Cover Page</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>1</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R2.htm</HtmlFileName>
+      <LongName>0000002 - Document - Audit Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/AuditInformation</Role>
+      <ShortName>Audit Information</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>2</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R3.htm</HtmlFileName>
+      <LongName>9952151 - Statement - CONSOLIDATED INCOME STATEMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDINCOMESTATEMENTS</Role>
+      <ShortName>CONSOLIDATED INCOME STATEMENTS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>3</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R4.htm</HtmlFileName>
+      <LongName>9952152 - Statement - CONSOLIDATED STATEMENTS OF COMPREHENSIVE INCOME</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDSTATEMENTSOFCOMPREHENSIVEINCOME</Role>
+      <ShortName>CONSOLIDATED STATEMENTS OF COMPREHENSIVE INCOME</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>4</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R5.htm</HtmlFileName>
+      <LongName>9952153 - Statement - CONSOLIDATED BALANCE SHEETS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDBALANCESHEETS</Role>
+      <ShortName>CONSOLIDATED BALANCE SHEETS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>5</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R6.htm</HtmlFileName>
+      <LongName>9952154 - Statement - CONSOLIDATED BALANCE SHEETS (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDBALANCESHEETSParenthetical</Role>
+      <ShortName>CONSOLIDATED BALANCE SHEETS (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>6</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R7.htm</HtmlFileName>
+      <LongName>9952155 - Statement - CONSOLIDATED STATEMENTS OF CASH FLOWS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDSTATEMENTSOFCASHFLOWS</Role>
+      <ShortName>CONSOLIDATED STATEMENTS OF CASH FLOWS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>7</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R8.htm</HtmlFileName>
+      <LongName>9952156 - Statement - CONSOLIDATED STATEMENTS OF EQUITY</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CONSOLIDATEDSTATEMENTSOFEQUITY</Role>
+      <ShortName>CONSOLIDATED STATEMENTS OF EQUITY</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>8</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R9.htm</HtmlFileName>
+      <LongName>9952157 - Disclosure - Nature of Operations and Basis of Presentation</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/NatureofOperationsandBasisofPresentation</Role>
+      <ShortName>Nature of Operations and Basis of Presentation</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>9</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R10.htm</HtmlFileName>
+      <LongName>9952158 - Disclosure - Significant Accounting Policies</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SignificantAccountingPolicies</Role>
+      <ShortName>Significant Accounting Policies</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>10</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R11.htm</HtmlFileName>
+      <LongName>9952159 - Disclosure - Revenue</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/Revenue</Role>
+      <ShortName>Revenue</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>11</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R12.htm</HtmlFileName>
+      <LongName>9952160 - Disclosure - Marketable and Other Securities</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/MarketableandOtherSecurities</Role>
+      <ShortName>Marketable and Other Securities</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>12</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R13.htm</HtmlFileName>
+      <LongName>9952161 - Disclosure - GM Financial Receivables and Transactions</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactions</Role>
+      <ShortName>GM Financial Receivables and Transactions</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>13</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R14.htm</HtmlFileName>
+      <LongName>9952162 - Disclosure - Inventories</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/Inventories</Role>
+      <ShortName>Inventories</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>14</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R15.htm</HtmlFileName>
+      <LongName>9952163 - Disclosure - Operating Leases</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/OperatingLeases</Role>
+      <ShortName>Operating Leases</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>15</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R16.htm</HtmlFileName>
+      <LongName>9952164 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliates</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>16</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R17.htm</HtmlFileName>
+      <LongName>9952165 - Disclosure - Property</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/Property</Role>
+      <ShortName>Property</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>17</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R18.htm</HtmlFileName>
+      <LongName>9952166 - Disclosure - Goodwill and Intangible Assets</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GoodwillandIntangibleAssets</Role>
+      <ShortName>Goodwill and Intangible Assets</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>18</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R19.htm</HtmlFileName>
+      <LongName>9952167 - Disclosure - Variable Interest Entities</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/VariableInterestEntities</Role>
+      <ShortName>Variable Interest Entities</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>19</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R20.htm</HtmlFileName>
+      <LongName>9952168 - Disclosure - Accrued and Other Liabilities</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/AccruedandOtherLiabilities</Role>
+      <ShortName>Accrued and Other Liabilities</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>20</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R21.htm</HtmlFileName>
+      <LongName>9952169 - Disclosure - Debt</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/Debt</Role>
+      <ShortName>Debt</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>21</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R22.htm</HtmlFileName>
+      <LongName>9952170 - Disclosure - Derivative Financial Instruments</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DerivativeFinancialInstruments</Role>
+      <ShortName>Derivative Financial Instruments</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>22</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R23.htm</HtmlFileName>
+      <LongName>9952171 - Disclosure - Pensions and Other Postretirement Benefits</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefits</Role>
+      <ShortName>Pensions and Other Postretirement Benefits</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>23</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R24.htm</HtmlFileName>
+      <LongName>9952172 - Disclosure - Commitments, Contingencies, and Uncertainties</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CommitmentsContingenciesandUncertainties</Role>
+      <ShortName>Commitments, Contingencies, and Uncertainties</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>24</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R25.htm</HtmlFileName>
+      <LongName>9952173 - Disclosure - Income Taxes</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxes</Role>
+      <ShortName>Income Taxes</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>25</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R26.htm</HtmlFileName>
+      <LongName>9952174 - Disclosure - Restructuring and Other Initiatives</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RestructuringandOtherInitiatives</Role>
+      <ShortName>Restructuring and Other Initiatives</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>26</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R27.htm</HtmlFileName>
+      <LongName>9952175 - Disclosure - Interest Income and Other Non-Operating Income</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/InterestIncomeandOtherNonOperatingIncome</Role>
+      <ShortName>Interest Income and Other Non-Operating Income</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>27</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R28.htm</HtmlFileName>
+      <LongName>9952176 - Disclosure - Stockholders' Equity and Noncontrolling Interests</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockholdersEquityandNoncontrollingInterests</Role>
+      <ShortName>Stockholders' Equity and Noncontrolling Interests</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>28</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R29.htm</HtmlFileName>
+      <LongName>9952177 - Disclosure - Earnings Per Share</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EarningsPerShare</Role>
+      <ShortName>Earnings Per Share</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>29</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R30.htm</HtmlFileName>
+      <LongName>9952178 - Disclosure - Stock Incentive Plans</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockIncentivePlans</Role>
+      <ShortName>Stock Incentive Plans</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>30</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R31.htm</HtmlFileName>
+      <LongName>9952179 - Disclosure - Segment Reporting</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SegmentReporting</Role>
+      <ShortName>Segment Reporting</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>31</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R32.htm</HtmlFileName>
+      <LongName>9952180 - Disclosure - Supplemental Information for the Consolidated Statements of Cash Flows</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SupplementalInformationfortheConsolidatedStatementsofCashFlows</Role>
+      <ShortName>Supplemental Information for the Consolidated Statements of Cash Flows</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>32</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R33.htm</HtmlFileName>
+      <LongName>995445 - Disclosure - Insider Trading Arrangements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingArrangements</Role>
+      <ShortName>Insider Trading Arrangements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>33</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R34.htm</HtmlFileName>
+      <LongName>995447 - Disclosure - Insider Trading Policies and Procedures</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingPoliciesProc</Role>
+      <ShortName>Insider Trading Policies and Procedures</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>34</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R35.htm</HtmlFileName>
+      <LongName>995550 - Disclosure - Cybersecurity Risk Management and Strategy Disclosure</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/cyd/role/CybersecurityRiskManagementAndStrategyDisclosure</Role>
+      <ShortName>Cybersecurity Risk Management and Strategy Disclosure</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>35</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R36.htm</HtmlFileName>
+      <LongName>9955511 - Disclosure - Significant Accounting Policies (Policies)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SignificantAccountingPoliciesPolicies</Role>
+      <ShortName>Significant Accounting Policies (Policies)</ShortName>
+      <MenuCategory>Policies</MenuCategory>
+      <ParentRole>http://www.gm.com/role/SignificantAccountingPolicies</ParentRole>
+      <Position>36</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R37.htm</HtmlFileName>
+      <LongName>9955512 - Disclosure - Revenue (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RevenueTables</Role>
+      <ShortName>Revenue (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/Revenue</ParentRole>
+      <Position>37</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R38.htm</HtmlFileName>
+      <LongName>9955513 - Disclosure - Marketable and Other Securities (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/MarketableandOtherSecuritiesTables</Role>
+      <ShortName>Marketable and Other Securities (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/MarketableandOtherSecurities</ParentRole>
+      <Position>38</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R39.htm</HtmlFileName>
+      <LongName>9955514 - Disclosure - GM Financial Receivables and Transactions (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsTables</Role>
+      <ShortName>GM Financial Receivables and Transactions (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/GMFinancialReceivablesandTransactions</ParentRole>
+      <Position>39</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R40.htm</HtmlFileName>
+      <LongName>9955515 - Disclosure - Inventories (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/InventoriesTables</Role>
+      <ShortName>Inventories (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/Inventories</ParentRole>
+      <Position>40</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R41.htm</HtmlFileName>
+      <LongName>9955516 - Disclosure - Operating Leases (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/OperatingLeasesTables</Role>
+      <ShortName>Operating Leases (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/OperatingLeases</ParentRole>
+      <Position>41</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R42.htm</HtmlFileName>
+      <LongName>9955517 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesTables</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliates</ParentRole>
+      <Position>42</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R43.htm</HtmlFileName>
+      <LongName>9955518 - Disclosure - Property (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PropertyTables</Role>
+      <ShortName>Property (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/Property</ParentRole>
+      <Position>43</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R44.htm</HtmlFileName>
+      <LongName>9955519 - Disclosure - Goodwill and Intangible Assets (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GoodwillandIntangibleAssetsTables</Role>
+      <ShortName>Goodwill and Intangible Assets (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/GoodwillandIntangibleAssets</ParentRole>
+      <Position>44</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R45.htm</HtmlFileName>
+      <LongName>9955520 - Disclosure - Variable Interest Entities (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/VariableInterestEntitiesTables</Role>
+      <ShortName>Variable Interest Entities (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/VariableInterestEntities</ParentRole>
+      <Position>45</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R46.htm</HtmlFileName>
+      <LongName>9955521 - Disclosure - Accrued and Other Liabilities (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/AccruedandOtherLiabilitiesTables</Role>
+      <ShortName>Accrued and Other Liabilities (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/AccruedandOtherLiabilities</ParentRole>
+      <Position>46</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R47.htm</HtmlFileName>
+      <LongName>9955522 - Disclosure - Debt (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DebtTables</Role>
+      <ShortName>Debt (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/Debt</ParentRole>
+      <Position>47</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R48.htm</HtmlFileName>
+      <LongName>9955523 - Disclosure - Derivative Financial Instruments (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DerivativeFinancialInstrumentsTables</Role>
+      <ShortName>Derivative Financial Instruments (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/DerivativeFinancialInstruments</ParentRole>
+      <Position>48</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R49.htm</HtmlFileName>
+      <LongName>9955524 - Disclosure - Pensions and Other Postretirement Benefits (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsTables</Role>
+      <ShortName>Pensions and Other Postretirement Benefits (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/PensionsandOtherPostretirementBenefits</ParentRole>
+      <Position>49</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R50.htm</HtmlFileName>
+      <LongName>9955525 - Disclosure - Commitments, Contingencies, and Uncertainties (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CommitmentsContingenciesandUncertaintiesTables</Role>
+      <ShortName>Commitments, Contingencies, and Uncertainties (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/CommitmentsContingenciesandUncertainties</ParentRole>
+      <Position>50</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R51.htm</HtmlFileName>
+      <LongName>9955526 - Disclosure - Income Taxes (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesTables</Role>
+      <ShortName>Income Taxes (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/IncomeTaxes</ParentRole>
+      <Position>51</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R52.htm</HtmlFileName>
+      <LongName>9955527 - Disclosure - Restructuring and Other Initiatives (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RestructuringandOtherInitiativesTables</Role>
+      <ShortName>Restructuring and Other Initiatives (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/RestructuringandOtherInitiatives</ParentRole>
+      <Position>52</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R53.htm</HtmlFileName>
+      <LongName>9955528 - Disclosure - Interest Income and Other Non-Operating Income (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/InterestIncomeandOtherNonOperatingIncomeTables</Role>
+      <ShortName>Interest Income and Other Non-Operating Income (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/InterestIncomeandOtherNonOperatingIncome</ParentRole>
+      <Position>53</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R54.htm</HtmlFileName>
+      <LongName>9955529 - Disclosure - Stockholders' Equity and Noncontrolling Interests (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockholdersEquityandNoncontrollingInterestsTables</Role>
+      <ShortName>Stockholders' Equity and Noncontrolling Interests (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/StockholdersEquityandNoncontrollingInterests</ParentRole>
+      <Position>54</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R55.htm</HtmlFileName>
+      <LongName>9955530 - Disclosure - Earnings Per Share (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EarningsPerShareTables</Role>
+      <ShortName>Earnings Per Share (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/EarningsPerShare</ParentRole>
+      <Position>55</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R56.htm</HtmlFileName>
+      <LongName>9955531 - Disclosure - Stock Incentive Plans (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockIncentivePlansTables</Role>
+      <ShortName>Stock Incentive Plans (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/StockIncentivePlans</ParentRole>
+      <Position>56</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R57.htm</HtmlFileName>
+      <LongName>9955532 - Disclosure - Segment Reporting (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SegmentReportingTables</Role>
+      <ShortName>Segment Reporting (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/SegmentReporting</ParentRole>
+      <Position>57</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R58.htm</HtmlFileName>
+      <LongName>9955533 - Disclosure - Supplemental Information for the Consolidated Statements of Cash Flows (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SupplementalInformationfortheConsolidatedStatementsofCashFlowsTables</Role>
+      <ShortName>Supplemental Information for the Consolidated Statements of Cash Flows (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.gm.com/role/SupplementalInformationfortheConsolidatedStatementsofCashFlows</ParentRole>
+      <Position>58</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R59.htm</HtmlFileName>
+      <LongName>9955534 - Disclosure - Significant Accounting Policies (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SignificantAccountingPoliciesDetails</Role>
+      <ShortName>Significant Accounting Policies (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/SignificantAccountingPoliciesPolicies</ParentRole>
+      <Position>59</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R60.htm</HtmlFileName>
+      <LongName>9955535 - Disclosure - Revenue - Disaggregation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RevenueDisaggregationDetails</Role>
+      <ShortName>Revenue - Disaggregation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>60</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R61.htm</HtmlFileName>
+      <LongName>9955536 - Disclosure - Revenue - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RevenueNarrativeDetails</Role>
+      <ShortName>Revenue - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>61</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R62.htm</HtmlFileName>
+      <LongName>9955537 - Disclosure - Marketable and Other Securities - Fair Value of Cash Equivalents and Marketable Securities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/MarketableandOtherSecuritiesFairValueofCashEquivalentsandMarketableSecuritiesDetails</Role>
+      <ShortName>Marketable and Other Securities - Fair Value of Cash Equivalents and Marketable Securities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>62</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R63.htm</HtmlFileName>
+      <LongName>9955538 - Disclosure - Marketable and Other Securities - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/MarketableandOtherSecuritiesNarrativeDetails</Role>
+      <ShortName>Marketable and Other Securities - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>63</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R64.htm</HtmlFileName>
+      <LongName>9955539 - Disclosure - Marketable and Other Securities - Reconciliation of Cash, Cash Equivalents and Restricted Cash (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/MarketableandOtherSecuritiesReconciliationofCashCashEquivalentsandRestrictedCashDetails</Role>
+      <ShortName>Marketable and Other Securities - Reconciliation of Cash, Cash Equivalents and Restricted Cash (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>64</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R65.htm</HtmlFileName>
+      <LongName>9955540 - Disclosure - GM Financial Receivables and Transactions - Summary of Finance Receivables (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsSummaryofFinanceReceivablesDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Summary of Finance Receivables (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>65</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R66.htm</HtmlFileName>
+      <LongName>9955541 - Disclosure - GM Financial Receivables and Transactions - Allowance for Loan Losses (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsAllowanceforLoanLossesDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Allowance for Loan Losses (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>66</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R67.htm</HtmlFileName>
+      <LongName>9955542 - Disclosure - GM Financial Receivables and Transactions - Credit Risk Profile by FICO Score (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsCreditRiskProfilebyFICOScoreDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Credit Risk Profile by FICO Score (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>67</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R68.htm</HtmlFileName>
+      <LongName>9955543 - Disclosure - GM Financial Receivables and Transactions - Retail Finance Receivables Delinquencies (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsRetailFinanceReceivablesDelinquenciesDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Retail Finance Receivables Delinquencies (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>68</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R69.htm</HtmlFileName>
+      <LongName>9955544 - Disclosure - GM Financial Receivables and Transactions - Commercial Finance Receivables Credit Quality Indicators (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsCommercialFinanceReceivablesCreditQualityIndicatorsDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Commercial Finance Receivables Credit Quality Indicators (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>69</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R70.htm</HtmlFileName>
+      <LongName>9955545 - Disclosure - GM Financial Receivables and Transactions - Transfers of Finance Receivables (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsTransfersofFinanceReceivablesDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Transfers of Finance Receivables (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>70</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R71.htm</HtmlFileName>
+      <LongName>9955546 - Disclosure - GM Financial Receivables and Transactions - Intercompany Transactions (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GMFinancialReceivablesandTransactionsIntercompanyTransactionsDetails</Role>
+      <ShortName>GM Financial Receivables and Transactions - Intercompany Transactions (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>71</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R72.htm</HtmlFileName>
+      <LongName>9955547 - Disclosure - Inventories (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/InventoriesDetails</Role>
+      <ShortName>Inventories (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/InventoriesTables</ParentRole>
+      <Position>72</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R73.htm</HtmlFileName>
+      <LongName>9955548 - Disclosure - Operating Leases (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/OperatingLeasesDetails</Role>
+      <ShortName>Operating Leases (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/OperatingLeasesTables</ParentRole>
+      <Position>73</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R74.htm</HtmlFileName>
+      <LongName>9955549 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates - Revenue and Expenses of our Joint Ventures (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesRevenueandExpensesofourJointVenturesDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates - Revenue and Expenses of our Joint Ventures (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>74</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R75.htm</HtmlFileName>
+      <LongName>9955550 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates -Investments in Nonconsolidated Affiliates (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesInvestmentsinNonconsolidatedAffiliatesDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates -Investments in Nonconsolidated Affiliates (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>75</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R76.htm</HtmlFileName>
+      <LongName>9955551 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesNarrativeDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesTables</ParentRole>
+      <Position>76</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R77.htm</HtmlFileName>
+      <LongName>9955552 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates - Direct Ownership Interests in our China JVs (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesDirectOwnershipInterestsinourChinaJVsDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates - Direct Ownership Interests in our China JVs (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>77</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R78.htm</HtmlFileName>
+      <LongName>9955553 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates - Summarized Financial Data of NCAs (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesSummarizedFinancialDataofNCAsDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates - Summarized Financial Data of NCAs (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>78</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R79.htm</HtmlFileName>
+      <LongName>9955554 - Disclosure - Equity in Net Assets of Nonconsolidated Affiliates - Transactions with NCAs (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EquityinNetAssetsofNonconsolidatedAffiliatesTransactionswithNCAsDetails</Role>
+      <ShortName>Equity in Net Assets of Nonconsolidated Affiliates - Transactions with NCAs (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>79</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R80.htm</HtmlFileName>
+      <LongName>9955555 - Disclosure - Property (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PropertyDetails</Role>
+      <ShortName>Property (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/PropertyTables</ParentRole>
+      <Position>80</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R81.htm</HtmlFileName>
+      <LongName>9955556 - Disclosure - Goodwill and Intangible Assets - Goodwill (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GoodwillandIntangibleAssetsGoodwillDetails</Role>
+      <ShortName>Goodwill and Intangible Assets - Goodwill (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>81</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R82.htm</HtmlFileName>
+      <LongName>9955557 - Disclosure - Goodwill and Intangible Assets - Intangible Assets (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/GoodwillandIntangibleAssetsIntangibleAssetsDetails</Role>
+      <ShortName>Goodwill and Intangible Assets - Intangible Assets (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>82</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R83.htm</HtmlFileName>
+      <LongName>9955558 - Disclosure - Variable Interest Entities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/VariableInterestEntitiesDetails</Role>
+      <ShortName>Variable Interest Entities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/VariableInterestEntitiesTables</ParentRole>
+      <Position>83</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R84.htm</HtmlFileName>
+      <LongName>9955559 - Disclosure - Accrued and Other Liabilities - Accrued and Other Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/AccruedandOtherLiabilitiesAccruedandOtherLiabilitiesDetails</Role>
+      <ShortName>Accrued and Other Liabilities - Accrued and Other Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>84</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R85.htm</HtmlFileName>
+      <LongName>9955560 - Disclosure - Accrued and Other Liabilities - Product Warranty and Related Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/AccruedandOtherLiabilitiesProductWarrantyandRelatedLiabilitiesDetails</Role>
+      <ShortName>Accrued and Other Liabilities - Product Warranty and Related Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>85</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R86.htm</HtmlFileName>
+      <LongName>9955561 - Disclosure - Debt - Automotive and GM Financial Debt (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DebtAutomotiveandGMFinancialDebtDetails</Role>
+      <ShortName>Debt - Automotive and GM Financial Debt (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>86</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R87.htm</HtmlFileName>
+      <LongName>9955562 - Disclosure - Debt - Secured Debt and Unsecured Debt (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DebtSecuredDebtandUnsecuredDebtDetails</Role>
+      <ShortName>Debt - Secured Debt and Unsecured Debt (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>87</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R88.htm</HtmlFileName>
+      <LongName>9955563 - Disclosure - Debt - Interest Expense and LT Debt Maturities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DebtInterestExpenseandLTDebtMaturitiesDetails</Role>
+      <ShortName>Debt - Interest Expense and LT Debt Maturities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>88</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R89.htm</HtmlFileName>
+      <LongName>9955564 - Disclosure - Derivative Financial Instruments - Derivative Financial Instruments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DerivativeFinancialInstrumentsDerivativeFinancialInstrumentsDetails</Role>
+      <ShortName>Derivative Financial Instruments - Derivative Financial Instruments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>89</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R90.htm</HtmlFileName>
+      <LongName>9955565 - Disclosure - Derivative Financial Instruments - Balance Sheet Location of GM Financial Unsecured Debt (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/DerivativeFinancialInstrumentsBalanceSheetLocationofGMFinancialUnsecuredDebtDetails</Role>
+      <ShortName>Derivative Financial Instruments - Balance Sheet Location of GM Financial Unsecured Debt (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>90</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R91.htm</HtmlFileName>
+      <LongName>9955566 - Disclosure - Pensions and Other Postretirement Benefits - Contributions and Plan Amendments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsContributionsandPlanAmendmentsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Contributions and Plan Amendments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>91</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R92.htm</HtmlFileName>
+      <LongName>9955567 - Disclosure - Pensions and Other Postretirement Benefits - Pensions and OPEB Obligations and Plan Assets (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsPensionsandOPEBObligationsandPlanAssetsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Pensions and OPEB Obligations and Plan Assets (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>92</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R93.htm</HtmlFileName>
+      <LongName>9955568 - Disclosure - Pensions and Other Postretirement Benefits - Accumulated Benefit Obligations and Projected Benefit Obligations (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsAccumulatedBenefitObligationsandProjectedBenefitObligationsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Accumulated Benefit Obligations and Projected Benefit Obligations (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>93</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R94.htm</HtmlFileName>
+      <LongName>9955569 - Disclosure - Pensions and Other Postretirement Benefits - Components of Expense and Assumptions (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsComponentsofExpenseandAssumptionsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Components of Expense and Assumptions (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>94</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R95.htm</HtmlFileName>
+      <LongName>9955570 - Disclosure - Pensions and Other Postretirement Benefits - Target Allocation Tables (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsTargetAllocationTablesDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Target Allocation Tables (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>95</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R96.htm</HtmlFileName>
+      <LongName>9955571 - Disclosure - Pensions and Other Postretirement Benefits - Assets and Fair Value Measurements (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsAssetsandFairValueMeasurementsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Assets and Fair Value Measurements (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>96</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R97.htm</HtmlFileName>
+      <LongName>9955572 - Disclosure - Pensions and Other Postretirement Benefits - Pension Benefit Payments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/PensionsandOtherPostretirementBenefitsPensionBenefitPaymentsDetails</Role>
+      <ShortName>Pensions and Other Postretirement Benefits - Pension Benefit Payments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>97</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R98.htm</HtmlFileName>
+      <LongName>9955573 - Disclosure - Commitments, Contingencies, and Uncertainties - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CommitmentsContingenciesandUncertaintiesNarrativeDetails</Role>
+      <ShortName>Commitments, Contingencies, and Uncertainties - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>98</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R99.htm</HtmlFileName>
+      <LongName>9955574 - Disclosure - Commitments, Contingencies, and Uncertainties - Schedule of Supplier Finance Program (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/CommitmentsContingenciesandUncertaintiesScheduleofSupplierFinanceProgramDetails</Role>
+      <ShortName>Commitments, Contingencies, and Uncertainties - Schedule of Supplier Finance Program (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>99</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R100.htm</HtmlFileName>
+      <LongName>9955575 - Disclosure - Income Taxes - Pre-tax Income and Income Tax Expense (Benefit) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesPretaxIncomeandIncomeTaxExpenseBenefitDetails</Role>
+      <ShortName>Income Taxes - Pre-tax Income and Income Tax Expense (Benefit) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>100</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R101.htm</HtmlFileName>
+      <LongName>9955576 - Disclosure - Income Taxes - U.S. Federal statutory tax rate (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesUSFederalstatutorytaxrateDetails</Role>
+      <ShortName>Income Taxes - U.S. Federal statutory tax rate (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>101</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R102.htm</HtmlFileName>
+      <LongName>9955577 - Disclosure - Income Taxes - Income Tax Expense (Benefit) Reconciliation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesIncomeTaxExpenseBenefitReconciliationDetails</Role>
+      <ShortName>Income Taxes - Income Tax Expense (Benefit) Reconciliation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>102</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R103.htm</HtmlFileName>
+      <LongName>9955578 - Disclosure - Income Taxes - Deferred Tax Assets and Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesDeferredTaxAssetsandLiabilitiesDetails</Role>
+      <ShortName>Income Taxes - Deferred Tax Assets and Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>103</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R104.htm</HtmlFileName>
+      <LongName>9955579 - Disclosure - Income Taxes - Uncertain Tax Positions (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesUncertainTaxPositionsDetails</Role>
+      <ShortName>Income Taxes - Uncertain Tax Positions (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>104</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R105.htm</HtmlFileName>
+      <LongName>9955580 - Disclosure - Income Taxes - Income Tax Cash Paid (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesIncomeTaxCashPaidDetails</Role>
+      <ShortName>Income Taxes - Income Tax Cash Paid (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>105</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R106.htm</HtmlFileName>
+      <LongName>9955581 - Disclosure - Income Taxes - Income Tax Cash Paid By Jurisdiction (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/IncomeTaxesIncomeTaxCashPaidByJurisdictionDetails</Role>
+      <ShortName>Income Taxes - Income Tax Cash Paid By Jurisdiction (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>106</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R107.htm</HtmlFileName>
+      <LongName>9955582 - Disclosure - Restructuring and Other Initiatives - Schedule of Restructuring Reserves and Charges (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RestructuringandOtherInitiativesScheduleofRestructuringReservesandChargesDetails</Role>
+      <ShortName>Restructuring and Other Initiatives - Schedule of Restructuring Reserves and Charges (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>107</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R108.htm</HtmlFileName>
+      <LongName>9955583 - Disclosure - Restructuring and Other Initiatives - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/RestructuringandOtherInitiativesNarrativeDetails</Role>
+      <ShortName>Restructuring and Other Initiatives - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>108</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R109.htm</HtmlFileName>
+      <LongName>9955584 - Disclosure - Interest Income and Other Non-Operating Income (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/InterestIncomeandOtherNonOperatingIncomeDetails</Role>
+      <ShortName>Interest Income and Other Non-Operating Income (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/InterestIncomeandOtherNonOperatingIncomeTables</ParentRole>
+      <Position>109</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R110.htm</HtmlFileName>
+      <LongName>9955585 - Disclosure - Stockholders' Equity and Noncontrolling Interests - Preferred and Common Stock (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockholdersEquityandNoncontrollingInterestsPreferredandCommonStockDetails</Role>
+      <ShortName>Stockholders' Equity and Noncontrolling Interests - Preferred and Common Stock (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>110</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R111.htm</HtmlFileName>
+      <LongName>9955586 - Disclosure - Stockholders' Equity and Noncontrolling Interests - Accumulated Other Comprehensive Loss (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockholdersEquityandNoncontrollingInterestsAccumulatedOtherComprehensiveLossDetails</Role>
+      <ShortName>Stockholders' Equity and Noncontrolling Interests - Accumulated Other Comprehensive Loss (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>111</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R112.htm</HtmlFileName>
+      <LongName>9955587 - Disclosure - Earnings Per Share (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/EarningsPerShareDetails</Role>
+      <ShortName>Earnings Per Share (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/EarningsPerShareTables</ParentRole>
+      <Position>112</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R113.htm</HtmlFileName>
+      <LongName>9955588 - Disclosure - Stock Incentive Plans - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockIncentivePlansNarrativeDetails</Role>
+      <ShortName>Stock Incentive Plans - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>113</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R114.htm</HtmlFileName>
+      <LongName>9955589 - Disclosure - Stock Incentive Plans - Equity-Classified Awards (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/StockIncentivePlansEquityClassifiedAwardsDetails</Role>
+      <ShortName>Stock Incentive Plans - Equity-Classified Awards (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>114</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R115.htm</HtmlFileName>
+      <LongName>9955590 - Disclosure - Segment Reporting - Summary of Key Financial Information by Segment (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SegmentReportingSummaryofKeyFinancialInformationbySegmentDetails</Role>
+      <ShortName>Segment Reporting - Summary of Key Financial Information by Segment (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>115</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R116.htm</HtmlFileName>
+      <LongName>9955591 - Disclosure - Segment Reporting - Revenues and long-lived assets by geographic region (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SegmentReportingRevenuesandlonglivedassetsbygeographicregionDetails</Role>
+      <ShortName>Segment Reporting - Revenues and long-lived assets by geographic region (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>116</Position>
+    </Report>
+    <Report instance="gm-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R117.htm</HtmlFileName>
+      <LongName>9955592 - Disclosure - Supplemental Information for the Consolidated Statements of Cash Flows (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.gm.com/role/SupplementalInformationfortheConsolidatedStatementsofCashFlowsDetails</Role>
+      <ShortName>Supplemental Information for the Consolidated Statements of Cash Flows (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.gm.com/role/SupplementalInformationfortheConsolidatedStatementsofCashFlowsTables</ParentRole>
+      <Position>117</Position>
+    </Report>
+    <Report>
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <LongName>All Reports</LongName>
+      <ReportType>Book</ReportType>
+      <ShortName>All Reports</ShortName>
+    </Report>
+  </MyReports>
+  <InputFiles>
+    <File doctype="10-K" isDefinitelyFs="true" isUsgaap="true" original="gm-20251231.htm">gm-20251231.htm</File>
+    <File>gm-20251231.xsd</File>
+    <File>gm-20251231_cal.xml</File>
+    <File>gm-20251231_def.xml</File>
+    <File>gm-20251231_lab.xml</File>
+    <File>gm-20251231_pre.xml</File>
+  </InputFiles>
+  <SupplementalFiles>
+    <File>gm-20251231_g1.jpg</File>
+    <File>gm-20251231_g2.jpg</File>
+    <File>gm-20251231_g3.jpg</File>
+  </SupplementalFiles>
+  <BaseTaxonomies>
+    <BaseTaxonomy items="6">http://fasb.org/srt/2025</BaseTaxonomy>
+    <BaseTaxonomy items="2425">http://fasb.org/us-gaap/2025</BaseTaxonomy>
+    <BaseTaxonomy items="15">http://xbrl.sec.gov/cyd/2025</BaseTaxonomy>
+    <BaseTaxonomy items="38">http://xbrl.sec.gov/dei/2025</BaseTaxonomy>
+    <BaseTaxonomy items="13">http://xbrl.sec.gov/ecd/2025</BaseTaxonomy>
+  </BaseTaxonomies>
+  <HasPresentationLinkbase>true</HasPresentationLinkbase>
+  <HasCalculationLinkbase>true</HasCalculationLinkbase>
+</FilingSummary>

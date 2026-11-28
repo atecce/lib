@@ -17,6 +17,11 @@ fetch = ["dep:reqwest"]
 [dependencies]
 chrono = "0.4.44"
 reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
+# Reading reports into the accounting's items (equities' vocabulary and
+# its Statements interface): HTML, in Big5.
+equities = { path = "../equities" }
+scraper = "0.26.0"
+encoding_rs = "0.8"
 
 [[bin]]
 name = "mops-fetch"

@@ -23,6 +23,10 @@ use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Reading a report's page into equities' items: `report::read_bytes`,
+/// and `report::MopsReport`, which implements equities' `Statements`.
+pub mod report;
+
 #[cfg(feature = "fetch")]
 mod client;
 #[cfg(feature = "fetch")]

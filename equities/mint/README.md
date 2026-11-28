@@ -27,7 +27,7 @@ read by `edgar::funds`.
 
 ## What it holds
 
-    cargo run --release -p equities --example fund_holdings -- MINT
+    cargo run --release -p store --example fund_holdings -- MINT
 
 From N-PORT for June 30, 2026 (0001410368-26-090134): 1,019 holdings from
 342 issuers, as percentages of net assets.
@@ -59,7 +59,7 @@ From N-PORT for June 30, 2026 (0001410368-26-090134): 1,019 holdings from
 
 ## How the portfolio has changed
 
-    cargo run --release -p equities --example fund_history -- MINT
+    cargo run --release -p store --example fund_history -- MINT
 
 Every N-PORT report since September 2019, as percentages of net assets
 (fixed and floating can add to more than 100 where the fund borrows
@@ -126,7 +126,7 @@ quarters around 2022.)
 
 ## Its return against bills
 
-    cargo run --release -p equities --example mint_treasuries
+    cargo run --release -p store --example mint_treasuries
 
 MINT's total return (Tiingo's adjusted closes, distributions reinvested)
 against rolling 3-month bills (each day accruing that day's 3-month

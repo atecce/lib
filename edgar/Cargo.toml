@@ -18,6 +18,12 @@ serde_json = "1.0.150"
 reqwest = { version = "0.13.4", features = ["blocking", "gzip"], optional = true }
 # Bulk submissions (fetch) and the fund data sets (read).
 zip = { version = "7.2.0", default-features = false, features = ["deflate"] }
+# Reading statements into the accounting's items: the vocabulary and the
+# Statements interface are equities'; the format is ours.
+equities = { path = "../equities" }
+calamine = "0.35.0"
+regex = "1.12.4"
+scraper = "0.26.0"
 
 [[bin]]
 name = "fetch"

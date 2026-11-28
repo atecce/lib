@@ -6,17 +6,18 @@
 //! monthly averages in percent, from April 1953. A year's yield is its
 //! December's.
 
-use std::error::Error;
+
 
 pub const SERIES: &str = "GS10";
 
 pub struct TenYear {
-    series: fred::Series,
+    series: crate::series::Series,
 }
 
 impl TenYear {
-    pub fn load() -> Result<TenYear, Box<dyn Error>> {
-        Ok(TenYear { series: fred::Cache::new(fred::Cache::default_dir()).series(SERIES)? })
+    /// From the GS10 series, as the caller read it (from the fred cache).
+    pub fn new(series: crate::series::Series) -> TenYear {
+        TenYear { series }
     }
 
     /// The yield at the end of `year` (December's average), as a fraction.
@@ -37,7 +38,12 @@ mod tests {
 
     #[test]
     fn reads_the_cached_series() {
-        let t = TenYear::load().expect("fred/cache/GS10.csv (tracked as a fixture)");
+        // The tracked fixture, compiled in: the test reads no files.
+        let csv = include_str!("../../fred/cache/GS10.csv");
+        let t = TenYear::new(crate::series::Series::new(csv.lines().skip(1).filter_map(|l| {
+            let (d, v) = l.split_once(',')?;
+            Some((d.parse().ok()?, v.parse().ok()?))
+        })));
         assert!((t.at_end_of(1981).unwrap() - 0.1372).abs() < 1e-12);
         assert!((t.cost_of_equity(2021, 0.04).unwrap() - 0.0493).abs() < 1e-12);
         assert!((1954..=2025).all(|y| t.at_end_of(y).is_some()));

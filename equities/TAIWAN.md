@@ -92,7 +92,7 @@ Some of the large names, with the US ADRs where they have them:
   company's history takes about 25 minutes. `mops-fetch 2330.TW ...`.
   The bulk zips (`tifrs-YYYYQn.zip`, every company's XBRL for a quarter)
   exist but are served at about 15 KB/s.
-- **The reader** (`equities::mops`): two layouts, to 2018 Chinese labels
+- **The reader** (`mops::report`, in the mops crate): two layouts, to 2018 Chinese labels
   only, from 2019 account codes with Chinese and English labels; mapped by
   the Chinese label, which both share. Columns from their headers: a date
   (年月日), a quarter (第N季), a range (至), a year (年度). Amounts in

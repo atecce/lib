@@ -313,3 +313,23 @@ impl CFS for CashFlowStatement {
         self.net_cash_used_in_financing_activities()
     }
 }
+
+/// The item one of NVIDIA's own elements reports: its purchases of property,
+/// equipment and intangible assets, its capital expenditure, carry its own.
+pub fn item(tag: &str) -> Option<crate::item::Item> {
+    match tag {
+        "nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets" =>
+            Some(crate::item::Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets),
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod own_element_tests {
+    #[test]
+    fn its_own_elements() {
+        assert_eq!(super::item("nvda_PurchasesOfPropertyAndEquipmentAndIntangibleAssets"),
+                   Some(crate::item::Item::PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets));
+    }
+}
+

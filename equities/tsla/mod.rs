@@ -115,6 +115,9 @@ pub struct IncomeStatement {
     pub other_expense_income_net: f64,
 
     pub provision_for_income_taxes: f64,
+    /// Net income of minority holders in subsidiaries (and redeemable
+    /// ones), which the parent's net income excludes.
+    pub net_income_attributable_to_noncontrolling_interests: f64,
 }
 
 impl Statement for IncomeStatement {
@@ -135,6 +138,13 @@ impl IS for IncomeStatement {
     }
     fn net_income(&self) -> f64 {
         self.income_before_income_tax() - self.provision_for_income_taxes
+    }
+}
+
+impl IncomeStatement {
+    /// The parent's: net income less the minority holders' share.
+    fn net_income_attributable_to_common_stockholders(&self) -> f64 {
+        IS::net_income(self) - self.net_income_attributable_to_noncontrolling_interests
     }
 }
 
@@ -361,7 +371,24 @@ impl_reported! {
         OtherIncomeNet => field other_expense_income_net,
         IncomeBeforeIncomeTax => method income_before_income_tax,
         IncomeTaxExpense => field provision_for_income_taxes,
-        NetIncome => method net_income,
+        ProfitLoss => method net_income,
+        NetIncome => method net_income_attributable_to_common_stockholders,
+    ]
+}
+
+// The lines the EDGAR reader reads from a cash-flow statement, for the
+// known-answer test (filings/q3_2025).
+impl_reported! {
+    CashFlowStatement,
+    [
+        DepreciationAndAmoritization => field depreciation_amortization_and_impairment,
+        StockBasedCompensationExpense => field stock_based_compensation,
+        ChangeInInventories => field changes_in_inventory,
+        NetCashProvidedByOperatingActivities => method net_cash_provided_by_operating_activities,
+        PurchasesRelatedToPropertyAndEquipmentAndIntangibleAssets => field purchases_of_property_and_equipment_excluding_finance_leases_net_of_sales,
+        NetCashUsedInInvestingActivities => method net_cash_used_in_investing_activities,
+        NetCashUsedInFinancingActivities => method net_cash_provided_by_financing_activities,
+        ChangeInCashAndCashEquivalents => method net_increase_in_cash_and_cash_equivalents_and_restricted_cash,
     ]
 }
 
@@ -376,3 +403,22 @@ impl CFS for CashFlowStatement {
         self.net_cash_provided_by_financing_activities()
     }
 }
+
+/// The item one of Tesla's own elements reports: its depreciation and
+/// amortization, with impairment, carries its own.
+pub fn item(tag: &str) -> Option<crate::item::Item> {
+    match tag {
+        "tsla_DepreciationAmortizationAndImpairment" => Some(crate::item::Item::DepreciationAndAmoritization),
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod own_element_tests {
+    #[test]
+    fn its_own_elements() {
+        assert_eq!(super::item("tsla_DepreciationAmortizationAndImpairment"),
+                   Some(crate::item::Item::DepreciationAndAmoritization));
+    }
+}
+

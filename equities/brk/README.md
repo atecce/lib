@@ -5,8 +5,8 @@ for Apple, over the sixty years since Buffett took control in 1965.
 Reproduce with
 
 ```sh
-cargo run --release -p equities --example brk_history            # r = 9%
-cargo run --release -p equities --example brk_history -- 0.07
+cargo run --release -p store --example brk_history            # r = 9%
+cargo run --release -p store --example brk_history -- 0.07
 cargo run --release -p backtest --example persistence -- BRK     # GAAP, against insurers
 cargo test -p equities --lib brk
 ```
@@ -221,7 +221,7 @@ since 1953 from the FRED cache (series GS10, the Federal Reserve's H.15;
 `--premium P` sets each year's r to the previous December's yield plus P:
 the rate known when the year began, plus an equity risk premium.
 
-    cargo run --release -p equities --example brk_history -- --premium 0.04
+    cargo run --release -p store --example brk_history -- --premium 0.04
 
 With a premium of 4%, r runs from 8.2% in 1965 to 17.7% in 1982 and down to
 4.9% in 2021:

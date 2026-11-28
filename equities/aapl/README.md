@@ -33,7 +33,7 @@ residual income is positive and the price above book.
 Fiscal 1991–2010 come from the 10-Ks themselves, filed before XBRL: their
 five-year tables, balance sheets and statements of shareholders' equity, as
 first reported (`BEFORE_XBRL` in `mod.rs`, each year with its filing;
-`cargo run --release -p equities --example aapl_history`). EDGAR begins
+`cargo run --release -p store --example aapl_history`). EDGAR begins
 with the fiscal 1994 10-K, whose statement of equity reaches back to
 September 1991; the 1980s were filed on paper. 2011 on is from XBRL
 (`backtest`'s `persistence` example). Fiscal years end in late September,
