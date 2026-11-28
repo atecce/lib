@@ -8,7 +8,8 @@ use std::error::Error;
 use equities::item::{Filed, Source};
 use edgar::filing::EdgarFiling;
 use edinet::report::EdinetReport;
-use equities::statements::{MopsReport, Statements};
+use mops::report::MopsReport;
+use equities::statements::Statements;
 use equities::Ticker;
 
 /// A company's filings in a source's cache, ready to read, and what isn't.

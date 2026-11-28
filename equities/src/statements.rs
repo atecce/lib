@@ -9,13 +9,14 @@
 //!   format): EDGAR's rendered statement pages, read as asked;
 //! - `edinet::report::EdinetReport` (in the edinet crate): a report's CSV
 //!   files (UTF-16, one fact a line);
-//! - `MopsReport`: a MOPS report's page (Big5 HTML).
+//! - `mops::report::MopsReport` (in the mops crate): a report's page (Big5
+//!   HTML).
 //!
 //! Each reads into `Reported`, every value carrying its filing. None opens a
 //! file: the caller (store::sources) hands over the contents.
 
 use crate::item::{Filed, Reported};
-use crate::Ticker;
+
 
 /// What reading a filing gave: its values, and what was left out and why,
 /// for the caller to report.
@@ -33,23 +34,3 @@ pub trait Statements {
     fn read(&mut self) -> Read;
 }
 
-/// A MOPS report: its page's bytes.
-pub struct MopsReport {
-    filed: Filed,
-    ticker: Ticker,
-    bytes: Vec<u8>,
-}
-
-impl MopsReport {
-    pub fn new(filed: Filed, ticker: Ticker, bytes: Vec<u8>) -> MopsReport {
-        MopsReport { filed, ticker, bytes }
-    }
-}
-
-impl Statements for MopsReport {
-    fn filed(&self) -> &Filed { &self.filed }
-
-    fn read(&mut self) -> Read {
-        Read { items: crate::mops::read_bytes(&self.filed, self.ticker, &self.bytes), notes: Vec::new() }
-    }
-}

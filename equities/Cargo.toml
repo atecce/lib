@@ -4,19 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-augurs = { version = "0.10.3", features = ["outlier", "changepoint", "seasons"] }
-calamine = "0.35.0"
 chrono = {version = "0.4.44", features = ["serde"]}
-# Reads the FRED cache (Treasury yields); fetching it is the fred crate's job.
+# FRED's series type (treasury's 10-year yield); callers read the cache.
 fred = { path = "../fred", default-features = false }
-# Big5, the encoding MOPS serves Taiwan's reports in.
-encoding_rs = "0.8"
-# Daily prices, for market values; fetching them is tiingo's job.
+# Tiingo's price type (valuation); callers read the cache.
 tiingo = { path = "tiingo", default-features = false }
 regex = "1.12.4"
-scraper = "0.26.0"
 serde = "1.0.228"
-serde_json = "1.0.150"
 uniffi = "0.31.1"
 
 [dev-dependencies]

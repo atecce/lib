@@ -966,15 +966,10 @@ dependencies = [
 name = "equities"
 version = "0.1.0"
 dependencies = [
- "augurs",
- "calamine 0.35.0",
  "chrono",
- "encoding_rs",
  "fred",
  "regex",
- "scraper",
  "serde",
- "serde_json",
  "tiingo",
  "uniffi",
 ]
@@ -1994,7 +1989,10 @@ name = "mops"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "encoding_rs",
+ "equities",
  "reqwest",
+ "scraper",
 ]
 
 [[package]]

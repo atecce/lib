@@ -25,8 +25,8 @@ use std::collections::HashMap;
 use chrono::NaiveDate;
 use scraper::{Html, Selector};
 
-use crate::item::{Filed, Item, Reported, Unit};
-use crate::{Currency, Period, Ticker};
+use equities::item::{Filed, Item, Reported, Unit};
+use equities::{Currency, Period, Ticker};
 
 /// Chinese label (the part before any English) → item, and a rank: where two
 /// lines give the same item, the lower rank wins. Amounts of lines marked
@@ -201,11 +201,11 @@ fn column(header: &str) -> Option<(NaiveDate, Period)> {
     // A quarter: 2017年第2季.
     if let Some((y, rest)) = h.split_once("年第") {
         let q = num(rest.strip_suffix('季')?)?;
-        return Some((quarter_end(y.parse().ok()?, q), Period::ThreeMonths));
+        return Some((crate::quarter_end(y.parse().ok()?, q), Period::ThreeMonths));
     }
     // A year: 2017年度.
     if let Some(y) = h.strip_suffix("年度") {
-        return Some((quarter_end(y.parse().ok()?, 4), Period::TwelveMonths));
+        return Some((crate::quarter_end(y.parse().ok()?, 4), Period::TwelveMonths));
     }
     // A date: 2025年6月30日 (followed in the new layout by 2025/6/30).
     let (y, rest) = h.split_once('年')?;
@@ -219,11 +219,27 @@ fn column(header: &str) -> Option<(NaiveDate, Period)> {
 
 use chrono::Datelike;
 
-/// The last day of a calendar quarter (Taiwan's fiscal years are calendar
-/// years).
-fn quarter_end(year: i32, quarter: u32) -> NaiveDate {
-    let (m, d) = match quarter { 1 => (3, 31), 2 => (6, 30), 3 => (9, 30), _ => (12, 31) };
-    NaiveDate::from_ymd_opt(year, m, d).unwrap()
+
+/// A MOPS report: its page's bytes, read as `Statements` (equities'
+/// interface for every source's filings).
+pub struct MopsReport {
+    filed: Filed,
+    ticker: Ticker,
+    bytes: Vec<u8>,
+}
+
+impl MopsReport {
+    pub fn new(filed: Filed, ticker: Ticker, bytes: Vec<u8>) -> MopsReport {
+        MopsReport { filed, ticker, bytes }
+    }
+}
+
+impl equities::statements::Statements for MopsReport {
+    fn filed(&self) -> &Filed { &self.filed }
+
+    fn read(&mut self) -> equities::statements::Read {
+        equities::statements::Read { items: read_bytes(&self.filed, self.ticker, &self.bytes), notes: Vec::new() }
+    }
 }
 
 #[cfg(test)]
