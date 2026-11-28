@@ -24,7 +24,6 @@
 
 use std::collections::HashMap;
 use std::error::Error;
-use std::path::Path;
 
 use chrono::{Months, NaiveDate};
 
@@ -40,10 +39,9 @@ struct Fact {
     value: String,
 }
 
-/// The facts in an EDINET CSV file (UTF-16 little-endian, tab-separated,
-/// every field quoted).
-fn read_facts(path: &Path) -> Result<Vec<Fact>, Box<dyn Error>> {
-    let bytes = std::fs::read(path)?;
+/// The facts in an EDINET CSV file's bytes (UTF-16 little-endian,
+/// tab-separated, every field quoted).
+fn read_facts(bytes: &[u8]) -> Result<Vec<Fact>, Box<dyn Error>> {
     let units: Vec<u16> = bytes.chunks_exact(2).map(|b| u16::from_le_bytes([b[0], b[1]])).collect();
     let text = String::from_utf16_lossy(&units);
     let mut facts = Vec::new();
@@ -156,20 +154,32 @@ fn number(s: &str) -> Option<f64> {
     s.replace(',', "").parse::<f64>().ok()
 }
 
-/// The items one EDINET report states, for `ticker`.
+/// The items one EDINET report states, for `ticker`, from the cache: `read_csv`
+/// with its files. The `files` feature.
+#[cfg(feature = "files")]
 pub fn read(cache: &edinet::Cache, d: &edinet::Document, ticker: Ticker) -> Result<Vec<Reported>, Box<dyn Error>> {
+    let mut files = Vec::new();
+    for path in cache.csv_files(d)? {
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("").to_string();
+        files.push((name, std::fs::read(&path)?));
+    }
+    read_csv(d, ticker, &files)
+}
+
+/// The items one EDINET report states, for `ticker`, from its CSV files,
+/// each (file name, bytes) as the caller read them: no files.
+pub fn read_csv(d: &edinet::Document, ticker: Ticker, files: &[(String, Vec<u8>)]) -> Result<Vec<Reported>, Box<dyn Error>> {
     let kind = kind(d).ok_or("not an annual, semiannual or quarterly report")?;
     let end = d.period_end.ok_or("report without a period")?;
 
     // Several elements can report one item (an IFRS and a summary element):
     // the lowest ranked wins, as on EDGAR.
     let mut best: HashMap<(Item, NaiveDate, Period, Currency), (usize, f64)> = HashMap::new();
-    for file in cache.csv_files(d)? {
+    for (name, bytes) in files {
         // The report proper ("jpcrp…-asr-…", "-q2r-"…); auditors' reports
         // ("jpaud-…") state nothing we read.
-        let name = file.file_name().and_then(|n| n.to_str()).unwrap_or("");
         if !name.starts_with("jpcrp") { continue; }
-        for fact in read_facts(&file)? {
+        for fact in read_facts(bytes)? {
             if fact.context.contains('_') { continue; }
             let Some((item, rank)) = crate::company::item_ranked(ticker, &element_tag(&fact.element))
                 .or_else(|| fact.label.parse::<Item>().ok().map(|i| (i, usize::MAX))) else { continue };
@@ -210,6 +220,7 @@ pub fn read(cache: &edinet::Cache, d: &edinet::Document, ticker: Ticker) -> Resu
 
 /// Every report of a company in the cache, read oldest first, with how many
 /// were not fetched yet.
+#[cfg(feature = "files")]
 pub fn read_company(cache: &edinet::Cache, ticker: Ticker) -> Result<(Vec<Reported>, usize, usize), Box<dyn Error>> {
     let reports = cache.reports(ticker.as_str())?;
     let (mut items, mut count, mut missing) = (Vec::new(), 0, 0);

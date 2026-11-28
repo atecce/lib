@@ -21,6 +21,7 @@
 //! yuán), earnings per share in dollars. Outflows are in parentheses.
 
 use std::collections::HashMap;
+#[cfg(feature = "files")]
 use std::error::Error;
 
 use chrono::NaiveDate;
@@ -86,6 +87,7 @@ const SUMS: &[(&str, Item)] = &[
 
 /// A company's cached reports, read: (items, reports read, reports that
 /// failed to read).
+#[cfg(feature = "files")]
 pub fn read_company(cache: &mops::Cache, ticker: Ticker) -> Result<(Vec<Reported>, usize, usize), Box<dyn Error>> {
     let mut items = Vec::new();
     let (mut read, mut failed) = (0, 0);
@@ -98,9 +100,16 @@ pub fn read_company(cache: &mops::Cache, ticker: Ticker) -> Result<(Vec<Reported
     Ok((items, read, failed))
 }
 
+/// A report from the cache: `read_bytes` with its file. The `files` feature.
+#[cfg(feature = "files")]
 pub fn read_report(report: &mops::Report, ticker: Ticker) -> Result<Vec<Reported>, Box<dyn Error>> {
-    let bytes = std::fs::read(&report.path)?;
-    let (text, _, _) = encoding_rs::BIG5.decode(&bytes);
+    Ok(read_bytes(report, ticker, &std::fs::read(&report.path)?))
+}
+
+/// A report's items from its file's bytes (Big5 HTML), as the caller read
+/// them: no files.
+pub fn read_bytes(report: &mops::Report, ticker: Ticker, bytes: &[u8]) -> Vec<Reported> {
+    let (text, _, _) = encoding_rs::BIG5.decode(bytes);
     let filed = Filed {
         accession: report.id(),
         filed: report.due(),
@@ -108,7 +117,7 @@ pub fn read_report(report: &mops::Report, ticker: Ticker) -> Result<Vec<Reported
         form: if report.quarter == 4 { "annual".into() } else { format!("Q{}", report.quarter) },
         period_end: Some(report.period_end()),
     };
-    Ok(read_html(&text, ticker, &filed))
+    read_html(&text, ticker, &filed)
 }
 
 /// The items in a report's HTML (decoded).
