@@ -49,8 +49,9 @@ reports only add folders.
 
 The few filings in git are test inputs, beside the tests that read them, and
 only the pages those read: `equities/tsla/filings/<accession>/` (four 10-Qs:
-FilingSummary.xml, R2, R4 and sometimes R8) and
-`equities/gs/filings/<accession>/` (the 2025 10-K's statements). Their tests
+FilingSummary.xml, R2, R4 and sometimes R8), and one annual report each in
+`equities/gs/filings/`, `f/filings/`, `gm/filings/` and `tm/filings/`
+(the statements each test reads, 300-700 KB a filing). Their tests
 check every line the reader reads against the statements transcribed by
 hand, and with the pages in git they run anywhere, a fresh checkout or a
 cloud build, without the SEC.
