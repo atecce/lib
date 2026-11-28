@@ -52,8 +52,9 @@ only the pages those read: `equities/tsla/filings/<accession>/` (four 10-Qs:
 FilingSummary.xml, R2, R4 and sometimes R8), and one annual report each in
 `equities/gs/filings/`, `f/filings/`, `gm/filings/` and `tm/filings/`
 (the statements each test reads, 300-700 KB a filing). Their tests
-check every line the reader reads against the statements transcribed by
-hand, and with the pages in git they run anywhere, a fresh checkout or a
+check what the reader reads against figures transcribed by hand from the
+statements (Tesla's, every line; the others, the totals and each company's
+own elements and section names), and with the pages in git they run anywhere, a fresh checkout or a
 cloud build, without the SEC.
 
 ## Executables
