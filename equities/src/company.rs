@@ -43,19 +43,26 @@ pub fn valued_with(ticker: Ticker) -> Option<Ticker> {
 /// the generic valuation reads (crate::valuation::market), from its module;
 /// put ahead of the reported items, so on a day both have, these are read.
 /// Not facts: for valuation only.
-pub fn valuation_items(ticker: Ticker, items: &[Reported]) -> Vec<Reported> {
+///
+/// `series` holds the FRED series the company's valuation needs
+/// (`valuation_series`), by ID, as (date, value), oldest first; the caller
+/// reads them. One missing: valued without it.
+pub fn valuation_items(ticker: Ticker, items: &[Reported], series: &Series) -> Vec<Reported> {
     match ticker.as_str() {
-        "TSM" => match fred::Cache::new(fred::Cache::default_dir()).series("DEXTAUS") {
-            Ok(s) => {
-                let rates: Vec<_> = s.observations.iter().filter_map(|o| Some((o.date, o.value?))).collect();
-                crate::tsm::in_dollars(items, &rates)
-            }
-            Err(e) => {
-                eprintln!("TSM: no Taiwan dollar rate ({}): valued from its 20-Fs alone", e);
-                Vec::new()
-            }
-        },
+        "TSM" => series.get("DEXTAUS").map(|rates| crate::tsm::in_dollars(items, rates)).unwrap_or_default(),
         _ => Vec::new(),
+    }
+}
+
+/// FRED series by ID, as (date, value), oldest first.
+pub type Series = std::collections::HashMap<&'static str, Vec<(chrono::NaiveDate, f64)>>;
+
+/// The FRED series a company's valuation needs (for `valuation_items`):
+/// TSMC's, the Taiwan dollar's rate (DEXTAUS, TWD per USD).
+pub fn valuation_series(ticker: Ticker) -> &'static [&'static str] {
+    match ticker.as_str() {
+        "TSM" => &["DEXTAUS"],
+        _ => &[],
     }
 }
 

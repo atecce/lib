@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None => None,
     };
     let fixed: f64 = if premium.is_some() { 0.0 } else { args.first().map(|s| s.parse()).transpose()?.unwrap_or(0.09) };
-    let ten_year = premium.map(|_| treasury::TenYear::load()).transpose()?;
+    let ten_year = premium.map(|_| fred::Cache::new(fred::Cache::default_dir()).series(treasury::SERIES).map(treasury::TenYear::new)).transpose()?;
     let cost = |year: i32| match (premium, &ten_year) {
         (Some(p), Some(t)) => t.cost_of_equity(year, p).expect("a Treasury yield for every year"),
         _ => fixed,

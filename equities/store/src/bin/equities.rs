@@ -135,7 +135,15 @@ fn main() -> Result<(), Box<dyn Error>> {
             equities::derive_quarters(&mut sibling);
             sibling.extend(items.iter().cloned());
         }
-        let valued: Vec<_> = equities::company::valuation_items(equity, if sibling.is_empty() { &items } else { &sibling })
+        // The FRED series its valuation needs, from the fred cache.
+        let mut series = equities::company::Series::new();
+        for id in equities::company::valuation_series(equity) {
+            match fred::Cache::new(fred::Cache::default_dir()).series(id) {
+                Ok(s) => { series.insert(id, s.observations.iter().filter_map(|o| Some((o.date, o.value?))).collect()); }
+                Err(e) => eprintln!("{}: no {} ({}): valued without it", equity, id, e),
+            }
+        }
+        let valued: Vec<_> = equities::company::valuation_items(equity, if sibling.is_empty() { &items } else { &sibling }, &series)
             .into_iter().chain(items.iter().cloned()).collect();
         let company_prices = prices.prices(equity.as_str()).ok();
         let market = company_prices.as_ref().map(|p| equities::valuation::market(equity, p, &valued)).unwrap_or_default();
