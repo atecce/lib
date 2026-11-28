@@ -13,6 +13,7 @@
 //! `Cache` reads this and never touches the network; it is all a reader of
 //! filings (`equities`) needs. With the `fetch` feature, `Client` downloads
 //! into it, and the `fetch` executable runs the client over a list of tickers.
+//! README.md explains the statement pages (R2.htm …) and what is in git.
 
 use std::error::Error;
 use std::fs;
